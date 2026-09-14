@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.1.1 - Sept 14, 2026
+
+### Changed:
+- Changed tagline to "Sometimes useful. Always Minecraft."
+
 ## v0.1.0 - Sept 14, 2026
 
 ### Added:

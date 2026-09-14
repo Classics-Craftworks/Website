@@ -44,7 +44,7 @@ const SITE_DATA = {
     heroImage: "",
     logo: "images/logo.png",
     name: "Classic's Craftworks",
-    tagline: "Minecraft Java Edition data packs, mods & resource packs"
+    tagline: "Sometimes useful. Always Minecraft."
   },
 
   // Buttons shown next to the logo at the very top of the page.
