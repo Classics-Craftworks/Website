@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.3.2
+### Changed:
+- Filled Resource Pack brush icon
+- Shrunk Data Pack brackets icon
+- Enlarged Mod box icon
+
 ## v0.3.1
 ### Changed:
 - Swapped Release colour from green to orange
