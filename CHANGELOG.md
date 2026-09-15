@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.3.3
+### Changed:
+- Widened site content again
+
+### Fixed:
+- Version pills moving down a line
+- Long version numbers overflowing from pills
+
 ## v0.3.2
 ### Changed:
 - Filled Resource Pack brush icon

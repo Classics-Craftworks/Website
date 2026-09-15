@@ -43,7 +43,7 @@ p { margin: 0; }
 }
 
 .page {
-  max-width: 1040px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 40px 24px 56px;
 }
@@ -296,11 +296,12 @@ p { margin: 0; }
   font-weight: 600;
   color: var(--text);
   min-height: 24px; /* Fixes height shift when icon or pill is missing */
-  flex-wrap: wrap;  /* Allows pill to drop smoothly below label if space is tight */
+  flex-wrap: nowrap;
 }
 
 .download-type-label {
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* Version Pill */
@@ -315,8 +316,12 @@ p { margin: 0; }
   color: var(--accent);
   background: rgba(244, 122, 36, 0.12);
   border: 1px solid rgba(244, 122, 36, 0.4);
-  white-space: nowrap; /* Prevents text from breaking */
-  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 .release-group.beta .pill {
