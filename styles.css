@@ -11,7 +11,7 @@
   --accent:        #F47A24;  /* primary accent — used sparingly (release CTA, status) */
   --accent-hover:  #f6954b;  /* accent hover */
   --border:        #3A2924;  /* hairline borders/dividers */
-  --release:       #57B87A;  /* release indicator */
+  --release:       #F47A24;  /* release indicator */
   --beta:          #B07CF5;  /* beta indicator */
 
   --font-display: 'Poppins', 'Century Gothic', 'Futura', sans-serif;
