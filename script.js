@@ -5,26 +5,17 @@
   want to change how things are laid out or behave.
 */
 
-const ICONS = {
-  github: '<path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.5 0-.24-.01-1.04-.01-1.88-2.78.62-3.37-1.23-3.37-1.23-.46-1.2-1.11-1.52-1.11-1.52-.91-.64.07-.63.07-.63 1 .07 1.53 1.05 1.53 1.05.9 1.57 2.34 1.12 2.91.86.09-.67.35-1.12.64-1.38-2.22-.26-4.56-1.14-4.56-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.9-1.33 2.74-1.05 2.74-1.05.56 1.41.21 2.45.1 2.71.65.72 1.03 1.63 1.03 2.75 0 3.93-2.35 4.79-4.58 5.05.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .28.18.61.69.5A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/>',
-  modrinth: '<path d="M9.5 14.5l5-5M8 12l-1.8 1.8a3 3 0 0 0 4.2 4.2L12.5 16M16 12l1.8-1.8a3 3 0 0 0-4.2-4.2L11.5 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-  discord: '<path d="M9.5 14.5l5-5M8 12l-1.8 1.8a3 3 0 0 0 4.2 4.2L12.5 16M16 12l1.8-1.8a3 3 0 0 0-4.2-4.2L11.5 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-  reddit: '<path d="M9.5 14.5l5-5M8 12l-1.8 1.8a3 3 0 0 0 4.2 4.2L12.5 16M16 12l1.8-1.8a3 3 0 0 0-4.2-4.2L11.5 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-  x: '<path d="M9.5 14.5l5-5M8 12l-1.8 1.8a3 3 0 0 0 4.2 4.2L12.5 16M16 12l1.8-1.8a3 3 0 0 0-4.2-4.2L11.5 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-  document: '<path d="M7 3h7l4 4v14H7z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M14 3v4h4" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 12h5M9.5 15h5M9.5 9h2" stroke="currentColor" stroke-width="1.3"/>',
-  link: '<path d="M9.5 14.5l5-5M8 12l-1.8 1.8a3 3 0 0 0 4.2 4.2L12.5 16M16 12l1.8-1.8a3 3 0 0 0-4.2-4.2L11.5 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-  spigot: '<path d="M9.5 14.5l5-5M8 12l-1.8 1.8a3 3 0 0 0 4.2 4.2L12.5 16M16 12l1.8-1.8a3 3 0 0 0-4.2-4.2L11.5 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
-  download: '<path d="M12 4v11M8 11l4 4 4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>'
-};
-
+// Icons are plain SVG files in images/icons/ — this paints them
+// using the calling element's current text color, so a link's
+// icon and its label always match (including on hover).
 function icon(name, cls) {
-  const body = ICONS[name] || ICONS.link;
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('class', 'icon' + (cls ? ' ' + cls : ''));
-  svg.setAttribute('aria-hidden', 'true');
-  svg.innerHTML = body;
-  return svg;
+  const span = document.createElement('span');
+  span.className = 'icon' + (cls ? ' ' + cls : '');
+  span.setAttribute('aria-hidden', 'true');
+  const url = `url('images/icons/${name || 'link'}.png')`;
+  span.style.webkitMaskImage = url;
+  span.style.maskImage = url;
+  return span;
 }
 
 function el(tag, opts = {}, children = []) {
@@ -61,14 +52,6 @@ function renderMeta(meta) {
 }
 
 function renderBrand(brand, topLinks) {
-  const hero = document.getElementById('hero-banner');
-  if (brand.heroImage) {
-    hero.src = brand.heroImage;
-    hero.alt = '';
-  } else {
-    hero.remove();
-  }
-
   const logo = document.getElementById('brand-logo');
   logo.src = brand.logo;
   logo.alt = brand.name + ' logo';
@@ -85,6 +68,29 @@ function renderBrand(brand, topLinks) {
   });
 }
 
+function renderRelease(release) {
+  const isBeta = release.channel === 'beta';
+
+  const header = el('div', { class: 'release-header' }, [
+    el('span', { class: 'status-dot' + (isBeta ? ' beta' : '') }),
+    el('span', { class: 'release-label', text: release.label }),
+    el('span', { class: 'release-sep', text: '\u00B7' }),
+    el('span', { class: 'release-mc', text: 'MC ' + release.mcVersion }),
+    el('span', { class: 'release-sep', text: '\u00B7' }),
+    el('span', { class: 'pill', text: release.version })
+  ]);
+
+  const downloads = el('div', { class: 'release-downloads' });
+  (release.downloads || []).forEach(d => {
+    downloads.appendChild(el('a', { class: 'download-btn' + (isBeta ? ' beta' : ' stable'), href: d.url }, [
+      icon('download', 'icon-sm'),
+      el('span', { text: d.label })
+    ]));
+  });
+
+  return el('div', { class: 'release-group' + (isBeta ? ' beta' : '') }, [header, downloads]);
+}
+
 function renderProject(p) {
   const linkRow = el('div', { class: 'project-links' });
   (p.links || []).forEach(l => {
@@ -94,24 +100,17 @@ function renderProject(p) {
     ]));
   });
 
-  const dlRow = el('div', { class: 'project-downloads' });
-  (p.downloads || []).forEach(d => {
-    dlRow.appendChild(el('a', { class: 'download-pill', href: d.url }, [
-      icon('download', 'icon-sm'),
-      el('span', { text: d.label })
-    ]));
-  });
+  const releaseRow = el('div', { class: 'release-row' },
+    (p.releases || []).map(renderRelease)
+  );
 
   return el('article', { class: 'project' }, [
     el('img', { class: 'project-image', src: p.image, alt: p.title, attrs: { loading: 'lazy' } }),
     el('div', { class: 'project-body' }, [
-      el('div', { class: 'project-heading' }, [
-        el('h3', { text: p.title }),
-        p.tag ? el('span', { class: 'tag', text: p.tag }) : null
-      ]),
+      el('h3', { text: p.title }),
       el('p', { class: 'project-description', text: p.description }),
       linkRow,
-      dlRow
+      releaseRow
     ])
   ]);
 }
@@ -129,7 +128,7 @@ function renderSections(sections) {
   });
 }
 
-function renderFooter(socials, footer) {
+function renderFooter(socials, footer, version) {
   const socialRow = document.getElementById('social-links');
   socials.forEach(s => {
     socialRow.appendChild(el('a', { class: 'social-link', href: s.url, attrs: { 'aria-label': s.label } }, [
@@ -138,11 +137,12 @@ function renderFooter(socials, footer) {
   });
   document.getElementById('copyright').textContent = footer.copyright;
   document.getElementById('disclaimer').textContent = footer.disclaimer;
+  if (version) document.getElementById('site-version').textContent = version;
 }
 
 (function init() {
   renderMeta(SITE_DATA.meta);
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
   renderSections(SITE_DATA.sections);
-  renderFooter(SITE_DATA.socials, SITE_DATA.footer);
+  renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
 })();

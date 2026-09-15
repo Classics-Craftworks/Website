@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.2.0 - Sept 15, 2026
+
+### Added:
+- Better link icons
+- Website version link to the footer
+- Version pills beside Stable and Beta release labels
+- Green Stable and contrasting Beta status indicators
+- A subtle accent colour for Beta releases
+- Better icons for GitHub, SpigotMC and Modrinth links
+
+### Changed:
+- Separated Stable and Beta/Preview downloads
+- Updated stable downloads to use filled orange buttons
+- Updated beta downloads to use outlined buttons
+- Lightened download panels
+- Reduced the use of orange for borders and decorative elements
+- Reduced project icon sizes
+- Increased project title prominence
+- Standardised download button widths and increased padding
+- Tightened header spacing
+- Made separators and borders more subtle
+
 ## v0.1.1 - Sept 14, 2026
 
 ### Changed:
