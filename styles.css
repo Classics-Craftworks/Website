@@ -8,11 +8,11 @@
   --surface-hover: #241B18;  /* hover state for surfaces above */
   --text:          #F5F1ED;  /* primary text */
   --text-soft:     #B8ADA6;  /* secondary text */
-  --accent:        #F47A24;  /* primary accent — used sparingly (stable CTA, status) */
+  --accent:        #F47A24;  /* primary accent — used sparingly (release CTA, status) */
   --accent-hover:  #f6954b;  /* accent hover */
   --border:        #3A2924;  /* hairline borders/dividers */
-  --stable:        #57B87A;  /* stable release indicator */
-  --beta:          #B07CF5;  /* beta/preview release indicator */
+  --release:       #57B87A;  /* release indicator */
+  --beta:          #B07CF5;  /* beta indicator */
 
   --font-display: 'Poppins', 'Century Gothic', 'Futura', sans-serif;
   --font-body: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
@@ -171,7 +171,7 @@ p { margin: 0; }
 }
 .text-link:hover { background: var(--surface-hover); color: var(--text); }
 
-/* ---------- Releases (stable / beta) ---------- */
+/* ---------- Releases (release / beta) ---------- */
 .release-row {
   display: flex;
   gap: 12px;
@@ -202,7 +202,7 @@ p { margin: 0; }
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--stable);
+  background: var(--release);
   flex-shrink: 0;
 }
 .status-dot.beta {
@@ -249,12 +249,12 @@ p { margin: 0; }
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.download-btn.stable {
+.download-btn.release {
   background: var(--accent);
   color: var(--bg);
   border: 1px solid var(--accent);
 }
-.download-btn.stable:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.download-btn.release:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
 .download-btn.beta {
   background: transparent;

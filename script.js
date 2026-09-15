@@ -82,7 +82,7 @@ function renderRelease(release) {
 
   const downloads = el('div', { class: 'release-downloads' });
   (release.downloads || []).forEach(d => {
-    downloads.appendChild(el('a', { class: 'download-btn' + (isBeta ? ' beta' : ' stable'), href: d.url }, [
+    downloads.appendChild(el('a', { class: 'download-btn' + (isBeta ? ' beta' : ' release'), href: d.url }, [
       icon('download', 'icon-sm'),
       el('span', { text: d.label })
     ]));

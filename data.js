@@ -74,8 +74,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "stable",
-              label: "Stable",
+              channel: "release",
+              label: "Release",
               version: "v7.4.0",
               mcVersion: "26.1 - 26.2",
               downloads: [
@@ -105,8 +105,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "stable",
-              label: "Stable",
+              channel: "release",
+              label: "Release",
               version: "v4.2.0",
               mcVersion: "26.1 - 26.2",
               downloads: [
@@ -136,8 +136,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "stable",
-              label: "Stable",
+              channel: "release",
+              label: "Release",
               version: "v4.3.1",
               mcVersion: "26.1 - 26.2",
               downloads: [
@@ -172,8 +172,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "stable",
-              label: "Stable",
+              channel: "release",
+              label: "Release",
               version: "v3.4.0",
               mcVersion: "1.21.9 - 26.3",
               downloads: [
@@ -181,8 +181,8 @@ const SITE_DATA = {
               ]
             },
             {
-              channel: "beta",
-              label: "Beta",
+              channel: "release",
+              label: "Release",
               version: "v3.4.0-pre.1",
               mcVersion: "1.21.9 - 26.3",
               downloads: [
@@ -202,8 +202,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "stable",
-              label: "Stable",
+              channel: "release",
+              label: "Release",
               version: "v1.4.0",
               mcVersion: "1.21.9 - 26.3",
               downloads: [
@@ -232,8 +232,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "stable",
-              label: "Stable",
+              channel: "release",
+              label: "Release",
               version: "v2.4.0",
               mcVersion: "1.21.9 - 26.3",
               downloads: [
