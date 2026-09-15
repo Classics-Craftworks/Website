@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.2.6.2
+### Fixed:
+- Incorrect Silly Eatables MC version
+
+## v0.2.6.1
+### Changed:
+- Updated for new releases
+
 ## v0.2.6
 ### Fixed:
 - Classic's Disc Tweaks betas being incorrectly set to the Release channel

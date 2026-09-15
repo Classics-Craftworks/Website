@@ -48,7 +48,7 @@ const SITE_DATA = {
   },
 
   // Website version, shown as small text at the very bottom of the page.
-  version: "v0.2.6.1",
+  version: "v0.2.6.2",
 
   // Buttons shown next to the logo at the very top of the page.
   topLinks: [
@@ -139,7 +139,7 @@ const SITE_DATA = {
               channel: "release",
               label: "Release",
               version: "v5.0.0",
-              mcVersion: "26.1 - 26.2",
+              mcVersion: "26.3",
               downloads: [
                 { label: "Data Pack", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0" },
                 { label: "Mod", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0+mod" }
