@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.2.3 - Sept 15, 2026
+### Changed:
+- Changed "Resource Pack" to "Download" on resource pack download buttons
+
 ## v0.2.2 - Sept 15, 2026
 ### Changed:
 - Improved link icons for Downloads & Modrinth

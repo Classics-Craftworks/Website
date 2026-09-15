@@ -48,7 +48,7 @@ const SITE_DATA = {
   },
 
   // Website version, shown as small text at the very bottom of the page.
-  version: "v0.2.2",
+  version: "v0.2.3",
 
   // Buttons shown next to the logo at the very top of the page.
   topLinks: [
@@ -177,7 +177,7 @@ const SITE_DATA = {
               version: "v3.4.0",
               mcVersion: "1.21.9 - 26.3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
+                { label: "Download", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
               ]
             },
             {
@@ -186,7 +186,7 @@ const SITE_DATA = {
               version: "v3.4.0-pre.1",
               mcVersion: "1.21.9 - 26.3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0-pre.1" }
+                { label: "Download", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0-pre.1" }
               ]
             }
           ]
@@ -207,7 +207,7 @@ const SITE_DATA = {
               version: "v1.4.0",
               mcVersion: "1.21.9 - 26.3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
+                { label: "Download", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
               ]
             },
             {
@@ -216,7 +216,7 @@ const SITE_DATA = {
               version: "v1.4.0-pre.1",
               mcVersion: "1.21.9 - 26.3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0-pre.1" }
+                { label: "Download", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0-pre.1" }
               ]
             }
           ]
@@ -237,7 +237,7 @@ const SITE_DATA = {
               version: "v2.4.0",
               mcVersion: "1.21.9 - 26.3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
+                { label: "Download", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
               ]
             },
             {
@@ -246,7 +246,7 @@ const SITE_DATA = {
               version: "v2.4.0-pre.1",
               mcVersion: "1.21.9 - 26.3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0-pre.1" }
+                { label: "Download", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0-pre.1" }
               ]
             }
           ]
