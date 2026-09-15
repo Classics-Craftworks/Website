@@ -83,8 +83,10 @@ function renderRelease(release) {
   const downloads = el('div', { class: 'release-downloads' });
 
   (release.downloads || []).forEach(d => {
-    const isMod = d.label.toLowerCase().includes('mod');
-    const typeIcon = d.icon || (isMod ? 'gear' : 'box');
+    const label = d.label.toLowerCase();
+    const isMod = label.includes('mod');
+    const isResourcePack = label.includes('resource pack');
+    const typeIcon = d.icon || (isMod ? 'box' : isResourcePack ? 'brush' : 'brackets');
     const isDisabled = d.disabled || !d.url;
 
     // Build Header Children (always includes icon for vertical alignment)
