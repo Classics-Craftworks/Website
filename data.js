@@ -48,7 +48,7 @@ const SITE_DATA = {
   },
 
   // Website version, shown as small text at the very bottom of the page.
-  version: "v0.2.3",
+  version: "v0.2.4",
 
   // Buttons shown next to the logo at the very top of the page.
   topLinks: [
@@ -138,11 +138,11 @@ const SITE_DATA = {
             {
               channel: "stable",
               label: "Stable",
-              version: "v4.3.0",
+              version: "v4.3.1",
               mcVersion: "26.1 - 26.2",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/silly-eatables/version/v4.3.0" },
-                { label: "Mod", url: "https://modrinth.com/datapack/silly-eatables/version/v4.3.0+mod" }
+                { label: "Data Pack", url: "https://modrinth.com/datapack/silly-eatables/version/v4.3.1" },
+                { label: "Mod", url: "https://modrinth.com/datapack/silly-eatables/version/v4.3.1+mod" }
               ]
             },
             {
