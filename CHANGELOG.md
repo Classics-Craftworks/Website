@@ -2,20 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
-## v0.2.4 - Sept 15, 2026
+## v0.2.5
+### Changed:
+- Renamed "Stable" branch to "Release"
+- Removed animation of page header
+
+### Fixed:
+- Alignment of project icons and content
+
+## v0.2.4
 ### Fixed:
 - Incorrect Silly Eatables version
 
-## v0.2.3 - Sept 15, 2026
+## v0.2.3
 ### Changed:
 - Changed "Resource Pack" to "Download" on resource pack download buttons
 
-## v0.2.2 - Sept 15, 2026
+## v0.2.2
 ### Changed:
 - Improved link icons for Downloads & Modrinth
 - Improved Classic's Craftworks logo & favicon
 
-## v0.2.1 - Sept 15, 2026
+## v0.2.1
 ### Fixed:
 - Page not loading correctly
 - Missing link icons
@@ -31,7 +39,7 @@ All notable changes to this project will be documented in this file.
 - Better icons for GitHub, SpigotMC and Modrinth links
 
 ### Changed:
-- Separated Stable and Beta/Preview downloads
+- Separated Stable and Beta downloads
 - Updated stable downloads to use filled orange buttons
 - Updated beta downloads to use outlined buttons
 - Lightened download panels
@@ -42,7 +50,7 @@ All notable changes to this project will be documented in this file.
 - Tightened header spacing
 - Made separators and borders more subtle
 
-## v0.1.1 - Sept 14, 2026
+## v0.1.1
 
 ### Changed:
 - Changed tagline to "Sometimes useful. Always Minecraft."

@@ -48,7 +48,7 @@ const SITE_DATA = {
   },
 
   // Website version, shown as small text at the very bottom of the page.
-  version: "v0.2.4",
+  version: "v0.2.5",
 
   // Buttons shown next to the logo at the very top of the page.
   topLinks: [
