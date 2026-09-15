@@ -48,7 +48,7 @@ const SITE_DATA = {
   },
 
   // Website version, shown as small text at the very bottom of the page.
-  version: "v0.2.5",
+  version: "v0.2.6",
 
   // Buttons shown next to the logo at the very top of the page.
   topLinks: [
@@ -181,8 +181,8 @@ const SITE_DATA = {
               ]
             },
             {
-              channel: "release",
-              label: "Release",
+              channel: "beta",
+              label: "Beta",
               version: "v3.4.0-pre.1",
               mcVersion: "1.21.9 - 26.3",
               downloads: [

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.2.6
+### Fixed:
+- Classic Disc Tweaks betas being incorrectly set to the Release channel
+
 ## v0.2.5
 ### Changed:
 - Renamed "Stable" branch to "Release"
