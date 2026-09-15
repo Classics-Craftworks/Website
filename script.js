@@ -71,21 +71,51 @@ function renderBrand(brand, topLinks) {
 function renderRelease(release) {
   const isBeta = release.channel === 'beta';
 
+  // Top Header: Status Dot + Label + Divider + MC Version
   const header = el('div', { class: 'release-header' }, [
     el('span', { class: 'status-dot' + (isBeta ? ' beta' : '') }),
     el('span', { class: 'release-label', text: release.label }),
-    el('span', { class: 'release-sep', text: '\u00B7' }),
-    el('span', { class: 'release-mc', text: 'MC ' + release.mcVersion }),
-    el('span', { class: 'release-sep', text: '\u00B7' }),
-    el('span', { class: 'pill', text: release.version })
+    el('span', { class: 'release-sep', text: '|' }),
+    el('span', { class: 'release-mc', text: release.mcVersion })
   ]);
 
+  // Main download columns container
   const downloads = el('div', { class: 'release-downloads' });
+
   (release.downloads || []).forEach(d => {
-    downloads.appendChild(el('a', { class: 'download-btn' + (isBeta ? ' beta' : ' release'), href: d.url }, [
-      icon('download', 'icon-sm'),
-      el('span', { text: d.label })
-    ]));
+    const isMod = d.label.toLowerCase().includes('mod');
+    const typeIcon = d.icon || (isMod ? 'gear' : 'box');
+    const isDisabled = d.disabled || !d.url;
+
+    // Build Header Children (always includes icon for vertical alignment)
+    const headerChildren = [
+      icon(typeIcon, 'icon-sm'),
+      el('span', { class: 'download-type-label', text: d.label }),
+      el('span', { class: 'pill' + (isDisabled ? ' disabled-pill' : ''), text: isDisabled ? 'N/A' : release.version })
+    ];
+
+    const colHeader = el('div', { 
+      class: 'download-col-header' + (isDisabled ? ' is-disabled' : '') 
+    }, headerChildren);
+
+    // Build Action Element (Download button or "Not available" text)
+    let actionEl;
+    if (isDisabled) {
+      actionEl = el('div', { class: 'download-unavailable', text: 'Not available' });
+    } else {
+      actionEl = el('a', { 
+        class: 'download-btn' + (isBeta ? ' beta' : ' release'), 
+        href: d.url 
+      }, [
+        icon('download', 'icon-sm'),
+        el('span', { text: 'Download' })
+      ]);
+    }
+
+    // Individual Column Box
+    downloads.appendChild(el('div', { 
+      class: 'download-col' + (isDisabled ? ' is-disabled' : '') 
+    }, [colHeader, actionEl]));
   });
 
   return el('div', { class: 'release-group' + (isBeta ? ' beta' : '') }, [header, downloads]);
@@ -137,7 +167,24 @@ function renderFooter(socials, footer, version) {
   });
   document.getElementById('copyright').textContent = footer.copyright;
   document.getElementById('disclaimer').textContent = footer.disclaimer;
-  if (version) document.getElementById('site-version').textContent = version;
+
+  if (version) {
+    const versionEl = document.getElementById('site-version');
+    versionEl.innerHTML = ''; // Clear existing content
+
+    const versionLabel = typeof version === 'object' ? version.label : version;
+    const versionUrl = typeof version === 'object' ? version.url : null;
+
+    if (versionUrl) {
+      versionEl.appendChild(el('a', { 
+        href: versionUrl, 
+        class: 'version-link',
+        text: versionLabel 
+      }));
+    } else {
+      versionEl.textContent = versionLabel;
+    }
+  }
 }
 
 (function init() {

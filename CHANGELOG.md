@@ -2,13 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.3.0
+### Added:
+- Redesigned Release sections to support separate mod versions and "unavailable" releases
+
+### Changed:
+- Widened site content
+- Improved version pill styling, matching their channels
+- Removed the MC prefix before Minecraft versions
+- Slightly increased the size of the header & icon
+- Slightly increased the size of section headings
+
+### Fixed:
+- Fixed wrong Minecraft versions for all betas
+
 ## v0.2.6.2
 ### Fixed:
-- Incorrect Silly Eatables MC version
+- Incorrect Silly Eatables Minecraft version
 
 ## v0.2.6.1
 ### Changed:
-- Updated for new releases
+- Updated for new data pack & mod releases (Minecraft 26.3)
 
 ## v0.2.6
 ### Fixed:

@@ -47,8 +47,12 @@ const SITE_DATA = {
     tagline: "Sometimes useful. Always Minecraft."
   },
 
-  // Website version, shown as small text at the very bottom of the page.
-  version: "v0.2.6.2",
+  // Website version shown at the very bottom of the page.
+   version: {
+    label: "v0.3.0",
+    url: "https://github.com/Classics-Craftworks/Website"
+  },
+
 
   // Buttons shown next to the logo at the very top of the page.
   topLinks: [
@@ -87,9 +91,10 @@ const SITE_DATA = {
               channel: "beta",
               label: "Beta",
               version: "v8.0.0-rc.1",
-              mcVersion: "26.3",
+              mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0-rc.1" }
+                { label: "Data Pack", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0-rc.1" },
+                { label: "Mod", disabled: true }
               ]
             }
           ]
@@ -118,9 +123,10 @@ const SITE_DATA = {
               channel: "beta",
               label: "Beta",
               version: "v5.0.0-rc.1",
-              mcVersion: "26.3",
+              mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0-rc.1" }
+                { label: "Data Pack", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0-rc.1" },
+                { label: "Mod", disabled: true }
               ]
             }
           ]
@@ -149,9 +155,10 @@ const SITE_DATA = {
               channel: "beta",
               label: "Beta",
               version: "v5.0.0-rc.1",
-              mcVersion: "26.3",
+              mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0-rc.1" }
+                { label: "Data Pack", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0-rc.1" },
+                { label: "Mod", disabled: true }
               ]
             }
           ]
@@ -175,18 +182,18 @@ const SITE_DATA = {
               channel: "release",
               label: "Release",
               version: "v3.4.0",
-              mcVersion: "1.21.9 - 26.3",
+              mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Download", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
+                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
               ]
             },
             {
               channel: "beta",
               label: "Beta",
               version: "v3.4.0-pre.1",
-              mcVersion: "1.21.9 - 26.3",
+              mcVersion: "1.21.9 – 26.3-rc-3",
               downloads: [
-                { label: "Download", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0-pre.1" }
+                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0-pre.1" }
               ]
             }
           ]
@@ -205,18 +212,18 @@ const SITE_DATA = {
               channel: "release",
               label: "Release",
               version: "v1.4.0",
-              mcVersion: "1.21.9 - 26.3",
+              mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Download", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
+                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
               ]
             },
             {
               channel: "beta",
               label: "Beta",
               version: "v1.4.0-pre.1",
-              mcVersion: "1.21.9 - 26.3",
+              mcVersion: "1.21.9 – 26.3-rc-3",
               downloads: [
-                { label: "Download", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0-pre.1" }
+                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0-pre.1" }
               ]
             }
           ]
@@ -235,18 +242,18 @@ const SITE_DATA = {
               channel: "release",
               label: "Release",
               version: "v2.4.0",
-              mcVersion: "1.21.9 - 26.3",
+              mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Download", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
+                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
               ]
             },
             {
               channel: "beta",
               label: "Beta",
               version: "v2.4.0-pre.1",
-              mcVersion: "1.21.9 - 26.3",
+              mcVersion: "1.21.9 – 26.3-rc-3",
               downloads: [
-                { label: "Download", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0-pre.1" }
+                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0-pre.1" }
               ]
             }
           ]
@@ -259,7 +266,7 @@ const SITE_DATA = {
   socials: [
     { label: "X", url: "https://x.com/C36Craftworks", icon: "x" },
     { label: "Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" },
-    { label: "Reddit", url: "https://www.reddit.com/r/ClassicsCraftworks/", icon: "reddit" }
+    { label: "Reddit", url: "https://www.reddit.com/r/ClassicsCraftworks", icon: "reddit" }
   ],
 
   footer: {

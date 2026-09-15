@@ -3,7 +3,7 @@
    Change these to re-theme the whole site.
    ============================================================ */
 :root {
-  --bg:            #1c1413;  /* page background */
+  --bg:            #1C1414;  /* page background */
   --surface:       #302420;  /* thumbnails, chips, panel backgrounds */
   --surface-hover: #241B18;  /* hover state for surfaces above */
   --text:          #F5F1ED;  /* primary text */
@@ -43,7 +43,7 @@ p { margin: 0; }
 }
 
 .page {
-  max-width: 880px;
+  max-width: 1040px;
   margin: 0 auto;
   padding: 40px 24px 56px;
 }
@@ -52,21 +52,29 @@ p { margin: 0; }
 .masthead {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 14px;
+  align-items: center; /* Ensures perfect vertical centering across all columns */
+  gap: 16px;
   padding-bottom: 20px;
   border-bottom: 1px solid var(--border);
 }
 
 .brand-logo {
-  width: 52px;
-  height: 52px;
+  width: 72px;
+  height: 72px;
   flex-shrink: 0;
+  display: block;
+  transform: translateY(-3px); /* Lifts the logo slightly upward */
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .brand-text h1 {
   font-size: clamp(1.7rem, 4.5vw, 2.3rem);
-  line-height: 1;
+  line-height: 1.05;
   text-wrap: balance;
 }
 
@@ -104,7 +112,7 @@ p { margin: 0; }
 }
 
 .catalog-section h2 {
-  font-size: clamp(1.4rem, 3.6vw, 1.75rem);
+  font-size: clamp(1.65rem, 4.2vw, 2.0rem);
   color: var(--text);
   padding-bottom: 10px;
   border-bottom: 1px solid var(--border);
@@ -179,78 +187,197 @@ p { margin: 0; }
 .release-row {
   display: flex;
   gap: 12px;
-  flex-wrap: wrap;
   margin-top: 16px;
+  align-items: stretch;
+  width: 100%;
 }
 
+/* Card Outer Shell */
 .release-group {
-  flex: 1 1 260px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-hover);
-  padding: 14px 16px 16px;
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1.5px solid rgba(244, 122, 36, 0.4);
+  border-radius: 12px;
+  /* Lightened background tint */
+  background: rgba(244, 122, 36, 0.04); 
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
 }
-.release-group.beta { border-color: rgba(176, 124, 245, 0.35); }
 
+.release-group.beta {
+  border-color: rgba(176, 124, 245, 0.45); /* Purple border */
+  background: rgba(176, 124, 245, 0.04);
+}
+
+/* Tint top horizontal divider purple in Beta cards */
+.release-group.beta .release-header {
+  border-bottom-color: rgba(176, 124, 245, 0.25);
+}
+
+/* Tint middle vertical column separator purple in Beta cards */
+.release-group.beta .download-col + .download-col {
+  border-left-color: rgba(176, 124, 245, 0.25);
+}
+
+/* Header Section */
 .release-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  font-size: 0.82rem;
+  gap: 10px;
+  font-size: 0.9rem;
   color: var(--text-soft);
-  margin-bottom: 12px;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--border);
 }
 
 .status-dot {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: var(--release);
   flex-shrink: 0;
 }
+
 .status-dot.beta {
   border-radius: 2px;
   background: var(--beta);
   transform: rotate(45deg);
 }
 
-.release-label { color: var(--text); font-weight: 600; }
-.release-sep { color: var(--text-soft); opacity: 0.5; }
-.release-mc { color: var(--text-soft); }
+.release-label { 
+  color: var(--release); 
+  font-weight: 700; 
+  font-size: 0.98rem;
+}
 
+.release-group.beta .release-label { 
+  color: var(--beta); 
+}
+
+.release-sep { 
+  color: var(--border); 
+  font-weight: 300; 
+}
+
+.release-mc { 
+  color: var(--text-soft); 
+  font-size: 0.88rem; 
+}
+
+/* Download Columns Section */
+.release-downloads {
+  display: flex;
+  gap: 14px;
+  margin-top: auto;
+}
+
+.download-col {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Divider between download columns if there are multiple */
+.download-col + .download-col {
+  padding-left: 14px;
+  border-left: 1px solid var(--border);
+}
+
+/* Ensure column headers wrap cleanly and align vertically */
+.download-col-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  min-height: 24px; /* Fixes height shift when icon or pill is missing */
+  flex-wrap: wrap;  /* Allows pill to drop smoothly below label if space is tight */
+}
+
+.download-type-label {
+  white-space: nowrap;
+}
+
+/* Version Pill */
 .pill {
   display: inline-flex;
   align-items: center;
   line-height: 1;
-  padding: 4px 10px 3px;
-  border: 1px solid var(--border);
+  padding: 3px 8px;
   border-radius: 999px;
-  font-size: 0.76rem;
-  font-weight: 600;
-  color: var(--text-soft);
-  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(244, 122, 36, 0.12);
+  border: 1px solid rgba(244, 122, 36, 0.4);
+  white-space: nowrap; /* Prevents text from breaking */
+  flex-shrink: 0;
 }
 
-.release-downloads {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+.release-group.beta .pill {
+  color: var(--beta);
+  background: rgba(176, 124, 245, 0.12);
+  border-color: rgba(176, 124, 245, 0.4);
 }
 
+/* Buttons */
 .download-btn {
-  flex: 1 1 0;
-  min-width: 132px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
+  gap: 6px;
+  padding: 8px 10px; /* Tighter padding for side-by-side layout */
   border-radius: 8px;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
   white-space: nowrap;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: all 0.15s ease;
+}
+
+/* Disabled / Unavailable States */
+
+.download-col-header.is-disabled {
+  color: var(--text);
+}
+
+/* Disabled / Unavailable states — dynamically themed by channel */
+.download-unavailable {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(244, 122, 36, 0.05);
+  border: 1px solid rgba(244, 122, 36, 0.2);
+  color: rgba(244, 122, 36, 0.6);
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.pill.disabled-pill {
+  color: rgba(244, 122, 36, 0.65);
+  background: rgba(244, 122, 36, 0.08);
+  border-color: rgba(244, 122, 36, 0.2);
+}
+
+/* Beta (Purple) Override */
+.release-group.beta .download-unavailable {
+  background: rgba(176, 124, 245, 0.05);
+  border-color: rgba(176, 124, 245, 0.2);
+  color: rgba(176, 124, 245, 0.65);
+}
+
+.release-group.beta .pill.disabled-pill {
+  color: rgba(176, 124, 245, 0.7);
+  background: rgba(176, 124, 245, 0.08);
+  border-color: rgba(176, 124, 245, 0.2);
 }
 
 .download-btn.release {
@@ -258,14 +385,21 @@ p { margin: 0; }
   color: var(--bg);
   border: 1px solid var(--accent);
 }
-.download-btn.release:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+.download-btn.release:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
 
 .download-btn.beta {
   background: transparent;
   color: var(--beta);
   border: 1px solid var(--beta);
 }
-.download-btn.beta:hover { background: rgba(176, 124, 245, 0.12); }
+
+.download-btn.beta:hover {
+  background: rgba(176, 124, 245, 0.15);
+}
 
 /* ---------- Icons (SVG files in images/icons/, painted via mask) ---------- */
 .icon {
@@ -322,6 +456,16 @@ p { margin: 0; }
   color: var(--text-soft);
   opacity: 0.7;
   margin-top: 14px;
+}
+
+.footer-version .version-link {
+  color: inherit;
+  transition: opacity 0.15s ease;
+}
+
+.footer-version .version-link:hover {
+  opacity: 1;
+  color: var(--text);
 }
 
 /* ---------- Responsive ---------- */
