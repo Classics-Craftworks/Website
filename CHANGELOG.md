@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.2.2 - Sept 15, 2026
+### Changed:
+- Improved link icons for Downloads & Modrinth
+- Improved Classic's Craftworks logo & favicon
+
 ## v0.2.1 - Sept 15, 2026
 ### Fixed:
 - Page not loading correctly
