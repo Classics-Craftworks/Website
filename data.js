@@ -48,7 +48,7 @@ const SITE_DATA = {
   },
 
   // Website version, shown as small text at the very bottom of the page.
-  version: "v0.2.6",
+  version: "v0.2.6.1",
 
   // Buttons shown next to the logo at the very top of the page.
   topLinks: [
@@ -76,11 +76,11 @@ const SITE_DATA = {
             {
               channel: "release",
               label: "Release",
-              version: "v7.4.0",
-              mcVersion: "26.1 - 26.2",
+              version: "v8.0.0",
+              mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/better-craftables/version/v7.4.0" },
-                { label: "Mod", url: "https://modrinth.com/datapack/better-craftables/version/v7.4.0+mod" }
+                { label: "Data Pack", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0" },
+                { label: "Mod", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0+mod" }
               ]
             },
             {
@@ -107,11 +107,11 @@ const SITE_DATA = {
             {
               channel: "release",
               label: "Release",
-              version: "v4.2.0",
-              mcVersion: "26.1 - 26.2",
+              version: "v5.0.0",
+              mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/better-unpackables/version/v4.2.0" },
-                { label: "Mod", url: "https://modrinth.com/datapack/better-unpackables/version/v4.2.0+mod" }
+                { label: "Data Pack", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0" },
+                { label: "Mod", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0+mod" }
               ]
             },
             {
@@ -138,11 +138,11 @@ const SITE_DATA = {
             {
               channel: "release",
               label: "Release",
-              version: "v4.3.1",
+              version: "v5.0.0",
               mcVersion: "26.1 - 26.2",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/silly-eatables/version/v4.3.1" },
-                { label: "Mod", url: "https://modrinth.com/datapack/silly-eatables/version/v4.3.1+mod" }
+                { label: "Data Pack", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0" },
+                { label: "Mod", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0+mod" }
               ]
             },
             {
