@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.3.1
+### Changed:
+- Swapped Release colour from green to orange
+
+### Fixed:
+- Missing resource pack, data pack & mod icons (& updated names)
+
 ## v0.3.0
 ### Added:
 - Redesigned Release sections to support separate mod versions and "unavailable" releases
@@ -14,7 +21,7 @@ All notable changes to this project will be documented in this file.
 - Slightly increased the size of section headings
 
 ### Fixed:
-- Fixed wrong Minecraft versions for all betas
+- Wrong Minecraft versions for all betas
 
 ## v0.2.6.2
 ### Fixed:

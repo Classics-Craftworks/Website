@@ -22,7 +22,8 @@
     and/or a "beta" one. Each release has its own version number,
     the Minecraft version it targets, and one or more download
     buttons. Delete a release block entirely if a project has no
-    beta, or copy one to add extra channels.
+    beta, or copy one to add extra channels. Add 'disabled: true'
+    when there are no versions available.
   - Don't delete commas between items or quote marks around text,
     or the page will stop working. When in doubt, copy an
     existing line and only change the words inside the quotes.
@@ -49,7 +50,7 @@ const SITE_DATA = {
 
   // Website version shown at the very bottom of the page.
    version: {
-    label: "v0.3.0",
+    label: "v0.3.1",
     url: "https://github.com/Classics-Craftworks/Website"
   },
 
