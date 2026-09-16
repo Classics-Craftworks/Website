@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.3.6 - 2026/09/16
+
+### Fixed
+- Attempted to fix preview cards
+
 ## v0.3.5 - 2026/09/16
 
 ### Added
