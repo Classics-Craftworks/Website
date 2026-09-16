@@ -90,7 +90,7 @@ const SITE_DATA = {
             },
             {
               channel: "beta",
-              label: "Beta",
+              label: "Release Candidate",
               version: "v8.0.0-rc.1",
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
@@ -122,7 +122,7 @@ const SITE_DATA = {
             },
             {
               channel: "beta",
-              label: "Beta",
+              label: "Release Candidate",
               version: "v5.0.0-rc.1",
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
@@ -154,7 +154,7 @@ const SITE_DATA = {
             },
             {
               channel: "beta",
-              label: "Beta",
+              label: "Release Candidate",
               version: "v5.0.0-rc.1",
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
@@ -190,7 +190,7 @@ const SITE_DATA = {
             },
             {
               channel: "beta",
-              label: "Beta",
+              label: "Pre-Release",
               version: "v3.4.0-pre.1",
               mcVersion: "1.21.9 – 26.3-rc-3",
               downloads: [
@@ -220,7 +220,7 @@ const SITE_DATA = {
             },
             {
               channel: "beta",
-              label: "Beta",
+              label: "Pre-Release",
               version: "v1.4.0-pre.1",
               mcVersion: "1.21.9 – 26.3-rc-3",
               downloads: [
@@ -250,7 +250,7 @@ const SITE_DATA = {
             },
             {
               channel: "beta",
-              label: "Beta",
+              label: "Pre-Release",
               version: "v2.4.0-pre.1",
               mcVersion: "1.21.9 – 26.3-rc-3",
               downloads: [
