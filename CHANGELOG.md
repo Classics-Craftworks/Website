@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.4.1 - 2026/09/16
+
+### Changed
+- Increased the hover brightness of Stable channel buttons while keeping Beta and Alpha buttons at their existing brightness
+
 ## v0.4.0 - 2026/09/16
 
 ### Added
