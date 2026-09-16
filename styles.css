@@ -349,8 +349,14 @@ p { margin: 0; }
   border: 1px solid var(--channel-color);
 }
 
-.download-btn:hover {
-  filter: brightness(1.1);
+/* Increase brightness of Beta/Alpha buttons on hover */
+.channel-group:not([data-channel="stable"]) .download-btn:hover {
+  background: rgba(var(--channel-rgb), 0.15);
+}
+
+/* Extra brightness only for Stable buttons on hover */
+.channel-group[data-channel="stable"] .download-btn:hover {
+  filter: brightness(1.15);
 }
 
 /* Disabled buttons for non-stable channels */
