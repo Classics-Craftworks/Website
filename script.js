@@ -106,7 +106,7 @@ function renderRelease(release) {
       actionEl = el('div', { class: 'download-unavailable', text: 'Not available' });
     } else {
       actionEl = el('a', { 
-        class: 'download-btn' + (isBeta ? ' beta' : ' release'), 
+        class: 'download-btn' + (isBeta ? ' beta' : ' stable'), 
         href: d.url 
       }, [
         icon('download', 'icon-sm'),

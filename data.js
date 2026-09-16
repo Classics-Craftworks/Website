@@ -50,8 +50,8 @@ const SITE_DATA = {
 
   // Website version shown at the very bottom of the page.
    version: {
-    label: "v0.3.3",
     url: "https://github.com/Classics-Craftworks/Website"
+    label: "v0.3.4",
   },
 
 
@@ -79,8 +79,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "release",
-              label: "Release",
+              channel: "stable",
+              label: "Stable",
               version: "v8.0.0",
               mcVersion: "26.3",
               downloads: [
@@ -111,8 +111,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "release",
-              label: "Release",
+              channel: "stable",
+              label: "Stable",
               version: "v5.0.0",
               mcVersion: "26.3",
               downloads: [
@@ -143,8 +143,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "release",
-              label: "Release",
+              channel: "stable",
+              label: "Stable",
               version: "v5.0.0",
               mcVersion: "26.3",
               downloads: [
@@ -180,8 +180,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "release",
-              label: "Release",
+              channel: "stable",
+              label: "Stable",
               version: "v3.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
@@ -210,8 +210,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "release",
-              label: "Release",
+              channel: "stable",
+              label: "Stable",
               version: "v1.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
@@ -240,8 +240,8 @@ const SITE_DATA = {
           ],
           releases: [
             {
-              channel: "release",
-              label: "Release",
+              channel: "stable",
+              label: "Stable",
               version: "v2.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [

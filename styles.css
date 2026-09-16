@@ -9,10 +9,11 @@
   --text:          #F5F1ED;  /* primary text */
   --text-soft:     #B8ADA6;  /* secondary text */
   --accent:        #F47A24;  /* primary accent — used sparingly (release CTA, status) */
-  --accent-hover:  #f6954b;  /* accent hover */
+  --accent-hover:  #F6954B;  /* accent hover */
   --border:        #3A2924;  /* hairline borders/dividers */
-  --release:       #F47A24;  /* release indicator */
-  --beta:          #B07CF5;  /* beta indicator */
+  --stable:        #F47A24;  /* stable channel indicator */
+  --stable-hover:  #F6954B;  /* stable channel hover */
+  --beta:          #B07CF5;  /* beta channel indicator */
 
   --font-display: 'Poppins', 'Century Gothic', 'Futura', sans-serif;
   --font-body: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
@@ -183,7 +184,7 @@ p { margin: 0; }
 }
 .text-link:hover { background: var(--surface-hover); color: var(--text); }
 
-/* ---------- Releases (release / beta) ---------- */
+/* ---------- Releases (stable / beta) ---------- */
 .release-row {
   display: flex;
   gap: 12px;
@@ -236,7 +237,7 @@ p { margin: 0; }
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: var(--release);
+  background: var(--stable);
   flex-shrink: 0;
 }
 
@@ -247,7 +248,7 @@ p { margin: 0; }
 }
 
 .release-label { 
-  color: var(--release); 
+  color: var(--stable); 
   font-weight: 700; 
   font-size: 0.98rem;
 }
@@ -385,13 +386,13 @@ p { margin: 0; }
   border-color: rgba(176, 124, 245, 0.2);
 }
 
-.download-btn.release {
-  background: var(--accent);
+.download-btn.stable {
+  background: var(--stable);
   color: var(--bg);
-  border: 1px solid var(--accent);
+  border: 1px solid var(--stable);
 }
 
-.download-btn.release:hover {
+.download-btn.stable:hover {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
 }
