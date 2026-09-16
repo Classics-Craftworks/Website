@@ -50,8 +50,8 @@ const SITE_DATA = {
 
   // Website version shown at the very bottom of the page.
    version: {
-    url: "https://github.com/Classics-Craftworks/Website"
     label: "v0.3.4",
+    url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
 
