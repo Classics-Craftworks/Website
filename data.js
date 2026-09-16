@@ -36,9 +36,9 @@ const SITE_DATA = {
   // shown when this page is shared as a link (e.g. on Discord).
   meta: {
     title: "Classic's Craftworks",
-    description: "Minecraft Java Edition data packs, mods & resource packs by Classic's Craftworks.",
-    shareImage: "images/logo.png",
-    url: "https://modrinth.com/organization/classics-craftworks"
+    description: "Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft.",
+    shareImage: "https://classicscraftworks.co.uk/images/banner.png",
+    url: "https://classicscraftworks.co.uk/"
   },
 
   // Logo, name and one-line tagline shown at the top of the page.
@@ -50,7 +50,7 @@ const SITE_DATA = {
 
   // Website version shown at the very bottom of the page.
    version: {
-    label: "v0.3.4",
+    label: "v0.3.5",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
