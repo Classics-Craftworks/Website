@@ -25,7 +25,7 @@ const SITE_DATA = {
 
   // Website version shown at the very bottom of the page.
    version: {
-    label: "v0.3.7",
+    label: "v0.4.0",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -65,7 +65,7 @@ const SITE_DATA = {
               ]
             },
             {
-              channel: "alpha",
+              channel: "beta",
               label: "Release Candidate",
               version: "v8.0.0-rc.1",
               mcVersion: "26.3-pre-3 – 26.3-rc-3",

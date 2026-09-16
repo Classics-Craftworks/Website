@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.4.0 - 2026/09/16
+
+### Added
+- Alpha channel (red) for experimental builds
+
+### Changed
+- Renamed "releases" to "channels" throughout the codebase for clearer terminology
+- Simplified channel configuration, making it easier to change each channel's colour
+
+### Removed
+- Redundant code intended for preview cards
+
 ## v0.3.7 - 2026/09/16
 
 ### Changed
