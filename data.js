@@ -74,6 +74,7 @@ const SITE_DATA = {
           description: "Adds some quality-of-life crafting and smelting recipes to the game.",
           links: [
             { label: "GitHub", url: "https://github.com/Classics-Craftworks/Better-Craftables", icon: "github" },
+            { label: "Modrinth", url: "https://modrinth.com/datapack/better-craftables", icon: "modrinth" },
             { label: "SpigotMC", url: "https://www.spigotmc.org/resources/better-craftables.108728/", icon: "spigot" },
             { label: "Wiki", url: "https://github.com/Classics-Craftworks/Better-Craftables/wiki", icon: "document" }
           ],
@@ -106,6 +107,7 @@ const SITE_DATA = {
           description: "Adds some quality-of-life unpacking recipes to the game.",
           links: [
             { label: "GitHub", url: "https://github.com/Classics-Craftworks/Better-Unpackables", icon: "github" },
+            { label: "Modrinth", url: "https://modrinth.com/datapack/better-unpackables", icon: "modrinth" },
             { label: "SpigotMC", url: "https://www.spigotmc.org/resources/better-unpackables.120335/", icon: "spigot" },
             { label: "Wiki", url: "https://github.com/Classics-Craftworks/Better-Unpackables/wiki", icon: "document" }
           ],
@@ -138,6 +140,7 @@ const SITE_DATA = {
           description: "Eat things you shouldn't with these silly food recipes!",
           links: [
             { label: "GitHub", url: "https://github.com/Classics-Craftworks/Silly-Eatables", icon: "github" },
+            { label: "Modrinth", url: "https://modrinth.com/datapack/silly-eatables", icon: "modrinth" },
             { label: "SpigotMC", url: "https://www.spigotmc.org/resources/silly-eatables.116362/", icon: "spigot" },
             { label: "Wiki", url: "https://github.com/Classics-Craftworks/Silly-Eatables/wiki", icon: "document" }
           ],
