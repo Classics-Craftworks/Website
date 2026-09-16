@@ -1,34 +1,9 @@
-/*
-  ============================================================
-   CLASSIC'S CRAFTWORKS — SITE CONTENT
-  ============================================================
-  This is the ONLY file you need to edit to change text, links,
-  or images on the site. The page structure lives in index.html
-  and reads everything from the SITE_DATA object below.
-
-  HOW TO EDIT
-  - Text: change the words inside the quotes "like this".
-  - Links: change the URL inside the quotes after "url:".
-  - Images: put your image file in the /images folder, then
-    change the path after "image:" to match its filename,
-    e.g. image: "images/my-screenshot.png"
-  - Adding a project: copy an existing {...} block inside a
-    section's "projects" array (including the commas) and edit it.
-  - Removing a project: delete its whole {...} block.
-  - Adding a link button (GitHub, Wiki, etc): copy a line inside
-    "links" and edit it. "icon" refers to a filename (without
-    ".svg") in images/icons/ — see that folder for the full set.
-  - Each project can have one or two "releases": a "stable" one
-    and/or a "beta" one. Each release has its own version number,
-    the Minecraft version it targets, and one or more download
-    buttons. Delete a release block entirely if a project has no
-    beta, or copy one to add extra channels. Add 'disabled: true'
-    when there are no versions available.
-  - Don't delete commas between items or quote marks around text,
-    or the page will stop working. When in doubt, copy an
-    existing line and only change the words inside the quotes.
-  ============================================================
-*/
+/* ============================================================
+   SITE DATA
+   This is the ONLY file you need to edit to change text, links
+   or images on the site. The page structure lives in script.js
+   and reads everything from the SITE_DATA object below.
+  ============================================================ */
 
 const SITE_DATA = {
 

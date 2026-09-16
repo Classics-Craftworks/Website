@@ -1,13 +1,9 @@
-/*
-  Renders the page from SITE_DATA (see data.js).
-  You shouldn't need to edit this file to update content —
-  edit data.js instead. This file only needs changes if you
-  want to change how things are laid out or behave.
-*/
+/* ============================================================
+   PAGE STRUCTURE
+   Renders the page from SITE_DATA (see data.js).
+   Edit that file if you want to make changes.
+  ============================================================ */
 
-// Icons are plain SVG files in images/icons/ — this paints them
-// using the calling element's current text color, so a link's
-// icon and its label always match (including on hover).
 function icon(name, cls) {
   const span = document.createElement('span');
   span.className = 'icon' + (cls ? ' ' + cls : '');

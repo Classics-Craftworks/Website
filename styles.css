@@ -384,7 +384,7 @@ p { margin: 0; }
   user-select: none;
 }
 
-/* ---------- Icons (SVG files in images/icons/, painted via mask) ---------- */
+/* ---------- Icons ---------- */
 .icon {
   display: inline-block;
   background-color: currentColor;
