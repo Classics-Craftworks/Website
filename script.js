@@ -30,27 +30,6 @@ function el(tag, opts = {}, children = []) {
   return node;
 }
 
-function renderMeta(meta) {
-  if (meta.title) document.title = meta.title;
-  const setMeta = (name, content, isProp) => {
-    if (!content) return;
-    const sel = isProp ? `meta[property="${name}"]` : `meta[name="${name}"]`;
-    let tag = document.head.querySelector(sel);
-    if (!tag) {
-      tag = document.createElement('meta');
-      if (isProp) tag.setAttribute('property', name); else tag.setAttribute('name', name);
-      document.head.appendChild(tag);
-    }
-    tag.setAttribute('content', content);
-  };
-  setMeta('description', meta.description);
-  setMeta('og:title', meta.title, true);
-  setMeta('og:description', meta.description, true);
-  setMeta('og:image', meta.shareImage, true);
-  setMeta('og:url', meta.url, true);
-  setMeta('twitter:card', 'summary_large_image');
-}
-
 function renderBrand(brand, topLinks) {
   const logo = document.getElementById('brand-logo');
   logo.src = brand.logo;
