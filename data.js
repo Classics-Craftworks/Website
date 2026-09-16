@@ -78,7 +78,7 @@ const SITE_DATA = {
             { label: "SpigotMC", url: "https://www.spigotmc.org/resources/better-craftables.108728/", icon: "spigot" },
             { label: "Wiki", url: "https://github.com/Classics-Craftworks/Better-Craftables/wiki", icon: "document" }
           ],
-          releases: [
+          channels: [
             {
               channel: "stable",
               label: "Stable",
@@ -90,7 +90,7 @@ const SITE_DATA = {
               ]
             },
             {
-              channel: "beta",
+              channel: "alpha",
               label: "Release Candidate",
               version: "v8.0.0-rc.1",
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
@@ -111,7 +111,7 @@ const SITE_DATA = {
             { label: "SpigotMC", url: "https://www.spigotmc.org/resources/better-unpackables.120335/", icon: "spigot" },
             { label: "Wiki", url: "https://github.com/Classics-Craftworks/Better-Unpackables/wiki", icon: "document" }
           ],
-          releases: [
+          channels: [
             {
               channel: "stable",
               label: "Stable",
@@ -144,7 +144,7 @@ const SITE_DATA = {
             { label: "SpigotMC", url: "https://www.spigotmc.org/resources/silly-eatables.116362/", icon: "spigot" },
             { label: "Wiki", url: "https://github.com/Classics-Craftworks/Silly-Eatables/wiki", icon: "document" }
           ],
-          releases: [
+          channels: [
             {
               channel: "stable",
               label: "Stable",
@@ -181,7 +181,7 @@ const SITE_DATA = {
             { label: "Modrinth", url: "https://modrinth.com/resourcepack/classics-disc-tweaks", icon: "modrinth" },
             { label: "Wiki", url: "https://github.com/Classics-Craftworks/Classics-Disc-Tweaks/wiki", icon: "document" }
           ],
-          releases: [
+          channels: [
             {
               channel: "stable",
               label: "Stable",
@@ -211,7 +211,7 @@ const SITE_DATA = {
             { label: "Modrinth", url: "https://modrinth.com/resourcepack/classics-dye-tweaks", icon: "modrinth" },
             { label: "Wiki", url: "https://github.com/Classics-Craftworks/Classics-Dye-Tweaks/wiki", icon: "document" }
           ],
-          releases: [
+          channels: [
             {
               channel: "stable",
               label: "Stable",
@@ -241,7 +241,7 @@ const SITE_DATA = {
             { label: "Modrinth", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks", icon: "modrinth" },
             { label: "Wiki", url: "https://github.com/Classics-Craftworks/Classics-Lantern-Tweaks/wiki", icon: "document" }
           ],
-          releases: [
+          channels: [
             {
               channel: "stable",
               label: "Stable",

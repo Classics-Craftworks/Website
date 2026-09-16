@@ -47,21 +47,21 @@ function renderBrand(brand, topLinks) {
   });
 }
 
-function renderRelease(release) {
-  const isBeta = release.channel === 'beta';
+function renderChannel(ch) {
+  const channelKey = (ch.channel || 'stable').toLowerCase();
 
   // Top Header: Status Dot + Label + Divider + MC Version
-  const header = el('div', { class: 'release-header' }, [
-    el('span', { class: 'status-dot' + (isBeta ? ' beta' : '') }),
-    el('span', { class: 'release-label', text: release.label }),
-    el('span', { class: 'release-sep', text: '|' }),
-    el('span', { class: 'release-mc', text: 'Java ' + release.mcVersion })
+  const header = el('div', { class: 'channel-header' }, [
+    el('span', { class: 'status-dot' }),
+    el('span', { class: 'channel-label', text: ch.label }),
+    el('span', { class: 'channel-sep', text: '|' }),
+    el('span', { class: 'channel-mc', text: 'Java ' + ch.mcVersion })
   ]);
 
   // Main download columns container
-  const downloads = el('div', { class: 'release-downloads' });
+  const downloads = el('div', { class: 'channel-downloads' });
 
-  (release.downloads || []).forEach(d => {
+  (ch.downloads || []).forEach(d => {
     const label = d.label.toLowerCase();
     const isMod = label.includes('mod');
     const isResourcePack = label.includes('resource pack');
@@ -72,7 +72,7 @@ function renderRelease(release) {
     const headerChildren = [
       icon(typeIcon, 'icon-sm'),
       el('span', { class: 'download-type-label', text: d.label }),
-      el('span', { class: 'pill' + (isDisabled ? ' disabled-pill' : ''), text: isDisabled ? 'N/A' : release.version })
+      el('span', { class: 'pill' + (isDisabled ? ' disabled-pill' : ''), text: isDisabled ? 'N/A' : ch.version })
     ];
 
     const colHeader = el('div', { 
@@ -85,7 +85,7 @@ function renderRelease(release) {
       actionEl = el('div', { class: 'download-unavailable', text: 'Not available' });
     } else {
       actionEl = el('a', { 
-        class: 'download-btn' + (isBeta ? ' beta' : ' stable'), 
+        class: 'download-btn', 
         href: d.url 
       }, [
         icon('download', 'icon-sm'),
@@ -99,7 +99,10 @@ function renderRelease(release) {
     }, [colHeader, actionEl]));
   });
 
-  return el('div', { class: 'release-group' + (isBeta ? ' beta' : '') }, [header, downloads]);
+  return el('div', { 
+    class: 'channel-group',
+    attrs: { 'data-channel': channelKey }
+  }, [header, downloads]);
 }
 
 function renderProject(p) {
@@ -111,8 +114,8 @@ function renderProject(p) {
     ]));
   });
 
-  const releaseRow = el('div', { class: 'release-row' },
-    (p.releases || []).map(renderRelease)
+  const channelRow = el('div', { class: 'channel-row' },
+    (p.channels || []).map(renderChannel)
   );
 
   return el('article', { class: 'project' }, [
@@ -121,7 +124,7 @@ function renderProject(p) {
       el('h3', { text: p.title }),
       el('p', { class: 'project-description', text: p.description }),
       linkRow,
-      releaseRow
+      channelRow
     ])
   ]);
 }

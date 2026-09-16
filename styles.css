@@ -11,14 +11,37 @@
   --accent:        #F47A24;  /* primary accent — used sparingly (release CTA, status) */
   --accent-hover:  #F6954B;  /* accent hover */
   --border:        #3A2924;  /* hairline borders/dividers */
-  --stable:        #F47A24;  /* stable channel indicator */
-  --stable-hover:  #F6954B;  /* stable channel hover */
-  --beta:          #B07CF5;  /* beta channel indicator */
+
+  /* Channel Indicators & Colors */
+  --ch-stable:     #F47A24;  /* stable channel indicator */
+  --ch-stable-rgb: 244, 122, 36;
+  
+  --ch-beta:       #B07CF5;  /* beta channel indicator */
+  --ch-beta-rgb:   176, 124, 245;
+
+  --ch-alpha:      #FF4D4D;  /* alpha channel indicator */
+  --ch-alpha-rgb:  255, 77, 77;
 
   --font-display: 'Poppins', 'Century Gothic', 'Futura', sans-serif;
   --font-body: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
 
   --measure: 68ch;
+}
+
+/* Local Channel Variable Mapping */
+.channel-group[data-channel="stable"] {
+  --channel-color: var(--ch-stable);
+  --channel-rgb: var(--ch-stable-rgb);
+}
+
+.channel-group[data-channel="beta"] {
+  --channel-color: var(--ch-beta);
+  --channel-rgb: var(--ch-beta-rgb);
+}
+
+.channel-group[data-channel="alpha"] {
+  --channel-color: var(--ch-alpha);
+  --channel-rgb: var(--ch-alpha-rgb);
 }
 
 * { box-sizing: border-box; }
@@ -184,8 +207,8 @@ p { margin: 0; }
 }
 .text-link:hover { background: var(--surface-hover); color: var(--text); }
 
-/* ---------- Releases (stable / beta) ---------- */
-.release-row {
+/* ---------- Channels (stable / beta / alpha) ---------- */
+.channel-row {
   display: flex;
   gap: 12px;
   margin-top: 16px;
@@ -194,35 +217,19 @@ p { margin: 0; }
 }
 
 /* Card Outer Shell */
-.release-group {
+.channel-group {
   flex: 1 1 0;
   min-width: 0;
-  border: 1.5px solid rgba(244, 122, 36, 0.4);
+  border: 1.5px solid rgba(var(--channel-rgb), 0.4);
   border-radius: 12px;
-  /* Lightened background tint */
-  background: rgba(244, 122, 36, 0.04); 
+  background: rgba(var(--channel-rgb), 0.04); 
   padding: 14px 14px 16px;
   display: flex;
   flex-direction: column;
 }
 
-.release-group.beta {
-  border-color: rgba(176, 124, 245, 0.45); /* Purple border */
-  background: rgba(176, 124, 245, 0.04);
-}
-
-/* Tint top horizontal divider purple in Beta cards */
-.release-group.beta .release-header {
-  border-bottom-color: rgba(176, 124, 245, 0.25);
-}
-
-/* Tint middle vertical column separator purple in Beta cards */
-.release-group.beta .download-col + .download-col {
-  border-left-color: rgba(176, 124, 245, 0.25);
-}
-
 /* Header Section */
-.release-header {
+.channel-header {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -230,45 +237,39 @@ p { margin: 0; }
   color: var(--text-soft);
   padding-bottom: 12px;
   margin-bottom: 14px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(var(--channel-rgb), 0.25);
 }
 
 .status-dot {
   width: 9px;
   height: 9px;
-  border-radius: 50%;
-  background: var(--stable);
+  background: var(--channel-color);
   flex-shrink: 0;
 }
 
-.status-dot.beta {
-  border-radius: 2px;
-  background: var(--beta);
-  transform: rotate(45deg);
-}
+/* Indicator shapes per channel */
+.channel-group[data-channel="stable"] .status-dot { border-radius: 50%; }
+.channel-group[data-channel="beta"] .status-dot { border-radius: 2px; transform: rotate(45deg); }
+.channel-group[data-channel="alpha"] .status-dot { border-radius: 1px; }
 
-.release-label { 
-  color: var(--stable); 
+.channel-label { 
+  color: var(--channel-color); 
   font-weight: 700; 
   font-size: 0.98rem;
 }
 
-.release-group.beta .release-label { 
-  color: var(--beta); 
-}
-
-.release-sep { 
+.channel-sep { 
   color: var(--border); 
   font-weight: 300; 
 }
 
-.release-mc { 
+.channel-mc { 
   color: var(--text-soft); 
   font-size: 0.88rem; 
 }
 
 /* Download Columns Section */
-.release-downloads {
+.channel-downloads {
   display: flex;
   gap: 14px;
   margin-top: auto;
@@ -285,7 +286,7 @@ p { margin: 0; }
 /* Divider between download columns if there are multiple */
 .download-col + .download-col {
   padding-left: 14px;
-  border-left: 1px solid var(--border);
+  border-left: 1px solid rgba(var(--channel-rgb), 0.25);
 }
 
 /* Ensure column headers wrap cleanly and align vertically */
@@ -314,9 +315,9 @@ p { margin: 0; }
   border-radius: 999px;
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--accent);
-  background: rgba(244, 122, 36, 0.12);
-  border: 1px solid rgba(244, 122, 36, 0.4);
+  color: var(--channel-color);
+  background: rgba(var(--channel-rgb), 0.12);
+  border: 1px solid rgba(var(--channel-rgb), 0.4);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -325,10 +326,10 @@ p { margin: 0; }
   flex-shrink: 1;
 }
 
-.release-group.beta .pill {
-  color: var(--beta);
-  background: rgba(176, 124, 245, 0.12);
-  border-color: rgba(176, 124, 245, 0.4);
+.pill.disabled-pill {
+  color: rgba(var(--channel-rgb), 0.65);
+  background: rgba(var(--channel-rgb), 0.08);
+  border-color: rgba(var(--channel-rgb), 0.2);
 }
 
 /* Buttons */
@@ -343,68 +344,44 @@ p { margin: 0; }
   font-weight: 600;
   white-space: nowrap;
   transition: all 0.15s ease;
+  background: var(--channel-color);
+  color: var(--bg);
+  border: 1px solid var(--channel-color);
 }
 
-/* Disabled / Unavailable States */
+.download-btn:hover {
+  filter: brightness(1.1);
+}
 
+/* Disabled buttons for non-stable channels */
+.channel-group:not([data-channel="stable"]) .download-btn {
+  background: transparent;
+  color: var(--channel-color);
+  border: 1px solid var(--channel-color);
+}
+
+.channel-group:not([data-channel="stable"]) .download-btn:hover {
+  background: rgba(var(--channel-rgb), 0.15);
+}
+
+/* Unavailable States */
 .download-col-header.is-disabled {
   color: var(--text);
 }
 
-/* Disabled / Unavailable states — dynamically themed by channel */
 .download-unavailable {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px 10px;
   border-radius: 8px;
-  background: rgba(244, 122, 36, 0.05);
-  border: 1px solid rgba(244, 122, 36, 0.2);
-  color: rgba(244, 122, 36, 0.6);
+  background: rgba(var(--channel-rgb), 0.05);
+  border: 1px solid rgba(var(--channel-rgb), 0.2);
+  color: rgba(var(--channel-rgb), 0.6);
   font-size: 0.82rem;
   font-weight: 600;
   white-space: nowrap;
   user-select: none;
-}
-
-.pill.disabled-pill {
-  color: rgba(244, 122, 36, 0.65);
-  background: rgba(244, 122, 36, 0.08);
-  border-color: rgba(244, 122, 36, 0.2);
-}
-
-/* Beta (Purple) Override */
-.release-group.beta .download-unavailable {
-  background: rgba(176, 124, 245, 0.05);
-  border-color: rgba(176, 124, 245, 0.2);
-  color: rgba(176, 124, 245, 0.65);
-}
-
-.release-group.beta .pill.disabled-pill {
-  color: rgba(176, 124, 245, 0.7);
-  background: rgba(176, 124, 245, 0.08);
-  border-color: rgba(176, 124, 245, 0.2);
-}
-
-.download-btn.stable {
-  background: var(--stable);
-  color: var(--bg);
-  border: 1px solid var(--stable);
-}
-
-.download-btn.stable:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
-
-.download-btn.beta {
-  background: transparent;
-  color: var(--beta);
-  border: 1px solid var(--beta);
-}
-
-.download-btn.beta:hover {
-  background: rgba(176, 124, 245, 0.15);
 }
 
 /* ---------- Icons (SVG files in images/icons/, painted via mask) ---------- */
@@ -491,7 +468,7 @@ p { margin: 0; }
     width: 100%;
     height: 140px;
   }
-  .release-row {
+  .channel-row {
     flex-direction: column;
   }
   .download-btn {
