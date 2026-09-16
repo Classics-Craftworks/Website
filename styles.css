@@ -361,7 +361,7 @@ p { margin: 0; }
 
 /* Extra brightness only for Stable buttons on hover */
 .channel-group[data-channel="stable"] .download-btn:hover {
-  filter: brightness(1.15);
+  filter: brightness(1.18);
 }
 
 /* Disabled buttons for non-stable channels */
