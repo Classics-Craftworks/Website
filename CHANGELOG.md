@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.4.2 - 2026/09/16
+
+### Changed
+- Slightly increased the hover brightness of Stable channel buttons again, based on user feedback
+- Updated the tagline in the site header to match its wording across Classic's Craftworks' other online presences
+
 ## v0.4.1 - 2026/09/16
 
 ### Changed
