@@ -1,7 +1,19 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-The format is loosely based on [Keep a Changelog](https://keepachangelog.com).
+
+The format is based on [Keep a Changelog](https://keepachangelog.com).
+
+## v0.3.4 - 2026/09/16
+
+### Added
+- Modrinth links to data pack/mod projects
+- "Java" prefix to Minecraft version numbers
+
+### Changed
+- Website version link now goes to changelog
+- Reverted the "Release" channel back to "Stable"
+- Beta channel is now labelled "Pre-Release" or "Release Candidate" when applicable
 
 ## v0.3.3 - 2026/09/15
 
@@ -25,7 +37,7 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com).
 - Swapped the Release colour from green to orange
 
 ### Fixed
-- Missing Resource Pack, Data Pack, and Mod icons (icon filenames had changed)
+- Missing Resource Pack, Data Pack and Mod icons (icon filenames had changed)
 
 ## v0.3.0 - 2026/09/15
 
