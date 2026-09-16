@@ -76,7 +76,7 @@ function renderRelease(release) {
     el('span', { class: 'status-dot' + (isBeta ? ' beta' : '') }),
     el('span', { class: 'release-label', text: release.label }),
     el('span', { class: 'release-sep', text: '|' }),
-    el('span', { class: 'release-mc', text: release.mcVersion })
+    el('span', { class: 'release-mc', text: 'Java ' + release.mcVersion })
   ]);
 
   // Main download columns container
