@@ -169,7 +169,6 @@ function renderFooter(socials, footer, version) {
 }
 
 (function init() {
-  renderMeta(SITE_DATA.meta);
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
   renderSections(SITE_DATA.sections);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
