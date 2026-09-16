@@ -1,6 +1,11 @@
 /* ============================================================
-   DESIGN TOKENS
-   Change these to re-theme the whole site.
+   SITE STYLES & THEME TOKENS
+   Contains all layout, visual styling, responsive design and channel theme tokens.
+   
+   QUICK GUIDE:
+   - Global Theme: Modify values in the :root selector to adjust site-wide colors or fonts.
+   - Channel Colors & Shapes: Change --ch-stable, --ch-beta, or --ch-alpha variables 
+     at the top of this file to update channel accent themes and indicator shapes.
    ============================================================ */
 :root {
   --bg:            #1C1414;  /* page background */
@@ -184,7 +189,7 @@ p { margin: 0; }
   color: var(--text-soft);
 }
 
-/* ---------- Project links (GitHub / SpigotMC / Wiki) ---------- */
+/* ---------- Project Links ---------- */
 .project-links {
   display: flex;
   gap: 8px;
@@ -228,7 +233,7 @@ p { margin: 0; }
   flex-direction: column;
 }
 
-/* Header Section */
+/* ---------- Header ---------- */
 .channel-header {
   display: flex;
   align-items: center;
@@ -247,7 +252,7 @@ p { margin: 0; }
   flex-shrink: 0;
 }
 
-/* Indicator shapes per channel */
+/* ---------- Channel Shapes ---------- */
 .channel-group[data-channel="stable"] .status-dot { border-radius: 50%; }
 .channel-group[data-channel="beta"] .status-dot { border-radius: 2px; transform: rotate(45deg); }
 .channel-group[data-channel="alpha"] .status-dot { border-radius: 1px; }
@@ -268,7 +273,7 @@ p { margin: 0; }
   font-size: 0.88rem; 
 }
 
-/* Download Columns Section */
+/* ---------- Download Columns ---------- */
 .channel-downloads {
   display: flex;
   gap: 14px;
@@ -306,7 +311,7 @@ p { margin: 0; }
   flex-shrink: 0;
 }
 
-/* Version Pill */
+/* ---------- Version Pills ---------- */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -332,7 +337,7 @@ p { margin: 0; }
   border-color: rgba(var(--channel-rgb), 0.2);
 }
 
-/* Buttons */
+/* ---------- Buttons ---------- */
 .download-btn {
   display: inline-flex;
   align-items: center;
@@ -370,7 +375,7 @@ p { margin: 0; }
   background: rgba(var(--channel-rgb), 0.15);
 }
 
-/* Unavailable States */
+/* ---------- Unavailable States ---------- */
 .download-col-header.is-disabled {
   color: var(--text);
 }

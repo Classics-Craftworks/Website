@@ -1,8 +1,11 @@
 /* ============================================================
-   PAGE STRUCTURE
-   Renders the page from SITE_DATA (see data.js).
-   Edit that file if you want to make changes.
-  ============================================================ */
+   RENDER SCRIPT
+   ============================================================
+   Dynamically generates elements from the configuration in data.js.
+   
+   You usually don't need to touch this file unless you want to change how
+   content is rendered, modify element structure, or adjust interactions.
+   ============================================================ */
 
 function icon(name, cls) {
   const span = document.createElement('span');
