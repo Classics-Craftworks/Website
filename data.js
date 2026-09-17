@@ -27,7 +27,7 @@ const SITE_DATA = {
   brand: {
     logo: "images/logo.png",
     name: "Classic's Craftworks",
-    tagline: "Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft."
+    tagline: "Minecraft Java Edition data packs, mods & resource packs.<br>Sometimes useful. Always Minecraft."
   },
 
   // Website version shown at the very bottom of the page.
