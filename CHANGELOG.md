@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.5.3 — 2026/09/18
+
+### Added
+- Added a canonical link tag to `index.html`
+- Added `sitemap.xml` & `robots.txt`
+
+### Changed
+- Moved logo down by 1px
+- Cleaned up some code
+
+### Removed
+- `<h1>` tag from brand name in `data.js`
+- Duplicate `title` tag in `index.html`
+- Unused `meta` object from `data.js` - hardcoded in `index.html` as of v0.3.6
+
 ## v0.5.2 — 2026/09/17
 
 ### Added
@@ -19,7 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 - Increased the version number's size, opacity, and margin
 
 ### Removed
-- Removed redundant code
+- Redundant code
 
 ## v0.5.1 — 2026/09/17
 
