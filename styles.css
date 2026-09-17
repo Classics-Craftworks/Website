@@ -215,12 +215,12 @@ p { margin: 0; }
 /* Make them less prominent */
 .project-links a,
 .project-links .top-link {
-  background: transparent;
+  background-color: transparent;
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-soft);
   font-weight: 400;
   opacity: 0.85;
-  transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
 }
 
 /* Light up smoothly on hover */
@@ -384,10 +384,15 @@ p { margin: 0; }
   font-size: 0.82rem;
   font-weight: 600;
   white-space: nowrap;
-  transition: all 0.15s ease;
   background: var(--channel-color);
   color: var(--bg);
   border: 1px solid var(--channel-color);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, filter 0.15s ease;
+}
+
+/* Prevent project link icons from flashing on hover */
+.project-links .top-link * {
+  transition: none;
 }
 
 /* Increase brightness of Beta/Alpha buttons on hover */
