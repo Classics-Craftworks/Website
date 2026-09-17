@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.4.4 - 2026/09/17
+
+### Changed
+- Added a line break in the tagline
+- Increased the size of the logo slightly
+
 ## v0.4.3 - 2026/09/16
 
 ### Changed
