@@ -7,6 +7,16 @@
    - Channel Colors & Shapes: Change --ch-stable, --ch-beta, or --ch-alpha variables 
      at the top of this file to update channel accent themes and indicator shapes.
    ============================================================ */
+
+/* Header Font */
+@font-face {
+  font-family: 'Minercraftory';
+  src: url('fonts/minercraftory.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg:            #18181B;  /* page background */
   --surface:       #27272A;  /* thumbnails, chips, panel backgrounds */
@@ -103,7 +113,11 @@ p { margin: 0; }
 }
 
 .brand-text h1 {
-  font-size: clamp(1.7rem, 4.5vw, 2.3rem);
+  font-family: 'Minercraftory', sans-serif; /* Font only to be used for heading */
+  font-size: clamp(1.4rem, 3.8vw, 1.8rem);
+  font-weight: 700;
+  letter-spacing: 0.04em; /* Adds a gap between letters */
+  margin-bottom: 0.20rem; /* Increases gap between title and tagline */
   line-height: 1.05;
   text-wrap: balance;
 }
