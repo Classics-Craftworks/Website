@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.5.1 — 2026/09/17
+
+### Fixed
+- Project link icons flashing on hover
+
+### Removed
+- Duplicate button shrink code
+
 ## v0.5.0 — 2026/09/17
 
 ### Visual Refresh
