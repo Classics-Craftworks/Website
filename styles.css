@@ -411,15 +411,7 @@ p { margin: 0; }
   background: rgba(var(--channel-rgb), 0.15);
 }
 
-/* Click effect for buttons */
-.download-btn,
-.project-links a,
-.top-link,
-.social-link {
-  transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
-}
-
-/* Shrink slightly when pressed down */
+/* Shrink slightly when clicked */
 .download-btn:active,
 .project-links a:active,
 .top-link:active,
