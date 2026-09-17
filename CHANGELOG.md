@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.5.0 — 2026/09/17
+
+### Visual Refresh
+
+- Updated the overall colour scheme from a warm brown-orange to a dark grey.
+- Updated channel colours:
+  - Stable: Changed from bright orange to vibrant green
+  - Beta: Changed from purple to warm amber, keeping it distinct without overpowering the page
+  - Alpha: Softened the red to a slightly more pink tone
+- Increased the rounding on project icons
+- Updated the header font
+- Updated the body text fonts
+- Made project links less visually prominent
+- Added a subtle shrink animation when clicking on buttons
+- Reduced the font weight of version pills and slightly increased their letter spacing
+- Increased the logo size and raised it slightly
+- Slightly increased project icon sizes
+
+### Changed
+
+- Changed the cursor to `not-allowed` when hovering over unavailable buttons
+- Reorganised project links to place the most important links first
+
 ## v0.4.4 - 2026/09/17
 
 ### Changed
