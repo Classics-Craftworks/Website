@@ -169,7 +169,7 @@ p { margin: 0; }
   height: 104px;
   object-fit: cover;
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 14px;
   background: var(--surface);
 }
 
