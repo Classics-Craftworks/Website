@@ -257,6 +257,6 @@ const SITE_DATA = {
 
   footer: {
     copyright: "\u00A9 2023\u20132026 Classic36 / Classic's Craftworks",
-    disclaimer: "Not an official Minecraft product or service. Not approved by or associated with Mojang or Microsoft."
+    disclaimer: "NOT AN OFFICIAL MINECRAFT PRODUCT OR SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT."
   }
 };
