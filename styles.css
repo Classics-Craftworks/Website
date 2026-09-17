@@ -558,10 +558,10 @@ p { margin: 0; }
 
 /* Footer Credits */
 .footer-credits {
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   color: var(--text-soft);
   opacity: 0.6;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .footer-credits .credits-link {
