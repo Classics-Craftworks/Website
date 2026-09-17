@@ -250,7 +250,7 @@ const SITE_DATA = {
 
   // Social links shown at the bottom of the page.
   socials: [
-    { label: "X", url: "https://x.com/C36Craftworks", icon: "x" },
+    { label: "X / Twitter", url: "https://x.com/C36Craftworks", icon: "x" },
     { label: "Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" },
     { label: "Reddit", url: "https://www.reddit.com/r/ClassicsCraftworks", icon: "reddit" }
   ],
