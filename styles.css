@@ -532,7 +532,12 @@ p { margin: 0; }
   margin-top: 6px;
 }
 
-.footer-disclaimer { max-width: 52ch; margin-inline: auto; }
+.footer-disclaimer {
+  max-width: 128ch;
+  margin-inline: auto;
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
 
 .footer-version {
   font-size: 0.75rem;
