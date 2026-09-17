@@ -99,11 +99,11 @@ p { margin: 0; }
 }
 
 .brand-logo {
-  width: 84px;
-  height: 84px;
+  width: 88px;
+  height: 88px;
   flex-shrink: 0;
   display: block;
-  transform: translateY(-3px); /* Lifts the logo slightly upward */
+  transform: translateY(-7px); /* Lifts the logo slightly upward */
 }
 
 .brand-text {
