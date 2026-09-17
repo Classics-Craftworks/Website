@@ -26,7 +26,7 @@ const SITE_DATA = {
   // Logo, name and one-line tagline shown at the top of the page.
   brand: {
     logo: "images/logo.png",
-    name: "<h1>CLASSIC'S CRAFTWORKS",
+    name: "CLASSIC'S CRAFTWORKS",
     tagline: "Minecraft Java Edition data packs, mods & resource packs.<br>Sometimes useful. Always Minecraft."
   },
 
