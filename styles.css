@@ -180,8 +180,8 @@ p { margin: 0; }
 .project:last-child { border-bottom: none; }
 
 .project-image {
-  width: 104px;
-  height: 104px;
+  width: 107px;
+  height: 107px;
   object-fit: cover;
   border: 1px solid var(--border);
   border-radius: 16px;
