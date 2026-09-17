@@ -88,8 +88,8 @@ p { margin: 0; }
 }
 
 .brand-logo {
-  width: 72px;
-  height: 72px;
+  width: 84px;
+  height: 84px;
   flex-shrink: 0;
   display: block;
   transform: translateY(-3px); /* Lifts the logo slightly upward */
