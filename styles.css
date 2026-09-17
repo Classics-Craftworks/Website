@@ -513,6 +513,26 @@ p { margin: 0; }
   color: var(--text);
 }
 
+/* Footer Credits */
+.footer-credits {
+  font-size: 0.65rem;
+  color: var(--text-soft);
+  opacity: 0.6;
+  margin-top: 8px;
+}
+
+.footer-credits .credits-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.footer-credits .credits-link:hover {
+  opacity: 1;
+  color: var(--text);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 620px) {
   .masthead {

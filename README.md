@@ -31,3 +31,7 @@ The website is built using:
 * JavaScript
 
 AI assistants were also used to assist with parts of the site.
+
+## Credits
+
+Icons used on the site were provided by [Icons8](https://icons8.com).
