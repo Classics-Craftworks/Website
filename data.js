@@ -14,15 +14,6 @@
 
 const SITE_DATA = {
 
-  // Browser tab title, search-engine description, and the image
-  // shown when this page is shared as a link (e.g. on Discord).
-  meta: {
-    title: "Classic's Craftworks",
-    description: "Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft.",
-    shareImage: "https://classicscraftworks.co.uk/images/banner.png",
-    url: "https://classicscraftworks.co.uk/"
-  },
-
   // Logo, name and one-line tagline shown at the top of the page.
   brand: {
     logo: "images/logo.png",
