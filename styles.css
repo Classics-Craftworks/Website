@@ -429,6 +429,8 @@ p { margin: 0; }
   font-weight: 600;
   white-space: nowrap;
   user-select: none;
+  cursor: not-allowed;
+  pointer-events: auto; /* Ensures the cursor: not-allowed actually displays */
 }
 
 /* ---------- Icons ---------- */
