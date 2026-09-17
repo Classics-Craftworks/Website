@@ -540,10 +540,10 @@ p { margin: 0; }
 }
 
 .footer-version {
-  font-size: 0.75rem;
+  font-size: 0.77rem;
   color: var(--text-soft);
-  opacity: 0.7;
-  margin-top: 14px;
+  opacity: 0.75;
+  margin-top: 16px;
 }
 
 .footer-version .version-link {
