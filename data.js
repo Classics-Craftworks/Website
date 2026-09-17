@@ -63,7 +63,7 @@ const SITE_DATA = {
           channels: [
             {
               channel: "stable",
-              label: "Stable",
+              label: "Release",
               version: "v8.0.0",
               mcVersion: "26.3",
               downloads: [
@@ -72,7 +72,7 @@ const SITE_DATA = {
               ]
             },
             {
-              channel: "beta",
+              channel: "alpha",
               label: "Release Candidate",
               version: "v8.0.0-rc.1",
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
@@ -96,7 +96,7 @@ const SITE_DATA = {
           channels: [
             {
               channel: "stable",
-              label: "Stable",
+              label: "Release",
               version: "v5.0.0",
               mcVersion: "26.3",
               downloads: [
@@ -129,7 +129,7 @@ const SITE_DATA = {
           channels: [
             {
               channel: "stable",
-              label: "Stable",
+              label: "Release",
               version: "v5.0.0",
               mcVersion: "26.3",
               downloads: [
@@ -166,7 +166,7 @@ const SITE_DATA = {
           channels: [
             {
               channel: "stable",
-              label: "Stable",
+              label: "Release",
               version: "v3.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
@@ -196,7 +196,7 @@ const SITE_DATA = {
           channels: [
             {
               channel: "stable",
-              label: "Stable",
+              label: "Release",
               version: "v1.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
@@ -226,7 +226,7 @@ const SITE_DATA = {
           channels: [
             {
               channel: "stable",
-              label: "Stable",
+              label: "Release",
               version: "v2.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
