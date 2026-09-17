@@ -8,13 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 ### Added
 - Added tooltips to social links in the footer
+- Added proper icon credits to the footer
 
 ### Changed
-- Updated the Download icon to a more rounded design
 - Changed footer social link icons from circles to rounded squares
-- Slightly increased the size of the footer version number
 - Renamed the X label to "X / Twitter"
-- Added proper icon credits to the footer
 - Increased the width of the footer
 - Capitalised the footer disclaimer
 - Moved the site version number to the bottom of the footer
