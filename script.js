@@ -141,10 +141,27 @@ function renderSections(sections) {
   });
 }
 
+/* Render Footer */
 function renderFooter(socials, footer, version) {
   const socialRow = document.getElementById('social-links');
   socials.forEach(s => {
     socialRow.appendChild(el('a', { class: 'social-link', href: s.url, attrs: { 'aria-label': s.label } }, [
+      icon(s.icon, 'icon-md')
+    ]));
+  });
+}
+
+function renderFooter(socials, footer, version) {
+  const socialRow = document.getElementById('social-links');
+  socials.forEach(s => {
+    socialRow.appendChild(el('a', { 
+      class: 'social-link', 
+      href: s.url, 
+      attrs: { 
+        'aria-label': s.label,
+        'data-tooltip': s.label /* Adds labels from data.js to the HTML attribute */
+      } 
+    }, [
       icon(s.icon, 'icon-md')
     ]));
   });

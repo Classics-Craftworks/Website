@@ -477,6 +477,7 @@ p { margin: 0; }
 }
 
 .social-link {
+  position: relative; /* For tooltip positioning */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -488,7 +489,46 @@ p { margin: 0; }
   color: var(--text-soft);
   transition: background-color 0.15s ease, color 0.15s ease;
 }
-.social-link:hover { background: var(--surface-hover); color: var(--text); }
+
+.social-link:hover { 
+  background: var(--surface-hover); 
+  color: var(--text); 
+}
+
+/* Tooltips on hover */
+.social-link::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  
+  /* Tooltip size */
+  padding: 5px 10px;
+  font-size: 0.80rem;
+  border-radius: 6px;
+  
+  background: var(--surface);
+  color: var(--text-soft);
+  border: 1px solid var(--border);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* Show Tooltip on Hover & Keyboard Focus */
+.social-link:hover::after,
+.social-link:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+  color: var(--text);
+  background: var(--surface-hover);
+  transform: translateX(-50%) translateY(-10px);
+}
 
 .footer-line {
   font-size: 0.82rem;
