@@ -27,8 +27,9 @@
   --ch-alpha:      #F15272;  /* alpha channel */
   --ch-alpha-rgb:  241, 82, 114;
 
-  --font-display: 'Poppins', 'Century Gothic', 'Futura', sans-serif;
-  --font-body: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+/* Fonts */
+  --font-display: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --measure: 68ch;
 }
