@@ -354,7 +354,8 @@ p { margin: 0; }
   padding: 3px 8px;
   border-radius: 999px;
   font-size: 0.72rem;
-  font-weight: 700;
+  font-weight: 450;
+  letter-spacing: 0.02em;
   color: var(--channel-color);
   background: rgba(var(--channel-rgb), 0.12);
   border: 1px solid rgba(var(--channel-rgb), 0.4);
