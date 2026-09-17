@@ -400,13 +400,14 @@ p { margin: 0; }
   filter: brightness(1.18);
 }
 
-/* Disabled buttons for non-stable channels */
+/* Hover states for non-Stable channel buttons */
 .channel-group:not([data-channel="stable"]) .download-btn {
   background: transparent;
   color: var(--channel-color);
   border: 1px solid var(--channel-color);
 }
 
+/* Increase brightness of Beta/Alpha buttons on hover */
 .channel-group:not([data-channel="stable"]) .download-btn:hover {
   background: rgba(var(--channel-rgb), 0.15);
 }
