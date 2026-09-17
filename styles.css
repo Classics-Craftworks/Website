@@ -395,11 +395,6 @@ p { margin: 0; }
   transition: none;
 }
 
-/* Increase brightness of Beta/Alpha buttons on hover */
-.channel-group:not([data-channel="stable"]) .download-btn:hover {
-  background: rgba(var(--channel-rgb), 0.15);
-}
-
 /* Extra brightness only for Stable buttons on hover */
 .channel-group[data-channel="stable"] .download-btn:hover {
   filter: brightness(1.18);
