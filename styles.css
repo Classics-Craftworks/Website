@@ -8,24 +8,24 @@
      at the top of this file to update channel accent themes and indicator shapes.
    ============================================================ */
 :root {
-  --bg:            #1C1414;  /* page background */
-  --surface:       #302420;  /* thumbnails, chips, panel backgrounds */
-  --surface-hover: #241B18;  /* hover state for surfaces above */
-  --text:          #F5F1ED;  /* primary text */
-  --text-soft:     #B8ADA6;  /* secondary text */
-  --accent:        #F47A24;  /* primary accent — used sparingly (release CTA, status) */
-  --accent-hover:  #F6954B;  /* accent hover */
-  --border:        #3A2924;  /* hairline borders/dividers */
+  --bg:            #18181B;  /* page background */
+  --surface:       #27272A;  /* thumbnails, chips, panel backgrounds */
+  --surface-hover: #3F3F46;  /* hover state for surfaces above */
+  --text:          #F4F4F5;  /* primary text */
+  --text-soft:     #A1A1AA;  /* secondary text */
+  --accent:        #20d2cc;  /* primary accent - used for keyboard selections */
+  --accent-hover:  #0cefe8;  /* accent hover */
+  --border:        #3F3F46;  /* hairline borders/dividers */
 
-  /* Channel Indicators & Colors */
-  --ch-stable:     #F47A24;  /* stable channel indicator */
-  --ch-stable-rgb: 244, 122, 36;
+/* Channel Indicators & Colors */
+  --ch-stable:     #22C55E;  /* stable channel */
+  --ch-stable-rgb: 34, 197, 94;
   
-  --ch-beta:       #B07CF5;  /* beta channel indicator */
-  --ch-beta-rgb:   176, 124, 245;
+  --ch-beta:       #FF9D47;  /* beta channel */
+  --ch-beta-rgb:   255, 157, 71;
 
-  --ch-alpha:      #FF4D4D;  /* alpha channel indicator */
-  --ch-alpha-rgb:  255, 77, 77;
+  --ch-alpha:      #F15272;  /* alpha channel */
+  --ch-alpha-rgb:  241, 82, 114;
 
   --font-display: 'Poppins', 'Century Gothic', 'Futura', sans-serif;
   --font-body: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
