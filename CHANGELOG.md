@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.5.2 — 2026/09/17
+
+### Added
+- Added tooltips to social links in the footer
+
+### Changed
+- Updated the Download icon to a more rounded design
+- Changed footer social link icons from circles to rounded squares
+- Slightly increased the size of the footer version number
+- Renamed the X label to "X / Twitter"
+- Added proper icon credits to the footer
+- Increased the width of the footer
+- Capitalised the footer disclaimer
+- Moved the site version number to the bottom of the footer
+- Increased the version number's size, opacity, and margin
+
+### Removed
+- Removed redundant code
+
 ## v0.5.1 — 2026/09/17
 
 ### Fixed
@@ -15,8 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 ## v0.5.0 — 2026/09/17
 
 ### Visual Refresh
-
-- Updated the overall colour scheme from a warm brown-orange to a dark grey.
+- Updated the overall colour scheme from a warm brown-orange to a dark grey
 - Updated channel colours:
   - Stable: Changed from bright orange to vibrant green
   - Beta: Changed from purple to warm amber, keeping it distinct without overpowering the page
@@ -31,7 +49,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 - Slightly increased project icon sizes
 
 ### Changed
-
 - Changed the cursor to `not-allowed` when hovering over unavailable buttons
 - Reorganised project links to place the most important links first
 
@@ -86,7 +103,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 ## v0.3.5 - 2026/09/16
 
 ### Added
-- Preview cards so site links look good when shared on Discord, X/Twitter and other platforms.
+- Preview cards so site links look good when shared on Discord, X/Twitter and other platforms
 
 ## v0.3.4 - 2026/09/16
 
