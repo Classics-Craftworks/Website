@@ -4,14 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.6.1 — 2026/09/18
+
+### Added
+- More fallback fonts for different and older operating systems and browsers
+
+### Changed
+- Reverted the status dot size change from v0.6.0
+
 ## v0.6.0 — 2026/09/18
 
 ### Added
-- Collapsible sections - collapse/expand sections with the new chevron icon next to section headers
+- Collapsible sections, allowing sections to be expanded or collapsed using a new chevron icon next to section headers
 
 ### Changed
-- Changed download icon
-- Slightly increased size of status dots & reduced gap around it
+- Changed the download icon
+- Slightly increased the size of status dots and reduced the spacing around them
 
 ## v0.5.5 — 2026/09/18
 
