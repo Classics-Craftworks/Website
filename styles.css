@@ -26,8 +26,8 @@
   --surface-hover: #3F3F46;  /* hover state for surfaces above */
   --text:          #F4F4F5;  /* primary text */
   --text-soft:     #A1A1AA;  /* secondary text */
-  --accent:        #20d2cc;  /* primary accent - used for keyboard selections */
-  --accent-hover:  #0cefe8;  /* accent hover */
+  --accent:        #2ff9f3;  /* primary accent - used for keyboard selections */
+  --accent-hover:  #99fcf9;  /* accent hover */
   --border:        #3F3F46;  /* hairline borders/dividers */
 
 /* Channel Indicators & Colors */
