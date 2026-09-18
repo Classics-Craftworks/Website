@@ -57,7 +57,7 @@
   --alpha-strong:  0.65;  /* muted text on tinted surfaces */
 
 /* Fonts */
-  --font: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   --measure: 68ch;
 }
