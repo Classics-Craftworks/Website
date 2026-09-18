@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.5.4 — 2026/09/18
+
+## Changed
+
+- Colour-matched separators in channel headers
+- Reduced padding at the top and bottom of the page
+- Darkened separators between projects
+- Brightened accent colours
+
+## Fixed
+
+- Brand header still using `innerHTML`
+- Missing logo size in `index.html`
+
 ## v0.5.3 — 2026/09/18
 
 ### Added
@@ -12,7 +26,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 ### Changed
 - Moved logo down by 1px
-- Cleaned up some code
 
 ### Removed
 - `<h1>` tag from brand name in `data.js`
@@ -33,16 +46,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 - Moved the site version number to the bottom of the footer
 - Increased the version number's size, opacity, and margin
 
-### Removed
-- Redundant code
-
 ## v0.5.1 — 2026/09/17
 
 ### Fixed
 - Project link icons flashing on hover
-
-### Removed
-- Duplicate button shrink code
 
 ## v0.5.0 — 2026/09/17
 
@@ -98,9 +105,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 ### Changed
 - Renamed "releases" to "channels" throughout the codebase for clearer terminology
 - Simplified channel configuration, making it easier to change each channel's colour
-
-### Removed
-- Redundant code intended for preview cards
 
 ## v0.3.7 - 2026/09/16
 
