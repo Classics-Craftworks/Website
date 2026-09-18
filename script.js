@@ -257,7 +257,7 @@ class Accordion {
 
     this.animation = this.el.animate(
       { height: [startHeight, endHeight] },
-      { duration: 300, easing: 'ease-in-out' }
+      { duration: 200, easing: 'ease-in-out' }
     );
 
     const cleanup = () => {
