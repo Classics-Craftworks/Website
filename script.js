@@ -92,12 +92,10 @@ function renderChannel(ch) {
   const downloads = el('div', { class: 'channel-downloads' });
 
   (ch.downloads || []).forEach(d => {
-    // Guess an icon based on the download's label, unless data.js
-    // explicitly set one via d.icon.
-    const label = d.label.toLowerCase();
-    const isMod = label.includes('mod');
-    const isResourcePack = label.includes('resource pack');
-    const typeIcon = d.icon || (isMod ? 'box' : isResourcePack ? 'brush' : 'brackets');
+    // Each download in data.js explicitly says which icon to use
+    // (e.g. icon: "brackets" for a data pack). Falls back to a
+    // box icon if one isn't specified.
+    const typeIcon = d.icon || 'box';
 
     // A download counts as "disabled" if data.js marked it disabled,
     // OR if it simply has no URL to link to.

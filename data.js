@@ -33,8 +33,8 @@ const SITE_DATA = {
 
   // Buttons shown next to the logo at the very top of the page.
   topLinks: [
-    { label: "Modrinth", url: "https://modrinth.com/organization/classics-craftworks", icon: "modrinth" },
-    { label: "GitHub", url: "https://github.com/Classics-Craftworks", icon: "github" }
+    { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/organization/classics-craftworks" },
+    { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks" }
   ],
 
   // The main content: each entry below is a section (a heading
@@ -52,10 +52,10 @@ const SITE_DATA = {
           title: "Better Craftables",
           description: "Adds some quality-of-life crafting and smelting recipes to the game.",
           links: [
-            { label: "Modrinth", url: "https://modrinth.com/datapack/better-craftables", icon: "modrinth" },
-            { label: "SpigotMC", url: "https://www.spigotmc.org/resources/better-craftables.108728/", icon: "spigot" },
-            { label: "GitHub", url: "https://github.com/Classics-Craftworks/Better-Craftables", icon: "github" },
-            { label: "Wiki", url: "https://github.com/Classics-Craftworks/Better-Craftables/wiki", icon: "book" }
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/better-craftables" },
+            { label: "SpigotMC", icon: "spigot", url: "https://www.spigotmc.org/resources/better-craftables.108728/" },
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Better-Craftables" },
+            { label: "Wiki", icon: "book", url: "https://github.com/Classics-Craftworks/Better-Craftables/wiki" }
           ],
           channels: [
             {
@@ -64,8 +64,8 @@ const SITE_DATA = {
               version: "v8.0.0",
               mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0" },
-                { label: "Mod", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0+mod" }
+                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0" },
+                { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0+mod" }
               ]
             },
             {
@@ -74,8 +74,8 @@ const SITE_DATA = {
               version: "v8.0.0-rc.1",
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0-rc.1" },
-                { label: "Mod", disabled: true }
+                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0-rc.1" },
+                { label: "Mod", icon: "box", disabled: true }
               ]
             }
           ]
@@ -85,10 +85,10 @@ const SITE_DATA = {
           title: "Better Unpackables",
           description: "Adds some quality-of-life unpacking recipes to the game.",
           links: [
-            { label: "Modrinth", url: "https://modrinth.com/datapack/better-unpackables", icon: "modrinth" },
-            { label: "SpigotMC", url: "https://www.spigotmc.org/resources/better-unpackables.120335/", icon: "spigot" },
-            { label: "GitHub", url: "https://github.com/Classics-Craftworks/Better-Unpackables", icon: "github" },
-            { label: "Wiki", url: "https://github.com/Classics-Craftworks/Better-Unpackables/wiki", icon: "book" }
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/better-unpackables" },
+            { label: "SpigotMC", icon: "spigot", url: "https://www.spigotmc.org/resources/better-unpackables.120335/" },
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Better-Unpackables" },
+            { label: "Wiki", icon: "book", url: "https://github.com/Classics-Craftworks/Better-Unpackables/wiki" }
           ],
           channels: [
             {
@@ -97,8 +97,8 @@ const SITE_DATA = {
               version: "v5.0.0",
               mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0" },
-                { label: "Mod", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0+mod" }
+                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0" },
+                { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0+mod" }
               ]
             },
             {
@@ -107,8 +107,8 @@ const SITE_DATA = {
               version: "v5.0.0-rc.1",
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0-rc.1" },
-                { label: "Mod", disabled: true }
+                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0-rc.1" },
+                { label: "Mod", icon: "box", disabled: true }
               ]
             }
           ]
@@ -118,10 +118,10 @@ const SITE_DATA = {
           title: "Silly Eatables",
           description: "Eat things you shouldn't with these silly food recipes!",
           links: [
-            { label: "Modrinth", url: "https://modrinth.com/datapack/silly-eatables", icon: "modrinth" },
-            { label: "SpigotMC", url: "https://www.spigotmc.org/resources/silly-eatables.116362/", icon: "spigot" },
-            { label: "GitHub", url: "https://github.com/Classics-Craftworks/Silly-Eatables", icon: "github" },
-            { label: "Wiki", url: "https://github.com/Classics-Craftworks/Silly-Eatables/wiki", icon: "book" }
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/silly-eatables" },
+            { label: "SpigotMC", icon: "spigot", url: "https://www.spigotmc.org/resources/silly-eatables.116362/" },
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Silly-Eatables" },
+            { label: "Wiki", icon: "book", url: "https://github.com/Classics-Craftworks/Silly-Eatables/wiki" }
           ],
           channels: [
             {
@@ -130,8 +130,8 @@ const SITE_DATA = {
               version: "v5.0.0",
               mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0" },
-                { label: "Mod", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0+mod" }
+                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0" },
+                { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0+mod" }
               ]
             },
             {
@@ -140,8 +140,8 @@ const SITE_DATA = {
               version: "v5.0.0-rc.1",
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
-                { label: "Data Pack", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0-rc.1" },
-                { label: "Mod", disabled: true }
+                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0-rc.1" },
+                { label: "Mod", icon: "box", disabled: true }
               ]
             }
           ]
@@ -156,9 +156,9 @@ const SITE_DATA = {
           title: "Classic's Disc Tweaks",
           description: "Subtly widens music discs and unifies their design for a more cohesive look.",
           links: [
-            { label: "Modrinth", url: "https://modrinth.com/resourcepack/classics-disc-tweaks", icon: "modrinth" },
-            { label: "GitHub", url: "https://github.com/Classics-Craftworks/Classics-Disc-Tweaks", icon: "github" },
-            { label: "Wiki", url: "https://github.com/Classics-Craftworks/Classics-Disc-Tweaks/wiki", icon: "book" }
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-disc-tweaks" },
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Disc-Tweaks" },
+            { label: "Wiki", icon: "book", url: "https://github.com/Classics-Craftworks/Classics-Disc-Tweaks/wiki" }
           ],
           channels: [
             {
@@ -167,7 +167,7 @@ const SITE_DATA = {
               version: "v3.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
+                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
               ]
             },
             {
@@ -176,7 +176,7 @@ const SITE_DATA = {
               version: "v3.4.0-pre.1",
               mcVersion: "1.21.9 – 26.3-rc-3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0-pre.1" }
+                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0-pre.1" }
               ]
             }
           ]
@@ -186,9 +186,9 @@ const SITE_DATA = {
           title: "Classic's Dye Tweaks",
           description: "Tweaks Minecraft's new dye textures and brings them to older versions of the game!",
           links: [
-            { label: "Modrinth", url: "https://modrinth.com/resourcepack/classics-dye-tweaks", icon: "modrinth" },
-            { label: "GitHub", url: "https://github.com/Classics-Craftworks/Classics-Dye-Tweaks", icon: "github" },
-            { label: "Wiki", url: "https://github.com/Classics-Craftworks/Classics-Dye-Tweaks/wiki", icon: "book" }
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-dye-tweaks" },
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Dye-Tweaks" },
+            { label: "Wiki", icon: "book", url: "https://github.com/Classics-Craftworks/Classics-Dye-Tweaks/wiki" }
           ],
           channels: [
             {
@@ -197,7 +197,7 @@ const SITE_DATA = {
               version: "v1.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
+                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
               ]
             },
             {
@@ -206,7 +206,7 @@ const SITE_DATA = {
               version: "v1.4.0-pre.1",
               mcVersion: "1.21.9 – 26.3-rc-3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0-pre.1" }
+                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0-pre.1" }
               ]
             }
           ]
@@ -216,9 +216,9 @@ const SITE_DATA = {
           title: "Classic's Lantern Tweaks",
           description: "Adjusts the edges of Soul & Copper Lanterns so they better match the regular Lantern. Little details matter!",
           links: [
-            { label: "Modrinth", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks", icon: "modrinth" },
-            { label: "GitHub", url: "https://github.com/Classics-Craftworks/Classics-Lantern-Tweaks", icon: "github" },
-            { label: "Wiki", url: "https://github.com/Classics-Craftworks/Classics-Lantern-Tweaks/wiki", icon: "book" }
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks" },
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Lantern-Tweaks" },
+            { label: "Wiki", icon: "book", url: "https://github.com/Classics-Craftworks/Classics-Lantern-Tweaks/wiki" }
           ],
           channels: [
             {
@@ -227,7 +227,7 @@ const SITE_DATA = {
               version: "v2.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
+                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
               ]
             },
             {
@@ -236,7 +236,7 @@ const SITE_DATA = {
               version: "v2.4.0-pre.1",
               mcVersion: "1.21.9 – 26.3-rc-3",
               downloads: [
-                { label: "Resource Pack", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0-pre.1" }
+                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0-pre.1" }
               ]
             }
           ]
