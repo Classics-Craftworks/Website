@@ -1,41 +1,66 @@
 /* ============================================================
    RENDER SCRIPT
    ============================================================
-   Dynamically generates elements from the configuration in data.js.
-   
-   You usually don't need to touch this file unless you want to change how
-   content is rendered, modify element structure, or adjust interactions.
+   This file reads the content from data.js and builds the actual
+   HTML elements you see on the page (logo, project list, footer, etc).
+
+   You usually don't need to touch this file unless you want to change
+   HOW content is rendered (e.g. add a new element to every project card).
+   To change WHAT is shown (text, links, images), edit data.js instead.
    ============================================================ */
 
+/* ---------- Small helper functions ----------
+   These two functions do the repetitive parts of building elements,
+   so the "render" functions below them stay short and readable. */
+
+// Creates one icon (a small colored square shaped like an icon,
+// e.g. the Discord logo) using a PNG file as a "mask".
+// A mask means the browser uses the PNG's shape as a stencil and
+// fills that shape with whatever color CSS gives it (currentColor).
+// This lets the same icon file automatically match site themes.
 function icon(name, cls) {
   const span = document.createElement('span');
   span.className = 'icon' + (cls ? ' ' + cls : '');
-  span.setAttribute('aria-hidden', 'true');
-  const url = `url('images/icons/${name || 'link'}.png')`;
-  span.style.webkitMaskImage = url;
-  span.style.maskImage = url;
+  span.setAttribute('aria-hidden', 'true'); // hide from screen readers — the visible text label next to it is enough
+  const url = `url('images/icons/${name || 'link'}.png')`; // falls back to "link.png" if no icon name is given
+  span.style.webkitMaskImage = url; // needed for Safari
+  span.style.maskImage = url; // needed for other browsers
   return span;
 }
 
+// A shortcut for building an HTML element without writing
+// document.createElement / setAttribute / appendChild every time.
+// Example: el('a', { class: 'btn', text: 'Click me', href: '#' })
+// creates: <a class="btn" href="#">Click me</a>
+//
+// tag      - the HTML tag name, e.g. 'div', 'a', 'span'
+// opts     - an object of optional settings (class, text, href, src, alt, attrs)
+// children - an array of other elements to nest inside this one
 function el(tag, opts = {}, children = []) {
   const node = document.createElement(tag);
   if (opts.class) node.className = opts.class;
   if (opts.text) node.textContent = opts.text;
-  if (opts.href) { node.href = opts.href; node.target = '_blank'; node.rel = 'noopener noreferrer'; }
+  if (opts.href) { node.href = opts.href; node.target = '_blank'; node.rel = 'noopener noreferrer'; } // all our links point off-site, so always open in a new tab
   if (opts.src) node.src = opts.src;
   if (opts.alt !== undefined) node.alt = opts.alt;
-  if (opts.attrs) for (const [k, v] of Object.entries(opts.attrs)) node.setAttribute(k, v);
-  children.forEach(c => c && node.appendChild(c));
+  if (opts.attrs) for (const [k, v] of Object.entries(opts.attrs)) node.setAttribute(k, v); // for any other attribute, e.g. data-* or loading="lazy"
+  children.forEach(c => c && node.appendChild(c)); // the "c &&" skips any falsy/empty children safely
   return node;
 }
 
+/* ---------- Page sections ----------
+   Each function below builds one part of the page.
+   They're called once, in order, at the very bottom of this file. */
+
+// Fills in the logo, site name, tagline, and the top-right nav buttons
+// (Modrinth / GitHub links) using the "brand" and "topLinks" data.
 function renderBrand(brand, topLinks) {
   const logo = document.getElementById('brand-logo');
   logo.src = brand.logo;
-  logo.alt = brand.name + ' logo';
+  logo.alt = brand.name + ' logo'; // describes the image for screen readers
 
   document.getElementById('brand-name').textContent = brand.name;
-  document.getElementById('brand-tagline').innerHTML = brand.tagline; // innerHTML used here for line break
+  document.getElementById('brand-tagline').innerHTML = brand.tagline; // innerHTML here on purpose: the tagline text contains a <br> for a manual line break
 
   const nav = document.getElementById('top-links');
   topLinks.forEach(l => {
@@ -46,10 +71,16 @@ function renderBrand(brand, topLinks) {
   });
 }
 
+// Builds ONE download channel box (e.g. the green "Release" box or the
+// orange "Release Candidate" box) for a single project. A project can
+// have multiple channels — see renderProject() below, which calls this
+// once per channel.
 function renderChannel(ch) {
+  // "stable" / "beta" / "alpha" controls the box's color via CSS.
+  // Falls back to "stable" if data.js didn't set a channel.
   const channelKey = (ch.channel || 'stable').toLowerCase();
 
-  // Top Header: Status Dot + Label + Divider + MC Version
+  // Top row of the box: colored dot + channel name + divider + MC version
   const header = el('div', { class: 'channel-header' }, [
     el('span', { class: 'status-dot' }),
     el('span', { class: 'channel-label', text: ch.label }),
@@ -57,53 +88,61 @@ function renderChannel(ch) {
     el('span', { class: 'channel-mc', text: 'Java ' + ch.mcVersion })
   ]);
 
-  // Main download columns container
+  // Container that will hold one column per download (Data Pack, Mod, etc.)
   const downloads = el('div', { class: 'channel-downloads' });
 
   (ch.downloads || []).forEach(d => {
+    // Guess an icon based on the download's label, unless data.js
+    // explicitly set one via d.icon.
     const label = d.label.toLowerCase();
     const isMod = label.includes('mod');
     const isResourcePack = label.includes('resource pack');
     const typeIcon = d.icon || (isMod ? 'box' : isResourcePack ? 'brush' : 'brackets');
+
+    // A download counts as "disabled" if data.js marked it disabled,
+    // OR if it simply has no URL to link to.
     const isDisabled = d.disabled || !d.url;
 
-    // Build Header Children (always includes icon for vertical alignment)
+    // The small header inside each download column: icon + label + version pill
     const headerChildren = [
       icon(typeIcon, 'icon-sm'),
       el('span', { class: 'download-type-label', text: d.label }),
       el('span', { class: 'pill' + (isDisabled ? ' disabled-pill' : ''), text: isDisabled ? 'N/A' : ch.version })
     ];
 
-    const colHeader = el('div', { 
-      class: 'download-col-header' + (isDisabled ? ' is-disabled' : '') 
+    const colHeader = el('div', {
+      class: 'download-col-header' + (isDisabled ? ' is-disabled' : '')
     }, headerChildren);
 
-    // Build Action Element (Download button or "Not available" text)
+    // Either a clickable "Download" button, or greyed-out "Not available" text
     let actionEl;
     if (isDisabled) {
       actionEl = el('div', { class: 'download-unavailable', text: 'Not available' });
     } else {
-      actionEl = el('a', { 
-        class: 'download-btn', 
-        href: d.url 
+      actionEl = el('a', {
+        class: 'download-btn',
+        href: d.url
       }, [
         icon('download', 'icon-sm'),
         el('span', { text: 'Download' })
       ]);
     }
 
-    // Individual Column Box
-    downloads.appendChild(el('div', { 
-      class: 'download-col' + (isDisabled ? ' is-disabled' : '') 
+    // Put the header + action together as one column, then add it to the row
+    downloads.appendChild(el('div', {
+      class: 'download-col' + (isDisabled ? ' is-disabled' : '')
     }, [colHeader, actionEl]));
   });
 
-  return el('div', { 
+  // data-channel="stable"/"beta"/"alpha" - read by styles.css to pick the right color theme
+  return el('div', {
     class: 'channel-group',
     attrs: { 'data-channel': channelKey }
   }, [header, downloads]);
 }
 
+// Builds one full project card: thumbnail image, title, description,
+// row of links (Modrinth/GitHub/Wiki), and one channel box per channel.
 function renderProject(p) {
   const linkRow = el('div', { class: 'project-links' });
   (p.links || []).forEach(l => {
@@ -113,12 +152,14 @@ function renderProject(p) {
     ]));
   });
 
+  // .map() here works just like .forEach() above, but it collects the
+  // results into a new array instead of throwing them away
   const channelRow = el('div', { class: 'channel-row' },
     (p.channels || []).map(renderChannel)
   );
 
   return el('article', { class: 'project' }, [
-    el('img', { class: 'project-image', src: p.image, alt: p.title, attrs: { loading: 'lazy' } }),
+    el('img', { class: 'project-image', src: p.image, alt: p.title, attrs: { loading: 'lazy' } }), // loading="lazy": don't download this image until it's about to scroll into view
     el('div', { class: 'project-body' }, [
       el('h3', { text: p.title }),
       el('p', { class: 'project-description', text: p.description }),
@@ -128,6 +169,8 @@ function renderProject(p) {
   ]);
 }
 
+// Builds every section (e.g. "Data Packs & Mods", "Resource Packs")
+// and all the project cards inside each one, then adds them to <main>.
 function renderSections(sections) {
   const main = document.getElementById('catalog');
   sections.forEach(section => {
@@ -141,36 +184,41 @@ function renderSections(sections) {
   });
 }
 
-/* Render Footer */
+// Fills in the footer: social icon links, copyright line, disclaimer,
+// and the site version (shown as a plain label, or a clickable link
+// to the changelog if data.js gave it a URL).
 function renderFooter(socials, footer, version) {
   const socialRow = document.getElementById('social-links');
   socials.forEach(s => {
-    socialRow.appendChild(el('a', { 
-      class: 'social-link', 
-      href: s.url, 
-      attrs: { 
-        'aria-label': s.label,
-        'data-tooltip': s.label /* Adds labels from data.js to the HTML attribute */
-      } 
+    socialRow.appendChild(el('a', {
+      class: 'social-link',
+      href: s.url,
+      attrs: {
+        'aria-label': s.label, // read aloud by screen readers, since the icon alone has no text
+        'data-tooltip': s.label // read by CSS to show the little hover tooltip (see .social-link::after in styles.css)
+      }
     }, [
       icon(s.icon, 'icon-md')
     ]));
   });
+
   document.getElementById('copyright').textContent = footer.copyright;
   document.getElementById('disclaimer').textContent = footer.disclaimer;
 
   if (version) {
     const versionEl = document.getElementById('site-version');
-    versionEl.innerHTML = ''; // Clear existing content
+    versionEl.innerHTML = ''; // clear out anything that might already be there before re-filling it
 
+    // version can be given in data.js either as a plain string ("e.g. v0.1.1")
+    // or as an object with a label + a url to link to. This handles both.
     const versionLabel = typeof version === 'object' ? version.label : version;
     const versionUrl = typeof version === 'object' ? version.url : null;
 
     if (versionUrl) {
-      versionEl.appendChild(el('a', { 
-        href: versionUrl, 
+      versionEl.appendChild(el('a', {
+        href: versionUrl,
         class: 'version-link',
-        text: versionLabel 
+        text: versionLabel
       }));
     } else {
       versionEl.textContent = versionLabel;
@@ -178,6 +226,11 @@ function renderFooter(socials, footer, version) {
   }
 }
 
+/* ---------- Run everything ----------
+   This is the only code that actually executes on page load — everything
+   above is just function definitions sitting idle until called.
+   Wrapping it in (function () { ... })() (an "IIFE") keeps these calls
+   out of the global scope, so they don't clash with anything else. */
 (function init() {
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
   renderSections(SITE_DATA.sections);

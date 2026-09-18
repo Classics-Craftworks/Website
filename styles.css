@@ -17,6 +17,9 @@
   font-display: swap;
 }
 
+/* :root defines "CSS variables" (also called custom properties) — named
+   values you can reuse anywhere in this file with var(--name). Change a
+   color here once, and everywhere that uses it updates automatically. */
 :root {
   --bg:            #18181B;  /* page background */
   --surface:       #27272A;  /* thumbnails, chips, panel backgrounds */
@@ -44,7 +47,12 @@
   --measure: 68ch;
 }
 
-/* Local Channel Variable Mapping */
+/* Local Channel Variable Mapping
+   [data-channel="stable"] targets any element with a data-channel="stable"
+   HTML attribute (script.js sets this on each channel box). Depending on
+   which value is present, we point --channel-color/--channel-rgb at a
+   different pair of variables from :root above — this is what makes
+   stable/beta/alpha boxes each get their own color automatically. */
 .channel-group[data-channel="stable"] {
   --channel-color: var(--ch-stable);
   --channel-rgb: var(--ch-stable-rgb);
@@ -89,6 +97,8 @@ p { margin: 0; }
 }
 
 /* ---------- Masthead ---------- */
+/* CSS Grid lays the header out in 3 side-by-side columns:
+   logo (auto width) | brand text (1fr = fills remaining space) | nav links (auto width) */
 .masthead {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -429,6 +439,12 @@ p { margin: 0; }
 }
 
 /* ---------- Icons ---------- */
+/* The icons are plain PNG files, but instead of showing the PNG's own
+   colors, we use it as a "mask": the image's shape becomes a stencil, and
+   background-color: currentColor fills that stencil with whatever text
+   color is active on the element (so icons automatically match hover/theme
+   colors instead of needing a separately-colored image file for each state).
+   PNGs will be swapped out for SVGs at some point. */
 .icon {
   display: inline-block;
   background-color: currentColor;

@@ -12,6 +12,9 @@
      label if a build is unavailable.
    ============================================================ */
 
+// This whole file is one big JavaScript object. script.js reads values
+// out of it (e.g. SITE_DATA.brand.name) to build the page — nothing in
+// here directly draws anything on screen by itself.
 const SITE_DATA = {
 
   // Logo, name and one-line tagline shown at the top of the page.
@@ -41,6 +44,9 @@ const SITE_DATA = {
     {
       heading: "Data Packs & Mods",
       projects: [
+        // Each object in this "projects" array becomes one project card
+        // on the page. Copy an entire { ... } block like this one and
+        // paste it here (with a trailing comma) to add a new project.
         {
           image: "images/better-craftables.png",
           title: "Better Craftables",
