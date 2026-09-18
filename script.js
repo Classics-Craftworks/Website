@@ -220,100 +220,66 @@ function renderSections(sections) {
 class Accordion {
   constructor(detailsEl, storageKey) {
     this.el = detailsEl;
-    this.storageKey = storageKey; // used to persist open/closed state — see saveState() below
+    this.storageKey = storageKey;
     this.summary = detailsEl.querySelector('summary');
-    this.content = detailsEl.querySelector('.project-list');
     this.animation = null;
-    this.isClosing = false;
-    this.isExpanding = false;
-    // Drives the chevron in styles.css. Kept separate from the `open`
-    // attribute, which for a collapse is deliberately only flipped once
-    // the animation finishes (see collapse() below) — if the chevron's
-    // CSS keyed off `[open]` directly it would wait for that same moment
-    // and visibly lag behind the box shrinking.
+    this.isAnimating = false;
+
     this.el.dataset.state = this.el.open ? 'expanded' : 'collapsed';
-    this.summary.addEventListener('click', e => this.onClick(e));
+    this.summary.addEventListener('click', this.onClick.bind(this));
   }
 
   onClick(e) {
-    e.preventDefault(); // stop the native instant toggle
-    this.el.style.overflow = 'hidden'; // clip content while the height is mid-animation
-    if (this.isClosing || !this.el.open) {
-      this.expand();
-    } else if (this.isExpanding || this.el.open) {
-      this.collapse();
-    }
+    e.preventDefault();
+    if (!this.isAnimating) this.toggle(!this.el.open);
   }
 
-  collapse() {
-    this.isClosing = true;
-    this.el.dataset.state = 'collapsed'; // chevron turns immediately, not at animation end
-    const startHeight = `${this.el.offsetHeight}px`;
-    const endHeight = `${this.summary.offsetHeight}px`;
-    this.runAnimation(startHeight, endHeight, false);
-  }
+  toggle(shouldOpen) {
+    this.isAnimating = true;
 
-  expand() {
-    this.el.dataset.state = 'expanded'; // chevron turns immediately
-    // open must be set before measuring, so the content is laid out and
-    // has a real height to animate toward — but this jumps the box to
-    // full height first, so lock it back to its current height first,
-    // then let requestAnimationFrame animate from there on the next frame.
-    this.el.style.height = `${this.el.offsetHeight}px`;
-    this.el.open = true;
-    window.requestAnimationFrame(() => {
-      this.isExpanding = true;
-      const startHeight = `${this.el.offsetHeight}px`;
-      // scrollHeight, not a manual "summary + content" sum, is what the
-      // browser itself will land on once the inline height is cleared at
-      // the end — using anything else risks a 1-2px mismatch that "pops"
-      // right as the animation finishes and can nudge the whole page's
-      // height across the scrollbar threshold, shifting everything sideways.
-      const endHeight = `${this.el.scrollHeight}px`;
-      this.runAnimation(startHeight, endHeight, true);
-    });
+    // Capture starting height before altering DOM state
+    const startHeight = `${this.el.getBoundingClientRect().height}px`;
+
+    // Toggle open state temporarily to capture exact target height
+    this.el.open = shouldOpen;
+    this.el.style.height = ''; 
+    const endHeight = `${this.el.getBoundingClientRect().height}px`;
+    
+    // Restore open state for closing animation duration
+    if (!shouldOpen) this.el.open = true;
+
+    this.runAnimation(startHeight, endHeight, shouldOpen);
   }
 
   runAnimation(startHeight, endHeight, opening) {
-    if (this.animation) this.animation.cancel();
+    this.el.style.overflow = 'hidden';
+    this.el.dataset.state = opening ? 'expanded' : 'collapsed';
+
     this.animation = this.el.animate(
       { height: [startHeight, endHeight] },
-      {
-        duration: 300,
-        easing: 'ease-in-out',
-        // Without this, the instant the animation's timeline ends the
-        // browser reverts `height` to its underlying stylesheet value
-        // (auto, since we never set one) — before the async `onfinish`
-        // below runs and sets the inline height itself. That gap is a
-        // one-frame flash to a different height: the "bounce". Holding
-        // the animated end value with fill: 'forwards' closes the gap.
-        fill: 'forwards'
-      }
+      { duration: 300, easing: 'ease-in-out' }
     );
-    this.animation.onfinish = () => {
+
+    const cleanup = () => {
       this.el.open = opening;
       this.el.style.height = '';
       this.el.style.overflow = '';
       this.animation = null;
-      this.isClosing = false;
-      this.isExpanding = false;
-      this.saveState(); // remember this section's new state for next visit
+      this.isAnimating = false;
     };
-    this.animation.oncancel = () => {
-      this.isClosing = false;
-      this.isExpanding = false;
+
+    this.animation.onfinish = () => {
+      cleanup();
+      this.saveState();
     };
+
+    this.animation.oncancel = cleanup;
   }
 
-  // Persists this section's open/closed state to localStorage, so
-  // renderSections() can restore it on the next page load. Wrapped in
-  // try/catch for the same reason as the read in renderSections — some
-  // browsers/privacy modes throw rather than silently no-op.
   saveState() {
-    if (!this.storageKey) return;
-    try {
-      localStorage.setItem(this.storageKey, this.el.open);
-    } catch (e) { /* storage unavailable — the toggle still works, it just won't persist */ }
+    if (this.storageKey) {
+      try { localStorage.setItem(this.storageKey, this.el.open); } catch {}
+    }
   }
 }
 

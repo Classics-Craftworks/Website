@@ -213,7 +213,7 @@ p { margin: 0; }
   padding-bottom: 10px;
   padding-left: 28px; /* leaves room so the chevron never overlaps the text */
   border-bottom: 1px solid var(--border);
-  margin-bottom: 20px;
+  margin-bottom: 0px;
   position: relative; /* lets the chevron below position itself against this box */
 }
 
@@ -239,9 +239,14 @@ p { margin: 0; }
   transform: translateY(-90%) rotate(45deg);
 }
 
+.catalog-section[data-state="collapsed"] .project-list {
+  pointer-events: none;
+}
+
 .project-list {
   display: flex;
   flex-direction: column;
+  margin-top: 20px;
 }
 
 .project {
