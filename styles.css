@@ -333,7 +333,7 @@ p { margin: 0; }
 .channel-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   font-size: 0.9rem;
   color: var(--text-soft);
   padding-bottom: 12px;
@@ -342,8 +342,8 @@ p { margin: 0; }
 }
 
 .status-dot {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   background: var(--channel-color);
   flex-shrink: 0;
 }
