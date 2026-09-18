@@ -42,8 +42,7 @@
   --ch-alpha-rgb:  241, 82, 114;
 
 /* Fonts */
-  --font-display: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-body: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;
 
   --measure: 68ch;
 }
@@ -77,13 +76,13 @@ body {
   margin: 0;
   background-color: var(--bg);
   color: var(--text);
-  font-family: var(--font-body);
+  font-family: var(--font);
   font-size: 16px;
   line-height: 1.55;
 }
 
 a { color: inherit; text-decoration: none; }
-h1, h2, h3 { margin: 0; font-family: var(--font-display); font-weight: 700; letter-spacing: 0.01em; }
+h1, h2, h3 { margin: 0; font-family: var(--font); font-weight: 700; letter-spacing: 0.01em; }
 p { margin: 0; }
 
 :focus-visible {
