@@ -199,22 +199,26 @@ p { margin: 0; }
    the whole section collapsible. It hides the browser's own disclosure
    marker here and draws a custom chevron on the h2 itself instead. */
 .catalog-section > summary {
-  cursor: pointer;
+  cursor: default;
   list-style: none; /* hides the default marker in Firefox/modern Chrome */
   user-select: none;
+  border-bottom: 1px solid var(--border); /* Full-width bottom border */
+  pointer-events: none; /* Disables clicking on the empty space */
 }
 .catalog-section > summary::-webkit-details-marker {
   display: none; /* hides the default marker in older WebKit (Safari) */
 }
 
 .catalog-section h2 {
+  display: inline-block; /* Shrinks the click target to match text width */
+  cursor: pointer;
+  pointer-events: auto; /* Re-enables clicking on the title & chevron */
   font-size: clamp(1.65rem, 4.2vw, 2.0rem);
   color: var(--text);
   padding-bottom: 10px;
-  padding-left: 28px; /* leaves room so the chevron never overlaps the text */
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 0px;
-  position: relative; /* lets the chevron below position itself against this box */
+  padding-left: 28px;
+  margin-bottom: -1px; /* Keeps chevron aligned with the bottom border */
+  position: relative;
 }
 
 /* Custom collapse/expand chevron, positioned at the left edge of the heading */
