@@ -85,7 +85,7 @@
 
 * { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
 
 body {
   margin: 0;
@@ -182,12 +182,45 @@ p { margin: 0; }
   margin-top: 40px;
 }
 
+/* The heading now lives inside a <summary> (see script.js), which makes
+   the whole section collapsible. It hides the browser's own disclosure
+   marker here and draws a custom chevron on the h2 itself instead. */
+.catalog-section > summary {
+  cursor: pointer;
+  list-style: none; /* hides the default marker in Firefox/modern Chrome */
+  user-select: none;
+}
+.catalog-section > summary::-webkit-details-marker {
+  display: none; /* hides the default marker in older WebKit (Safari) */
+}
+
 .catalog-section h2 {
   font-size: clamp(1.65rem, 4.2vw, 2.0rem);
   color: var(--text);
   padding-bottom: 10px;
+  padding-left: 28px; /* leaves room so the chevron never overlaps the text */
   border-bottom: 1px solid var(--border);
   margin-bottom: 20px;
+  position: relative; /* lets the chevron below position itself against this box */
+}
+
+/* Custom collapse/expand chevron, positioned at the left edge of the heading */
+.catalog-section h2::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--text);
+  border-bottom: 2px solid var(--text);
+  transform: translateY(-90%) rotate(-45deg); /* pointing right = collapsed indicator */
+  transition: transform 0.1s ease;
+}
+
+/* Flip the chevron to point down when the section is open */
+.catalog-section[open] h2::after {
+  transform: translateY(-90%) rotate(45deg);
 }
 
 .project-list {

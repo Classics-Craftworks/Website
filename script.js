@@ -169,16 +169,25 @@ function renderProject(p) {
 
 // Builds every section (e.g. "Data Packs & Mods", "Resource Packs")
 // and all the project cards inside each one, then adds them to <main>.
+//
+// Each section is a <details> element with the heading as its <summary> —
+// that makes the whole section collapsible (click the heading to fold
+// away every project inside it) with no custom toggle logic needed.
+// They start open, so nothing looks different until someone collapses one.
 function renderSections(sections) {
   const main = document.getElementById('catalog');
   sections.forEach(section => {
     const list = el('div', { class: 'project-list' },
       section.projects.map(renderProject)
     );
-    main.appendChild(el('section', { class: 'catalog-section' }, [
-      el('h2', { text: section.heading }),
+    const sectionEl = el('details', { class: 'catalog-section' }, [
+      el('summary', {}, [
+        el('h2', { text: section.heading })
+      ]),
       list
-    ]));
+    ]);
+    sectionEl.open = true;
+    main.appendChild(sectionEl);
   });
 }
 
