@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.7.0 — 2026/09/19
+
+### Added
+- Persistence for collapsed sections, so their state is retained when the page is refreshed
+
+### Changed
+- Sped up animation when collapsing or expanding sections
+- Disabled section toggling while the collapse/expand animation is playing
+
+### Fixed
+- Restricted section toggle interactions to section titles and chevrons, preventing accidental toggling when clicking empty header space
+
 ## v0.6.1 — 2026/09/18
 
 ### Added
