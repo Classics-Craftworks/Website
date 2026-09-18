@@ -34,7 +34,7 @@ function renderBrand(brand, topLinks) {
   logo.src = brand.logo;
   logo.alt = brand.name + ' logo';
 
-  document.getElementById('brand-name').innerHTML = brand.name; // innerHTML used here for heading
+  document.getElementById('brand-name').textContent = brand.name;
   document.getElementById('brand-tagline').innerHTML = brand.tagline; // innerHTML used here for line break
 
   const nav = document.getElementById('top-links');
