@@ -29,6 +29,7 @@
   --accent:        #2ff9f3;  /* primary accent - used for keyboard selections */
   --accent-hover:  #99fcf9;  /* accent hover */
   --border:        #3F3F46;  /* hairline borders/dividers */
+  --border-rgb:    63, 63, 70;
 
 /* Channel Indicators & Colors */
   --ch-stable:     #22C55E;  /* stable channel */
@@ -185,7 +186,7 @@ p { margin: 0; }
   grid-template-columns: 104px 1fr;
   gap: 20px;
   padding: 26px 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid rgba(var(--border-rgb), 0.6);
   align-items: start; /* Locks icon to the top edge */
 }
 .project:first-child { padding-top: 4px; }
