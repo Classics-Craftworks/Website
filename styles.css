@@ -295,7 +295,7 @@ p { margin: 0; }
 }
 
 .channel-sep { 
-  color: var(--border); 
+  color: rgba(var(--channel-rgb), 0.25); 
   font-weight: 300; 
 }
 
