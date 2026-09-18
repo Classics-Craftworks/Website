@@ -173,7 +173,11 @@ function renderProject(p) {
 // Each section is a <details> element with the heading as its <summary> —
 // that makes the whole section collapsible (click the heading to fold
 // away every project inside it) with no custom toggle logic needed.
-// They start open, so nothing looks different until someone collapses one.
+//
+// We also remember each section's open/closed state in the browser's
+// localStorage, keyed by the section's heading text, so it's restored
+// the way the visitor left it next time they load the page. If nothing
+// has been saved yet (first visit), sections default to open.
 function renderSections(sections) {
   const main = document.getElementById('catalog');
   sections.forEach(section => {
@@ -186,9 +190,21 @@ function renderSections(sections) {
       ]),
       list
     ]);
-    sectionEl.open = true;
+
+    const storageKey = 'section-open:' + section.heading;
+
+    // localStorage can throw in some situations (e.g. Safari private
+    // browsing, or a browser with storage disabled entirely), so every
+    // read/write is wrapped in try/catch — if it fails, we just fall
+    // back to the default open state instead of breaking the page.
+    let saved = null;
+    try {
+      saved = localStorage.getItem(storageKey);
+    } catch (e) { /* storage unavailable — ignore and use the default below */ }
+
+    sectionEl.open = saved === null ? true : saved === 'true';
     main.appendChild(sectionEl);
-    new Accordion(sectionEl); // wires up the animated expand/collapse (see class below)
+    new Accordion(sectionEl, storageKey); // wires up the animated expand/collapse (see class below)
   });
 }
 
@@ -202,8 +218,9 @@ function renderSections(sections) {
 // current value to its target value with the Web Animations API, and
 // only flips `open` (or removes it) once that animation finishes.
 class Accordion {
-  constructor(detailsEl) {
+  constructor(detailsEl, storageKey) {
     this.el = detailsEl;
+    this.storageKey = storageKey; // used to persist open/closed state — see saveState() below
     this.summary = detailsEl.querySelector('summary');
     this.content = detailsEl.querySelector('.project-list');
     this.animation = null;
@@ -280,11 +297,23 @@ class Accordion {
       this.animation = null;
       this.isClosing = false;
       this.isExpanding = false;
+      this.saveState(); // remember this section's new state for next visit
     };
     this.animation.oncancel = () => {
       this.isClosing = false;
       this.isExpanding = false;
     };
+  }
+
+  // Persists this section's open/closed state to localStorage, so
+  // renderSections() can restore it on the next page load. Wrapped in
+  // try/catch for the same reason as the read in renderSections — some
+  // browsers/privacy modes throw rather than silently no-op.
+  saveState() {
+    if (!this.storageKey) return;
+    try {
+      localStorage.setItem(this.storageKey, this.el.open);
+    } catch (e) { /* storage unavailable — the toggle still works, it just won't persist */ }
   }
 }
 
