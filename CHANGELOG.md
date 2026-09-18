@@ -4,28 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.6.0 — 2026/09/18
+
+### Added
+- Collapsible sections - collapse/expand sections with the new chevron icon next to section headers
+
+### Changed
+- Changed download icon
+- Slightly increased size of status dots & reduced gap around it
+
 ## v0.5.5 — 2026/09/18
 
 ### Added
-
 - Alpha transparency scale to `styles.css` for easier access to and adjustment of alpha values
 
 ### Changed
-
 - Project type icons are now explicitly defined in `data.js` instead of being automatically inferred
 - Merged fonts since there was no distinction between them
 
 ## v0.5.4 — 2026/09/18
 
 ### Changed
-
 - Colour-matched separators in channel headers
 - Reduced padding at the top and bottom of the page
 - Darkened separators between projects
 - Brightened accent colours
 
 ### Fixed
-
 - Brand header still using `innerHTML`
 - Missing logo size in `index.html`
 
