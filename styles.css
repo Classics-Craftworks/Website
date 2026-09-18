@@ -182,6 +182,19 @@ p { margin: 0; }
   margin-top: 40px;
 }
 
+/* The Accordion class in script.js animates this element's `height`
+   directly via the Web Animations API, so it needs box-sizing: content-box
+   to be off the table for surprises — border-box keeps the animated
+   height in sync with what offsetHeight reports. */
+.catalog-section {
+  box-sizing: border-box;
+  /* Without this, the browser's scroll anchoring "helpfully" adjusts the
+     scroll position whenever this element's height changes mid-animation
+     or when the inline height is cleared at the end — which is what was
+     showing up as a bounce and as content above the section jumping. */
+  overflow-anchor: none;
+}
+
 /* The heading now lives inside a <summary> (see script.js), which makes
    the whole section collapsible. It hides the browser's own disclosure
    marker here and draws a custom chevron on the h2 itself instead. */
@@ -215,11 +228,14 @@ p { margin: 0; }
   border-right: 2px solid var(--text);
   border-bottom: 2px solid var(--text);
   transform: translateY(-90%) rotate(-45deg); /* pointing right = collapsed indicator */
-  transition: transform 0.1s ease;
+  transition: transform 0.3s ease-in-out;
 }
 
-/* Flip the chevron to point down when the section is open */
-.catalog-section[open] h2::after {
+/* Flip the chevron to point down when the section is open. Keyed off
+   data-state (set synchronously in script.js) rather than the `open`
+   attribute — `open` itself changes late on collapse so the chevron
+   stays in sync with the animation instead of lagging behind it. */
+.catalog-section[data-state="expanded"] h2::after {
   transform: translateY(-90%) rotate(45deg);
 }
 
