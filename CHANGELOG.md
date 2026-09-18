@@ -4,16 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.5.5 — 2026/09/18
+
+### Added
+
+- Alpha transparency scale to `styles.css` for easier access to and adjustment of alpha values
+
+### Changed
+
+- Project type icons are now explicitly defined in `data.js` instead of being automatically inferred
+- Merged fonts since there was no distinction between them
+
 ## v0.5.4 — 2026/09/18
 
-## Changed
+### Changed
 
 - Colour-matched separators in channel headers
 - Reduced padding at the top and bottom of the page
 - Darkened separators between projects
 - Brightened accent colours
 
-## Fixed
+### Fixed
 
 - Brand header still using `innerHTML`
 - Missing logo size in `index.html`
