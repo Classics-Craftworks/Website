@@ -179,7 +179,10 @@ p { margin: 0; }
 
 /* ---------- Sections ---------- */
 .catalog-section {
-  margin-top: 40px;
+  margin-top: 24px;
+  /* Animates the tighter gap applied below when two collapsed sections
+     sit back-to-back, so the layout eases into it instead of jumping. */
+  transition: margin-top 0.2s ease;
 }
 
 /* The Accordion class in script.js animates this element's `height`
@@ -196,28 +199,43 @@ p { margin: 0; }
 }
 
 /* The heading now lives inside a <summary> (see script.js), which makes
-   the whole section collapsible. It hides the browser's own disclosure
-   marker here and draws a custom chevron on the h2 itself instead. */
+   the whole section collapsible. The whole bar is styled and clickable
+   as one card — not just the heading text — so a collapsed section
+   reads as an obvious, pressable control rather than a bare underlined
+   title with dead space next to it. */
 .catalog-section > summary {
-  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   list-style: none; /* hides the default marker in Firefox/modern Chrome */
   user-select: none;
-  border-bottom: 1px solid var(--border); /* Full-width bottom border */
-  pointer-events: none; /* Disables clicking on the empty space */
+  cursor: pointer;
+  padding: 14px 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.catalog-section > summary:hover {
+  background: var(--surface-hover);
 }
 .catalog-section > summary::-webkit-details-marker {
   display: none; /* hides the default marker in older WebKit (Safari) */
 }
 
+/* Groups the heading + count badge together on the left side of the bar. */
+.section-heading-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0; /* lets a long heading truncate instead of overflowing the card */
+}
+
 .catalog-section h2 {
-  display: inline-block; /* Shrinks the click target to match text width */
-  cursor: pointer;
-  pointer-events: auto; /* Re-enables clicking on the title & chevron */
-  font-size: clamp(1.65rem, 4.2vw, 2.0rem);
+  font-size: clamp(1.4rem, 3.6vw, 1.7rem);
   color: var(--text);
-  padding-bottom: 10px;
-  padding-left: 28px;
-  margin-bottom: -1px; /* Keeps chevron aligned with the bottom border */
+  padding-left: 22px; /* room for the chevron below */
   position: relative;
 }
 
@@ -232,7 +250,7 @@ p { margin: 0; }
 .catalog-section h2::after {
   content: '';
   position: absolute;
-  left: 4px;
+  left: 0;
   top: 50%;
   width: 10px;
   height: 10px;
@@ -250,8 +268,79 @@ p { margin: 0; }
   transform: translateY(-90%) rotate(45deg);
 }
 
+/* Small project count badge next to the heading to keep a
+   collapsed section from looking empty or uninformative. */
+.section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-soft);
+  background: rgba(var(--border-rgb), var(--alpha-soft));
+  border: 1px solid rgba(var(--border-rgb), var(--alpha-medium));
+  flex-shrink: 0;
+}
+
+/* A little stack of project thumbnails peeking out on the right of a
+   collapsed section — gives it something to look at before you even
+   open it. It fades out once the section expands, since the real
+   project cards take over at that point. */
+.section-peek {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+.catalog-section[data-state="expanded"] .section-peek {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.section-peek-thumb,
+.section-peek-more {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  margin-left: -10px;
+  /* Matches the card's own background, so overlapping thumbnails look
+     "cut out" from one another instead of just stacking messily. */
+  border: 2px solid var(--surface);
+}
+.section-peek-thumb:first-child,
+.section-peek-more:first-child {
+  margin-left: 0;
+}
+.section-peek-thumb {
+  object-fit: cover;
+  background: var(--bg);
+}
+.section-peek-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-hover);
+  color: var(--text-soft);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
 .catalog-section[data-state="collapsed"] .project-list {
   pointer-events: none;
+}
+
+/* Tightens the gap between two collapsed sections sitting back-to-back,
+   so a fully collapsed page doesn't feel like it has big dead zones of
+   empty space between the section bars. Sections next to an expanded
+   one keep the roomier default margin above. */
+.catalog-section[data-state="collapsed"] + .catalog-section[data-state="collapsed"] {
+  margin-top: 10px;
 }
 
 .project-list {
@@ -494,8 +583,15 @@ p { margin: 0; }
 .project-links a:active,
 .top-link:active,
 .social-link:active,
-.catalog-section h2:active .heading-label {
+.catalog-section > summary:active .heading-label {
   transform: scale(0.95);
+}
+
+/* Section bar is a full card now, so give it its own press feedback
+   too — darkens like the hover state, regardless of which part of the
+   row was clicked. */
+.catalog-section > summary:active {
+  background: var(--surface-hover);
 }
 
 /* ---------- Unavailable States ---------- */
@@ -682,5 +778,8 @@ p { margin: 0; }
   }
   .download-btn {
     min-width: 0;
+  }
+  .section-peek {
+    display: none;
   }
 }

@@ -178,6 +178,47 @@ function renderProject(p) {
 // localStorage, keyed by the section's heading text, so it's restored
 // the way the visitor left it next time they load the page. If nothing
 // has been saved yet (first visit), sections default to open.
+// Builds the clickable header row for one section: the heading (with its
+// chevron), a small badge showing how many projects are inside, and — on
+// the right — a little stack of project thumbnails that peeks out while
+// the section is collapsed. The peek strip fades away once the section
+// opens (see .section-peek in styles.css), since the real project cards
+// take over at that point.
+function renderSectionSummary(section) {
+  const projects = section.projects || [];
+
+  const heading = el('h2', {}, [
+    el('span', { class: 'heading-label', text: section.heading })
+  ]);
+
+  const count = el('span', {
+    class: 'section-count',
+    text: String(projects.length)
+  });
+
+  const headingGroup = el('div', { class: 'section-heading-group' }, [heading, count]);
+
+  // Only peek at a handful of thumbnails so the stack doesn't get silly
+  // on sections with lots of projects — anything past that becomes a
+  // plain "+N" chip instead of another image.
+  const maxPeek = 4;
+  const peekThumbs = projects.slice(0, maxPeek).map(p => el('img', {
+    class: 'section-peek-thumb',
+    src: p.image,
+    alt: '', // decorative — the section already has a text heading, and the whole strip is aria-hidden below
+    attrs: { loading: 'lazy' }
+  }));
+
+  const overflow = projects.length - maxPeek;
+  if (overflow > 0) {
+    peekThumbs.push(el('span', { class: 'section-peek-more', text: '+' + overflow }));
+  }
+
+  const peek = el('div', { class: 'section-peek', attrs: { 'aria-hidden': 'true' } }, peekThumbs);
+
+  return el('summary', {}, [headingGroup, peek]);
+}
+
 function renderSections(sections) {
   const main = document.getElementById('catalog');
   sections.forEach(section => {
@@ -185,11 +226,7 @@ function renderSections(sections) {
       section.projects.map(renderProject)
     );
     const sectionEl = el('details', { class: 'catalog-section' }, [
-      el('summary', {}, [
-        el('h2', {}, [
-          el('span', { class: 'heading-label', text: section.heading })
-        ])
-      ]),
+      renderSectionSummary(section),
       list
     ]);
 
