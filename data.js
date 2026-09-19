@@ -286,6 +286,7 @@ const SITE_DATA = {
     },
     {
       heading: "Other Projects",
+      defaultOpen: false,
       projects: [
         {
           image: "images/crafthorizon.png",

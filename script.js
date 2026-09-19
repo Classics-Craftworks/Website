@@ -242,7 +242,11 @@ function renderSections(sections) {
       saved = localStorage.getItem(storageKey);
     } catch (e) { /* storage unavailable — ignore and use the default below */ }
 
-    sectionEl.open = saved === null ? true : saved === 'true';
+    // A section can set defaultOpen: false in data.js to start collapsed
+    // for first-time visitors. Once someone toggles it, their choice is
+    // remembered (see the localStorage read above) and wins from then on.
+    const defaultOpen = section.defaultOpen !== false;
+    sectionEl.open = saved === null ? defaultOpen : saved === 'true';
     main.appendChild(sectionEl);
     new Accordion(sectionEl, storageKey); // wires up the animated expand/collapse (see class below)
   });
