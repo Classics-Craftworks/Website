@@ -218,35 +218,49 @@ function renderSections(sections) {
 // current value to its target value with the Web Animations API, and
 // only flips `open` (or removes it) once that animation finishes.
 class Accordion {
-  constructor(detailsEl, storageKey) {
+  constructor(detailsEl, storageKey, { duration = 150, easing = 'ease-in-out' } = {}) {
     this.el = detailsEl;
     this.storageKey = storageKey;
     this.summary = detailsEl.querySelector('summary');
+    this.duration = duration;
+    this.easing = easing;
     this.animation = null;
-    this.isAnimating = false;
 
+    if (!this.summary) {
+      throw new Error('Accordion: no <summary> element found inside details element.');
+    }
+
+    this.restoreState();
     this.el.dataset.state = this.el.open ? 'expanded' : 'collapsed';
-    this.summary.addEventListener('click', this.onClick.bind(this));
+
+    this.onClick = this.onClick.bind(this);
+    this.summary.addEventListener('click', this.onClick);
+  }
+
+  restoreState() {
+    if (!this.storageKey) return;
+    try {
+      const saved = localStorage.getItem(this.storageKey);
+      if (saved !== null) this.el.open = saved === 'true';
+    } catch {
+      /* localStorage unavailable (private mode, disabled, etc.) — ignore */
+    }
   }
 
   onClick(e) {
     e.preventDefault();
-    if (!this.isAnimating) this.toggle(!this.el.open);
+    if (this.animation) return; // ignore clicks until the current animation finishes
+    this.toggle(!this.el.open);
   }
 
   toggle(shouldOpen) {
-    this.isAnimating = true;
-
-    // Capture starting height before altering DOM state
     const startHeight = `${this.el.getBoundingClientRect().height}px`;
 
-    // Toggle open state temporarily to capture exact target height
     this.el.open = shouldOpen;
-    this.el.style.height = ''; 
+    this.el.style.height = '';
     const endHeight = `${this.el.getBoundingClientRect().height}px`;
-    
-    // Restore open state for closing animation duration
-    if (!shouldOpen) this.el.open = true;
+
+    if (!shouldOpen) this.el.open = true; // keep content visible while collapsing
 
     this.runAnimation(startHeight, endHeight, shouldOpen);
   }
@@ -255,31 +269,36 @@ class Accordion {
     this.el.style.overflow = 'hidden';
     this.el.dataset.state = opening ? 'expanded' : 'collapsed';
 
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     this.animation = this.el.animate(
       { height: [startHeight, endHeight] },
-      { duration: 200, easing: 'ease-in-out' }
+      { duration: reduceMotion ? 0 : this.duration, easing: this.easing }
     );
 
-    const cleanup = () => {
+    const finish = () => {
       this.el.open = opening;
       this.el.style.height = '';
       this.el.style.overflow = '';
       this.animation = null;
-      this.isAnimating = false;
-    };
-
-    this.animation.onfinish = () => {
-      cleanup();
       this.saveState();
     };
 
-    this.animation.oncancel = cleanup;
+    this.animation.onfinish = finish;
   }
 
   saveState() {
-    if (this.storageKey) {
-      try { localStorage.setItem(this.storageKey, this.el.open); } catch {}
+    if (!this.storageKey) return;
+    try {
+      localStorage.setItem(this.storageKey, this.el.open);
+    } catch {
+      /* ignore quota / privacy errors */
     }
+  }
+
+  destroy() {
+    this.animation?.cancel();
+    this.summary.removeEventListener('click', this.onClick);
   }
 }
 
