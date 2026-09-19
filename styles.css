@@ -320,7 +320,7 @@ p { margin: 0; }
   height: 38px;
   border-radius: 10px;
   flex-shrink: 0;
-  margin-left: -12px;
+  margin-left: -8px;
   /* Matches the card's own background, so overlapping thumbnails look
      "cut out" from one another instead of just stacking messily. */
   border: 2px solid var(--surface);
