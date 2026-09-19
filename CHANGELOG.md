@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.7.1 — 2026/09/19
+
+### Added
+- Shrink animation when clicking on section collapse/expand buttons
+
+### Changed
+- Improvements to section collapse/expand animation & sped up the animation again
+- Slight tweaks to shrink animation on all buttons
+
 ## v0.7.0 — 2026/09/19
 
 ### Added
