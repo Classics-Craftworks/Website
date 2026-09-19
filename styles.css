@@ -41,7 +41,7 @@
   --ch-alpha:      #F15272;  /* alpha channel */
   --ch-alpha-rgb:  241, 82, 114;
 
-  --ch-unsupported:      #3B82F6;  /* unsupported channel */
+  --ch-unsupported:      #4F8EDB;  /* unsupported channel */
   --ch-unsupported-rgb:  59, 130, 246;
 
 /* Alpha (transparency) scale — named opacity levels used with the channel
