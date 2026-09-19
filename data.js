@@ -272,8 +272,8 @@ const SITE_DATA = {
           ],
           channels: [
             {
-              channel: "stable",
-              label: "Release",
+              channel: "unsupported",
+              label: "Limited Support",
               version: "v2.4.1",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
