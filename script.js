@@ -388,6 +388,27 @@ function renderFooter(socials, footer, version) {
   }
 }
 
+// Fades the "back to top" button in once the visitor has scrolled down a
+// bit, and scrolls smoothly back to the top when it's clicked — instantly
+// instead of smoothly for anyone with prefers-reduced-motion set.
+function initBackToTop() {
+  const btn = document.getElementById('back-to-top');
+  if (!btn) return; // not every page has one (e.g. 404.html)
+
+  const SHOW_AFTER = 400; // pixels scrolled down before the button appears
+
+  const updateVisibility = () => {
+    btn.classList.toggle('is-visible', window.scrollY > SHOW_AFTER);
+  };
+  updateVisibility(); // sets the correct state immediately, in case the page loads already scrolled down
+  window.addEventListener('scroll', updateVisibility, { passive: true });
+
+  btn.addEventListener('click', () => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+}
+
 /* ---------- Run everything ----------
    This is the only code that actually executes on page load — everything
    above is just function definitions sitting idle until called.
@@ -397,4 +418,5 @@ function renderFooter(socials, footer, version) {
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
   renderSections(SITE_DATA.sections);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
+  initBackToTop();
 })();
