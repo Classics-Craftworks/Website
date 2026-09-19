@@ -180,9 +180,6 @@ p { margin: 0; }
 /* ---------- Sections ---------- */
 .catalog-section {
   margin-top: 24px;
-  /* Animates the tighter gap applied below when two collapsed sections
-     sit back-to-back, so the layout eases into it instead of jumping. */
-  transition: margin-top 0.2s ease;
 }
 
 /* The Accordion class in script.js animates this element's `height`
@@ -333,14 +330,6 @@ p { margin: 0; }
 
 .catalog-section[data-state="collapsed"] .project-list {
   pointer-events: none;
-}
-
-/* Tightens the gap between two collapsed sections sitting back-to-back,
-   so a fully collapsed page doesn't feel like it has big dead zones of
-   empty space between the section bars. Sections next to an expanded
-   one keep the roomier default margin above. */
-.catalog-section[data-state="collapsed"] + .catalog-section[data-state="collapsed"] {
-  margin-top: 10px;
 }
 
 .project-list {
