@@ -256,7 +256,7 @@ p { margin: 0; }
   height: 10px;
   border-right: 2px solid var(--text);
   border-bottom: 2px solid var(--text);
-  transform: translateY(-90%) rotate(-45deg); /* pointing right = collapsed indicator */
+  transform: translateY(-50%) rotate(-45deg); /* pointing right = collapsed indicator */
   transition: transform 0.3s ease-in-out;
 }
 
@@ -265,7 +265,7 @@ p { margin: 0; }
    attribute — `open` itself changes late on collapse so the chevron
    stays in sync with the animation instead of lagging behind it. */
 .catalog-section[data-state="expanded"] h2::after {
-  transform: translateY(-90%) rotate(45deg);
+  transform: translateY(-50%) rotate(45deg);
 }
 
 /* Small project count badge next to the heading to keep a
