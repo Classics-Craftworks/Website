@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.9.0 — 2026/09/19
+
+### Added
+- Added a custom 404 page for invalid or unavailable URLs
+
 ## v0.8.0 — 2026/09/19
 
 ### Added
