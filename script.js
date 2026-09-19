@@ -221,6 +221,7 @@ function renderSectionSummary(section) {
 
 function renderSections(sections) {
   const main = document.getElementById('catalog');
+  if (!main) return; // this page (e.g. 404.html) doesn't have a catalog — nothing to render
   sections.forEach(section => {
     const list = el('div', { class: 'project-list' },
       section.projects.map(renderProject)

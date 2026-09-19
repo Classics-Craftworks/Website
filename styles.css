@@ -779,3 +779,38 @@ p { margin: 0; }
     display: none;
   }
 }
+
+/* ---------- 404 Page ---------- */
+/* Reuses .top-link (see Nav Links above) for the "Back to home" button,
+   so it matches the header's Modrinth/GitHub buttons automatically. */
+.not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40vh;
+  padding: 60px 0;
+}
+
+.not-found-card {
+  max-width: 420px;
+  text-align: center;
+}
+
+.not-found-code {
+  margin: 0 0 8px;
+  font-size: clamp(3rem, 10vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+}
+
+.not-found-card h2 {
+  margin: 0 0 10px;
+  font-size: 1.4rem;
+  color: var(--text);
+}
+
+.not-found-text {
+  margin: 0 0 24px;
+  color: var(--text-soft);
+}

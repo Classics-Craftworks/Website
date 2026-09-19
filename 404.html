@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+  <title>Page not found - Classic's Craftworks</title>
+  <meta name="description" content="This page doesn't exist. Head back to Classic's Craftworks for Minecraft data packs, mods & resource packs." />
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Same header markup as index.html — filled in by renderBrand() in
+       script.js, so it stays in sync with data.js automatically. -->
+  <header class="masthead">
+    <img id="brand-logo" class="brand-logo" alt="" width="88" height="88">
+    <div class="brand-text">
+      <h1 id="brand-name"></h1>
+      <p id="brand-tagline"></p>
+    </div>
+    <nav id="top-links" class="link-row" aria-label="Primary links"></nav>
+  </header>
+
+  <!-- No id="catalog" here on purpose — renderSections() in script.js
+       skips rendering the project catalog when it can't find that
+       element, so this page just shows the 404 message below instead. -->
+  <main class="not-found">
+    <div class="not-found-card">
+      <p class="not-found-code">404</p>
+      <h2>Page not found</h2>
+      <p class="not-found-text">This page doesn't exist. It might have been moved, renamed, or never existed in the first place.</p>
+      <a class="top-link" href="/">
+        <span>Back to home</span>
+      </a>
+    </div>
+  </main>
+
+  <!-- Same footer markup as index.html — filled in by renderFooter() -->
+  <footer class="site-footer">
+    <div id="social-links" class="social-row" aria-label="Social links"></div>
+    <p id="copyright" class="footer-line"></p>
+    <p id="disclaimer" class="footer-line footer-disclaimer"></p>
+    <p class="footer-line footer-credits"> Icons by <a href="https://icons8.com" target="_blank" rel="noopener noreferrer" class="credits-link">Icons8</a></p>
+    <p id="site-version" class="footer-version"></p>
+  </footer>
+
+</div>
+
+<script src="data.js" defer></script>
+<script src="script.js" defer></script>
+</body>
+</html>
