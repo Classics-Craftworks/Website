@@ -4,8 +4,8 @@
    
    QUICK GUIDE:
    - Global Theme: Modify values in the :root selector to adjust site-wide colors or fonts.
-   - Channel Colors & Shapes: Change --ch-stable, --ch-beta, or --ch-alpha variables 
-     at the top of this file to update channel accent themes and indicator shapes.
+   - Channel Colors & Shapes: Change --ch-stable, --ch-beta, --ch-alpha, --ch-unsupported, or
+     --ch-unavailable variables at the top of this file to update channel accent themes and indicator shapes.
    ============================================================ */
 
 /* Header Font */
@@ -40,6 +40,12 @@
 
   --ch-alpha:      #F15272;  /* alpha channel */
   --ch-alpha-rgb:  241, 82, 114;
+
+  --ch-unsupported:      #3B82F6;  /* unsupported channel */
+  --ch-unsupported-rgb:  59, 130, 246;
+
+  --ch-unavailable:      #A1A1AA;  /* unavailable channel */
+  --ch-unavailable-rgb:  161, 161, 170;
 
 /* Alpha (transparency) scale — named opacity levels used with the channel
    RGB variables above, e.g. rgba(var(--channel-rgb), var(--alpha-soft)).
@@ -81,6 +87,16 @@
 .channel-group[data-channel="alpha"] {
   --channel-color: var(--ch-alpha);
   --channel-rgb: var(--ch-alpha-rgb);
+}
+
+.channel-group[data-channel="unsupported"] {
+  --channel-color: var(--ch-unsupported);
+  --channel-rgb: var(--ch-unsupported-rgb);
+}
+
+.channel-group[data-channel="unavailable"] {
+  --channel-color: var(--ch-unavailable);
+  --channel-rgb: var(--ch-unavailable-rgb);
 }
 
 * { box-sizing: border-box; }
@@ -453,6 +469,8 @@ p { margin: 0; }
 .channel-group[data-channel="stable"] .status-dot { border-radius: 50%; }
 .channel-group[data-channel="beta"] .status-dot { border-radius: 2px; transform: rotate(45deg); }
 .channel-group[data-channel="alpha"] .status-dot { border-radius: 1px; }
+.channel-group[data-channel="unsupported"] .status-dot { border-radius: 3px; }
+.channel-group[data-channel="unavailable"] .status-dot { border-radius: 50%; opacity: 0.6; }
 
 .channel-label { 
   color: var(--channel-color); 
