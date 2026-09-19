@@ -5,7 +5,7 @@
    QUICK GUIDE:
    - Global Theme: Modify values in the :root selector to adjust site-wide colors or fonts.
    - Channel Colors & Shapes: Change --ch-stable, --ch-beta, --ch-alpha, or --ch-unsupported
-  variables at the top of this file to update channel accent themes and indicator shapes.
+     variables at the top of this file to update channel accent themes and indicator shapes.
    ============================================================ */
 
 /* Header Font */
@@ -570,20 +570,21 @@ p { margin: 0; }
   transition: none;
 }
 
-/* Extra brightness only for Stable buttons on hover */
-.channel-group[data-channel="stable"] .download-btn:hover {
+/* Extra brightness only for solid-style buttons (Stable, Unsupported) on hover */
+.channel-group[data-channel="stable"] .download-btn:hover,
+.channel-group[data-channel="unsupported"] .download-btn:hover {
   filter: brightness(1.18);
 }
 
-/* Hover states for non-Stable channel buttons */
-.channel-group:not([data-channel="stable"]) .download-btn {
+/* Hover states for outline-style (non-solid) channel buttons */
+.channel-group:not([data-channel="stable"]):not([data-channel="unsupported"]) .download-btn {
   background: transparent;
   color: var(--channel-color);
   border: 1px solid var(--channel-color);
 }
 
 /* Increase brightness of Beta/Alpha buttons on hover */
-.channel-group:not([data-channel="stable"]) .download-btn:hover {
+.channel-group:not([data-channel="stable"]):not([data-channel="unsupported"]) .download-btn:hover {
   background: rgba(var(--channel-rgb), var(--alpha-hover));
 }
 
