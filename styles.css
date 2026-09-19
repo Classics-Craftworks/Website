@@ -91,11 +91,6 @@
   --channel-rgb: var(--ch-unsupported-rgb);
 }
 
-.channel-group[data-channel="unavailable"] {
-  --channel-color: var(--ch-unavailable);
-  --channel-rgb: var(--ch-unavailable-rgb);
-}
-
 * { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
