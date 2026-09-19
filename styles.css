@@ -238,7 +238,7 @@ p { margin: 0; }
 }
 
 .catalog-section h2 {
-  font-size: clamp(1.4rem, 3.6vw, 1.7rem);
+  font-size: clamp(1.2rem, 3vw, 1.45rem);
   color: var(--text);
   padding-left: 22px; /* room for the chevron below */
   position: relative;
