@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.8.0 — 2026/09/19
+
+### Added
+- Reworked section headers
+  - The whole bar is clickable now (instead of just the text) and made to look more like a button
+  - Each section now shows how many projects are inside it
+  - A small preview of project icons peeks out on the right side of a collapsed section and fades away once you expand it
+
 ## v0.7.1 — 2026/09/19
 
 ### Added
