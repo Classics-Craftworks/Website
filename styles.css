@@ -281,6 +281,13 @@ p { margin: 0; }
   background: var(--surface-hover);
   border: 1px solid var(--border);
   flex-shrink: 0;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Swap to a darker colour so the counter badge still stands out on hover. */
+.catalog-section > summary:hover .section-count {
+  background: color-mix(in srgb, var(--surface-hover), white 15%);
+  border-color: color-mix(in srgb, var(--border), white 15%);
 }
 
 /* A little stack of project thumbnails peeking out on the right of a
