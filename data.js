@@ -165,16 +165,6 @@ const SITE_DATA = {
                 { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2" },
                 { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2+mod" }
               ]
-            },
-            {
-              channel: "unavailable",
-              label: "No Betas",
-              version: "N/A",
-              mcVersion: "1.21.5 – 1.21.8",
-              downloads: [
-                { label: "Data Pack", icon: "brackets", disabled: true },
-                { label: "Mod", icon: "box", disabled: true }
-              ]
             }
           ]
         }
@@ -288,15 +278,6 @@ const SITE_DATA = {
               mcVersion: "1.21.9 – 26.3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1" }
-              ]
-            },
-            {
-              channel: "unavailable",
-              label: "No Betas",
-              version: "N/A",
-              mcVersion: "1.21.9 – 26.3",
-              downloads: [
-                { label: "Resource Pack", icon: "brush", disabled: true }
               ]
             }
           ]

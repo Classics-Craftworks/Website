@@ -436,7 +436,11 @@ p { margin: 0; }
 
 /* Card Outer Shell */
 .channel-group {
-  flex: 1 1 0;
+  /* flex-basis matches what a box would be if it had one sibling
+     (50% minus half the row gap), and flex-grow: 0 means a channel
+     box with NO sibling won't stretch to fill the row — it stays the
+     same size whether it's paired with another box or standing alone. */
+  flex: 0 1 calc(50% - 6px);
   min-width: 0;
   border: 1.5px solid rgba(var(--channel-rgb), var(--alpha-medium));
   border-radius: 12px;
