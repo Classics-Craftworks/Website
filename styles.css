@@ -221,6 +221,13 @@ p { margin: 0; }
   position: relative;
 }
 
+/* The text sits in its own inline span so it can shrink on click
+   without dragging the h2::after chevron (below) along with it. */
+.heading-label {
+  display: inline-block;
+  transition: transform 0.1s ease;
+}
+
 /* Custom collapse/expand chevron, positioned at the left edge of the heading */
 .catalog-section h2::after {
   content: '';
@@ -486,8 +493,9 @@ p { margin: 0; }
 .download-btn:active,
 .project-links a:active,
 .top-link:active,
-.social-link:active {
-  transform: scale(0.92);
+.social-link:active,
+.catalog-section h2:active .heading-label {
+  transform: scale(0.95);
 }
 
 /* ---------- Unavailable States ---------- */

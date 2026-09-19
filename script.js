@@ -186,7 +186,9 @@ function renderSections(sections) {
     );
     const sectionEl = el('details', { class: 'catalog-section' }, [
       el('summary', {}, [
-        el('h2', { text: section.heading })
+        el('h2', {}, [
+          el('span', { class: 'heading-label', text: section.heading })
+        ])
       ]),
       list
     ]);
