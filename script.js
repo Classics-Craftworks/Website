@@ -201,7 +201,7 @@ function renderSectionSummary(section) {
   // Only peek at a handful of thumbnails so the stack doesn't get silly
   // on sections with lots of projects — anything past that becomes a
   // plain "+N" chip instead of another image.
-  const maxPeek = 5;
+  const maxPeek = 4;
   const peekThumbs = projects.slice(0, maxPeek).map(p => el('img', {
     class: 'section-peek-thumb',
     src: p.image,
