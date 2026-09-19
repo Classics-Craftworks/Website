@@ -301,11 +301,11 @@ p { margin: 0; }
 
 .section-peek-thumb,
 .section-peek-more {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   flex-shrink: 0;
-  margin-left: -10px;
+  margin-left: -12px;
   /* Matches the card's own background, so overlapping thumbnails look
      "cut out" from one another instead of just stacking messily. */
   border: 2px solid var(--surface);
@@ -324,7 +324,7 @@ p { margin: 0; }
   justify-content: center;
   background: var(--surface-hover);
   color: var(--text-soft);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
