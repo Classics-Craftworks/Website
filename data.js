@@ -8,8 +8,8 @@
    - Images: Place files in /images and set the relative path (e.g., "images/logo.png").
    - Icons: Place PNG files in /images/icons/ and refer to them by filename without extension.
    - Projects: Copy an existing project object block {...} inside the "projects" array to add a new project.
-   - Channels: Each project supports "stable", "beta", "alpha", or "unsupported" channels. Add
-     "disabled: true" to a download label if a build is unavailable.
+   - Channels: Each project supports "stable", "beta", "alpha", or "unsupported" channels. Add "disabled: true"
+     to a download label if a build is unavailable.
    ============================================================ */
 
 // This whole file is one big JavaScript object. script.js reads values
@@ -26,7 +26,7 @@ const SITE_DATA = {
 
   // Website version shown at the very bottom of the page.
    version: {
-    label: "v0.9.0",
+    label: "v0.10.0",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 

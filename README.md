@@ -2,7 +2,7 @@
 
 Classic's Craftworks is a collection of Minecraft projects focused on adding new and quality-of-life crafting recipes, as well as other enhancements, to Minecraft Java Edition.
 
-This repository contains the source code for the Classic's Craftworks website.
+This repository contains the source code for the [Classic's Craftworks website](https://classicscraftworks.co.uk/).
 
 ## Features
 
