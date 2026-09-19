@@ -145,6 +145,38 @@ const SITE_DATA = {
               ]
             }
           ]
+        },
+        {
+          image: "images/new-sword-blocking.png",
+          title: "New Sword Blocking",
+          description: "Restores and enhances sword blocking in Minecraft 1.21.5 – 1.21.8",
+          links: [
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/new-sword-blocking" },
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/New-Sword-Blocking" },
+            { label: "Wiki", icon: "book", url: "https://github.com/Classics-Craftworks/New-Sword-Blocking/wiki" }
+          ],
+          channels: [
+            {
+              channel: "unsupported",
+              label: "Unsupported",
+              version: "v1.1.2",
+              mcVersion: "1.21.5 – 1.21.8",
+              downloads: [
+                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2" },
+                { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2+mod" }
+              ]
+            },
+            {
+              channel: "unavailable",
+              label: "No Betas",
+              version: "N/A",
+              mcVersion: "1.21.5 – 1.21.8",
+              downloads: [
+                { label: "Data Pack", icon: "brackets", disabled: true },
+                { label: "Mod", icon: "box", disabled: true }
+              ]
+            }
+          ]
         }
       ]
     },
