@@ -662,7 +662,7 @@ p { margin: 0; }
 }
 
 .social-link {
-  position: relative; /* For tooltip positioning */
+  position: relative; /* anchors the tooltip's absolute positioning below */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -681,7 +681,7 @@ p { margin: 0; }
 }
 
 /* Tooltips on hover */
-.social-link::after {
+[data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
   bottom: 100%;
@@ -706,8 +706,8 @@ p { margin: 0; }
 }
 
 /* Show Tooltip on Hover & Keyboard Focus */
-.social-link:hover::after,
-.social-link:focus-visible::after {
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
   opacity: 1;
   visibility: visible;
   color: var(--text);
