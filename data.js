@@ -240,6 +240,34 @@ const SITE_DATA = {
               ]
             }
           ]
+        },
+        {
+          image: "images/zisteau-pigmen.png",
+          title: "Zisteau Pigmen",
+          description: "Zombified Piglins named 'Zisteau' become Zombie Pigmen.",
+          links: [
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/zisteau-pigmen" }
+          ],
+          channels: [
+            {
+              channel: "stable",
+              label: "Release",
+              version: "v2.4.1",
+              mcVersion: "1.21.9 – 26.3",
+              downloads: [
+                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1" }
+              ]
+            },
+            {
+              channel: "unavailable",
+              label: "No Betas",
+              version: "N/A",
+              mcVersion: "1.21.9 – 26.3",
+              downloads: [
+                { label: "Resource Pack", icon: "brush", disabled: true }
+              ]
+            }
+          ]
         }
       ]
     },
