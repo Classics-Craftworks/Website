@@ -41,12 +41,15 @@ const SITE_DATA = {
   // plus a list of projects). Add, remove, or reorder sections
   // and projects freely — the layout will adjust automatically.
   sections: [
+    // #region ▓▓▓▓▓▓▓▓▓▓▓▓  DATA PACKS & MODS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Data Packs & Mods",
       projects: [
         // Each object in this "projects" array becomes one project card
         // on the page. Copy an entire { ... } block like this one and
         // paste it here (with a trailing comma) to add a new project.
+
+        // #region ──────── Better Craftables ────────
         {
           image: "images/better-craftables.png",
           title: "Better Craftables",
@@ -80,6 +83,9 @@ const SITE_DATA = {
             }
           ]
         },
+        // #endregion Better Craftables
+
+        // #region ──────── Better Unpackables ────────
         {
           image: "images/better-unpackables.png",
           title: "Better Unpackables",
@@ -113,6 +119,9 @@ const SITE_DATA = {
             }
           ]
         },
+        // #endregion Better Unpackables
+
+        // #region ──────── Silly Eatables ────────
         {
           image: "images/silly-eatables.png",
           title: "Silly Eatables",
@@ -146,6 +155,9 @@ const SITE_DATA = {
             }
           ]
         },
+        // #endregion Silly Eatables
+
+        // #region ──────── New Sword Blocking ────────
         {
           image: "images/new-sword-blocking.png",
           title: "New Sword Blocking",
@@ -168,11 +180,16 @@ const SITE_DATA = {
             }
           ]
         }
+        // #endregion New Sword Blocking
       ]
     },
+    // #endregion DATA PACKS & MODS
+
+    // #region ▓▓▓▓▓▓▓▓▓▓▓▓  RESOURCE PACKS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Resource Packs",
       projects: [
+        // #region ──────── Classic's Disc Tweaks ────────
         {
           image: "images/disc-tweaks.png",
           title: "Classic's Disc Tweaks",
@@ -203,6 +220,9 @@ const SITE_DATA = {
             }
           ]
         },
+        // #endregion Classic's Disc Tweaks
+
+        // #region ──────── Classic's Dye Tweaks ────────
         {
           image: "images/dye-tweaks.png",
           title: "Classic's Dye Tweaks",
@@ -233,6 +253,9 @@ const SITE_DATA = {
             }
           ]
         },
+        // #endregion Classic's Dye Tweaks
+
+        // #region ──────── Classic's Lantern Tweaks ────────
         {
           image: "images/lantern-tweaks.png",
           title: "Classic's Lantern Tweaks",
@@ -263,6 +286,9 @@ const SITE_DATA = {
             }
           ]
         },
+        // #endregion Classic's Lantern Tweaks
+
+        // #region ──────── Zisteau Pigmen ────────
         {
           image: "images/zisteau-pigmen.png",
           title: "Zisteau Pigmen",
@@ -282,12 +308,17 @@ const SITE_DATA = {
             }
           ]
         }
+        // #endregion Zisteau Pigmen
       ]
     },
+    // #endregion RESOURCE PACKS
+
+    // #region ▓▓▓▓▓▓▓▓▓▓▓▓  OTHER PROJECTS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Other Projects",
       defaultOpen: false,
       projects: [
+        // #region ──────── CraftHorizon ────────
         {
           image: "images/crafthorizon.png",
           title: "CraftHorizon",
@@ -298,8 +329,10 @@ const SITE_DATA = {
             { label: "Wiki", icon: "book", url: "https://classicscraftworks.gitbook.io/crafthorizon/" }
           ]
         }
+        // #endregion CraftHorizon
       ]
     }
+    // #endregion OTHER PROJECTS
   ],
 
   // Social links shown at the bottom of the page.
