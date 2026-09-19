@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.11.1 — 2026/09/19
+
+### Changed
+- Decreased size of section headers slightly
+- Decreased the overlap of peek icons
+- Slightly increased the size of peek icons
+
 ## v0.11.0 — 2026/09/19
 
 ### Added
