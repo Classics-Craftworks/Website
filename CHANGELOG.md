@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.11.0 — 2026/09/19
+
+### Added
+- "Back to top" button, appears when the user has scrolled 400px down the page
+
 ## v0.10.1 — 2026/09/19
 
 ### Changed
