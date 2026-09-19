@@ -242,6 +242,21 @@ const SITE_DATA = {
           ]
         }
       ]
+    },
+    {
+      heading: "Other Projects",
+      projects: [
+        {
+          image: "images/crafthorizon.png",
+          title: "CraftHorizon",
+          description: "Whitelisted Minecraft server, with a focus on vanilla+ Survival and Creative gameplay.",
+          links: [
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/server/crafthorizon" },
+            { label: "Trello", icon: "document", url: "https://trello.com/b/TK7pofcG/crafthorizon" },
+            { label: "Wiki", icon: "book", url: "https://classicscraftworks.gitbook.io/crafthorizon/" }
+          ]
+        }
+      ]
     }
   ],
 
