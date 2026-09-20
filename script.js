@@ -428,7 +428,10 @@ function renderSectionNav(sections, sectionEls, accordions) {
       const sectionEl = sectionEls[i];
       const accordion = accordions[i];
       const jumpToSection = () => {
-        sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Same check as initBackToTop() below: an instant jump instead of
+        // a smooth scroll for anyone with prefers-reduced-motion set.
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        sectionEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
       };
 
       if (!sectionEl.open) {

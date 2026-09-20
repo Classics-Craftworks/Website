@@ -1280,6 +1280,27 @@ p { margin: 0; }
   margin-left: -6px;
   margin-right: -6px;
 }
+
+/* The accordion's own expand/collapse animation already checks
+   prefers-reduced-motion in script.js (see the Accordion class), but the
+   little "press" shrink on buttons and heading text below is pure CSS
+   and doesn't know about that setting on its own. This turns those
+   transform effects off for anyone who's asked for reduced motion,
+   while leaving the (non-motion) colour/background feedback on each of
+   these elements' :active and :hover states untouched. */
+@media (prefers-reduced-motion: reduce) {
+  .nav-jump-btn:active,
+  .nav-toggle-all:active,
+  .download-btn:active,
+  .project-links a:active,
+  .top-link:active,
+  .social-link:active,
+  .catalog-section > summary:active .heading-label {
+    transform: none;
+  }
+  .back-to-top.is-visible:active {
+    transform: translateY(0);
+  }
 }
 
 /* Belt-and-suspenders: an image should never be able to force its
