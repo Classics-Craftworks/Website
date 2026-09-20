@@ -161,7 +161,7 @@ const SITE_DATA = {
         {
           image: "images/new-sword-blocking.png",
           title: "New Sword Blocking",
-          description: "Restores and enhances sword blocking in Minecraft 1.21.5 – 1.21.8",
+          description: "Restores and enhances sword blocking in Minecraft 1.21.5 – 1.21.8!",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/new-sword-blocking" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/New-Sword-Blocking" },
