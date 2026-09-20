@@ -248,7 +248,7 @@ p { margin: 0; }
   display: inline-flex;
   align-items: center;
   border: 1px solid rgba(var(--white-rgb), 0.35);
-  border-radius: 999px;
+  border-radius: 6px;
   background: rgba(var(--white-rgb), var(--alpha-faint));
   color: var(--text);
   font: inherit;
