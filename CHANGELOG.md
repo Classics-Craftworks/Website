@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.12.0 — 2026/09/20
+
+### Added
+- Navigation bar to the top of the page
+  - Buttons to jump to sections
+  - Button to expand/collapse all sections
+  - Search bar
+
+### Fixed
+- Missing exclamation mark from New Sword Blocking's description
+
 ## v0.11.1 — 2026/09/19
 
 ### Changed
