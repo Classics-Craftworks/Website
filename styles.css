@@ -94,7 +94,36 @@
 
 * { box-sizing: border-box; }
 
+/* scrollbar-gutter: stable reserves space for a vertical scrollbar even
+   when the page doesn't need one, so desktop content doesn't reflow the
+   instant it grows past one screen and a scrollbar appears. On mobile
+   there's no such reflow to guard against — scrollbars there are
+   overlay/invisible and don't take up layout space — so the reservation
+   just leaves dead space the viewport can still scroll into sideways
+   with nothing there to see, which is exactly what a "no element bleeds
+   past the edge, but it still scrolls" report points to. Scoped off
+   below the mobile breakpoint instead of removed outright, so desktop
+   keeps the original reflow protection. */
 html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
+@media (max-width: 620px) {
+  html { scrollbar-gutter: auto; }
+}
+
+/* Belt-and-suspenders against horizontal scroll, on top of the more
+   targeted fixes below (the .masthead/#section-nav/#catalog/.site-footer
+   overflow rule, the scrollbar-gutter fix). overflow-x: clip is
+   deliberately used instead of hidden — per spec, 'clip' doesn't
+   establish a scroll container the way 'hidden' does (and doesn't force
+   overflow-y to 'auto' either, the coupling behind the Safari sticky bug
+   those other rules are written around) — so this can safely sit on
+   html/body themselves, ancestors of the sticky nav included, without
+   risking position: sticky anywhere on the page. This is a page that
+   never legitimately needs to scroll sideways, so simply disabling the
+   capability outright is more robust than continuing to chase down every
+   individual pixel-wide source of it one at a time. */
+html {
+  overflow-x: clip;
+}
 
 body {
   margin: 0;
@@ -103,6 +132,7 @@ body {
   font-family: var(--font);
   font-size: 16px;
   line-height: 1.55;
+  overflow-x: clip;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -153,7 +183,7 @@ p { margin: 0; }
   font-weight: 700;
   letter-spacing: 0.04em; /* Adds a gap between letters */
   margin-bottom: 0.20rem; /* Increases gap between title and tagline */
-  line-height: 1.05;
+  line-height: 1.35; /* This font's capitals have very little natural line spacing, so a wrapped second line (e.g. "Craftworks" on its own row) sat almost touching the first without this */
   text-wrap: balance;
 }
 
@@ -236,10 +266,10 @@ p { margin: 0; }
 
 /* ---------- Expand/Collapse All + search ---------- */
 /* The toggle-all button sits at the end of the jump row (separated from
-   the section buttons by .nav-divider) since it's a close cousin of
-   them — a navigation control, just acting on every section at once
-   instead of one. Search stays in its own group on the other side of
-   the bar. */
+   the section buttons by .nav-divider, appended alongside it in
+   script.js) since it's a close cousin of them — a navigation control,
+   just acting on every section at once instead of one. Search stays in
+   its own group on the other side of the bar. */
 .nav-controls {
   display: flex;
   align-items: center;
@@ -595,6 +625,13 @@ p { margin: 0; }
   padding: 14px 14px 16px;
   display: flex;
   flex-direction: column;
+  /* Lets the rules under "Container Queries" further down key off this
+     box's own rendered width, rather than the screen's. A paired channel
+     box (Release + Release Candidate side by side) can get just as
+     cramped on a wide-ish tablet as a single stacked box does on a phone
+     — what matters is how much room *this box* actually has, not which
+     device it's on. */
+  container-type: inline-size;
 }
 
 /* ---------- Header ---------- */
@@ -668,12 +705,21 @@ p { margin: 0; }
   font-weight: 600;
   color: var(--text);
   min-height: 24px; /* Fixes height shift when icon or pill is missing */
-  flex-wrap: nowrap;
+  flex-wrap: wrap; /* lets the pill drop to its own line below instead of squeezing/truncating — on desktop this only kicks in if it doesn't fit; on mobile .download-col-break forces it every time (see below) */
+  row-gap: 4px;
 }
 
 .download-type-label {
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* Forced line-break spacer between the label and the pill — see the
+   comment in script.js. Not a flex item at all by default, so it has
+   zero effect on this desktop layout (no extra gap, no forced wrap);
+   the mobile media query below is what activates it. */
+.download-col-break {
+  display: none;
 }
 
 /* ---------- Version Pills ---------- */
@@ -694,7 +740,7 @@ p { margin: 0; }
   text-overflow: ellipsis;
   max-width: 100%;
   min-width: 0;
-  flex-shrink: 1;
+  flex-shrink: 0; /* never squeeze/truncate the version text — .download-col-header wraps it to its own line instead when space runs out */
 }
 
 .pill.disabled-pill {
@@ -870,6 +916,26 @@ p { margin: 0; }
   transform: translateX(-50%) translateY(-10px);
 }
 
+/* #back-to-top sits right up against the viewport's right edge (see
+   .back-to-top below), so the default centered tooltip above — which
+   positions itself with left: 50% / translateX(-50%) relative to the
+   button — pokes out past the edge of the screen on every viewport
+   width. That box still counts toward the page's scrollable area even
+   while invisible (visibility: hidden doesn't remove it from layout the
+   way display: none would), so it was adding a permanent horizontal
+   scrollbar to the whole page. Anchor this one tooltip's right edge to
+   the button's right edge instead of centering it, so it always stays
+   within the viewport. */
+#back-to-top[data-tooltip]::after {
+  left: auto;
+  right: 0;
+  transform: translateY(-4px);
+}
+#back-to-top[data-tooltip]:hover::after,
+#back-to-top[data-tooltip]:focus-visible::after {
+  transform: translateY(-10px);
+}
+
 .footer-line {
   font-size: 0.82rem;
   color: var(--text-soft);
@@ -920,39 +986,251 @@ p { margin: 0; }
   color: var(--text);
 }
 
+/* ---------- Channel box: narrow-container adjustments ---------- */
+/* Keyed to .channel-group's own rendered width (see container-type on
+   that rule, in the "Channels" section above), not the screen's. A
+   channel box gets cramped for the same reason regardless of *why* it's
+   narrow — paired with a sibling box on a phone, paired on a tablet, or
+   just a narrow browser window — so one rule set keyed off its actual
+   size handles all of those, instead of a screen-width breakpoint that
+   only caught some of them (a tablet showing two side-by-side boxes was
+   falling through a phone-only breakpoint and hitting exactly this
+   squeeze). 360px is roughly the width at which "icon + Data Pack + a
+   version pill" stops comfortably fitting on one line within a single
+   download column.
+   Placed here, after every base rule it touches (.channel-header,
+   .download-btn, etc.) rather than immediately next to them — a
+   @container block has no more specificity than a plain class selector,
+   so if it came *before* one of those base rules in the file, the base
+   rule would win the cascade and silently override it even while the
+   query matched (which is exactly what happened with .download-btn when
+   this was first written right after .pill, above the "Buttons"
+   section's own .download-btn rule). */
+@container (max-width: 360px) {
+  /* The header (dot + name + Java version) can overflow onto a second
+     line once a long version range (e.g. "26.3-pre-3 – 26.3-rc-3") is
+     involved. Rather than letting that wrap mid-run — which breaks the
+     pipe separator onto its own orphaned line — give the version its
+     own full-width line, indented to align under the label. */
+  .channel-header {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+  .channel-sep {
+    display: none;
+  }
+  .channel-mc {
+    flex-basis: 100%;
+    padding-left: 18px;
+  }
+
+  /* Activate the break spacer (see script.js + the base rule above) so
+     every version pill lands on its own line here, instead of only
+     wrapping when it happens not to fit next to the label — "Mod
+     v1.1.2" no longer sits on one line while "Data Pack v1.1.2" wraps
+     to two right next to it. It's zero-height so it doesn't add a
+     visible gap of its own; the pill's own row-gap (set on
+     .download-col-header) provides the spacing above it. flex-basis:
+     100% is what forces the line break — same trick .channel-mc uses
+     above for the Java version, just on an invisible spacer here
+     rather than the pill itself, so the pill keeps its normal chip
+     size instead of stretching full-width. Scoped to .has-multiple
+     (two download columns side by side, see script.js) — a channel
+     with only one download type has the full row to itself, so
+     there's no cramped-column reason to force a break. */
+  .channel-downloads.has-multiple .download-col-break {
+    display: block;
+    flex-basis: 100%;
+    height: 0;
+  }
+
+  /* Lines the pill up under the label text instead of under the icon —
+     23px = the icon's width (15px) + its gap to the label (8px), the
+     same logic .channel-mc uses for the Java version line above.
+     margin-left (not padding-left) — padding only pushes the text
+     inside the pill's box to the right while its border/background
+     stay flush against the left edge; margin moves the whole chip.
+     Same .has-multiple scoping as the break spacer above, so a
+     single-column channel's pill keeps sitting flush next to its
+     label. */
+  .channel-downloads.has-multiple .download-col-header .pill {
+    margin-left: 23px;
+  }
+}
+
+/* One tier narrower still: even the shrunk-down Download button above
+   stops fitting two side-by-side columns once a channel box gets this
+   tight (a phone showing two channels stacked full-width doesn't reach
+   this — it's specifically the "two channels *and* two download types,
+   both squeezed" combination, which mostly shows up on tablet widths).
+   Rather than shrinking the button further, which would start making it
+   hard to read or tap, stack Data Pack above Mod instead — each column
+   then gets the box's full width, at full size, no compromise needed. */
+@container (max-width: 300px) {
+  .channel-downloads.has-multiple {
+    flex-direction: column;
+    gap: 14px;
+  }
+  /* The divider between columns was a left border (for side-by-side
+     columns); stacked, it needs to run along the top instead. */
+  .channel-downloads.has-multiple .download-col + .download-col {
+    padding-left: 0;
+    padding-top: 14px;
+    border-left: none;
+    border-top: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
+  }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 620px) {
+  /* Free up horizontal space on narrow phones — the fixed 24px side
+     margins were the biggest single contributor to buttons/pills
+     wrapping awkwardly, since every row had ~48px less to work with. */
+  .page {
+    padding: 20px 16px 20px;
+  }
+
   .masthead {
     grid-template-columns: auto 1fr;
+    /* The base rule above centers the logo against the full height of
+       whatever's beside it. On desktop that's fine — the title/tagline
+       are short enough to roughly match the logo's own height — but on
+       mobile the title wraps to two lines and the tagline to two more,
+       so a vertically-centered logo drifts down away from the title
+       and ends up looking like it's floating next to the tagline
+       instead. Top-align the row here so the logo's top edge lines up
+       with the top of the title instead. */
+    align-items: start;
+    gap: 12px;
+  }
+  /* Slightly smaller logo so the brand row has more room to breathe
+     once the nav links drop to their own line below it. */
+  .brand-logo {
+    width: 64px;
+    height: 64px;
+    transform: none;
   }
   .link-row {
-    grid-column: 1 / -1;
+    grid-column: 2 / -1; /* line up with the brand text above instead of the logo — starting under the logo made this row look disconnected from everything else in the header */
     justify-self: start;
     margin-top: 14px;
   }
+
   .section-nav {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
+    padding: 12px 0;
+  }
+
+  /* Switched from flex-wrap to a real 2-column grid here. Flex-wrap packs
+     each row independently, so a wide button in row 1 (e.g. "Data Packs
+     & Mods") shifts everything after it, while a narrower row-2 button
+     (e.g. "Other Projects") starts the next row at a different offset —
+     the columns drift out of line with each other. Grid defines the
+     column widths once for the whole row, so every button lines up
+     underneath the one above it regardless of label length. */
+  .nav-jump-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .nav-jump-btn {
+    padding: 9px 16px; /* slightly taller tap target on touch screens */
+    justify-content: center; /* center the label now that the button fills its grid cell instead of hugging its own text */
+    min-width: 0; /* lets the label wrap/shrink instead of forcing its grid column wider than the viewport if a heading is ever long */
+  }
+
+  /* Expand/Collapse All lives inside the jump-button row (see script.js),
+     so it sits in the grid and grows tap targets right along with the
+     section buttons rather than needing its own layout rules here. */
+  .nav-toggle-all {
+    flex-shrink: 0;
+    padding: 9px 14px;
+    justify-content: center;
+  }
+  .nav-divider {
+    display: none; /* a thin vertical line doesn't read as a grouping cue once everything's arranged in a grid instead of a single row */
+  }
+  .nav-controls {
+    gap: 10px;
   }
   .nav-search-wrap {
     max-width: none;
+    flex: 1 1 auto;
+    min-width: 0;
   }
+
+  /* Same fix as .nav-jump-row above: a real grid instead of flex-wrap so
+     the project link chips (Modrinth/GitHub/Wiki/etc.) line up in
+     consistent columns regardless of how long each label is. */
+  .project-links {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .project-links a,
+  .project-links .top-link {
+    justify-content: center;
+    min-width: 0; /* same insurance as .nav-jump-btn above */
+  }
+
+  /* Project cards: keep the thumbnail small and square (matching its
+     source aspect ratio) instead of stretching it into a full-width
+     140px-tall banner. Object-fit: cover on a wide short box crops
+     square artwork/logos badly — icons end up with their edges cut off
+     or looking stretched. A compact square icon beside the title also
+     keeps cards shorter, so more of the catalog fits on screen at once. */
   .project {
-    grid-template-columns: 1fr;
+    grid-template-columns: 64px 1fr;
+    gap: 14px;
+    padding: 18px 0;
   }
   .project-image {
-    width: 100%;
-    height: 140px;
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
   }
+  .project-body h3 {
+    font-size: 1.25rem;
+    transform: none;
+  }
+
   .channel-row {
     flex-direction: column;
   }
   .download-btn {
     min-width: 0;
   }
+
   .section-peek {
     display: none;
   }
+}
+
+/* Safety net against any remaining stray horizontal overflow (a very
+   long unbroken word in a project description, a custom font rendering
+   wider than the fallback used while testing, etc). Scoped to these four
+   elements specifically — all *siblings* of #section-nav, never one of
+   its ancestors — rather than applied to html/body/.page, which would
+   risk silently breaking the nav's position: sticky in Safari on iOS (a
+   long-standing WebKit quirk where sticky positioning stops working if
+   any ancestor of the sticky element has overflow set to anything other
+   than visible). #section-nav is included too — safe here since this is
+   the sticky element itself, not an ancestor of it. */
+.masthead, #section-nav, #catalog, .site-footer {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Belt-and-suspenders: an image should never be able to force its
+   container wider than the viewport, even if a future edit to data.js
+   swaps in one without matching width/height CSS. Elements that already
+   set explicit dimensions (.brand-logo, .project-image, etc.) are
+   unaffected, since those are narrower than 100% of their container
+   anyway. */
+img, svg {
+  max-width: 100%;
 }
 
 /* ---------- 404 Page ---------- */

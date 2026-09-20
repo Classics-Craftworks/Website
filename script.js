@@ -89,7 +89,15 @@ function renderChannel(ch) {
   ]);
 
   // Container that will hold one column per download (Data Pack, Mod, etc.)
-  const downloads = el('div', { class: 'channel-downloads' });
+  // "has-multiple" flags channels with two download types side by side —
+  // that's the only layout tight enough on mobile to need the pill forced
+  // onto its own line (see .download-col-break below). A single-column
+  // channel (e.g. a resource-pack-only release) has the full row width to
+  // itself, so its pill comfortably sits inline next to the label instead.
+  const hasMultipleDownloads = (ch.downloads || []).length > 1;
+  const downloads = el('div', {
+    class: 'channel-downloads' + (hasMultipleDownloads ? ' has-multiple' : '')
+  });
 
   (ch.downloads || []).forEach(d => {
     // Each download in data.js explicitly says which icon to use
@@ -101,10 +109,18 @@ function renderChannel(ch) {
     // OR if it simply has no URL to link to.
     const isDisabled = d.disabled || !d.url;
 
-    // The small header inside each download column: icon + label + version pill
+    // The small header inside each download column: icon + label + version pill.
+    // The empty "break" span between the label and the pill does nothing on
+    // desktop (display: none — see .download-col-break in styles.css), but
+    // below the mobile breakpoint it becomes a zero-height, full-width flex
+    // item that forces the pill onto its own line every time, instead of
+    // only when it happens not to fit next to the label. That keeps every
+    // download column consistent on mobile, rather than some pills sitting
+    // inline and others wrapping depending on how long the label is.
     const headerChildren = [
       icon(typeIcon, 'icon-sm'),
       el('span', { class: 'download-type-label', text: d.label }),
+      el('span', { class: 'download-col-break', attrs: { 'aria-hidden': 'true' } }),
       el('span', { class: 'pill' + (isDisabled ? ' disabled-pill' : ''), text: isDisabled ? 'N/A' : ch.version })
     ];
 
@@ -474,6 +490,14 @@ function renderSectionNav(sections, sectionEls, accordions) {
   // until they manually toggled something.
   syncToggleAllLabel();
 
+  // Append the divider + toggle-all button to the jump row itself, right
+  // after the section buttons — they're both navigation controls, just
+  // acting on one section vs. all of them, so they read as one group
+  // instead of toggle-all being stranded over with the unrelated search box.
+  const toggleAllDivider = el('span', { class: 'nav-divider', attrs: { 'aria-hidden': 'true' } });
+  jumpRow.appendChild(toggleAllDivider);
+  jumpRow.appendChild(toggleAllBtn);
+
   /* ---------- Live search ---------- */
 
   const searchWrap = el('div', { class: 'nav-search-wrap' });
@@ -526,14 +550,21 @@ function renderSectionNav(sections, sectionEls, accordions) {
     syncToggleAllLabel(); // a search can open sections directly, bypassing the 'toggle' event below
   });
 
-  const divider = el('span', { class: 'nav-divider', attrs: { 'aria-hidden': 'true' } });
-  jumpRow.appendChild(divider);
-  jumpRow.appendChild(toggleAllBtn);
+  // The section jump buttons + Expand/Collapse All live in their own row,
+  // separate from search (see .nav-controls below). This row wraps onto
+  // as many lines as it needs on narrow screens rather than scrolling
+  // horizontally (see the .nav-jump-row rules inside the mobile media
+  // query in styles.css).
   nav.appendChild(jumpRow);
 
   searchWrap.appendChild(searchIcon);
   searchWrap.appendChild(searchInput);
 
+  // Search sits on its own on the other side of the bar (.section-nav's
+  // space-between handles the split) — it acts on the whole catalog like
+  // Expand/Collapse All does, but pairing it with a text input instead of
+  // the jump buttons would make the jump row's purpose (navigation) less
+  // clear at a glance.
   const controls = el('div', { class: 'nav-controls' }, [searchWrap]);
   nav.appendChild(controls);
 
@@ -543,8 +574,18 @@ function renderSectionNav(sections, sectionEls, accordions) {
   // controls. Re-measures whenever that row's size changes (window
   // resize, or its own content/font reflowing) rather than just once.
   const topLinks = document.getElementById('top-links');
+  const mobileQuery = window.matchMedia('(max-width: 620px)');
   if (topLinks) {
     const syncSearchWidth = () => {
+      // Below the mobile breakpoint the search box fills whatever space
+      // .nav-controls' flexbox gives it (see styles.css) instead of
+      // matching the masthead links — those links sit in their own
+      // stacked row on mobile and can be much narrower than the screen,
+      // which would otherwise force the search box to be narrow too.
+      if (mobileQuery.matches) {
+        searchWrap.style.width = '';
+        return;
+      }
       const width = topLinks.getBoundingClientRect().width;
       if (width > 0) searchWrap.style.width = `${Math.round(width)}px`;
     };
@@ -553,6 +594,15 @@ function renderSectionNav(sections, sectionEls, accordions) {
       new ResizeObserver(syncSearchWidth).observe(topLinks);
     } else {
       window.addEventListener('resize', syncSearchWidth);
+    }
+    // Crossing the mobile breakpoint doesn't always change #top-links'
+    // own size (e.g. it was already on one line either side of it), so
+    // the ResizeObserver above can miss it — listen for the breakpoint
+    // itself too.
+    if (mobileQuery.addEventListener) {
+      mobileQuery.addEventListener('change', syncSearchWidth);
+    } else {
+      mobileQuery.addListener(syncSearchWidth); // Safari <14 fallback
     }
   }
 }
