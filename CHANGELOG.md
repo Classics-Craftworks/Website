@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.13.1 — 2026/09/20
+
+### Changed
+- Slightly brightened soft text to pass contrast tests, most noticable in the footer
+- Changed round navigation bar buttons to rounded squares to fit the rest of the site
+- More animations now respect `prefers-reduced-motion` settings
+- Moved the Expand/Collapse All button away from the other nav bar buttons, and make the separator more visible
+
+### Fixed
+- Search bar having an ugly outline when active
+- Keyboard focus highlights being cut off at the edges of the page
+- Social link tooltips being cut off in the footer
+
 ## v0.13.0 — 2026/09/20
 
 ### Added
