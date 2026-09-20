@@ -264,6 +264,22 @@ p { margin: 0; }
 }
 .nav-jump-btn:active { transform: scale(0.97); }
 
+/* Filled in (instead of the ghost/outline treatment above) while its
+   section is expanded, so the jump row doubles as an at-a-glance
+   "what's open" indicator. Kept in sync with each section's real state
+   from script.js — including sections opened by clicking their own
+   heading, via Expand/Collapse All, or by typing into the search box —
+   not just clicks on the jump button itself. */
+.nav-jump-btn.is-open {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--bg);
+}
+.nav-jump-btn.is-open:hover {
+  background: color-mix(in srgb, var(--text), black 12%);
+  border-color: color-mix(in srgb, var(--text), black 12%);
+}
+
 /* ---------- Expand/Collapse All + search ---------- */
 /* The toggle-all button sits at the end of the jump row (separated from
    the section buttons by .nav-divider, appended alongside it in

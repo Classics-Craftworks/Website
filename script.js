@@ -412,12 +412,18 @@ function renderSectionNav(sections, sectionEls, accordions) {
   // just jumps to it and doesn't collapse anything.
   let lastJumpedIndex = null;
 
+  // Handles to every jump button, in the same order as sectionEls/accordions,
+  // so syncJumpButtonStates() below can look up "is this button's section
+  // open?" and fill it in accordingly.
+  const jumpButtons = [];
+
   sections.forEach((section, i) => {
     const btn = el('button', {
       class: 'nav-jump-btn',
       text: section.heading,
       attrs: { type: 'button' }
     });
+    jumpButtons.push(btn);
     btn.addEventListener('click', () => {
       const sectionEl = sectionEls[i];
       const accordion = accordions[i];
@@ -471,7 +477,25 @@ function renderSectionNav(sections, sectionEls, accordions) {
     const allOpen = accordions.every(a => a.el.open);
     toggleAllBtn.textContent = allOpen ? 'Collapse All' : 'Expand All';
   };
-  accordions.forEach(a => { a.onToggle = syncToggleAllLabel; });
+
+  // Fills in each jump button while its section is open, and reverts it
+  // to the plain ghost style once that section closes again — regardless
+  // of *how* it was opened or closed (its own jump button, its own
+  // heading, Expand/Collapse All, or the search box below).
+  const syncJumpButtonStates = () => {
+    jumpButtons.forEach((btn, i) => {
+      btn.classList.toggle('is-open', sectionEls[i].open);
+    });
+  };
+
+  // Both callbacks care about the same event (a section's state actually
+  // settling), so run them together rather than fighting over which one
+  // gets to be `onToggle`.
+  const onAccordionSettled = () => {
+    syncToggleAllLabel();
+    syncJumpButtonStates();
+  };
+  accordions.forEach(a => { a.onToggle = onAccordionSettled; });
 
   toggleAllBtn.addEventListener('click', () => {
     // If every section is already open, the button collapses all of them;
@@ -489,6 +513,11 @@ function renderSectionNav(sections, sectionEls, accordions) {
   // sections all loaded collapsed would see "Collapse All" sitting there
   // until they manually toggled something.
   syncToggleAllLabel();
+  // Same idea as the label above, but for each jump button's filled/ghost
+  // state — set it once up front from each section's restored open state,
+  // rather than leaving every button in its default ghost styling until
+  // something toggles.
+  syncJumpButtonStates();
 
   // Append the divider + toggle-all button to the jump row itself, right
   // after the section buttons — they're both navigation controls, just
@@ -547,7 +576,10 @@ function renderSectionNav(sections, sectionEls, accordions) {
     });
 
     noResults.hidden = !(query && !anyVisible);
-    syncToggleAllLabel(); // a search can open sections directly, bypassing the 'toggle' event below
+    // A search can open sections directly, bypassing the accordion's own
+    // onToggle callback above, so both of these need re-syncing here too.
+    syncToggleAllLabel();
+    syncJumpButtonStates();
   });
 
   // The section jump buttons + Expand/Collapse All live in their own row,
