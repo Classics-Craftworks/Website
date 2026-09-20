@@ -30,6 +30,7 @@
   --accent-hover:  #99fcf9;  /* accent hover */
   --border:        #3F3F46;  /* hairline borders/dividers */
   --border-rgb:    63, 63, 70;
+  --white-rgb:     255, 255, 255;  /* used for translucent white fills/borders (nav) */
 
 /* Channel Indicators & Colors */
   --ch-stable:     #22C55E;  /* stable channel */
@@ -185,9 +186,163 @@ p { margin: 0; }
 .top-link { gap: 7px; padding: 8px 14px; }
 .text-link { gap: 6px; padding: 6px 12px; color: var(--text-soft); }
 
+/* ---------- Section nav (jump links, expand/collapse all, search) ---------- */
+/* Sticks to the top of the viewport as you scroll, so jump/search/collapse
+   stay reachable no matter how far down the catalog you are. */
+.section-nav {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-jump-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Jump buttons get their own distinct pill treatment (white outline,
+   transparent fill, fully-rounded) so they read as "navigation" at a
+   glance, instead of blending in with the solid grey action buttons used
+   elsewhere on the page (.top-link, .text-link, .download-btn). */
+.nav-jump-btn {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(var(--white-rgb), 0.35);
+  border-radius: 999px;
+  background: rgba(var(--white-rgb), var(--alpha-faint));
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.nav-jump-btn:hover {
+  background: rgba(var(--white-rgb), var(--alpha-hover));
+  border-color: rgba(var(--white-rgb), 0.7);
+}
+.nav-jump-btn:active { transform: scale(0.97); }
+
+/* ---------- Expand/Collapse All + search ---------- */
+/* The toggle-all button sits at the end of the jump row (separated from
+   the section buttons by .nav-divider) since it's a close cousin of
+   them — a navigation control, just acting on every section at once
+   instead of one. Search stays in its own group on the other side of
+   the bar. */
+.nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* A plain sibling element, not part of the button — so hovering or
+   clicking on it never triggers the button's own hover/press styling. */
+.nav-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.nav-toggle-all {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.nav-toggle-all:hover { color: var(--text); background: var(--surface-hover); }
+.nav-toggle-all:active { transform: scale(0.97); }
+
+.nav-search-wrap {
+  position: relative;
+  flex: 0 1 auto;
+  width: 220px; /* default before JS measures the top-links row; kept in sync with it on load/resize */
+  max-width: 100%;
+}
+
+.nav-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-soft);
+  pointer-events: none;
+}
+
+.nav-search-input {
+  width: 100%;
+  /* Resets Chrome/Safari's native search-field chrome — which draws its
+     own rounded shape, inner shadow, and focus glow independently of
+     outline/box-shadow — so the custom focus ring below is the only ring
+     that ever shows. appearance:none alone isn't always enough in
+     WebKit; the pseudo-elements below need clearing too, since they're
+     what actually paints the native decorations/focus glow. */
+  -webkit-appearance: none;
+  appearance: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 8px 12px 8px 32px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.nav-search-input::-webkit-search-decoration,
+.nav-search-input::-webkit-search-cancel-button,
+.nav-search-input::-webkit-search-results-button,
+.nav-search-input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+.nav-search-input::placeholder { color: var(--text-soft); }
+/* Uses :focus (not just :focus-visible) so a mouse click into the box
+   gets this colour too, instead of falling back to the browser's own
+   default focus ring. !important guards against the global :focus-visible
+   rule elsewhere in this file, which otherwise also matches text inputs
+   on a plain mouse click in some browsers (they treat typing fields as
+   always needing a visible ring, regardless of input method). */
+.nav-search-input:focus {
+  outline: none !important;
+  border-color: rgba(var(--white-rgb), 0.8);
+  box-shadow: 0 0 0 3px rgba(var(--white-rgb), 0.25);
+}
+.nav-search-wrap:focus-within .nav-search-icon {
+  color: var(--text);
+}
+
+.nav-search-empty {
+  margin: 20px 0 0;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 /* ---------- Sections ---------- */
 .catalog-section {
   margin-top: 24px;
+  /* Keeps a section's heading clear of the sticky nav bar above when a
+     jump button (or find-in-page) scrolls straight to it. */
+  scroll-margin-top: 68px;
 }
 
 /* The Accordion class in script.js animates this element's `height`
@@ -774,6 +929,13 @@ p { margin: 0; }
     grid-column: 1 / -1;
     justify-self: start;
     margin-top: 14px;
+  }
+  .section-nav {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .nav-search-wrap {
+    max-width: none;
   }
   .project {
     grid-template-columns: 1fr;

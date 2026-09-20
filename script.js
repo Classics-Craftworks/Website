@@ -156,7 +156,11 @@ function renderProject(p) {
     (p.channels || []).map(renderChannel)
   );
 
-  return el('article', { class: 'project' }, [
+  // Plain-text blob used by the nav bar's search box (see renderSectionNav)
+  // to decide whether this card matches whatever someone typed.
+  const searchText = [p.title, p.description].filter(Boolean).join(' ').toLowerCase();
+
+  return el('article', { class: 'project', attrs: { 'data-search': searchText } }, [
     el('img', { class: 'project-image', src: p.image, alt: p.title, attrs: { loading: 'lazy' } }), // loading="lazy": don't download this image until it's about to scroll into view
     el('div', { class: 'project-body' }, [
       el('h3', { text: p.title }),
@@ -221,7 +225,16 @@ function renderSectionSummary(section) {
 
 function renderSections(sections) {
   const main = document.getElementById('catalog');
-  if (!main) return; // this page (e.g. 404.html) doesn't have a catalog — nothing to render
+  // this page (e.g. 404.html) doesn't have a catalog — nothing to render,
+  // and nothing for renderSectionNav() to hook into either
+  if (!main) return { sectionEls: [], accordions: [] };
+
+  // Handles to every section/accordion we build below, keyed by the same
+  // order as `sections` — renderSectionNav() uses these to jump to, expand,
+  // or collapse a given section from the nav bar.
+  const sectionEls = [];
+  const accordions = [];
+
   sections.forEach(section => {
     const list = el('div', { class: 'project-list' },
       section.projects.map(renderProject)
@@ -248,8 +261,13 @@ function renderSections(sections) {
     const defaultOpen = section.defaultOpen !== false;
     sectionEl.open = saved === null ? defaultOpen : saved === 'true';
     main.appendChild(sectionEl);
-    new Accordion(sectionEl, storageKey); // wires up the animated expand/collapse (see class below)
+    const accordion = new Accordion(sectionEl, storageKey); // wires up the animated expand/collapse (see class below)
+
+    sectionEls.push(sectionEl);
+    accordions.push(accordion);
   });
+
+  return { sectionEls, accordions };
 }
 
 // Makes a <details> element animate its open/close instead of snapping
@@ -262,13 +280,22 @@ function renderSections(sections) {
 // current value to its target value with the Web Animations API, and
 // only flips `open` (or removes it) once that animation finishes.
 class Accordion {
-  constructor(detailsEl, storageKey, { duration = 150, easing = 'ease-in-out' } = {}) {
+  constructor(detailsEl, storageKey, { duration = 150, easing = 'ease-in-out', onToggle = null } = {}) {
     this.el = detailsEl;
     this.storageKey = storageKey;
     this.summary = detailsEl.querySelector('summary');
     this.duration = duration;
     this.easing = easing;
     this.animation = null;
+    // Called only once the accordion's state has genuinely settled (after
+    // its animation finishes) — see runAnimation()/finish() below. This is
+    // deliberately NOT wired to the native <details> "toggle" event: toggle()
+    // briefly flips `open` false-then-true again when *closing* (to measure
+    // the collapsed height while keeping content visible for the animation),
+    // and that transient flip fires its own native toggle events which don't
+    // reflect the real end state. Listening to those directly is what used
+    // to make the Expand/Collapse All label flicker between states.
+    this.onToggle = onToggle;
 
     if (!this.summary) {
       throw new Error('Accordion: no <summary> element found inside details element.');
@@ -326,6 +353,7 @@ class Accordion {
       this.el.style.overflow = '';
       this.animation = null;
       this.saveState();
+      this.onToggle?.(); // notify listeners now that the state has actually settled
     };
 
     this.animation.onfinish = finish;
@@ -343,6 +371,189 @@ class Accordion {
   destroy() {
     this.animation?.cancel();
     this.summary.removeEventListener('click', this.onClick);
+  }
+}
+
+// Builds the sticky sub-nav under the masthead: one button per section that
+// jumps to (and expands, if needed) that section, an "Expand/Collapse All"
+// button, and a live search box that filters project cards as you type.
+//
+// `sectionEls` and `accordions` are the arrays returned by renderSections()
+// above, in the same order as `sections` — index i in one lines up with
+// index i in the others.
+function renderSectionNav(sections, sectionEls, accordions) {
+  const nav = document.getElementById('section-nav');
+  if (!nav || sectionEls.length === 0) return; // nothing to build a nav for (e.g. 404.html, or an empty catalog)
+
+  /* ---------- Jump-to-section buttons + Expand/Collapse All ---------- */
+
+  const jumpRow = el('div', { class: 'nav-jump-row' });
+
+  // Tracks which section (by index) was most recently expanded-and-jumped-to
+  // via one of these buttons. Clicking that same button again collapses the
+  // section. Clicking any other section's button — even one that's already
+  // open some other way (default-open, opened via its own heading, etc.) —
+  // just jumps to it and doesn't collapse anything.
+  let lastJumpedIndex = null;
+
+  sections.forEach((section, i) => {
+    const btn = el('button', {
+      class: 'nav-jump-btn',
+      text: section.heading,
+      attrs: { type: 'button' }
+    });
+    btn.addEventListener('click', () => {
+      const sectionEl = sectionEls[i];
+      const accordion = accordions[i];
+      const jumpToSection = () => {
+        sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+
+      if (!sectionEl.open) {
+        // Expand it first (if it's collapsed) so you're not scrolled to a
+        // heading with nothing visible underneath it. Wait for the expand
+        // animation to actually finish before scrolling — jumping mid
+        // animation (while the section's layout is still growing) is what
+        // used to make the first click "just expand" and need a second
+        // click to actually land on the section.
+        accordion.toggle(true);
+        if (accordion.animation) {
+          accordion.animation.finished.then(jumpToSection).catch(jumpToSection);
+        } else {
+          requestAnimationFrame(jumpToSection);
+        }
+        lastJumpedIndex = i;
+      } else if (lastJumpedIndex === i) {
+        // Already open, and this is the section we last jumped to — a
+        // second click on the same button collapses it again.
+        accordion.toggle(false);
+        lastJumpedIndex = null;
+      } else {
+        // Already open, but we haven't just jumped here — just jump to it.
+        jumpToSection();
+        lastJumpedIndex = i;
+      }
+    });
+    jumpRow.appendChild(btn);
+  });
+
+  // Expand/Collapse All sits at the end of the jump row, set apart from
+  // the section buttons by a divider (see nav-divider below) — it's a
+  // navigation control like them, just acting on every section at once.
+  const toggleAllBtn = el('button', {
+    class: 'nav-toggle-all',
+    text: 'Collapse All',
+    attrs: { type: 'button' }
+  });
+
+  // Keep the "Expand All" / "Collapse All" label honest even when a section
+  // is opened/closed some other way (its own heading, or a jump button).
+  // Hooked up via each Accordion's onToggle callback (fires once its state
+  // has actually settled) rather than the native <details> "toggle" event,
+  // which used to fire spuriously mid-animation and flicker the label.
+  const syncToggleAllLabel = () => {
+    const allOpen = accordions.every(a => a.el.open);
+    toggleAllBtn.textContent = allOpen ? 'Collapse All' : 'Expand All';
+  };
+  accordions.forEach(a => { a.onToggle = syncToggleAllLabel; });
+
+  toggleAllBtn.addEventListener('click', () => {
+    // If every section is already open, the button collapses all of them;
+    // otherwise it opens whichever ones aren't open yet.
+    const allOpen = accordions.every(a => a.el.open);
+    accordions.forEach(a => {
+      if (a.el.open === allOpen) a.toggle(!allOpen);
+    });
+    toggleAllBtn.textContent = allOpen ? 'Expand All' : 'Collapse All';
+  });
+
+  // Set the correct label immediately based on each section's *restored*
+  // state (localStorage / defaultOpen), instead of leaving the hardcoded
+  // "Collapse All" text from creation above. Without this, a visitor whose
+  // sections all loaded collapsed would see "Collapse All" sitting there
+  // until they manually toggled something.
+  syncToggleAllLabel();
+
+  /* ---------- Live search ---------- */
+
+  const searchWrap = el('div', { class: 'nav-search-wrap' });
+  const searchIcon = icon('search', 'nav-search-icon icon-sm');
+  const searchInput = el('input', {
+    class: 'nav-search-input',
+    attrs: {
+      type: 'search',
+      id: 'site-search',
+      placeholder: 'Search projects…',
+      'aria-label': 'Search projects'
+    }
+  });
+
+  const noResults = el('p', { class: 'nav-search-empty', text: 'No projects match your search.' });
+  noResults.hidden = true;
+  document.getElementById('catalog').appendChild(noResults);
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim().toLowerCase();
+    let anyVisible = false;
+
+    sectionEls.forEach(sectionEl => {
+      const projects = sectionEl.querySelectorAll('.project');
+      let visibleInSection = 0;
+
+      projects.forEach(project => {
+        const matches = !query || (project.dataset.search || '').includes(query);
+        project.style.display = matches ? '' : 'none';
+        if (matches) visibleInSection++;
+      });
+
+      const sectionHasMatch = visibleInSection > 0;
+      // Hide a section completely once nothing inside it matches; otherwise
+      // make sure it's visible (a previous search may have hidden it).
+      sectionEl.style.display = (query && !sectionHasMatch) ? 'none' : '';
+      if (sectionHasMatch) anyVisible = true;
+
+      if (query && sectionHasMatch && !sectionEl.open) {
+        // Force it open directly (no animation, no localStorage write) so
+        // typing quickly doesn't fight the accordion's own transitions.
+        // Left open once the search is cleared too, rather than snapping
+        // shut again — someone may still be reading it.
+        sectionEl.open = true;
+        sectionEl.dataset.state = 'expanded';
+      }
+    });
+
+    noResults.hidden = !(query && !anyVisible);
+    syncToggleAllLabel(); // a search can open sections directly, bypassing the 'toggle' event below
+  });
+
+  const divider = el('span', { class: 'nav-divider', attrs: { 'aria-hidden': 'true' } });
+  jumpRow.appendChild(divider);
+  jumpRow.appendChild(toggleAllBtn);
+  nav.appendChild(jumpRow);
+
+  searchWrap.appendChild(searchIcon);
+  searchWrap.appendChild(searchInput);
+
+  const controls = el('div', { class: 'nav-controls' }, [searchWrap]);
+  nav.appendChild(controls);
+
+  // Keep the search box the same width as the two link buttons in the
+  // masthead above it (#top-links), rather than a fixed guess — those
+  // buttons' combined width depends on their label text, which data.js
+  // controls. Re-measures whenever that row's size changes (window
+  // resize, or its own content/font reflowing) rather than just once.
+  const topLinks = document.getElementById('top-links');
+  if (topLinks) {
+    const syncSearchWidth = () => {
+      const width = topLinks.getBoundingClientRect().width;
+      if (width > 0) searchWrap.style.width = `${Math.round(width)}px`;
+    };
+    syncSearchWidth();
+    if (window.ResizeObserver) {
+      new ResizeObserver(syncSearchWidth).observe(topLinks);
+    } else {
+      window.addEventListener('resize', syncSearchWidth);
+    }
   }
 }
 
@@ -416,7 +627,8 @@ function initBackToTop() {
    out of the global scope, so they don't clash with anything else. */
 (function init() {
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
-  renderSections(SITE_DATA.sections);
+  const { sectionEls, accordions } = renderSections(SITE_DATA.sections);
+  renderSectionNav(SITE_DATA.sections, sectionEls, accordions);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   initBackToTop();
 })();
