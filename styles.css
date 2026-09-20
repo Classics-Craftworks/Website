@@ -144,6 +144,28 @@ p { margin: 0; }
   outline-offset: 3px;
 }
 
+/* The rule above covers every focusable element by default, but the
+   things a keyboard user actually tabs through most on this page —
+   section summary rows, download buttons, and the various link styles —
+   get their own explicit rule here too. That keeps their ring
+   intentional (and immune to being dropped later if a more specific
+   selector ever overrides `outline` on one of them) rather than relying
+   solely on the catch-all above. Each one already sets its own
+   border-radius elsewhere in this file, so the outline follows that
+   same rounded shape automatically. */
+.catalog-section > summary:focus-visible,
+.download-btn:focus-visible,
+.top-link:focus-visible,
+.text-link:focus-visible,
+.social-link:focus-visible,
+.version-link:focus-visible,
+.credits-link:focus-visible,
+.nav-jump-btn:focus-visible,
+.nav-toggle-all:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 /* Page width & padding */
 .page {
   max-width: 1100px;
@@ -1230,9 +1252,34 @@ p { margin: 0; }
    any ancestor of the sticky element has overflow set to anything other
    than visible). #section-nav is included too — safe here since this is
    the sticky element itself, not an ancestor of it. */
+/* A keyboard focus ring (2px outline + 3px offset = 5px beyond the
+   element's own border box) drawn by an element flush against one of
+   these containers' edges — a section summary row, the first/last jump
+   button, a masthead link, a project link column that lands at the
+   right edge on mobile — is exactly the kind of "overflow" this rule
+   clips, since it's visually outside the focused element's box too. The
+   6px of padding here gives that ring room to breathe, and the matching
+   negative margin cancels it back out so nothing actually shifts or
+   resizes for anyone *not* focused on an edge element.
+
+   overflow-x is `clip` rather than `hidden` for the same reason the
+   html rule above uses it: setting only overflow-x to `hidden` (or
+   `auto`/`scroll`) forces the *other* axis from its default `visible`
+   to `auto` too, per spec, which turned each of these elements into a
+   vertical scroll/clip container as a side effect nobody wanted — it's
+   what was cutting off the last catalog section's focus ring when
+   collapsed (clipped against #catalog's own bottom edge), the version
+   link's focus ring in the footer, and the social-link tooltips popping
+   up above the footer's top edge. `clip` clips the horizontal overflow
+   this rule exists for without that vertical coupling. */
 .masthead, #section-nav, #catalog, .site-footer {
-  overflow-x: hidden;
+  overflow-x: clip;
   max-width: 100%;
+  padding-left: 6px;
+  padding-right: 6px;
+  margin-left: -6px;
+  margin-right: -6px;
+}
 }
 
 /* Belt-and-suspenders: an image should never be able to force its
