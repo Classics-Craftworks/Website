@@ -316,11 +316,20 @@ p { margin: 0; }
 }
 
 /* A plain sibling element, not part of the button — so hovering or
-   clicking on it never triggers the button's own hover/press styling. */
+   clicking on it never triggers the button's own hover/press styling.
+   The extra left/right margin (on top of .nav-jump-row's own gap) gives
+   it a bit more breathing room from the section buttons on one side and
+   Expand/Collapse All on the other, so it reads more clearly as a
+   separator between two distinct groups instead of just another item in
+   the row. Only set here, not in the mobile media query below (where
+   this element is hidden entirely), so it has no effect on that layout.
+   Slightly brighter than --border too, so it actually stands out against
+   the section-nav's dark background instead of nearly disappearing. */
 .nav-divider {
   width: 1px;
-  height: 28px;
-  background: var(--border);
+  height: 30px;
+  margin: 0 8px;
+  background: rgba(var(--white-rgb), var(--alpha-border));
   flex-shrink: 0;
 }
 
