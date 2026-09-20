@@ -354,7 +354,6 @@ p { margin: 0; }
 .nav-search-input:focus {
   outline: none !important;
   border-color: rgba(var(--white-rgb), 0.8);
-  box-shadow: 0 0 0 3px rgba(var(--white-rgb), 0.25);
 }
 .nav-search-wrap:focus-within .nav-search-icon {
   color: var(--text);
