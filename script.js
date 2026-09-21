@@ -75,6 +75,17 @@ function el(tag, opts = {}, children = []) {
   return node;
 }
 
+// Updates the address bar to point at #id (e.g. a section or project
+// anchor — see assignSlug()) without navigating anywhere or firing a
+// hashchange/scroll. Used anywhere a click already does its own
+// scrolling/copying and just needs the URL to reflect where you ended up,
+// the same way a real anchor link's URL would.
+function setHashSilently(id) {
+  const url = `${location.origin}${location.pathname}#${id}`;
+  try { history.pushState(null, '', url); } catch { /* not fatal — whatever triggered this still works, just without the URL updating */ }
+  return url;
+}
+
 // Small "copy link" icon-button used by both section headings and project
 // titles (see renderSectionSummary()/renderProject() below) to let people
 // grab a direct #anchor link to that section or project. label is used
@@ -95,13 +106,7 @@ function copyLinkButton(id, label) {
     e.preventDefault();
     e.stopPropagation();
 
-    const url = `${location.origin}${location.pathname}#${id}`;
-
-    // history.pushState (not location.hash =) updates the address bar
-    // and browser history the same way a real anchor link would, but
-    // without also firing a native hashchange/scroll — this button
-    // already does its own copying rather than navigating anywhere.
-    try { history.pushState(null, '', url); } catch { /* not fatal — clipboard copy below still works */ }
+    const url = setHashSilently(id);
 
     const showCopied = () => {
       btn.classList.add('is-copied');
@@ -533,6 +538,13 @@ function renderSectionNav(sections, sectionEls, accordions) {
     btn.addEventListener('click', () => {
       const sectionEl = sectionEls[i];
       const accordion = accordions[i];
+
+      // Updates the address bar to this section's #anchor (see
+      // assignSlug()/setHashSilently()) so the jump buttons behave like
+      // real deep links — copyable straight from the address bar, and
+      // usable with browser back/forward — not just an in-page scroll.
+      setHashSilently(sectionEl.id);
+
       const jumpToSection = () => {
         // Same check as initBackToTop() below: an instant jump instead of
         // a smooth scroll for anyone with prefers-reduced-motion set.
