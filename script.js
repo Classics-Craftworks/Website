@@ -378,14 +378,17 @@ function renderSections(sections) {
 
   // Handles to every section/accordion we build below, keyed by the same
   // order as `sections` — renderSectionNav() uses these to jump to, expand,
-  // or collapse a given section from the nav bar.
+  // or collapse a given section from the nav bar. projectsBySection keeps
+  // each section's already-built project <article> elements too, so the
+  // live search box in renderSectionNav() can filter them directly instead
+  // of re-querying the DOM with querySelectorAll on every keystroke.
   const sectionEls = [];
   const accordions = [];
+  const projectsBySection = [];
 
   sections.forEach(section => {
-    const list = el('div', { class: 'project-list' },
-      section.projects.map(renderProject)
-    );
+    const projectEls = section.projects.map(renderProject);
+    const list = el('div', { class: 'project-list' }, projectEls);
     // Gives this section a stable #anchor (e.g. #data-packs-mods) so it
     // can be linked to directly — see copyLinkButton() and the hash
     // handling near the bottom of this file.
@@ -411,9 +414,10 @@ function renderSections(sections) {
 
     sectionEls.push(sectionEl);
     accordions.push(accordion);
+    projectsBySection.push(projectEls);
   });
 
-  return { sectionEls, accordions };
+  return { sectionEls, accordions, projectsBySection };
 }
 
 // Makes a <details> element animate its open/close instead of snapping
@@ -516,10 +520,10 @@ class Accordion {
 // jumps to (and expands, if needed) that section, an "Expand/Collapse All"
 // button, and a live search box that filters project cards as you type.
 //
-// `sectionEls` and `accordions` are the arrays returned by renderSections()
-// above, in the same order as `sections` — index i in one lines up with
-// index i in the others.
-function renderSectionNav(sections, sectionEls, accordions) {
+// `sectionEls`, `accordions` and `projectsBySection` are the arrays
+// returned by renderSections() above, in the same order as `sections` —
+// index i in one lines up with index i in the others.
+function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
   const nav = document.getElementById('section-nav');
   if (!nav || sectionEls.length === 0) return; // nothing to build a nav for (e.g. 404.html, or an empty catalog)
 
@@ -700,8 +704,8 @@ function renderSectionNav(sections, sectionEls, accordions) {
     const query = searchInput.value.trim().toLowerCase();
     let anyVisible = false;
 
-    sectionEls.forEach(sectionEl => {
-      const projects = sectionEl.querySelectorAll('.project');
+    sectionEls.forEach((sectionEl, i) => {
+      const projects = projectsBySection[i];
       let visibleInSection = 0;
 
       projects.forEach(project => {
@@ -929,8 +933,8 @@ function handleDeepLink() {
    out of the global scope, so they don't clash with anything else. */
 (function init() {
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
-  const { sectionEls, accordions } = renderSections(SITE_DATA.sections);
-  renderSectionNav(SITE_DATA.sections, sectionEls, accordions);
+  const { sectionEls, accordions, projectsBySection } = renderSections(SITE_DATA.sections);
+  renderSectionNav(SITE_DATA.sections, sectionEls, accordions, projectsBySection);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   initBackToTop();
   handleDeepLink();
