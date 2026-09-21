@@ -6,32 +6,34 @@ This repository contains the source code for the [Classic's Craftworks website](
 
 ## Features
 
-* Project listings for data packs, mods and resource packs
-* Stable and Beta release information
-* Download links for each project
-* Links to GitHub, Modrinth, SpigotMC and project wikis
+- Project listings for data packs, mods and resource packs, each split into their own collapsable category 
+- Release information and links for each project
+- Search and jump-to-section navigation to quickly find a project or category
+- Multiple release channels (stable, beta, alpha, unsupported) per project, each with its own download links
+- Responsive, accessible design with keyboard navigation and dark theme
 
 ## Projects
 
 The website currently features:
 
-* Better Craftables
-* Better Unpackables
-* Silly Eatables
-* Classic's Disc Tweaks
-* Classic's Dye Tweaks
-* Classic's Lantern Tweaks
+### Data Packs & Mods
 
-## Development
+- Better Craftables
+- Better Unpackables
+- Silly Eatables
+- New Sword Blocking (unsupported)
 
-The website is built using:
+### Resource Packs
 
-* HTML
-* CSS
-* JavaScript
+- Classic's Disc Tweaks
+- Classic's Dye Tweaks
+- Classic's Lantern Tweaks
+- Zisteau Pigmen (limited support)
 
-AI assistants were also used to assist with parts of the site.
+### Other Projects
+
+- CraftHorizon
 
 ## Credits
 
-Icons used on the site were provided by [Icons8](https://icons8.com).
+Link icons used on the site were provided by [Icons8](https://icons8.com).

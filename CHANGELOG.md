@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.13.2 — 2026/09/21
+
+### Changed
+- Improved colours across the site for better readability and accessibility
+- Reduced the size of social link icons in the footer
+- Slightly reduced section header padding
+- Updated wording of link icons credit in the footer
+- Moved logo down by 2px
+
+### Fixed
+- Incorrect colours for the Unsupported channel
+
 ## v0.13.1 — 2026/09/20
 
 ### Changed
