@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.14.0 — 2026/09/21
+
+### Added
+- Deep links for each section, and each project (e.g. `classicscraftworks.co.uk/#better-craftables` to jump to the Better Craftables section)
+  - Additionally, there is now a copy link icon next to each section & project for easier sharing
+- An 'x' icon to clear text from the search bar
+
+### Changed
+- Search now also looks for Minecraft versions & project versions
+- Removed the separator between the header and navigation bar, and reduced the padding between them
+- Changed "Back to home" button on 404 page to "Go Back"
+
+### Fixed
+- 404 page footer not matching with the main page
+
 ## v0.13.2 — 2026/09/21
 
 ### Changed
