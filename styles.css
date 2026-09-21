@@ -161,7 +161,9 @@ p { margin: 0; }
 .version-link:focus-visible,
 .credits-link:focus-visible,
 .nav-jump-btn:focus-visible,
-.nav-toggle-all:focus-visible {
+.nav-toggle-all:focus-visible,
+.copy-link-btn:focus-visible,
+.nav-search-clear:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
@@ -381,7 +383,7 @@ p { margin: 0; }
   color: var(--text);
   font: inherit;
   font-size: 0.85rem;
-  padding: 8px 12px 8px 32px;
+  padding: 8px 30px 8px 32px; /* right padding reserved for .nav-search-clear, even while it's hidden, so text doesn't jump around as it appears/disappears */
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .nav-search-input::-webkit-search-decoration,
@@ -404,6 +406,54 @@ p { margin: 0; }
 .nav-search-wrap:focus-within .nav-search-icon {
   color: var(--text);
 }
+
+/* Clears the search box and defocuses it (see the click handler in
+   script.js). Drawn as a plain "×" with two rotated bars rather than an
+   image icon, matching the chevron/back-to-top arrow elsewhere in this
+   file — no icon asset to keep in sync. */
+.nav-search-clear {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+/* Without this, the `display: flex` above wins over the browser's own
+   default `[hidden] { display: none }` rule — author stylesheets always
+   take precedence over the browser's built-in ones, regardless of
+   specificity — so setting the `hidden` property in script.js (see
+   updateClearButton()) was silently having no visual effect and the
+   button stayed visible even with an empty search box. */
+.nav-search-clear[hidden] {
+  display: none;
+}
+.nav-search-clear:hover,
+.nav-search-clear:focus-visible {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.nav-search-clear::before,
+.nav-search-clear::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.nav-search-clear::before { transform: rotate(45deg); }
+.nav-search-clear::after { transform: rotate(-45deg); }
 
 .nav-search-empty {
   margin: 20px 0 0;

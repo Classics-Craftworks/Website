@@ -257,8 +257,15 @@ function renderProject(p) {
   );
 
   // Plain-text blob used by the nav bar's search box (see renderSectionNav)
-  // to decide whether this card matches whatever someone typed.
-  const searchText = [p.title, p.description].filter(Boolean).join(' ').toLowerCase();
+  // to decide whether this card matches whatever someone typed. Includes
+  // each channel's MC version ("Java 1.20.1") and release version (the
+  // text shown on its pill, e.g. "v8.0.0") alongside the title/description,
+  // so searching "1.20.1" or "v8.0.0" finds the right project too.
+  const versionText = (p.channels || [])
+    .flatMap(ch => [ch.mcVersion, ch.version])
+    .filter(Boolean)
+    .join(' ');
+  const searchText = [p.title, p.description, versionText].filter(Boolean).join(' ').toLowerCase();
 
   // Gives this project a stable #anchor (e.g. #better-craftables) so it
   // can be linked to directly — see copyLinkButton() and the hash
@@ -643,11 +650,30 @@ function renderSectionNav(sections, sectionEls, accordions) {
     }
   });
 
+  // Clears the search box and defocuses it. Drawn as a plain CSS "×" (two
+  // rotated bars, same technique as the chevron/back-to-top icons
+  // elsewhere in this file) rather than an image icon, so it doesn't
+  // depend on an icons8 asset existing. Only shown once there's actually
+  // something to clear — see updateClearButton() below.
+  const clearBtn = el('button', {
+    class: 'nav-search-clear',
+    attrs: { type: 'button', 'aria-label': 'Clear search' }
+  });
+  clearBtn.hidden = true;
+
   const noResults = el('p', { class: 'nav-search-empty', text: 'No projects match your search.' });
   noResults.hidden = true;
   document.getElementById('catalog').appendChild(noResults);
 
-  searchInput.addEventListener('input', () => {
+  // Shows/hides the "×" button based on whether there's currently
+  // anything in the search box to clear.
+  const updateClearButton = () => {
+    clearBtn.hidden = searchInput.value.length === 0;
+  };
+
+  // The actual filtering logic — pulled out into its own function so both
+  // typing in the box (below) and clicking the "×" button can trigger it.
+  const applySearchFilter = () => {
     const query = searchInput.value.trim().toLowerCase();
     let anyVisible = false;
 
@@ -682,6 +708,18 @@ function renderSectionNav(sections, sectionEls, accordions) {
     // onToggle callback above, so both of these need re-syncing here too.
     syncToggleAllLabel();
     syncJumpButtonStates();
+  };
+
+  searchInput.addEventListener('input', () => {
+    updateClearButton();
+    applySearchFilter();
+  });
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    updateClearButton();
+    applySearchFilter();
+    searchInput.blur(); // defocus, per the request — not just an empty box left with the cursor still in it
   });
 
   // The section jump buttons + Expand/Collapse All live in their own row,
@@ -693,6 +731,7 @@ function renderSectionNav(sections, sectionEls, accordions) {
 
   searchWrap.appendChild(searchIcon);
   searchWrap.appendChild(searchInput);
+  searchWrap.appendChild(clearBtn);
 
   // Search sits on its own on the other side of the bar (.section-nav's
   // space-between handles the split) — it acts on the whole catalog like
