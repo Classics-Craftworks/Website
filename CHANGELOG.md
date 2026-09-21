@@ -4,16 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.14.2 — 2026/09/21
+
+### Changed
+- Optimisations and improvements
+  - Search should now be faster
+  - Page should load quicker
+
+### Fixed
+- Navigation bar buttons not being highlighted when a section is accessed via a deep link
+- Sections jumped to via a deep link not showing as expanded in the navigation bar
+- Clicking a section in the nav bar right after landing on it via a link now collapses it properly, instead of appearing to do nothing
+
 ## v0.14.1 — 2026/09/21
 
 ### Changed
-- Moved "copy link" icons slightly closer to the text
-- Navigation bar now uses deep links
+- Moved "copy link" icons slightly closer to their text
+- Navigation bar now uses deep links for easier navigation and sharing via browser's address bar
 
 ## v0.14.0 — 2026/09/21
 
 ### Added
-- Deep links for each section, and each project (e.g. `classicscraftworks.co.uk/#better-craftables` to jump to the Better Craftables section)
+- Deep links for each section and each project (e.g. `classicscraftworks.co.uk/#better-craftables` to jump to the Better Craftables section)
   - Additionally, there is now a copy link icon next to each section & project for easier sharing
 - An 'x' icon to clear text from the search bar
 
