@@ -10,6 +10,10 @@
    - Projects: Copy an existing project object block {...} inside the "projects" array to add a new project.
    - Channels: Each project supports "stable", "beta", "alpha", or "unsupported" channels. Add "disabled: true"
      to a download label if a build is unavailable.
+   - "New"/"Updated" badge: add `badge: "new"` or `badge: "updated"` to any channel to show a small
+     dismissible tag next to its name. Visitors can dismiss it (✕); it quietly comes back on its own the
+     next time you bump that channel's "version" — no extra flag to remove/reset by hand, so it's safe to
+     just leave `badge: "new"` sitting on a channel across releases.
    ============================================================ */
 
 // This whole file is one big JavaScript object. script.js reads values

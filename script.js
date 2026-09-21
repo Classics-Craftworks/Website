@@ -157,20 +157,63 @@ function renderBrand(brand, topLinks) {
   });
 }
 
+// Builds the little "New"/"Updated" tag shown next to a channel's
+// name. Set via `badge: "new"` or `badge: "updated"` on a channel in
+// data.js. The visitor can dismiss it (✕), and it stays dismissed —
+// until that channel's `version` changes, at which point it comes
+// back automatically, since the dismissal is remembered per-version.
+function renderChannelBadge(ch, badgeKey) {
+  const badgeText = String(ch.badge).toLowerCase() === 'updated' ? 'Updated' : 'New';
+
+  const dismissedVersion = storageGet(badgeKey);
+  if (dismissedVersion === (ch.version || '')) return null;
+
+  // The whole badge is now the clickable/focusable element…
+  const wrap = el('button', {
+    class: 'channel-badge',
+    attrs: {
+      type: 'button',
+      'data-badge': badgeText.toLowerCase(),
+      'aria-label': 'Dismiss "' + badgeText + '" label'
+    }
+  }, [
+    el('span', { class: 'channel-badge-text', text: badgeText }),
+    el('span', { class: 'channel-badge-dismiss' }) // …so this is now just a decorative circle, not a nested button
+  ]);
+
+  wrap.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    storageSet(badgeKey, ch.version || '');
+    wrap.classList.add('is-dismissed');
+    wrap.addEventListener('transitionend', () => wrap.remove(), { once: true });
+    window.setTimeout(() => wrap.remove(), 250);
+  });
+
+  return wrap;
+}
+
 // Builds one download channel box (e.g. "Release" or "Release
 // Candidate") for a project. A project can have several channels.
-function renderChannel(ch) {
+// `projectId` is the project's #anchor slug — used together with the
+// channel to make a stable localStorage key for the "new" badge above.
+function renderChannel(ch, projectId) {
   // "stable" / "beta" / "alpha" controls the box's color via CSS.
   // Falls back to "stable" if data.js didn't set a channel.
   const channelKey = (ch.channel || 'stable').toLowerCase();
 
-  // Top row of the box: colored dot + channel name + divider + MC version
+  // Top row of the box: colored dot + channel name + divider + MC
+  // version. The badge (if any) isn't part of this row — it's
+  // absolutely positioned against the channel box itself, hanging off
+  // its top-left corner (see .channel-badge in styles.css).
   const header = el('div', { class: 'channel-header' }, [
     el('span', { class: 'status-dot' }),
     el('span', { class: 'channel-label', text: ch.label }),
     el('span', { class: 'channel-sep', text: '|' }),
     el('span', { class: 'channel-mc', text: 'Java ' + ch.mcVersion })
   ]);
+
+  const badge = ch.badge ? renderChannelBadge(ch, `badge-dismissed:${projectId}:${channelKey}`) : null;
 
   // Holds one column per download (Data Pack, Mod, etc.). "has-multiple"
   // flags channels with two download types, which need extra mobile
@@ -227,7 +270,7 @@ function renderChannel(ch) {
   return el('div', {
     class: 'channel-group',
     attrs: { 'data-channel': channelKey }
-  }, [header, downloads]);
+  }, [badge, header, downloads]);
 }
 
 // Builds one full project card: thumbnail image, title, description,
@@ -241,10 +284,16 @@ function renderProject(p) {
     ]));
   });
 
+  // Gives this project a stable #anchor so it can be linked to
+  // directly. Computed here (rather than down by titleRow, where it
+  // used to live) because renderChannel also needs it, to key each
+  // channel's "new" badge dismissal in localStorage.
+  const id = assignSlug(p.title, 'project');
+
   // .map() here works just like .forEach() above, but it collects the
   // results into a new array instead of throwing them away
   const channelRow = el('div', { class: 'channel-row' },
-    (p.channels || []).map(renderChannel)
+    (p.channels || []).map(ch => renderChannel(ch, id))
   );
 
   // Text blob the search box matches against — includes the title,
@@ -256,9 +305,6 @@ function renderProject(p) {
     .join(' ');
   const searchText = [p.title, p.description, versionText].filter(Boolean).join(' ').toLowerCase();
 
-  // Gives this project a stable #anchor so it can be linked to
-  // directly.
-  const id = assignSlug(p.title, 'project');
   const titleRow = el('div', { class: 'project-title-row' }, [
     el('h3', { text: p.title }),
     copyLinkButton(id, p.title)

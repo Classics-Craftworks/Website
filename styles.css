@@ -24,6 +24,7 @@
   --text:          #F4F4F5;  /* primary text */
   --text-soft:     #AFAFB8;  /* secondary text */
   --accent:        #2ff9f3;  /* primary accent - used for keyboard selections */
+  --accent-rgb:    47, 249, 243;
   --accent-hover:  #99fcf9;  /* accent hover */
   --border:        #4E4E58;  /* hairline borders/dividers */
   --border-rgb:    78, 78, 88;
@@ -41,6 +42,9 @@
 
   --ch-unsupported:      #5C96DE;  /* unsupported channel */
   --ch-unsupported-rgb:  92, 150, 222;
+
+  --badge-color:      #efdd65;  /* "new"/"updated" channel badge */
+  --badge-color-rgb:  239, 221, 101;
 
 /* Named opacity levels, used with the channel colors above
    (e.g. rgba(var(--channel-rgb), var(--alpha-soft))). */
@@ -663,6 +667,7 @@ p { margin: 0; }
   padding: 14px 14px 16px;
   display: flex;
   flex-direction: column;
+  position: relative; /* anchors the "new"/"updated" badge, which hangs off the top-left corner */
   /* Lets the @container rules further down respond to this box's own
    width, not just the screen size. */
   container-type: inline-size;
@@ -697,6 +702,77 @@ p { margin: 0; }
   color: var(--channel-color); 
   font-weight: 700; 
   font-size: 0.98rem;
+}
+
+/* ---------- "New" / "Updated" Channel Badge ---------- */
+/* Set per-channel via `badge: "new"` or `badge: "updated"` in data.js.
+   Hangs off the channel box's top-left corner, half on/half off the
+   border, like a tag — outlined rather than filled, so it reads as a
+   small flag rather than a solid sticker.
+   Dismissing it is remembered per-version (see renderChannelBadge() in
+   script.js), so it quietly comes back the next time that channel's
+   `version` is bumped for a fresh release. */
+.channel-badge {
+  position: absolute;
+  top: -10px;
+  left: 2px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1;
+  padding: 3px 4px 3px 7px;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--badge-color);
+  background: var(--bg); /* solid, not tinted yellow — cuts a clean "tag" shape out of the border below it */
+  border: 1.5px solid var(--badge-color);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  cursor: pointer;
+}
+
+.channel-badge.is-dismissed {
+  opacity: 0;
+  transform: scale(0.85) translateY(2px);
+}
+
+/* A CSS-drawn "×" (two crossed bars) instead of a text glyph — this
+   keeps it pixel-centered regardless of font/line-height quirks. */
+.channel-badge-dismiss {
+  position: relative;
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(var(--badge-color-rgb), var(--alpha-hover));
+  color: inherit;
+  flex-shrink: 0;
+  transition: background-color var(--transition-fast);
+}
+
+.channel-badge-dismiss::before,
+.channel-badge-dismiss::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+.channel-badge-dismiss::before { transform: translate(-50%, -50%) rotate(45deg); }
+.channel-badge-dismiss::after  { transform: translate(-50%, -50%) rotate(-45deg); }
+
+.channel-badge-dismiss:hover,
+.channel-badge-dismiss:focus-visible {
+  background: rgba(var(--badge-color-rgb), var(--alpha-border));
 }
 
 .channel-sep { 
