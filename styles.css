@@ -476,18 +476,15 @@ p { margin: 0; }
 }
 
 /* ---------- Sections ---------- */
-.catalog-section {
-  margin-top: 24px;
-  /* Keeps a section's heading clear of the sticky nav bar above when a
-     jump button (or find-in-page) scrolls straight to it. */
-  scroll-margin-top: 68px;
-}
-
 /* The Accordion class in script.js animates this element's `height`
    directly via the Web Animations API, so it needs box-sizing: content-box
    to be off the table for surprises — border-box keeps the animated
    height in sync with what offsetHeight reports. */
 .catalog-section {
+  margin-top: 24px;
+  /* Keeps a section's heading clear of the sticky nav bar above when a
+     jump button (or find-in-page) scrolls straight to it. */
+  scroll-margin-top: 68px;
   box-sizing: border-box;
   /* Without this, the browser's scroll anchoring "helpfully" adjusts the
      scroll position whenever this element's height changes mid-animation
