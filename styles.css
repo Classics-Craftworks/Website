@@ -181,8 +181,7 @@ p { margin: 0; }
   grid-template-columns: auto 1fr auto;
   align-items: center; /* Ensures perfect vertical centering across all columns */
   gap: 16px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
 }
 
 .brand-logo {
