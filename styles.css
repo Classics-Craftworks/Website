@@ -25,11 +25,11 @@
   --surface:       #27272A;  /* thumbnails, chips, panel backgrounds */
   --surface-hover: #3F3F46;  /* hover state for surfaces above */
   --text:          #F4F4F5;  /* primary text */
-  --text-soft:     #A4A4AD;  /* secondary text */
+  --text-soft:     #AFAFB8;  /* secondary text */
   --accent:        #2ff9f3;  /* primary accent - used for keyboard selections */
   --accent-hover:  #99fcf9;  /* accent hover */
-  --border:        #3F3F46;  /* hairline borders/dividers */
-  --border-rgb:    63, 63, 70;
+  --border:        #4E4E58;  /* hairline borders/dividers */
+  --border-rgb:    78, 78, 88;
   --white-rgb:     255, 255, 255;  /* used for translucent white fills/borders (nav) */
 
 /* Channel Indicators & Colors */
@@ -39,11 +39,11 @@
   --ch-beta:       #FF9D47;  /* beta channel */
   --ch-beta-rgb:   255, 157, 71;
 
-  --ch-alpha:      #F15272;  /* alpha channel */
-  --ch-alpha-rgb:  241, 82, 114;
+  --ch-alpha:      #F2607E;  /* alpha channel */
+  --ch-alpha-rgb:  242, 96, 126;
 
-  --ch-unsupported:      #4F8EDB;  /* unsupported channel */
-  --ch-unsupported-rgb:  59, 130, 246;
+  --ch-unsupported:      #5C96DE;  /* unsupported channel */
+  --ch-unsupported-rgb:  92, 150, 222;
 
 /* Alpha (transparency) scale — named opacity levels used with the channel
    RGB variables above, e.g. rgba(var(--channel-rgb), var(--alpha-soft)).
@@ -642,7 +642,7 @@ p { margin: 0; }
 /* Light up smoothly on hover */
 .project-links a:hover,
 .project-links .top-link:hover {
-  opacity: 0.5;
+  opacity: 1;
   color: var(--text);
   border-color: var(--border);
   background: var(--surface-hover);
