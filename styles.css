@@ -263,10 +263,10 @@ p { margin: 0; }
   gap: 8px;
 }
 
-/* Jump buttons get their own distinct pill treatment (white outline,
-   transparent fill, fully-rounded) so they read as "navigation" at a
-   glance, instead of blending in with the solid grey action buttons used
-   elsewhere on the page (.top-link, .text-link, .download-btn). */
+/* Jump buttons get their own distinct button treatment so they read as
+   "navigation" at a glance, instead of blending in with the solid grey
+   action buttons used elsewhere on the page (.top-link, .text-link,
+   .download-btn). */
 .nav-jump-btn {
   display: inline-flex;
   align-items: center;
@@ -517,6 +517,14 @@ p { margin: 0; }
   min-width: 0; /* lets a long heading truncate instead of overflowing the card */
 }
 
+/* Pulls the deep-link icon closer to the count badge than the group's
+   10px gap alone would, without touching the heading<->count spacing
+   (that gap is shared by both pairs, so it can't be tuned per-pair on
+   its own). */
+.section-heading-group .copy-link-btn {
+  margin-left: -5px;
+}
+
 .catalog-section h2 {
   font-size: clamp(1.2rem, 3vw, 1.45rem);
   color: var(--text);
@@ -665,7 +673,7 @@ p { margin: 0; }
 .project-title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .project-body h3 {
