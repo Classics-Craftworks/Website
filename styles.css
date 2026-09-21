@@ -64,6 +64,15 @@
   --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   --measure: 68ch;
+
+/* Transition timings — used across every hover/press state in this file
+   (buttons, links, pills, chips) so the whole page's feel can be tuned
+   from one place instead of hunting down every individual `transition`
+   declaration. --transition-fast covers color/background/border fades;
+   --transition-snap is the quicker one used for the little press/scale
+   feedback on click. */
+  --transition-fast: 0.15s ease;
+  --transition-snap: 0.1s ease;
 }
 
 /* Local Channel Variable Mapping
@@ -232,7 +241,7 @@ p { margin: 0; }
   font-weight: 500;
   background: var(--surface);
   color: var(--text);
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 .top-link:hover, .text-link:hover { background: var(--surface-hover); color: var(--text); }
 
@@ -279,7 +288,7 @@ p { margin: 0; }
   font-weight: 600;
   padding: 7px 14px;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 .nav-jump-btn:hover {
   background: rgba(var(--white-rgb), var(--alpha-hover));
@@ -346,7 +355,7 @@ p { margin: 0; }
   font-weight: 500;
   padding: 7px 14px;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 .nav-toggle-all:hover { color: var(--text); background: var(--surface-hover); }
 .nav-toggle-all:active { transform: scale(0.97); }
@@ -384,7 +393,7 @@ p { margin: 0; }
   font: inherit;
   font-size: 0.85rem;
   padding: 8px 30px 8px 32px; /* right padding reserved for .nav-search-clear, even while it's hidden, so text doesn't jump around as it appears/disappears */
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .nav-search-input::-webkit-search-decoration,
 .nav-search-input::-webkit-search-cancel-button,
@@ -427,7 +436,7 @@ p { margin: 0; }
   background: transparent;
   color: var(--text-soft);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 /* Without this, the `display: flex` above wins over the browser's own
    default `[hidden] { display: none }` rule — author stylesheets always
@@ -500,7 +509,7 @@ p { margin: 0; }
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 .catalog-section > summary:hover {
   background: var(--surface-hover);
@@ -536,7 +545,7 @@ p { margin: 0; }
    without dragging the h2::after chevron (below) along with it. */
 .heading-label {
   display: inline-block;
-  transition: transform 0.1s ease;
+  transition: transform var(--transition-snap);
 }
 
 /* Custom collapse/expand chevron, positioned at the left edge of the heading */
@@ -577,7 +586,7 @@ p { margin: 0; }
   background: var(--surface-hover);
   border: 1px solid var(--border);
   flex-shrink: 0;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
 /* Swap to a darker colour so the counter badge still stands out on hover. */
@@ -595,7 +604,7 @@ p { margin: 0; }
   align-items: center;
   flex-shrink: 0;
   opacity: 1;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--transition-fast);
 }
 .catalog-section[data-state="expanded"] .section-peek {
   opacity: 0;
@@ -706,7 +715,7 @@ p { margin: 0; }
   color: var(--text-soft);
   font-weight: 400;
   opacity: 0.85;
-  transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+  transition: opacity var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-snap);
 }
 
 /* Light up smoothly on hover */
@@ -879,7 +888,7 @@ p { margin: 0; }
   background: var(--channel-color);
   color: var(--bg);
   border: 1px solid var(--channel-color);
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease, filter 0.15s ease;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-snap), filter var(--transition-fast);
 }
 
 /* Prevent project link icons from flashing on hover */
@@ -988,7 +997,7 @@ p { margin: 0; }
   background: transparent;
   color: var(--text-soft);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 .copy-link-btn:hover,
 .copy-link-btn:focus-visible {
@@ -1053,7 +1062,7 @@ p { margin: 0; }
   border-radius: 9px;
   background: var(--surface);
   color: var(--text-soft);
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .social-link:hover { 
@@ -1083,7 +1092,7 @@ p { margin: 0; }
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
 /* Show Tooltip on Hover & Keyboard Focus */
@@ -1136,7 +1145,7 @@ p { margin: 0; }
 
 .footer-version .version-link {
   color: inherit;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--transition-fast);
 }
 
 .footer-version .version-link:hover {
@@ -1155,7 +1164,7 @@ p { margin: 0; }
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 2px;
-  transition: opacity 0.15s ease, color 0.15s ease;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
 }
 
 .footer-credits .credits-link:hover {
@@ -1511,7 +1520,7 @@ img, svg {
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none; /* can't click it while it's faded out */
-  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.15s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color var(--transition-fast);
   z-index: 40;
 }
 .back-to-top.is-visible {
