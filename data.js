@@ -70,6 +70,7 @@ const SITE_DATA = {
               label: "Release",
               version: "v8.0.0",
               mcVersion: "26.3",
+              badge: "new",
               downloads: [
                 { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0" },
                 { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0+mod" }
@@ -106,6 +107,7 @@ const SITE_DATA = {
               label: "Release",
               version: "v5.0.0",
               mcVersion: "26.3",
+              badge: "new",
               downloads: [
                 { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0" },
                 { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0+mod" }
@@ -142,6 +144,7 @@ const SITE_DATA = {
               label: "Release",
               version: "v5.0.0",
               mcVersion: "26.3",
+              badge: "new",
               downloads: [
                 { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0" },
                 { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0+mod" }
@@ -209,6 +212,7 @@ const SITE_DATA = {
               label: "Release",
               version: "v3.4.0",
               mcVersion: "1.21.9 – 26.3",
+              badge: "updated",
               downloads: [
                 { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
               ]
@@ -242,6 +246,7 @@ const SITE_DATA = {
               label: "Release",
               version: "v1.4.0",
               mcVersion: "1.21.9 – 26.3",
+              badge: "updated",
               downloads: [
                 { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
               ]
@@ -275,6 +280,7 @@ const SITE_DATA = {
               label: "Release",
               version: "v2.4.0",
               mcVersion: "1.21.9 – 26.3",
+              badge: "updated",
               downloads: [
                 { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
               ]
@@ -306,6 +312,7 @@ const SITE_DATA = {
               label: "Limited Support",
               version: "v2.4.1",
               mcVersion: "1.21.9 – 26.3",
+              badge: "updated",
               downloads: [
                 { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1" }
               ]
