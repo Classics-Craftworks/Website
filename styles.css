@@ -190,7 +190,7 @@ p { margin: 0; }
   height: 88px;
   flex-shrink: 0;
   display: block;
-  transform: translateY(-6px); /* Lifts the logo slightly upward */
+  transform: translateY(-4px); /* Lifts the logo slightly upward */
 }
 
 .brand-text {
