@@ -28,6 +28,33 @@ function icon(name, cls) {
   return span;
 }
 
+// Turns a heading/title into a URL-anchor-friendly slug, e.g.
+// "Data Packs & Mods" -> "data-packs-mods". Used to give every section
+// and project a stable #id so people can link straight to it (see
+// assignSlug() below and the hash-handling code near the bottom of
+// this file).
+function slugify(text) {
+  return String(text)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-') // any run of non-alphanumeric chars becomes one hyphen
+    .replace(/^-+|-+$/g, '');    // trim leading/trailing hyphens
+}
+
+// slugify() alone can't guarantee uniqueness (two projects could share a
+// name, or a title could slugify to nothing) — this wraps it with a
+// running tally of slugs already handed out so ids stay unique and
+// non-empty across the whole page.
+const usedSlugs = new Set();
+function assignSlug(text, fallback) {
+  let base = slugify(text) || fallback;
+  let slug = base;
+  let n = 2;
+  while (usedSlugs.has(slug)) slug = `${base}-${n++}`;
+  usedSlugs.add(slug);
+  return slug;
+}
+
 // A shortcut for building an HTML element without writing
 // document.createElement / setAttribute / appendChild every time.
 // Example: el('a', { class: 'btn', text: 'Click me', href: '#' })
@@ -46,6 +73,63 @@ function el(tag, opts = {}, children = []) {
   if (opts.attrs) for (const [k, v] of Object.entries(opts.attrs)) node.setAttribute(k, v); // for any other attribute, e.g. data-* or loading="lazy"
   children.forEach(c => c && node.appendChild(c)); // the "c &&" skips any falsy/empty children safely
   return node;
+}
+
+// Small "copy link" icon-button used by both section headings and project
+// titles (see renderSectionSummary()/renderProject() below) to let people
+// grab a direct #anchor link to that section or project. label is used
+// for the accessible name/tooltip, e.g. "Copy link to Better Craftables".
+function copyLinkButton(id, label) {
+  const btn = el('button', {
+    class: 'copy-link-btn',
+    attrs: {
+      type: 'button',
+      'aria-label': 'Copy link to ' + label,
+      'data-tooltip': 'Copy link'
+    }
+  }, [icon('link', 'icon-sm')]);
+
+  btn.addEventListener('click', e => {
+    // Stops the click from also toggling a parent <summary>/<details> —
+    // this button can sit inside a section's clickable header row.
+    e.preventDefault();
+    e.stopPropagation();
+
+    const url = `${location.origin}${location.pathname}#${id}`;
+
+    // history.pushState (not location.hash =) updates the address bar
+    // and browser history the same way a real anchor link would, but
+    // without also firing a native hashchange/scroll — this button
+    // already does its own copying rather than navigating anywhere.
+    try { history.pushState(null, '', url); } catch { /* not fatal — clipboard copy below still works */ }
+
+    const showCopied = () => {
+      btn.classList.add('is-copied');
+      btn.setAttribute('data-tooltip', 'Copied!');
+      window.clearTimeout(btn._copiedTimer);
+      btn._copiedTimer = window.setTimeout(() => {
+        btn.classList.remove('is-copied');
+        btn.setAttribute('data-tooltip', 'Copy link');
+      }, 1500);
+    };
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(showCopied).catch(() => { /* clipboard permission denied — URL is still in the address bar above */ });
+    } else {
+      // Fallback for browsers without the async Clipboard API: a
+      // temporary offscreen textarea + the older execCommand copy.
+      const temp = document.createElement('textarea');
+      temp.value = url;
+      temp.style.position = 'fixed';
+      temp.style.opacity = '0';
+      document.body.appendChild(temp);
+      temp.select();
+      try { document.execCommand('copy'); showCopied(); } catch { /* copy unsupported — URL is still in the address bar above */ }
+      document.body.removeChild(temp);
+    }
+  });
+
+  return btn;
 }
 
 /* ---------- Page sections ----------
@@ -176,10 +260,19 @@ function renderProject(p) {
   // to decide whether this card matches whatever someone typed.
   const searchText = [p.title, p.description].filter(Boolean).join(' ').toLowerCase();
 
-  return el('article', { class: 'project', attrs: { 'data-search': searchText } }, [
+  // Gives this project a stable #anchor (e.g. #better-craftables) so it
+  // can be linked to directly — see copyLinkButton() and the hash
+  // handling near the bottom of this file.
+  const id = assignSlug(p.title, 'project');
+  const titleRow = el('div', { class: 'project-title-row' }, [
+    el('h3', { text: p.title }),
+    copyLinkButton(id, p.title)
+  ]);
+
+  return el('article', { class: 'project', attrs: { 'data-search': searchText, id } }, [
     el('img', { class: 'project-image', src: p.image, alt: p.title, attrs: { loading: 'lazy' } }), // loading="lazy": don't download this image until it's about to scroll into view
     el('div', { class: 'project-body' }, [
-      el('h3', { text: p.title }),
+      titleRow,
       el('p', { class: 'project-description', text: p.description }),
       linkRow,
       channelRow
@@ -204,7 +297,7 @@ function renderProject(p) {
 // the section is collapsed. The peek strip fades away once the section
 // opens (see .section-peek in styles.css), since the real project cards
 // take over at that point.
-function renderSectionSummary(section) {
+function renderSectionSummary(section, id) {
   const projects = section.projects || [];
 
   const heading = el('h2', {}, [
@@ -216,7 +309,9 @@ function renderSectionSummary(section) {
     text: String(projects.length)
   });
 
-  const headingGroup = el('div', { class: 'section-heading-group' }, [heading, count]);
+  // Section's own #anchor link (see copyLinkButton()) — stopPropagation
+  // inside the button keeps clicking it from also toggling the section.
+  const headingGroup = el('div', { class: 'section-heading-group' }, [heading, count, copyLinkButton(id, section.heading)]);
 
   // Only peek at a handful of thumbnails so the stack doesn't get silly
   // on sections with lots of projects — anything past that becomes a
@@ -255,8 +350,12 @@ function renderSections(sections) {
     const list = el('div', { class: 'project-list' },
       section.projects.map(renderProject)
     );
-    const sectionEl = el('details', { class: 'catalog-section' }, [
-      renderSectionSummary(section),
+    // Gives this section a stable #anchor (e.g. #data-packs-mods) so it
+    // can be linked to directly — see copyLinkButton() and the hash
+    // handling near the bottom of this file.
+    const id = assignSlug(section.heading, 'section');
+    const sectionEl = el('details', { class: 'catalog-section', attrs: { id } }, [
+      renderSectionSummary(section, id),
       list
     ]);
 
@@ -720,6 +819,47 @@ function initBackToTop() {
   });
 }
 
+// If the page was loaded (or navigated to, e.g. via browser back/forward)
+// with a #section-id or #project-id hash — see assignSlug()/copyLinkButton()
+// above — this expands that section if it was collapsed and scrolls to it,
+// briefly highlighting the target if it's a specific project rather than
+// a whole section. Doesn't touch each section's saved open/closed
+// preference (see Accordion.saveState): following a link is a one-off
+// visit, not a statement about how you want the page laid out next time.
+function handleDeepLink() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return;
+
+  const target = document.getElementById(id);
+  if (!target) return; // stale/unknown link — leave the page as-is rather than guessing
+
+  const sectionEl = target.classList.contains('catalog-section')
+    ? target
+    : target.closest('.catalog-section');
+
+  if (sectionEl && !sectionEl.open) {
+    sectionEl.open = true;
+    sectionEl.dataset.state = 'expanded';
+  }
+
+  // Wait a frame so the (possibly just-expanded) layout has settled
+  // before measuring where to scroll to.
+  requestAnimationFrame(() => {
+    target.scrollIntoView({ behavior: 'auto', block: 'start' }); // instant, not smooth — this is where the page should land, not a navigation to animate
+
+    if (target !== sectionEl) {
+      // A linked project can be one of several similar-looking cards in
+      // a long list — this pulse makes it obvious which one the link
+      // actually pointed at. Purely visual (color/shadow, nothing that
+      // moves), and .is-linked-target's animation is itself removed
+      // under prefers-reduced-motion in styles.css, so this is safe to
+      // always add.
+      target.classList.add('is-linked-target');
+      target.addEventListener('animationend', () => target.classList.remove('is-linked-target'), { once: true });
+    }
+  });
+}
+
 /* ---------- Run everything ----------
    This is the only code that actually executes on page load — everything
    above is just function definitions sitting idle until called.
@@ -731,4 +871,10 @@ function initBackToTop() {
   renderSectionNav(SITE_DATA.sections, sectionEls, accordions);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   initBackToTop();
+  handleDeepLink();
+  // Also handles a hash arriving after the initial load — pasting a new
+  // #anchor into the address bar, or using browser back/forward after
+  // clicking a copy-link button (see copyLinkButton(), which uses
+  // history.pushState so those are real history entries).
+  window.addEventListener('hashchange', handleDeepLink);
 })();

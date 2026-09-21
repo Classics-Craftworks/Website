@@ -591,6 +591,11 @@ p { margin: 0; }
   padding: 26px 0;
   border-bottom: 1px solid rgba(var(--border-rgb), 0.6);
   align-items: start; /* Locks icon to the top edge */
+  /* Same reasoning as .catalog-section's scroll-margin-top above: keeps a
+     deep-linked project (#better-craftables) clear of the sticky nav bar
+     when jumped to directly, e.g. via .copy-link-btn / handleDeepLink()
+     in script.js. */
+  scroll-margin-top: 68px;
 }
 .project:first-child { padding-top: 4px; }
 .project:last-child { border-bottom: none; }
@@ -605,6 +610,14 @@ p { margin: 0; }
 }
 
 .project-body { min-width: 0; }
+
+/* Holds the project title next to its "copy link" button (see
+   .copy-link-btn below and copyLinkButton() in script.js). */
+.project-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 .project-body h3 {
   font-size: 1.55rem;
@@ -897,6 +910,65 @@ p { margin: 0; }
    it down alongside the ~10% smaller button below instead of touching the
    shared .icon-md rule, which would also affect any future non-social use. */
 .social-link .icon-md { width: 17px; height: 17px; }
+
+/* ---------- Deep-linking ("copy link" buttons) ---------- */
+/* Small ghost icon-button used by both section headings and project
+   titles (see copyLinkButton() in script.js) to copy a direct #anchor
+   link. Kept visible (not hover-only) so keyboard and touch users get
+   the same access to it as mouse users — muted by default so it doesn't
+   compete with the heading text next to it. */
+.copy-link-btn {
+  position: relative; /* anchors the tooltip below, same as .social-link */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.copy-link-btn:hover,
+.copy-link-btn:focus-visible {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.copy-link-btn .icon-sm { width: 14px; height: 14px; }
+
+/* Briefly swaps to the accent color while the "Copied!" tooltip is
+   showing (see copyLinkButton()'s showCopied()), as extra confirmation
+   beyond the tooltip text alone. */
+.copy-link-btn.is-copied {
+  color: var(--accent);
+}
+
+/* Section headings already sit on a full-card hover/press background
+   (.catalog-section > summary:hover / :active) that would otherwise
+   swallow this button's own hover state — bumping it a shade further
+   keeps it visibly distinct. */
+.catalog-section > summary:hover .copy-link-btn:hover {
+  background: color-mix(in srgb, var(--surface-hover), white 15%);
+}
+
+/* Briefly highlights a project card that was scrolled to via a direct
+   #anchor link (see handleDeepLink() in script.js), so it's obvious
+   which card the link actually pointed at in a long list of similar
+   ones. Colour/shadow only — nothing moves or resizes — and skipped
+   entirely for anyone who's asked for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .is-linked-target {
+    animation: linked-target-pulse 2s ease-out;
+  }
+}
+@keyframes linked-target-pulse {
+  0%   { box-shadow: 0 0 0 2px var(--accent); border-radius: 12px; }
+  100% { box-shadow: 0 0 0 2px transparent; border-radius: 12px; }
+}
 
 /* ---------- Footer ---------- */
 .site-footer {
