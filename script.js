@@ -87,6 +87,18 @@ function prefersReducedMotion() {
   return reducedMotionQuery.matches;
 }
 
+// localStorage can throw in some situations (Safari private browsing, or a
+// browser with storage disabled entirely) — every read/write in this file
+// goes through these two so that try/catch only has to be written once.
+// Failures are silent on purpose: whatever called this falls back to a sane
+// default (see each caller) rather than breaking the page.
+function storageGet(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function storageSet(key, value) {
+  try { localStorage.setItem(key, value); } catch { /* quota / privacy error — ignore */ }
+}
+
 // Updates the address bar to point at #id (e.g. a section or project
 // anchor — see assignSlug()) without navigating anywhere or firing a
 // hashchange/scroll. Used anywhere a click already does its own
@@ -385,14 +397,9 @@ function renderSections(sections) {
 
     const storageKey = 'section-open:' + section.heading;
 
-    // localStorage can throw in some situations (e.g. Safari private
-    // browsing, or a browser with storage disabled entirely), so every
-    // read/write is wrapped in try/catch — if it fails, we just fall
-    // back to the default open state instead of breaking the page.
-    let saved = null;
-    try {
-      saved = localStorage.getItem(storageKey);
-    } catch (e) { /* storage unavailable — ignore and use the default below */ }
+    // See storageGet() above — falls back to the default open state below
+    // if storage is unavailable rather than breaking the page.
+    const saved = storageGet(storageKey);
 
     // A section can set defaultOpen: false in data.js to start collapsed
     // for first-time visitors. Once someone toggles it, their choice is
@@ -449,12 +456,8 @@ class Accordion {
 
   restoreState() {
     if (!this.storageKey) return;
-    try {
-      const saved = localStorage.getItem(this.storageKey);
-      if (saved !== null) this.el.open = saved === 'true';
-    } catch {
-      /* localStorage unavailable (private mode, disabled, etc.) — ignore */
-    }
+    const saved = storageGet(this.storageKey);
+    if (saved !== null) this.el.open = saved === 'true';
   }
 
   onClick(e) {
@@ -500,11 +503,7 @@ class Accordion {
 
   saveState() {
     if (!this.storageKey) return;
-    try {
-      localStorage.setItem(this.storageKey, this.el.open);
-    } catch {
-      /* ignore quota / privacy errors */
-    }
+    storageSet(this.storageKey, this.el.open);
   }
 
   destroy() {
