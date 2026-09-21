@@ -75,6 +75,18 @@ function el(tag, opts = {}, children = []) {
   return node;
 }
 
+// Whether the visitor has asked the OS for reduced motion — checked by the
+// accordion's open/close animation, the back-to-top scroll, and the
+// jump-to-section scroll, so they all fall back to an instant snap instead
+// of animating. The media query itself doesn't change without a real OS
+// setting change, so one MediaQueryList reused everywhere behaves exactly
+// like calling matchMedia() fresh each time, just without creating a new
+// query object on every click/toggle.
+const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+function prefersReducedMotion() {
+  return reducedMotionQuery.matches;
+}
+
 // Updates the address bar to point at #id (e.g. a section or project
 // anchor — see assignSlug()) without navigating anywhere or firing a
 // hashchange/scroll. Used anywhere a click already does its own
@@ -467,7 +479,7 @@ class Accordion {
     this.el.style.overflow = 'hidden';
     this.el.dataset.state = opening ? 'expanded' : 'collapsed';
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduceMotion = prefersReducedMotion();
 
     this.animation = this.el.animate(
       { height: [startHeight, endHeight] },
@@ -548,7 +560,7 @@ function renderSectionNav(sections, sectionEls, accordions) {
       const jumpToSection = () => {
         // Same check as initBackToTop() below: an instant jump instead of
         // a smooth scroll for anyone with prefers-reduced-motion set.
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const reduceMotion = prefersReducedMotion();
         sectionEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
       };
 
@@ -865,7 +877,7 @@ function initBackToTop() {
   window.addEventListener('scroll', updateVisibility, { passive: true });
 
   btn.addEventListener('click', () => {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduceMotion = prefersReducedMotion();
     window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
   });
 }
