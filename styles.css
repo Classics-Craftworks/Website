@@ -233,8 +233,6 @@ p { margin: 0; }
 }
 
 .top-link, .text-link {
-  display: inline-flex;
-  align-items: center;
   border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 0.85rem;
@@ -247,6 +245,16 @@ p { margin: 0; }
 
 .top-link { gap: 7px; padding: 8px 14px; }
 .text-link { gap: 6px; padding: 6px 12px; color: var(--text-soft); }
+
+/* Shared layout for every "chip button" on the page (nav links, jump
+   buttons, toggle-all, download buttons) — each keeps its own rule below
+   for the sizing/color/border that makes it look distinct, but they all
+   lay themselves out as a centered inline-flex row, so that part is
+   pulled out once here instead of repeated five times. */
+.top-link, .text-link, .nav-jump-btn, .nav-toggle-all, .download-btn {
+  display: inline-flex;
+  align-items: center;
+}
 
 /* ---------- Section nav (jump links, expand/collapse all, search) ---------- */
 /* Sticks to the top of the viewport as you scroll, so jump/search/collapse
@@ -277,8 +285,6 @@ p { margin: 0; }
    action buttons used elsewhere on the page (.top-link, .text-link,
    .download-btn). */
 .nav-jump-btn {
-  display: inline-flex;
-  align-items: center;
   border: 1px solid rgba(var(--white-rgb), 0.35);
   border-radius: 6px;
   background: rgba(var(--white-rgb), var(--alpha-faint));
@@ -344,8 +350,6 @@ p { margin: 0; }
 }
 
 .nav-toggle-all {
-  display: inline-flex;
-  align-items: center;
   border: 1px solid var(--border);
   border-radius: 6px;
   background: transparent;
@@ -876,8 +880,6 @@ p { margin: 0; }
 
 /* ---------- Buttons ---------- */
 .download-btn {
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
   gap: 6px;
   padding: 8px 10px; /* Tighter padding for side-by-side layout */
