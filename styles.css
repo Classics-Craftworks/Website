@@ -1457,7 +1457,7 @@ img, svg {
 }
 
 /* ---------- 404 Page ---------- */
-/* Reuses .top-link (see Nav Links above) for the "Back to home" button,
+/* Reuses .top-link (see Nav Links above) for the "Go Back" button,
    so it matches the header's Modrinth/GitHub buttons automatically. */
 .not-found {
   display: flex;

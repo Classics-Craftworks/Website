@@ -6,7 +6,7 @@ This repository contains the source code for the [Classic's Craftworks website](
 
 ## Features
 
-- Project listings for data packs, mods and resource packs, each split into their own collapsable category 
+- Project listings for data packs, mods and resource packs, each split into their own collapsible category 
 - Release information and links for each project
 - Search and jump-to-section navigation to quickly find a project or category
 - Multiple release channels (stable, beta, alpha, unsupported) per project, each with its own download links
