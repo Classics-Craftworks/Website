@@ -447,7 +447,7 @@ p { margin: 0; }
   list-style: none; /* hides the default marker in Firefox/modern Chrome */
   user-select: none;
   cursor: pointer;
-  padding: 14px 20px;
+  padding: 11px 20px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: var(--surface);
