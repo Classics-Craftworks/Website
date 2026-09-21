@@ -893,6 +893,11 @@ p { margin: 0; }
 .icon-sm { width: 15px; height: 15px; }
 .icon-md { width: 19px; height: 19px; }
 
+/* icon-md is only ever used inside .social-link (see script.js), so scale
+   it down alongside the ~10% smaller button below instead of touching the
+   shared .icon-md rule, which would also affect any future non-social use. */
+.social-link .icon-md { width: 17px; height: 17px; }
+
 /* ---------- Footer ---------- */
 .site-footer {
   margin-top: 52px;
@@ -913,10 +918,10 @@ p { margin: 0; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 9px;
   background: var(--surface);
   color: var(--text-soft);
   transition: background-color 0.15s ease, color 0.15s ease;
