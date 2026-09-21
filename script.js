@@ -2,8 +2,8 @@
    RENDER SCRIPT
 
    Builds the page (logo, project list, footer, etc.) from data.js.
-   Edit this file to change how things are built and edit data.js
-   to change what is shown.
+   Edit this file to change how things are built, edit data.js to
+   change what is shown.
    ============================================================ */
 
 /* ---------- Small helper functions ---------- */
@@ -454,7 +454,7 @@ class Accordion {
 // from renderSections() above, all in the same order as `sections`.
 function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
   const nav = document.getElementById('section-nav');
-  if (!nav || sectionEls.length === 0) return; // nothing to build a nav for (e.g. 404.html, or an empty catalog)
+  if (!nav || sectionEls.length === 0) return { syncNavState: () => {}, markJumped: () => {} }; // nothing to build a nav for (e.g. 404.html, or an empty catalog)
 
   /* ---------- Jump-to-section buttons + Expand/Collapse All ---------- */
 
@@ -513,6 +513,16 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
     });
     jumpRow.appendChild(btn);
   });
+
+  // Lets handleDeepLink() record a section as "last jumped to" too, so
+  // landing on it via a link and then clicking its own jump button
+  // collapses it — the same as if you'd clicked the button to get
+  // there — instead of the button treating you as arriving from
+  // somewhere else and just re-scrolling to a spot you're already at.
+  const markJumped = (sectionEl) => {
+    const i = sectionEls.indexOf(sectionEl);
+    if (i !== -1) lastJumpedIndex = i;
+  };
 
   // Sits at the end of the jump row — a navigation control too, just
   // acting on every section at once.
@@ -694,7 +704,7 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
   // Exposed so handleDeepLink() can keep the jump buttons and
   // Expand/Collapse All label in sync when it expands a section
   // directly, the same way search and the accordion's own toggle do.
-  return { syncNavState: onAccordionSettled };
+  return { syncNavState: onAccordionSettled, markJumped };
 }
 
 // Fills in the footer: social links, copyright, disclaimer, and the
@@ -773,6 +783,11 @@ function initBackToTop() {
   });
 }
 
+// If the page loaded with a #section-id or #project-id in the URL,
+// expands that section and scrolls to it, briefly highlighting a
+// linked project. Doesn't change any section's saved open/closed state.
+// `nav` is the { syncNavState, markJumped } object from renderSectionNav().
+function handleDeepLink(nav) {
   const id = decodeURIComponent(location.hash.slice(1));
   if (!id) return;
 
@@ -783,9 +798,23 @@ function initBackToTop() {
     ? target
     : target.closest('.catalog-section');
 
-  if (sectionEl && !sectionEl.open) {
-    sectionEl.open = true;
-    sectionEl.dataset.state = 'expanded';
+  if (sectionEl) {
+    if (!sectionEl.open) {
+      sectionEl.open = true;
+      sectionEl.dataset.state = 'expanded';
+      // Expanding here bypasses the accordion's own toggle() (see the
+      // search filter above for the same pattern), so the nav bar's jump
+      // buttons and Expand/Collapse All label need a manual nudge —
+      // otherwise a section opened via a deep link looks expanded on the
+      // page but its jump button stays unfilled.
+      nav?.syncNavState();
+    }
+    // Also record this as the section you "jumped to", same as clicking
+    // its jump button would — otherwise clicking that same button right
+    // after landing here via the link looks like it does nothing: the
+    // button treats you as arriving from elsewhere and just re-scrolls
+    // to where you already are, instead of collapsing the section.
+    nav?.markJumped(sectionEl);
   }
 
   // Wait a frame so the (possibly just-expanded) layout has settled
@@ -808,13 +837,11 @@ function initBackToTop() {
 (function init() {
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
   const { sectionEls, accordions, projectsBySection } = renderSections(SITE_DATA.sections);
-  renderSectionNav(SITE_DATA.sections, sectionEls, accordions, projectsBySection);
+  const nav = renderSectionNav(SITE_DATA.sections, sectionEls, accordions, projectsBySection);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   initBackToTop();
-  handleDeepLink();
-  // Also handles a hash arriving after the initial load — pasting a new
-  // #anchor into the address bar, or using browser back/forward after
-  // clicking a copy-link button (see copyLinkButton(), which uses
-  // history.pushState so those are real history entries).
-  window.addEventListener('hashchange', handleDeepLink);
+  handleDeepLink(nav);
+  // Also handles a hash arriving after the initial load (pasted into
+  // the address bar, or via browser back/forward).
+  window.addEventListener('hashchange', () => handleDeepLink(nav));
 })();
