@@ -663,6 +663,21 @@ function renderFooter(socials, footer, version) {
   document.getElementById('copyright').textContent = footer.copyright;
   document.getElementById('disclaimer').textContent = footer.disclaimer;
 
+  // "<prefix><link>" — text + link, so built with el() rather than set
+  // via textContent (which can't mix in a nested <a>). Edit text in data.js.
+  if (footer.iconCredits) {
+    const creditsEl = document.getElementById('icon-credits');
+    creditsEl.innerHTML = ''; // clear out anything already there before re-filling it
+    if (footer.iconCredits.prefix) {
+      creditsEl.appendChild(document.createTextNode(footer.iconCredits.prefix));
+    }
+    creditsEl.appendChild(el('a', {
+      href: footer.iconCredits.url,
+      class: 'credits-link',
+      text: footer.iconCredits.label
+    }));
+  }
+
   if (version) {
     const versionEl = document.getElementById('site-version');
     versionEl.innerHTML = ''; // clear out anything that might already be there before re-filling it
