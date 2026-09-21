@@ -1,23 +1,15 @@
 /* ============================================================
    RENDER SCRIPT
-   ============================================================
-   This file reads the content from data.js and builds the actual
-   HTML elements you see on the page (logo, project list, footer, etc).
 
-   You usually don't need to touch this file unless you want to change
-   HOW content is rendered (e.g. add a new element to every project card).
-   To change WHAT is shown (text, links, images), edit data.js instead.
+   Builds the page (logo, project list, footer, etc.) from data.js.
+   Edit this file to change how things are built and edit data.js
+   to change what is shown.
    ============================================================ */
 
-/* ---------- Small helper functions ----------
-   These two functions do the repetitive parts of building elements,
-   so the "render" functions below them stay short and readable. */
+/* ---------- Small helper functions ---------- */
 
-// Creates one icon (a small colored square shaped like an icon,
-// e.g. the Discord logo) using a PNG file as a "mask".
-// A mask means the browser uses the PNG's shape as a stencil and
-// fills that shape with whatever color CSS gives it (currentColor).
-// This lets the same icon file automatically match site themes.
+// Creates one icon. Uses the PNG as a color "mask" so it automatically
+// matches the site's theme colors.
 function icon(name, cls) {
   const span = document.createElement('span');
   span.className = 'icon' + (cls ? ' ' + cls : '');
@@ -28,11 +20,8 @@ function icon(name, cls) {
   return span;
 }
 
-// Turns a heading/title into a URL-anchor-friendly slug, e.g.
-// "Data Packs & Mods" -> "data-packs-mods". Used to give every section
-// and project a stable #id so people can link straight to it (see
-// assignSlug() below and the hash-handling code near the bottom of
-// this file).
+// Turns a title into a URL-friendly slug, e.g. "Data Packs & Mods" ->
+// "data-packs-mods". Used to give sections/projects a stable #id.
 function slugify(text) {
   return String(text)
     .toLowerCase()
@@ -41,10 +30,8 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');    // trim leading/trailing hyphens
 }
 
-// slugify() alone can't guarantee uniqueness (two projects could share a
-// name, or a title could slugify to nothing) — this wraps it with a
-// running tally of slugs already handed out so ids stay unique and
-// non-empty across the whole page.
+// Wraps slugify() to make sure every id is unique, in case two
+// projects share a name.
 const usedSlugs = new Set();
 function assignSlug(text, fallback) {
   let base = slugify(text) || fallback;
@@ -55,14 +42,13 @@ function assignSlug(text, fallback) {
   return slug;
 }
 
-// A shortcut for building an HTML element without writing
-// document.createElement / setAttribute / appendChild every time.
+// Shortcut for building an HTML element.
 // Example: el('a', { class: 'btn', text: 'Click me', href: '#' })
 // creates: <a class="btn" href="#">Click me</a>
 //
 // tag      - the HTML tag name, e.g. 'div', 'a', 'span'
-// opts     - an object of optional settings (class, text, href, src, alt, attrs)
-// children - an array of other elements to nest inside this one
+// opts     - optional settings (class, text, href, src, alt, attrs)
+// children - other elements to nest inside this one
 function el(tag, opts = {}, children = []) {
   const node = document.createElement(tag);
   if (opts.class) node.className = opts.class;
@@ -75,23 +61,15 @@ function el(tag, opts = {}, children = []) {
   return node;
 }
 
-// Whether the visitor has asked the OS for reduced motion — checked by the
-// accordion's open/close animation, the back-to-top scroll, and the
-// jump-to-section scroll, so they all fall back to an instant snap instead
-// of animating. The media query itself doesn't change without a real OS
-// setting change, so one MediaQueryList reused everywhere behaves exactly
-// like calling matchMedia() fresh each time, just without creating a new
-// query object on every click/toggle.
+// Whether the visitor has asked for reduced motion. Used by every
+// animation in this file so they can skip animating when needed.
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 function prefersReducedMotion() {
   return reducedMotionQuery.matches;
 }
 
-// localStorage can throw in some situations (Safari private browsing, or a
-// browser with storage disabled entirely) — every read/write in this file
-// goes through these two so that try/catch only has to be written once.
-// Failures are silent on purpose: whatever called this falls back to a sane
-// default (see each caller) rather than breaking the page.
+// Safe localStorage read/write — some browsers (e.g. Safari private
+// mode) can throw here, so every call in this file goes through these.
 function storageGet(key) {
   try { return localStorage.getItem(key); } catch { return null; }
 }
@@ -99,21 +77,16 @@ function storageSet(key, value) {
   try { localStorage.setItem(key, value); } catch { /* quota / privacy error — ignore */ }
 }
 
-// Updates the address bar to point at #id (e.g. a section or project
-// anchor — see assignSlug()) without navigating anywhere or firing a
-// hashchange/scroll. Used anywhere a click already does its own
-// scrolling/copying and just needs the URL to reflect where you ended up,
-// the same way a real anchor link's URL would.
+// Updates the address bar to #id without actually navigating or
+// scrolling — used when a click already handles that itself.
 function setHashSilently(id) {
   const url = `${location.origin}${location.pathname}#${id}`;
   try { history.pushState(null, '', url); } catch { /* not fatal — whatever triggered this still works, just without the URL updating */ }
   return url;
 }
 
-// Small "copy link" icon-button used by both section headings and project
-// titles (see renderSectionSummary()/renderProject() below) to let people
-// grab a direct #anchor link to that section or project. label is used
-// for the accessible name/tooltip, e.g. "Copy link to Better Craftables".
+// Small "copy link" button used on section headings and project
+// titles. label is used for the tooltip, e.g. "Copy link to X".
 function copyLinkButton(id, label) {
   const btn = el('button', {
     class: 'copy-link-btn',
@@ -162,8 +135,8 @@ function copyLinkButton(id, label) {
 }
 
 /* ---------- Page sections ----------
-   Each function below builds one part of the page.
-   They're called once, in order, at the very bottom of this file. */
+   Each function below builds one part of the page. Called once, in
+   order, at the bottom of this file. */
 
 // Fills in the logo, site name, tagline, and the top-right nav buttons
 // (Modrinth / GitHub links) using the "brand" and "topLinks" data.
@@ -184,10 +157,8 @@ function renderBrand(brand, topLinks) {
   });
 }
 
-// Builds ONE download channel box (e.g. the green "Release" box or the
-// orange "Release Candidate" box) for a single project. A project can
-// have multiple channels — see renderProject() below, which calls this
-// once per channel.
+// Builds one download channel box (e.g. "Release" or "Release
+// Candidate") for a project. A project can have several channels.
 function renderChannel(ch) {
   // "stable" / "beta" / "alpha" controls the box's color via CSS.
   // Falls back to "stable" if data.js didn't set a channel.
@@ -201,35 +172,26 @@ function renderChannel(ch) {
     el('span', { class: 'channel-mc', text: 'Java ' + ch.mcVersion })
   ]);
 
-  // Container that will hold one column per download (Data Pack, Mod, etc.)
-  // "has-multiple" flags channels with two download types side by side —
-  // that's the only layout tight enough on mobile to need the pill forced
-  // onto its own line (see .download-col-break below). A single-column
-  // channel (e.g. a resource-pack-only release) has the full row width to
-  // itself, so its pill comfortably sits inline next to the label instead.
+  // Holds one column per download (Data Pack, Mod, etc.). "has-multiple"
+  // flags channels with two download types, which need extra mobile
+  // styling (see .download-col-break below).
   const hasMultipleDownloads = (ch.downloads || []).length > 1;
   const downloads = el('div', {
     class: 'channel-downloads' + (hasMultipleDownloads ? ' has-multiple' : '')
   });
 
   (ch.downloads || []).forEach(d => {
-    // Each download in data.js explicitly says which icon to use
-    // (e.g. icon: "brackets" for a data pack). Falls back to a
-    // box icon if one isn't specified.
+    // Falls back to a box icon if data.js didn't specify one.
     const typeIcon = d.icon || 'box';
 
     // A download counts as "disabled" if data.js marked it disabled,
     // OR if it simply has no URL to link to.
     const isDisabled = d.disabled || !d.url;
 
-    // The small header inside each download column: icon + label + version pill.
-    // The empty "break" span between the label and the pill does nothing on
-    // desktop (display: none — see .download-col-break in styles.css), but
-    // below the mobile breakpoint it becomes a zero-height, full-width flex
-    // item that forces the pill onto its own line every time, instead of
-    // only when it happens not to fit next to the label. That keeps every
-    // download column consistent on mobile, rather than some pills sitting
-    // inline and others wrapping depending on how long the label is.
+    // Header for each download column: icon + label + version pill.
+    // The empty "break" span forces the pill onto its own line on
+    // mobile (see .download-col-break in styles.css); it does nothing
+    // on desktop.
     const headerChildren = [
       icon(typeIcon, 'icon-sm'),
       el('span', { class: 'download-type-label', text: d.label }),
@@ -285,20 +247,17 @@ function renderProject(p) {
     (p.channels || []).map(renderChannel)
   );
 
-  // Plain-text blob used by the nav bar's search box (see renderSectionNav)
-  // to decide whether this card matches whatever someone typed. Includes
-  // each channel's MC version ("Java 1.20.1") and release version (the
-  // text shown on its pill, e.g. "v8.0.0") alongside the title/description,
-  // so searching "1.20.1" or "v8.0.0" finds the right project too.
+  // Text blob the search box matches against — includes the title,
+  // description, and each channel's version, so searching a version
+  // number finds the right project too.
   const versionText = (p.channels || [])
     .flatMap(ch => [ch.mcVersion, ch.version])
     .filter(Boolean)
     .join(' ');
   const searchText = [p.title, p.description, versionText].filter(Boolean).join(' ').toLowerCase();
 
-  // Gives this project a stable #anchor (e.g. #better-craftables) so it
-  // can be linked to directly — see copyLinkButton() and the hash
-  // handling near the bottom of this file.
+  // Gives this project a stable #anchor so it can be linked to
+  // directly.
   const id = assignSlug(p.title, 'project');
   const titleRow = el('div', { class: 'project-title-row' }, [
     el('h3', { text: p.title }),
@@ -316,23 +275,12 @@ function renderProject(p) {
   ]);
 }
 
-// Builds every section (e.g. "Data Packs & Mods", "Resource Packs")
-// and all the project cards inside each one, then adds them to <main>.
+// Builds every section and its project cards, then adds them to <main>.
+// Each section is a collapsible <details> element, with its open/closed
+// state remembered in localStorage.
 //
-// Each section is a <details> element with the heading as its <summary> —
-// that makes the whole section collapsible (click the heading to fold
-// away every project inside it) with no custom toggle logic needed.
-//
-// We also remember each section's open/closed state in the browser's
-// localStorage, keyed by the section's heading text, so it's restored
-// the way the visitor left it next time they load the page. If nothing
-// has been saved yet (first visit), sections default to open.
-// Builds the clickable header row for one section: the heading (with its
-// chevron), a small badge showing how many projects are inside, and — on
-// the right — a little stack of project thumbnails that peeks out while
-// the section is collapsed. The peek strip fades away once the section
-// opens (see .section-peek in styles.css), since the real project cards
-// take over at that point.
+// Builds the clickable header row for one section: the heading, a
+// count badge, and a peek strip of thumbnails shown while collapsed.
 function renderSectionSummary(section, id) {
   const projects = section.projects || [];
 
@@ -349,9 +297,7 @@ function renderSectionSummary(section, id) {
   // inside the button keeps clicking it from also toggling the section.
   const headingGroup = el('div', { class: 'section-heading-group' }, [heading, count, copyLinkButton(id, section.heading)]);
 
-  // Only peek at a handful of thumbnails so the stack doesn't get silly
-  // on sections with lots of projects — anything past that becomes a
-  // plain "+N" chip instead of another image.
+  // Only shows a handful of thumbnails; the rest become a "+N" chip.
   const maxPeek = 4;
   const peekThumbs = projects.slice(0, maxPeek).map(p => el('img', {
     class: 'section-peek-thumb',
@@ -376,12 +322,9 @@ function renderSections(sections) {
   // and nothing for renderSectionNav() to hook into either
   if (!main) return { sectionEls: [], accordions: [] };
 
-  // Handles to every section/accordion we build below, keyed by the same
-  // order as `sections` — renderSectionNav() uses these to jump to, expand,
-  // or collapse a given section from the nav bar. projectsBySection keeps
-  // each section's already-built project <article> elements too, so the
-  // live search box in renderSectionNav() can filter them directly instead
-  // of re-querying the DOM with querySelectorAll on every keystroke.
+  // Built up as we go, in the same order as `sections`. projectsBySection
+  // caches each section's project elements so the search box (in
+  // renderSectionNav) can filter them without re-querying the DOM.
   const sectionEls = [];
   const accordions = [];
   const projectsBySection = [];
@@ -389,9 +332,8 @@ function renderSections(sections) {
   sections.forEach(section => {
     const projectEls = section.projects.map(renderProject);
     const list = el('div', { class: 'project-list' }, projectEls);
-    // Gives this section a stable #anchor (e.g. #data-packs-mods) so it
-    // can be linked to directly — see copyLinkButton() and the hash
-    // handling near the bottom of this file.
+    // Gives this section a stable #anchor so it can be linked to
+    // directly.
     const id = assignSlug(section.heading, 'section');
     const sectionEl = el('details', { class: 'catalog-section', attrs: { id } }, [
       renderSectionSummary(section, id),
@@ -404,9 +346,8 @@ function renderSections(sections) {
     // if storage is unavailable rather than breaking the page.
     const saved = storageGet(storageKey);
 
-    // A section can set defaultOpen: false in data.js to start collapsed
-    // for first-time visitors. Once someone toggles it, their choice is
-    // remembered (see the localStorage read above) and wins from then on.
+    // A section can start collapsed via defaultOpen: false in data.js;
+    // once someone toggles it, their choice is remembered instead.
     const defaultOpen = section.defaultOpen !== false;
     sectionEl.open = saved === null ? defaultOpen : saved === 'true';
     main.appendChild(sectionEl);
@@ -420,15 +361,10 @@ function renderSections(sections) {
   return { sectionEls, accordions, projectsBySection };
 }
 
-// Makes a <details> element animate its open/close instead of snapping
-// instantly, while keeping all the native <details>/<summary> behaviour
-// (keyboard toggling, find-in-page auto-expand, screen reader semantics).
-//
-// The browser only animates properties like height/opacity, not the
-// open/closed state itself, so this steps in on click: it stops the
-// browser's own instant toggle, animates the element's height from its
-// current value to its target value with the Web Animations API, and
-// only flips `open` (or removes it) once that animation finishes.
+// Makes a <details> element animate open/close instead of snapping
+// instantly, while keeping normal keyboard/screen-reader behavior.
+// Animates the element's height, and only flips `open` once that
+// animation finishes.
 class Accordion {
   constructor(detailsEl, storageKey, { duration = 150, easing = 'ease-in-out', onToggle = null } = {}) {
     this.el = detailsEl;
@@ -437,14 +373,9 @@ class Accordion {
     this.duration = duration;
     this.easing = easing;
     this.animation = null;
-    // Called only once the accordion's state has genuinely settled (after
-    // its animation finishes) — see runAnimation()/finish() below. This is
-    // deliberately NOT wired to the native <details> "toggle" event: toggle()
-    // briefly flips `open` false-then-true again when *closing* (to measure
-    // the collapsed height while keeping content visible for the animation),
-    // and that transient flip fires its own native toggle events which don't
-    // reflect the real end state. Listening to those directly is what used
-    // to make the Expand/Collapse All label flicker between states.
+    // Called once the accordion's state has actually settled (after its
+    // animation finishes), not on the native "toggle" event — that
+    // event fires too early and used to make labels flicker.
     this.onToggle = onToggle;
 
     if (!this.summary) {
@@ -516,13 +447,11 @@ class Accordion {
   }
 }
 
-// Builds the sticky sub-nav under the masthead: one button per section that
-// jumps to (and expands, if needed) that section, an "Expand/Collapse All"
-// button, and a live search box that filters project cards as you type.
+// Builds the sticky sub-nav: one jump button per section, an
+// Expand/Collapse All button, and a live search box.
 //
 // `sectionEls`, `accordions` and `projectsBySection` are the arrays
-// returned by renderSections() above, in the same order as `sections` —
-// index i in one lines up with index i in the others.
+// from renderSections() above, all in the same order as `sections`.
 function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
   const nav = document.getElementById('section-nav');
   if (!nav || sectionEls.length === 0) return; // nothing to build a nav for (e.g. 404.html, or an empty catalog)
@@ -531,16 +460,12 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
 
   const jumpRow = el('div', { class: 'nav-jump-row' });
 
-  // Tracks which section (by index) was most recently expanded-and-jumped-to
-  // via one of these buttons. Clicking that same button again collapses the
-  // section. Clicking any other section's button — even one that's already
-  // open some other way (default-open, opened via its own heading, etc.) —
-  // just jumps to it and doesn't collapse anything.
+  // Tracks which section was last jumped to, so clicking its button
+  // again collapses it — clicking a different section's button never
+  // collapses anything.
   let lastJumpedIndex = null;
 
-  // Handles to every jump button, in the same order as sectionEls/accordions,
-  // so syncJumpButtonStates() below can look up "is this button's section
-  // open?" and fill it in accordingly.
+  // Handles to every jump button, same order as sectionEls/accordions.
   const jumpButtons = [];
 
   sections.forEach((section, i) => {
@@ -554,10 +479,8 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
       const sectionEl = sectionEls[i];
       const accordion = accordions[i];
 
-      // Updates the address bar to this section's #anchor (see
-      // assignSlug()/setHashSilently()) so the jump buttons behave like
-      // real deep links — copyable straight from the address bar, and
-      // usable with browser back/forward — not just an in-page scroll.
+      // Updates the address bar so jump buttons behave like real
+      // links, not just an in-page scroll.
       setHashSilently(sectionEl.id);
 
       const jumpToSection = () => {
@@ -568,12 +491,8 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
       };
 
       if (!sectionEl.open) {
-        // Expand it first (if it's collapsed) so you're not scrolled to a
-        // heading with nothing visible underneath it. Wait for the expand
-        // animation to actually finish before scrolling — jumping mid
-        // animation (while the section's layout is still growing) is what
-        // used to make the first click "just expand" and need a second
-        // click to actually land on the section.
+        // Expands the section first if needed, and waits for that
+        // animation to finish before scrolling to it.
         accordion.toggle(true);
         if (accordion.animation) {
           accordion.animation.finished.then(jumpToSection).catch(jumpToSection);
@@ -595,38 +514,30 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
     jumpRow.appendChild(btn);
   });
 
-  // Expand/Collapse All sits at the end of the jump row, set apart from
-  // the section buttons by a divider (see nav-divider below) — it's a
-  // navigation control like them, just acting on every section at once.
+  // Sits at the end of the jump row — a navigation control too, just
+  // acting on every section at once.
   const toggleAllBtn = el('button', {
     class: 'nav-toggle-all',
     text: 'Collapse All',
     attrs: { type: 'button' }
   });
 
-  // Keep the "Expand All" / "Collapse All" label honest even when a section
-  // is opened/closed some other way (its own heading, or a jump button).
-  // Hooked up via each Accordion's onToggle callback (fires once its state
-  // has actually settled) rather than the native <details> "toggle" event,
-  // which used to fire spuriously mid-animation and flicker the label.
+  // Keeps the "Expand/Collapse All" label accurate no matter how a
+  // section was opened or closed.
   const syncToggleAllLabel = () => {
     const allOpen = accordions.every(a => a.el.open);
     toggleAllBtn.textContent = allOpen ? 'Collapse All' : 'Expand All';
   };
 
-  // Fills in each jump button while its section is open, and reverts it
-  // to the plain ghost style once that section closes again — regardless
-  // of *how* it was opened or closed (its own jump button, its own
-  // heading, Expand/Collapse All, or the search box below).
+  // Fills in a jump button while its section is open, whatever caused
+  // it to open or close.
   const syncJumpButtonStates = () => {
     jumpButtons.forEach((btn, i) => {
       btn.classList.toggle('is-open', sectionEls[i].open);
     });
   };
 
-  // Both callbacks care about the same event (a section's state actually
-  // settling), so run them together rather than fighting over which one
-  // gets to be `onToggle`.
+  // Both callbacks run on the same event, so combine them here.
   const onAccordionSettled = () => {
     syncToggleAllLabel();
     syncJumpButtonStates();
@@ -643,22 +554,14 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
     toggleAllBtn.textContent = allOpen ? 'Expand All' : 'Collapse All';
   });
 
-  // Set the correct label immediately based on each section's *restored*
-  // state (localStorage / defaultOpen), instead of leaving the hardcoded
-  // "Collapse All" text from creation above. Without this, a visitor whose
-  // sections all loaded collapsed would see "Collapse All" sitting there
-  // until they manually toggled something.
+  // Sets the correct label right away, based on each section's
+  // restored open/closed state.
   syncToggleAllLabel();
-  // Same idea as the label above, but for each jump button's filled/ghost
-  // state — set it once up front from each section's restored open state,
-  // rather than leaving every button in its default ghost styling until
-  // something toggles.
+  // Same idea as above, but for each jump button's filled/ghost state.
   syncJumpButtonStates();
 
-  // Append the divider + toggle-all button to the jump row itself, right
-  // after the section buttons — they're both navigation controls, just
-  // acting on one section vs. all of them, so they read as one group
-  // instead of toggle-all being stranded over with the unrelated search box.
+  // Adds the divider + toggle-all button right after the section
+  // buttons, so they read as one group.
   const toggleAllDivider = el('span', { class: 'nav-divider', attrs: { 'aria-hidden': 'true' } });
   jumpRow.appendChild(toggleAllDivider);
   jumpRow.appendChild(toggleAllBtn);
@@ -677,11 +580,9 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
     }
   });
 
-  // Clears the search box and defocuses it. Drawn as a plain CSS "×" (two
-  // rotated bars, same technique as the chevron/back-to-top icons
-  // elsewhere in this file) rather than an image icon, so it doesn't
-  // depend on an icons8 asset existing. Only shown once there's actually
-  // something to clear — see updateClearButton() below.
+  // Clears the search box. Drawn as a plain CSS "×", same trick as the
+  // chevron elsewhere in this file. Only shown when there's something
+  // to clear.
   const clearBtn = el('button', {
     class: 'nav-search-clear',
     attrs: { type: 'button', 'aria-label': 'Clear search' }
@@ -721,10 +622,8 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
       if (sectionHasMatch) anyVisible = true;
 
       if (query && sectionHasMatch && !sectionEl.open) {
-        // Force it open directly (no animation, no localStorage write) so
-        // typing quickly doesn't fight the accordion's own transitions.
-        // Left open once the search is cleared too, rather than snapping
-        // shut again — someone may still be reading it.
+        // Opens it directly, no animation, so fast typing doesn't
+        // fight the accordion. Stays open once search is cleared.
         sectionEl.open = true;
         sectionEl.dataset.state = 'expanded';
       }
@@ -749,39 +648,27 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
     searchInput.blur(); // defocus, per the request — not just an empty box left with the cursor still in it
   });
 
-  // The section jump buttons + Expand/Collapse All live in their own row,
-  // separate from search (see .nav-controls below). This row wraps onto
-  // as many lines as it needs on narrow screens rather than scrolling
-  // horizontally (see the .nav-jump-row rules inside the mobile media
-  // query in styles.css).
+  // The jump buttons + Expand/Collapse All live in their own row,
+  // separate from search, and wrap onto more lines on narrow screens.
   nav.appendChild(jumpRow);
 
   searchWrap.appendChild(searchIcon);
   searchWrap.appendChild(searchInput);
   searchWrap.appendChild(clearBtn);
 
-  // Search sits on its own on the other side of the bar (.section-nav's
-  // space-between handles the split) — it acts on the whole catalog like
-  // Expand/Collapse All does, but pairing it with a text input instead of
-  // the jump buttons would make the jump row's purpose (navigation) less
-  // clear at a glance.
+  // Search sits on its own on the other side of the bar, kept
+  // separate from the jump buttons so their purpose stays clear.
   const controls = el('div', { class: 'nav-controls' }, [searchWrap]);
   nav.appendChild(controls);
 
-  // Keep the search box the same width as the two link buttons in the
-  // masthead above it (#top-links), rather than a fixed guess — those
-  // buttons' combined width depends on their label text, which data.js
-  // controls. Re-measures whenever that row's size changes (window
-  // resize, or its own content/font reflowing) rather than just once.
+  // Keeps the search box the same width as the link buttons above it,
+  // re-measuring whenever that row's size changes.
   const topLinks = document.getElementById('top-links');
   const mobileQuery = window.matchMedia('(max-width: 620px)');
   if (topLinks) {
     const syncSearchWidth = () => {
-      // Below the mobile breakpoint the search box fills whatever space
-      // .nav-controls' flexbox gives it (see styles.css) instead of
-      // matching the masthead links — those links sit in their own
-      // stacked row on mobile and can be much narrower than the screen,
-      // which would otherwise force the search box to be narrow too.
+      // On mobile the search box just fills its flexbox space instead
+      // of matching the (now narrower) masthead links.
       if (mobileQuery.matches) {
         searchWrap.style.width = '';
         return;
@@ -795,21 +682,23 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
     } else {
       window.addEventListener('resize', syncSearchWidth);
     }
-    // Crossing the mobile breakpoint doesn't always change #top-links'
-    // own size (e.g. it was already on one line either side of it), so
-    // the ResizeObserver above can miss it — listen for the breakpoint
-    // itself too.
+    // Also listen for the breakpoint directly, since the
+    // ResizeObserver above can miss it in some cases.
     if (mobileQuery.addEventListener) {
       mobileQuery.addEventListener('change', syncSearchWidth);
     } else {
       mobileQuery.addListener(syncSearchWidth); // Safari <14 fallback
     }
   }
+
+  // Exposed so handleDeepLink() can keep the jump buttons and
+  // Expand/Collapse All label in sync when it expands a section
+  // directly, the same way search and the accordion's own toggle do.
+  return { syncNavState: onAccordionSettled };
 }
 
-// Fills in the footer: social icon links, copyright line, disclaimer,
-// and the site version (shown as a plain label, or a clickable link
-// to the changelog if data.js gave it a URL).
+// Fills in the footer: social links, copyright, disclaimer, and the
+// site version (plain text, or a link if data.js gave it a URL).
 function renderFooter(socials, footer, version) {
   const socialRow = document.getElementById('social-links');
   socials.forEach(s => {
@@ -847,8 +736,8 @@ function renderFooter(socials, footer, version) {
     const versionEl = document.getElementById('site-version');
     versionEl.innerHTML = ''; // clear out anything that might already be there before re-filling it
 
-    // version can be given in data.js either as a plain string ("e.g. v0.1.1")
-    // or as an object with a label + a url to link to. This handles both.
+    // version can be a plain string or an object with a label + url —
+    // this handles both.
     const versionLabel = typeof version === 'object' ? version.label : version;
     const versionUrl = typeof version === 'object' ? version.url : null;
 
@@ -864,9 +753,8 @@ function renderFooter(socials, footer, version) {
   }
 }
 
-// Fades the "back to top" button in once the visitor has scrolled down a
-// bit, and scrolls smoothly back to the top when it's clicked — instantly
-// instead of smoothly for anyone with prefers-reduced-motion set.
+// Fades the "back to top" button in after scrolling down, and scrolls
+// back to the top when clicked.
 function initBackToTop() {
   const btn = document.getElementById('back-to-top');
   if (!btn) return; // not every page has one (e.g. 404.html)
@@ -885,14 +773,6 @@ function initBackToTop() {
   });
 }
 
-// If the page was loaded (or navigated to, e.g. via browser back/forward)
-// with a #section-id or #project-id hash — see assignSlug()/copyLinkButton()
-// above — this expands that section if it was collapsed and scrolls to it,
-// briefly highlighting the target if it's a specific project rather than
-// a whole section. Doesn't touch each section's saved open/closed
-// preference (see Accordion.saveState): following a link is a one-off
-// visit, not a statement about how you want the page laid out next time.
-function handleDeepLink() {
   const id = decodeURIComponent(location.hash.slice(1));
   if (!id) return;
 
@@ -914,12 +794,8 @@ function handleDeepLink() {
     target.scrollIntoView({ behavior: 'auto', block: 'start' }); // instant, not smooth — this is where the page should land, not a navigation to animate
 
     if (target !== sectionEl) {
-      // A linked project can be one of several similar-looking cards in
-      // a long list — this pulse makes it obvious which one the link
-      // actually pointed at. Purely visual (color/shadow, nothing that
-      // moves), and .is-linked-target's animation is itself removed
-      // under prefers-reduced-motion in styles.css, so this is safe to
-      // always add.
+      // Makes it obvious which card the link pointed to. Purely visual,
+      // and already disabled for reduced motion in styles.css.
       target.classList.add('is-linked-target');
       target.addEventListener('animationend', () => target.classList.remove('is-linked-target'), { once: true });
     }
@@ -927,10 +803,8 @@ function handleDeepLink() {
 }
 
 /* ---------- Run everything ----------
-   This is the only code that actually executes on page load — everything
-   above is just function definitions sitting idle until called.
-   Wrapping it in (function () { ... })() (an "IIFE") keeps these calls
-   out of the global scope, so they don't clash with anything else. */
+   This is the only code that runs on page load — everything above is
+   just function definitions until called here. */
 (function init() {
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
   const { sectionEls, accordions, projectsBySection } = renderSections(SITE_DATA.sections);

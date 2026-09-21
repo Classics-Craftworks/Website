@@ -1,11 +1,9 @@
 /* ============================================================
    SITE STYLES & THEME TOKENS
-   Contains all layout, visual styling, responsive design and channel theme tokens.
-   
-   QUICK GUIDE:
-   - Global Theme: Modify values in the :root selector to adjust site-wide colors or fonts.
-   - Channel Colors & Shapes: Change --ch-stable, --ch-beta, --ch-alpha, or --ch-unsupported
-     variables at the top of this file to update channel accent themes and indicator shapes.
+
+   To change site-wide colors or fonts, edit the :root section below.
+   To change channel colors/shapes, edit --ch-stable, --ch-beta,
+   --ch-alpha and --ch-unsupported.
    ============================================================ */
 
 /* Header Font */
@@ -17,9 +15,8 @@
   font-display: swap;
 }
 
-/* :root defines "CSS variables" (also called custom properties) — named
-   values you can reuse anywhere in this file with var(--name). Change a
-   color here once, and everywhere that uses it updates automatically. */
+/* Named colors/values reused throughout the file. Change one here and
+   it updates everywhere it's used. */
 :root {
   --bg:            #18181B;  /* page background */
   --surface:       #27272A;  /* thumbnails, chips, panel backgrounds */
@@ -45,10 +42,8 @@
   --ch-unsupported:      #5C96DE;  /* unsupported channel */
   --ch-unsupported-rgb:  92, 150, 222;
 
-/* Alpha (transparency) scale — named opacity levels used with the channel
-   RGB variables above, e.g. rgba(var(--channel-rgb), var(--alpha-soft)).
-   These variables means every "transparency" setting comes from one place,
-   instead of being scattered. */
+/* Named opacity levels, used with the channel colors above
+   (e.g. rgba(var(--channel-rgb), var(--alpha-soft))). */
   --alpha-faint:   0.04;  /* barely-there background tint */
   --alpha-whisper: 0.05;  /* even fainter background, for "unavailable" states */
   --alpha-subtle:  0.08;  /* disabled-state fills */
@@ -65,22 +60,16 @@
 
   --measure: 68ch;
 
-/* Transition timings — used across every hover/press state in this file
-   (buttons, links, pills, chips) so the whole page's feel can be tuned
-   from one place instead of hunting down every individual `transition`
-   declaration. --transition-fast covers color/background/border fades;
-   --transition-snap is the quicker one used for the little press/scale
-   feedback on click. */
+/* Shared timings for hover/press animations. --transition-fast is for
+   color/background fades; --transition-snap is the quicker one for
+   button-press effects. */
   --transition-fast: 0.15s ease;
   --transition-snap: 0.1s ease;
 }
 
-/* Local Channel Variable Mapping
-   [data-channel="stable"] targets any element with a data-channel="stable"
-   HTML attribute (script.js sets this on each channel box). Depending on
-   which value is present, we point --channel-color/--channel-rgb at a
-   different pair of variables from :root above — this is what makes
-   stable/beta/alpha boxes each get their own color automatically. */
+/* Each channel box gets a data-channel attribute (set in script.js).
+   These rules point --channel-color at the right color for that
+   channel, so the rest of the CSS can just use --channel-color. */
 .channel-group[data-channel="stable"] {
   --channel-color: var(--ch-stable);
   --channel-rgb: var(--ch-stable-rgb);
@@ -103,33 +92,16 @@
 
 * { box-sizing: border-box; }
 
-/* scrollbar-gutter: stable reserves space for a vertical scrollbar even
-   when the page doesn't need one, so desktop content doesn't reflow the
-   instant it grows past one screen and a scrollbar appears. On mobile
-   there's no such reflow to guard against — scrollbars there are
-   overlay/invisible and don't take up layout space — so the reservation
-   just leaves dead space the viewport can still scroll into sideways
-   with nothing there to see, which is exactly what a "no element bleeds
-   past the edge, but it still scrolls" report points to. Scoped off
-   below the mobile breakpoint instead of removed outright, so desktop
-   keeps the original reflow protection. */
+/* Reserves space for a scrollbar on desktop, so the page doesn't shift
+   when one appears. Turned off on mobile, where scrollbars float over
+   the content instead of taking up space. */
 html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
 @media (max-width: 620px) {
   html { scrollbar-gutter: auto; }
 }
 
-/* Belt-and-suspenders against horizontal scroll, on top of the more
-   targeted fixes below (the .masthead/#section-nav/#catalog/.site-footer
-   overflow rule, the scrollbar-gutter fix). overflow-x: clip is
-   deliberately used instead of hidden — per spec, 'clip' doesn't
-   establish a scroll container the way 'hidden' does (and doesn't force
-   overflow-y to 'auto' either, the coupling behind the Safari sticky bug
-   those other rules are written around) — so this can safely sit on
-   html/body themselves, ancestors of the sticky nav included, without
-   risking position: sticky anywhere on the page. This is a page that
-   never legitimately needs to scroll sideways, so simply disabling the
-   capability outright is more robust than continuing to chase down every
-   individual pixel-wide source of it one at a time. */
+/* Extra safety net against horizontal scrolling. Uses "clip" instead
+   of "hidden" so it doesn't break the sticky nav bar in Safari. */
 html {
   overflow-x: clip;
 }
@@ -153,15 +125,9 @@ p { margin: 0; }
   outline-offset: 3px;
 }
 
-/* The rule above covers every focusable element by default, but the
-   things a keyboard user actually tabs through most on this page —
-   section summary rows, download buttons, and the various link styles —
-   get their own explicit rule here too. That keeps their ring
-   intentional (and immune to being dropped later if a more specific
-   selector ever overrides `outline` on one of them) rather than relying
-   solely on the catch-all above. Each one already sets its own
-   border-radius elsewhere in this file, so the outline follows that
-   same rounded shape automatically. */
+/* Same focus ring as above, listed explicitly for the buttons/links
+   people tab through most, so a future style change can't accidentally
+   remove it. */
 .catalog-section > summary:focus-visible,
 .download-btn:focus-visible,
 .top-link:focus-visible,
@@ -185,8 +151,7 @@ p { margin: 0; }
 }
 
 /* ---------- Masthead ---------- */
-/* CSS Grid lays the header out in 3 side-by-side columns:
-   logo (auto width) | brand text (1fr = fills remaining space) | nav links (auto width) */
+/* Header layout: logo, brand text, nav links side by side. */
 .masthead {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -215,7 +180,8 @@ p { margin: 0; }
   font-weight: 700;
   letter-spacing: 0.04em; /* Adds a gap between letters */
   margin-bottom: 0.20rem; /* Increases gap between title and tagline */
-  line-height: 1.35; /* This font's capitals have very little natural line spacing, so a wrapped second line (e.g. "Craftworks" on its own row) sat almost touching the first without this */
+  line-height: 1.35; /* Extra line spacing — this font's capitals sit close together
+   without it. */
   text-wrap: balance;
 }
 
@@ -246,19 +212,17 @@ p { margin: 0; }
 .top-link { gap: 7px; padding: 8px 14px; }
 .text-link { gap: 6px; padding: 6px 12px; color: var(--text-soft); }
 
-/* Shared layout for every "chip button" on the page (nav links, jump
-   buttons, toggle-all, download buttons) — each keeps its own rule below
-   for the sizing/color/border that makes it look distinct, but they all
-   lay themselves out as a centered inline-flex row, so that part is
-   pulled out once here instead of repeated five times. */
+/* Shared layout for every button-like element on the page (nav links,
+   jump buttons, download buttons). Each keeps its own colors/sizing
+   below. */
 .top-link, .text-link, .nav-jump-btn, .nav-toggle-all, .download-btn {
   display: inline-flex;
   align-items: center;
 }
 
 /* ---------- Section nav (jump links, expand/collapse all, search) ---------- */
-/* Sticks to the top of the viewport as you scroll, so jump/search/collapse
-   stay reachable no matter how far down the catalog you are. */
+/* Sticks to the top of the screen while scrolling, so search and
+   navigation stay reachable. */
 .section-nav {
   position: sticky;
   top: 0;
@@ -280,10 +244,8 @@ p { margin: 0; }
   gap: 8px;
 }
 
-/* Jump buttons get their own distinct button treatment so they read as
-   "navigation" at a glance, instead of blending in with the solid grey
-   action buttons used elsewhere on the page (.top-link, .text-link,
-   .download-btn). */
+/* Styled differently from other buttons on the page so they clearly
+   read as navigation. */
 .nav-jump-btn {
   border: 1px solid rgba(var(--white-rgb), 0.35);
   border-radius: 6px;
@@ -302,12 +264,8 @@ p { margin: 0; }
 }
 .nav-jump-btn:active { transform: scale(0.97); }
 
-/* Filled in (instead of the ghost/outline treatment above) while its
-   section is expanded, so the jump row doubles as an at-a-glance
-   "what's open" indicator. Kept in sync with each section's real state
-   from script.js — including sections opened by clicking their own
-   heading, via Expand/Collapse All, or by typing into the search box —
-   not just clicks on the jump button itself. */
+/* Filled-in style for when a section is open, so the jump row also
+   shows what's currently expanded. */
 .nav-jump-btn.is-open {
   background: var(--text);
   border-color: var(--text);
@@ -319,11 +277,8 @@ p { margin: 0; }
 }
 
 /* ---------- Expand/Collapse All + search ---------- */
-/* The toggle-all button sits at the end of the jump row (separated from
-   the section buttons by .nav-divider, appended alongside it in
-   script.js) since it's a close cousin of them — a navigation control,
-   just acting on every section at once instead of one. Search stays in
-   its own group on the other side of the bar. */
+/* Sits at the end of the jump row, since it's a navigation control
+   too — just acting on every section at once. */
 .nav-controls {
   display: flex;
   align-items: center;
@@ -331,16 +286,8 @@ p { margin: 0; }
   flex-wrap: wrap;
 }
 
-/* A plain sibling element, not part of the button — so hovering or
-   clicking on it never triggers the button's own hover/press styling.
-   The extra left/right margin (on top of .nav-jump-row's own gap) gives
-   it a bit more breathing room from the section buttons on one side and
-   Expand/Collapse All on the other, so it reads more clearly as a
-   separator between two distinct groups instead of just another item in
-   the row. Only set here, not in the mobile media query below (where
-   this element is hidden entirely), so it has no effect on that layout.
-   Slightly brighter than --border too, so it actually stands out against
-   the section-nav's dark background instead of nearly disappearing. */
+/* A simple vertical divider between the section buttons and
+   Expand/Collapse All. Hidden on mobile. */
 .nav-divider {
   width: 1px;
   height: 30px;
@@ -382,12 +329,8 @@ p { margin: 0; }
 
 .nav-search-input {
   width: 100%;
-  /* Resets Chrome/Safari's native search-field chrome — which draws its
-     own rounded shape, inner shadow, and focus glow independently of
-     outline/box-shadow — so the custom focus ring below is the only ring
-     that ever shows. appearance:none alone isn't always enough in
-     WebKit; the pseudo-elements below need clearing too, since they're
-     what actually paints the native decorations/focus glow. */
+  /* Removes the browser's own search-box styling so only our custom
+   focus ring shows. */
   -webkit-appearance: none;
   appearance: none;
   border: 1px solid var(--border);
@@ -396,7 +339,7 @@ p { margin: 0; }
   color: var(--text);
   font: inherit;
   font-size: 0.85rem;
-  padding: 8px 30px 8px 32px; /* right padding reserved for .nav-search-clear, even while it's hidden, so text doesn't jump around as it appears/disappears */
+  padding: 8px 30px 8px 32px; /* Reserves room for the clear ("×") button so text doesn't shift when it appears */
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .nav-search-input::-webkit-search-decoration,
@@ -406,12 +349,8 @@ p { margin: 0; }
   -webkit-appearance: none;
 }
 .nav-search-input::placeholder { color: var(--text-soft); }
-/* Uses :focus (not just :focus-visible) so a mouse click into the box
-   gets this colour too, instead of falling back to the browser's own
-   default focus ring. !important guards against the global :focus-visible
-   rule elsewhere in this file, which otherwise also matches text inputs
-   on a plain mouse click in some browsers (they treat typing fields as
-   always needing a visible ring, regardless of input method). */
+/* Applies on any focus (not just keyboard), so clicking into the box
+   always shows this style instead of the browser default. */
 .nav-search-input:focus {
   outline: none !important;
   border-color: rgba(var(--white-rgb), 0.8);
@@ -420,10 +359,8 @@ p { margin: 0; }
   color: var(--text);
 }
 
-/* Clears the search box and defocuses it (see the click handler in
-   script.js). Drawn as a plain "×" with two rotated bars rather than an
-   image icon, matching the chevron/back-to-top arrow elsewhere in this
-   file — no icon asset to keep in sync. */
+/* Clears the search box. Drawn as a plain "×" out of two rotated bars,
+   like the other icon-free shapes in this file. */
 .nav-search-clear {
   position: absolute;
   right: 5px;
@@ -442,12 +379,8 @@ p { margin: 0; }
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
-/* Without this, the `display: flex` above wins over the browser's own
-   default `[hidden] { display: none }` rule — author stylesheets always
-   take precedence over the browser's built-in ones, regardless of
-   specificity — so setting the `hidden` property in script.js (see
-   updateClearButton()) was silently having no visual effect and the
-   button stayed visible even with an empty search box. */
+/* Makes sure the `hidden` attribute (set in script.js) actually hides
+   this button, overriding the display: flex above. */
 .nav-search-clear[hidden] {
   display: none;
 }
@@ -476,34 +409,26 @@ p { margin: 0; }
 }
 
 /* ---------- Sections ---------- */
-/* The Accordion class in script.js animates this element's `height`
-   directly via the Web Animations API, so it needs box-sizing: content-box
-   to be off the table for surprises — border-box keeps the animated
-   height in sync with what offsetHeight reports. */
+/* Keeps the box model consistent for the open/close animation in
+   script.js's Accordion class. */
 .catalog-section {
   margin-top: 24px;
-  /* Keeps a section's heading clear of the sticky nav bar above when a
-     jump button (or find-in-page) scrolls straight to it. */
+  /* Keeps the heading clear of the sticky nav bar when jumped to. */
   scroll-margin-top: 68px;
   box-sizing: border-box;
-  /* Without this, the browser's scroll anchoring "helpfully" adjusts the
-     scroll position whenever this element's height changes mid-animation
-     or when the inline height is cleared at the end — which is what was
-     showing up as a bounce and as content above the section jumping. */
+  /* Stops the browser from auto-adjusting scroll position while this
+   element's height is animating (open/close). */
   overflow-anchor: none;
 }
 
-/* The heading now lives inside a <summary> (see script.js), which makes
-   the whole section collapsible. The whole bar is styled and clickable
-   as one card — not just the heading text — so a collapsed section
-   reads as an obvious, pressable control rather than a bare underlined
-   title with dead space next to it. */
+/* The whole bar is clickable, not just the heading text, so it reads
+   as an obvious button for expanding/collapsing. */
 .catalog-section > summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  list-style: none; /* hides the default marker in Firefox/modern Chrome */
+  list-style: none; /* hides the default expand/collapse marker (Firefox/Chrome) */
   user-select: none;
   cursor: pointer;
   padding: 11px 20px;
@@ -516,21 +441,18 @@ p { margin: 0; }
   background: var(--surface-hover);
 }
 .catalog-section > summary::-webkit-details-marker {
-  display: none; /* hides the default marker in older WebKit (Safari) */
+  display: none; /* hides the default expand/collapse marker (older Safari) */
 }
 
-/* Groups the heading + count badge together on the left side of the bar. */
+/* Groups the heading and count badge on the left. */
 .section-heading-group {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 0; /* lets a long heading truncate instead of overflowing the card */
+  min-width: 0; /* lets a long heading truncate instead of overflowing */
 }
 
-/* Pulls the deep-link icon closer to the count badge than the group's
-   10px gap alone would, without touching the heading<->count spacing
-   (that gap is shared by both pairs, so it can't be tuned per-pair on
-   its own). */
+/* Pulls the copy-link icon a bit closer to the count badge. */
 .section-heading-group .copy-link-btn {
   margin-left: -5px;
 }
@@ -542,14 +464,15 @@ p { margin: 0; }
   position: relative;
 }
 
-/* The text sits in its own inline span so it can shrink on click
-   without dragging the h2::after chevron (below) along with it. */
+/* Own element so the press-shrink effect doesn't also shrink the
+   chevron. */
 .heading-label {
   display: inline-block;
   transition: transform var(--transition-snap);
 }
 
-/* Custom collapse/expand chevron, positioned at the left edge of the heading */
+/* Custom expand/collapse chevron, drawn with borders instead of an
+   image */
 .catalog-section h2::after {
   content: '';
   position: absolute;
@@ -559,20 +482,16 @@ p { margin: 0; }
   height: 10px;
   border-right: 2px solid var(--text);
   border-bottom: 2px solid var(--text);
-  transform: translateY(-50%) rotate(-45deg); /* pointing right = collapsed indicator */
+  transform: translateY(-50%) rotate(-45deg); /* points right when collapsed */
   transition: transform 0.3s ease-in-out;
 }
 
-/* Flip the chevron to point down when the section is open. Keyed off
-   data-state (set synchronously in script.js) rather than the `open`
-   attribute — `open` itself changes late on collapse so the chevron
-   stays in sync with the animation instead of lagging behind it. */
+/* Flips the chevron to point down when the section is open. */
 .catalog-section[data-state="expanded"] h2::after {
   transform: translateY(-50%) rotate(45deg);
 }
 
-/* Small project count badge next to the heading to keep a
-   collapsed section from looking empty or uninformative. */
+/* Small badge showing how many projects are in this section. */
 .section-count {
   display: inline-flex;
   align-items: center;
@@ -590,16 +509,14 @@ p { margin: 0; }
   transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
-/* Swap to a darker colour so the counter badge still stands out on hover. */
+/* Darker badge color on hover, so it still stands out. */
 .catalog-section > summary:hover .section-count {
   background: color-mix(in srgb, var(--surface-hover), white 15%);
   border-color: color-mix(in srgb, var(--border), white 15%);
 }
 
-/* A little stack of project thumbnails peeking out on the right of a
-   collapsed section — gives it something to look at before you even
-   open it. It fades out once the section expands, since the real
-   project cards take over at that point. */
+/* A stack of thumbnails that peeks out while the section is
+   collapsed, and fades away once it's opened. */
 .section-peek {
   display: flex;
   align-items: center;
@@ -619,8 +536,8 @@ p { margin: 0; }
   border-radius: 10px;
   flex-shrink: 0;
   margin-left: -8px;
-  /* Matches the card's own background, so overlapping thumbnails look
-     "cut out" from one another instead of just stacking messily. */
+  /* Matches the background color so overlapping thumbnails look neatly
+   layered. */
   border: 2px solid var(--surface);
 }
 .section-peek-thumb:first-child,
@@ -657,11 +574,9 @@ p { margin: 0; }
   gap: 20px;
   padding: 26px 0;
   border-bottom: 1px solid rgba(var(--border-rgb), 0.6);
-  align-items: start; /* Locks icon to the top edge */
-  /* Same reasoning as .catalog-section's scroll-margin-top above: keeps a
-     deep-linked project (#better-craftables) clear of the sticky nav bar
-     when jumped to directly, e.g. via .copy-link-btn / handleDeepLink()
-     in script.js. */
+  align-items: start; /* keeps the thumbnail aligned to the top */
+  /* Same as the section's scroll-margin-top above — keeps a linked
+   project clear of the sticky nav bar. */
   scroll-margin-top: 68px;
 }
 .project:first-child { padding-top: 4px; }
@@ -678,8 +593,7 @@ p { margin: 0; }
 
 .project-body { min-width: 0; }
 
-/* Holds the project title next to its "copy link" button (see
-   .copy-link-btn below and copyLinkButton() in script.js). */
+/* Holds the project title next to its copy-link button. */
 .project-title-row {
   display: flex;
   align-items: center;
@@ -691,7 +605,7 @@ p { margin: 0; }
   color: var(--text);
   margin-top: 0;
   line-height: 1.1;
-  transform: translateY(-3px); /* Can tweak to -1px, -2px, or -3px */
+  transform: translateY(-3px); /* fine-tune this if the title looks off-center */
 }
 
 .project-description {
@@ -708,7 +622,7 @@ p { margin: 0; }
   margin-top: 14px;
 }
 
-/* Make them less prominent */
+/* muted styling, less prominent than the main buttons */
 .project-links a,
 .project-links .top-link {
   background-color: transparent;
@@ -719,7 +633,7 @@ p { margin: 0; }
   transition: opacity var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-snap);
 }
 
-/* Light up smoothly on hover */
+/* lights up on hover */
 .project-links a:hover,
 .project-links .top-link:hover {
   opacity: 1;
@@ -739,10 +653,8 @@ p { margin: 0; }
 
 /* Card Outer Shell */
 .channel-group {
-  /* flex-basis matches what a box would be if it had one sibling
-     (50% minus half the row gap), and flex-grow: 0 means a channel
-     box with NO sibling won't stretch to fill the row — it stays the
-     same size whether it's paired with another box or standing alone. */
+  /* Sized for two boxes side by side, but won't stretch to fill the
+   row if there's only one. */
   flex: 0 1 calc(50% - 6px);
   min-width: 0;
   border: 1.5px solid rgba(var(--channel-rgb), var(--alpha-medium));
@@ -751,12 +663,8 @@ p { margin: 0; }
   padding: 14px 14px 16px;
   display: flex;
   flex-direction: column;
-  /* Lets the rules under "Container Queries" further down key off this
-     box's own rendered width, rather than the screen's. A paired channel
-     box (Release + Release Candidate side by side) can get just as
-     cramped on a wide-ish tablet as a single stacked box does on a phone
-     — what matters is how much room *this box* actually has, not which
-     device it's on. */
+  /* Lets the @container rules further down respond to this box's own
+   width, not just the screen size. */
   container-type: inline-size;
 }
 
@@ -831,7 +739,7 @@ p { margin: 0; }
   font-weight: 600;
   color: var(--text);
   min-height: 24px; /* Fixes height shift when icon or pill is missing */
-  flex-wrap: wrap; /* lets the pill drop to its own line below instead of squeezing/truncating — on desktop this only kicks in if it doesn't fit; on mobile .download-col-break forces it every time (see below) */
+  flex-wrap: wrap; /* lets the version pill drop to its own line if it doesn't fit */
   row-gap: 4px;
 }
 
@@ -840,10 +748,8 @@ p { margin: 0; }
   flex-shrink: 0;
 }
 
-/* Forced line-break spacer between the label and the pill — see the
-   comment in script.js. Not a flex item at all by default, so it has
-   zero effect on this desktop layout (no extra gap, no forced wrap);
-   the mobile media query below is what activates it. */
+/* A spacer that forces a line break on mobile (see below); does
+   nothing on desktop. */
 .download-col-break {
   display: none;
 }
@@ -866,7 +772,7 @@ p { margin: 0; }
   text-overflow: ellipsis;
   max-width: 100%;
   min-width: 0;
-  flex-shrink: 0; /* never squeeze/truncate the version text — .download-col-header wraps it to its own line instead when space runs out */
+  flex-shrink: 0; /* never truncate the version text — it wraps to its own line instead */
 }
 
 .pill.disabled-pill {
@@ -921,9 +827,7 @@ p { margin: 0; }
   transform: scale(0.95);
 }
 
-/* Section bar is a full card now, so give it its own press feedback
-   too — darkens like the hover state, regardless of which part of the
-   row was clicked. */
+/* Press feedback for the section bar, matching its hover state. */
 .catalog-section > summary:active {
   background: var(--surface-hover);
 }
@@ -951,12 +855,8 @@ p { margin: 0; }
 }
 
 /* ---------- Icons ---------- */
-/* The icons are plain PNG files, but instead of showing the PNG's own
-   colors, we use it as a "mask": the image's shape becomes a stencil, and
-   background-color: currentColor fills that stencil with whatever text
-   color is active on the element (so icons automatically match hover/theme
-   colors instead of needing a separately-colored image file for each state).
-   PNGs will be swapped out for SVGs at some point. */
+/* Icons are PNGs used as color "stencils", so they automatically
+   match whatever text color is active (hover, theme, etc). */
 .icon {
   display: inline-block;
   background-color: currentColor;
@@ -971,19 +871,14 @@ p { margin: 0; }
 .icon-sm { width: 15px; height: 15px; }
 .icon-md { width: 19px; height: 19px; }
 
-/* icon-md is only ever used inside .social-link (see script.js), so scale
-   it down alongside the ~10% smaller button below instead of touching the
-   shared .icon-md rule, which would also affect any future non-social use. */
+/* Slightly smaller icon size, just for social buttons. */
 .social-link .icon-md { width: 17px; height: 17px; }
 
 /* ---------- Deep-linking ("copy link" buttons) ---------- */
-/* Small ghost icon-button used by both section headings and project
-   titles (see copyLinkButton() in script.js) to copy a direct #anchor
-   link. Kept visible (not hover-only) so keyboard and touch users get
-   the same access to it as mouse users — muted by default so it doesn't
-   compete with the heading text next to it. */
+/* Small button for copying a direct link. Always visible (not just
+   on hover), so it works for keyboard and touch too. */
 .copy-link-btn {
-  position: relative; /* anchors the tooltip below, same as .social-link */
+  position: relative; /* anchors the tooltip below */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1005,26 +900,21 @@ p { margin: 0; }
 }
 .copy-link-btn .icon-sm { width: 14px; height: 14px; }
 
-/* Briefly swaps to the accent color while the "Copied!" tooltip is
-   showing (see copyLinkButton()'s showCopied()), as extra confirmation
-   beyond the tooltip text alone. */
+/* Briefly changes color while the "Copied!" tooltip is showing, as
+   extra confirmation. */
 .copy-link-btn.is-copied {
   color: var(--accent);
 }
 
-/* Section headings already sit on a full-card hover/press background
-   (.catalog-section > summary:hover / :active) that would otherwise
-   swallow this button's own hover state — bumping it a shade further
-   keeps it visibly distinct. */
+/* A bit brighter than usual on hover, so it stays visible against the
+   section bar's own hover color. */
 .catalog-section > summary:hover .copy-link-btn:hover {
   background: color-mix(in srgb, var(--surface-hover), white 15%);
 }
 
-/* Briefly highlights a project card that was scrolled to via a direct
-   #anchor link (see handleDeepLink() in script.js), so it's obvious
-   which card the link actually pointed at in a long list of similar
-   ones. Colour/shadow only — nothing moves or resizes — and skipped
-   entirely for anyone who's asked for reduced motion. */
+/* Briefly highlights a project after jumping to it via a direct link,
+   so it's clear which card the link pointed to. Skipped for anyone
+   who's asked for reduced motion. */
 @media (prefers-reduced-motion: no-preference) {
   .is-linked-target {
     animation: linked-target-pulse 2s ease-out;
@@ -1104,16 +994,8 @@ p { margin: 0; }
   transform: translateX(-50%) translateY(-10px);
 }
 
-/* #back-to-top sits right up against the viewport's right edge (see
-   .back-to-top below), so the default centered tooltip above — which
-   positions itself with left: 50% / translateX(-50%) relative to the
-   button — pokes out past the edge of the screen on every viewport
-   width. That box still counts toward the page's scrollable area even
-   while invisible (visibility: hidden doesn't remove it from layout the
-   way display: none would), so it was adding a permanent horizontal
-   scrollbar to the whole page. Anchor this one tooltip's right edge to
-   the button's right edge instead of centering it, so it always stays
-   within the viewport. */
+/* The back-to-top button sits at the screen edge, so its tooltip is
+   right-aligned instead of centered, to avoid poking off-screen. */
 #back-to-top[data-tooltip]::after {
   left: auto;
   right: 0;
@@ -1172,31 +1054,14 @@ p { margin: 0; }
 }
 
 /* ---------- Channel box: narrow-container adjustments ---------- */
-/* Keyed to .channel-group's own rendered width (see container-type on
-   that rule, in the "Channels" section above), not the screen's. A
-   channel box gets cramped for the same reason regardless of *why* it's
-   narrow — paired with a sibling box on a phone, paired on a tablet, or
-   just a narrow browser window — so one rule set keyed off its actual
-   size handles all of those, instead of a screen-width breakpoint that
-   only caught some of them (a tablet showing two side-by-side boxes was
-   falling through a phone-only breakpoint and hitting exactly this
-   squeeze). 360px is roughly the width at which "icon + Data Pack + a
-   version pill" stops comfortably fitting on one line within a single
-   download column.
-   Placed here, after every base rule it touches (.channel-header,
-   .download-btn, etc.) rather than immediately next to them — a
-   @container block has no more specificity than a plain class selector,
-   so if it came *before* one of those base rules in the file, the base
-   rule would win the cascade and silently override it even while the
-   query matched (which is exactly what happened with .download-btn when
-   this was first written right after .pill, above the "Buttons"
-   section's own .download-btn rule). */
+/* Adjusts a channel box's own layout once it gets narrow — based on
+   the box's actual width, not the screen's, so it works whether it's
+   narrow because of the device or because it's paired with another
+   box. Placed after the base rules it overrides, since @container
+   rules don't win on specificity alone. */
 @container (max-width: 360px) {
-  /* The header (dot + name + Java version) can overflow onto a second
-     line once a long version range (e.g. "26.3-pre-3 – 26.3-rc-3") is
-     involved. Rather than letting that wrap mid-run — which breaks the
-     pipe separator onto its own orphaned line — give the version its
-     own full-width line, indented to align under the label. */
+  /* Gives the version text its own line if it's too long to fit next
+   to the channel name. */
   .channel-header {
     flex-wrap: wrap;
     row-gap: 4px;
@@ -1209,55 +1074,29 @@ p { margin: 0; }
     padding-left: 18px;
   }
 
-  /* Activate the break spacer (see script.js + the base rule above) so
-     every version pill lands on its own line here, instead of only
-     wrapping when it happens not to fit next to the label — "Mod
-     v1.1.2" no longer sits on one line while "Data Pack v1.1.2" wraps
-     to two right next to it. It's zero-height so it doesn't add a
-     visible gap of its own; the pill's own row-gap (set on
-     .download-col-header) provides the spacing above it. flex-basis:
-     100% is what forces the line break — same trick .channel-mc uses
-     above for the Java version, just on an invisible spacer here
-     rather than the pill itself, so the pill keeps its normal chip
-     size instead of stretching full-width. Scoped to .has-multiple
-     (two download columns side by side, see script.js) — a channel
-     with only one download type has the full row to itself, so
-     there's no cramped-column reason to force a break. */
+  /* Forces every version pill onto its own line here, so they all
+   look consistent instead of wrapping only when they don't fit. */
   .channel-downloads.has-multiple .download-col-break {
     display: block;
     flex-basis: 100%;
     height: 0;
   }
 
-  /* Lines the pill up under the label text instead of under the icon —
-     23px = the icon's width (15px) + its gap to the label (8px), the
-     same logic .channel-mc uses for the Java version line above.
-     margin-left (not padding-left) — padding only pushes the text
-     inside the pill's box to the right while its border/background
-     stay flush against the left edge; margin moves the whole chip.
-     Same .has-multiple scoping as the break spacer above, so a
-     single-column channel's pill keeps sitting flush next to its
-     label. */
+  /* Lines the pill up under the label text instead of under the icon. */
   .channel-downloads.has-multiple .download-col-header .pill {
     margin-left: 23px;
   }
 }
 
-/* One tier narrower still: even the shrunk-down Download button above
-   stops fitting two side-by-side columns once a channel box gets this
-   tight (a phone showing two channels stacked full-width doesn't reach
-   this — it's specifically the "two channels *and* two download types,
-   both squeezed" combination, which mostly shows up on tablet widths).
-   Rather than shrinking the button further, which would start making it
-   hard to read or tap, stack Data Pack above Mod instead — each column
-   then gets the box's full width, at full size, no compromise needed. */
+/* When a channel box gets even tighter, stack its download columns
+   instead of shrinking the buttons further. */
 @container (max-width: 300px) {
   .channel-downloads.has-multiple {
     flex-direction: column;
     gap: 14px;
   }
-  /* The divider between columns was a left border (for side-by-side
-     columns); stacked, it needs to run along the top instead. */
+  /* Moves the divider from the side to the top, now that the columns
+   are stacked. */
   .channel-downloads.has-multiple .download-col + .download-col {
     padding-left: 0;
     padding-top: 14px;
@@ -1268,35 +1107,26 @@ p { margin: 0; }
 
 /* ---------- Responsive ---------- */
 @media (max-width: 620px) {
-  /* Free up horizontal space on narrow phones — the fixed 24px side
-     margins were the biggest single contributor to buttons/pills
-     wrapping awkwardly, since every row had ~48px less to work with. */
+  /* Smaller side margins on narrow phones, to give rows more room. */
   .page {
     padding: 20px 16px 20px;
   }
 
   .masthead {
     grid-template-columns: auto 1fr;
-    /* The base rule above centers the logo against the full height of
-       whatever's beside it. On desktop that's fine — the title/tagline
-       are short enough to roughly match the logo's own height — but on
-       mobile the title wraps to two lines and the tagline to two more,
-       so a vertically-centered logo drifts down away from the title
-       and ends up looking like it's floating next to the tagline
-       instead. Top-align the row here so the logo's top edge lines up
-       with the top of the title instead. */
+    /* Top-aligns the logo instead of centering it — on mobile the title
+   wraps to more lines, so a centered logo would drift too low. */
     align-items: start;
     gap: 12px;
   }
-  /* Slightly smaller logo so the brand row has more room to breathe
-     once the nav links drop to their own line below it. */
+  /* Smaller logo, so the header has more breathing room on mobile. */
   .brand-logo {
     width: 64px;
     height: 64px;
     transform: none;
   }
   .link-row {
-    grid-column: 2 / -1; /* line up with the brand text above instead of the logo — starting under the logo made this row look disconnected from everything else in the header */
+    grid-column: 2 / -1; /* lines up with the brand text instead of the logo */
     justify-self: start;
     margin-top: 14px;
   }
@@ -1308,13 +1138,8 @@ p { margin: 0; }
     padding: 12px 0;
   }
 
-  /* Switched from flex-wrap to a real 2-column grid here. Flex-wrap packs
-     each row independently, so a wide button in row 1 (e.g. "Data Packs
-     & Mods") shifts everything after it, while a narrower row-2 button
-     (e.g. "Other Projects") starts the next row at a different offset —
-     the columns drift out of line with each other. Grid defines the
-     column widths once for the whole row, so every button lines up
-     underneath the one above it regardless of label length. */
+  /* A real 2-column grid instead of wrapping, so buttons line up in
+   neat columns regardless of label length. */
   .nav-jump-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1326,9 +1151,8 @@ p { margin: 0; }
     min-width: 0; /* lets the label wrap/shrink instead of forcing its grid column wider than the viewport if a heading is ever long */
   }
 
-  /* Expand/Collapse All lives inside the jump-button row (see script.js),
-     so it sits in the grid and grows tap targets right along with the
-     section buttons rather than needing its own layout rules here. */
+  /* Expand/Collapse All sits inside the same grid as the section
+   buttons, so it gets the same layout for free. */
   .nav-toggle-all {
     flex-shrink: 0;
     padding: 9px 14px;
@@ -1346,9 +1170,8 @@ p { margin: 0; }
     min-width: 0;
   }
 
-  /* Same fix as .nav-jump-row above: a real grid instead of flex-wrap so
-     the project link chips (Modrinth/GitHub/Wiki/etc.) line up in
-     consistent columns regardless of how long each label is. */
+  /* Same fix as the jump-button row above — a real grid so the link
+   chips line up in columns. */
   .project-links {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1357,15 +1180,11 @@ p { margin: 0; }
   .project-links a,
   .project-links .top-link {
     justify-content: center;
-    min-width: 0; /* same insurance as .nav-jump-btn above */
+    min-width: 0; /* lets long labels wrap instead of overflowing */
   }
 
-  /* Project cards: keep the thumbnail small and square (matching its
-     source aspect ratio) instead of stretching it into a full-width
-     140px-tall banner. Object-fit: cover on a wide short box crops
-     square artwork/logos badly — icons end up with their edges cut off
-     or looking stretched. A compact square icon beside the title also
-     keeps cards shorter, so more of the catalog fits on screen at once. */
+  /* Keeps the project thumbnail small and square on mobile, instead of
+   stretching it into a wide banner. */
   .project {
     grid-template-columns: 64px 1fr;
     gap: 14px;
@@ -1393,36 +1212,12 @@ p { margin: 0; }
   }
 }
 
-/* Safety net against any remaining stray horizontal overflow (a very
-   long unbroken word in a project description, a custom font rendering
-   wider than the fallback used while testing, etc). Scoped to these four
-   elements specifically — all *siblings* of #section-nav, never one of
-   its ancestors — rather than applied to html/body/.page, which would
-   risk silently breaking the nav's position: sticky in Safari on iOS (a
-   long-standing WebKit quirk where sticky positioning stops working if
-   any ancestor of the sticky element has overflow set to anything other
-   than visible). #section-nav is included too — safe here since this is
-   the sticky element itself, not an ancestor of it. */
-/* A keyboard focus ring (2px outline + 3px offset = 5px beyond the
-   element's own border box) drawn by an element flush against one of
-   these containers' edges — a section summary row, the first/last jump
-   button, a masthead link, a project link column that lands at the
-   right edge on mobile — is exactly the kind of "overflow" this rule
-   clips, since it's visually outside the focused element's box too. The
-   6px of padding here gives that ring room to breathe, and the matching
-   negative margin cancels it back out so nothing actually shifts or
-   resizes for anyone *not* focused on an edge element.
-
-   overflow-x is `clip` rather than `hidden` for the same reason the
-   html rule above uses it: setting only overflow-x to `hidden` (or
-   `auto`/`scroll`) forces the *other* axis from its default `visible`
-   to `auto` too, per spec, which turned each of these elements into a
-   vertical scroll/clip container as a side effect nobody wanted — it's
-   what was cutting off the last catalog section's focus ring when
-   collapsed (clipped against #catalog's own bottom edge), the version
-   link's focus ring in the footer, and the social-link tooltips popping
-   up above the footer's top edge. `clip` clips the horizontal overflow
-   this rule exists for without that vertical coupling. */
+/* A safety net against stray horizontal overflow (e.g. a very long
+   word). Scoped narrowly so it doesn't break the sticky nav bar in
+   Safari, which is sensitive to overflow on its parent elements. */
+/* Adds a little padding so focus rings on edge elements (like the
+   last button in a row) don't get clipped by the overflow rule above.
+   The matching negative margin cancels it out visually. */
 .masthead, #section-nav, #catalog, .site-footer {
   overflow-x: clip;
   max-width: 100%;
@@ -1432,13 +1227,8 @@ p { margin: 0; }
   margin-right: -6px;
 }
 
-/* The accordion's own expand/collapse animation already checks
-   prefers-reduced-motion in script.js (see the Accordion class), but the
-   little "press" shrink on buttons and heading text below is pure CSS
-   and doesn't know about that setting on its own. This turns those
-   transform effects off for anyone who's asked for reduced motion,
-   while leaving the (non-motion) colour/background feedback on each of
-   these elements' :active and :hover states untouched. */
+/* Turns off the little "press" shrink effect for anyone who's asked
+   for reduced motion. Color/background feedback stays. */
 @media (prefers-reduced-motion: reduce) {
   .nav-jump-btn:active,
   .nav-toggle-all:active,
@@ -1454,19 +1244,14 @@ p { margin: 0; }
   }
 }
 
-/* Belt-and-suspenders: an image should never be able to force its
-   container wider than the viewport, even if a future edit to data.js
-   swaps in one without matching width/height CSS. Elements that already
-   set explicit dimensions (.brand-logo, .project-image, etc.) are
-   unaffected, since those are narrower than 100% of their container
-   anyway. */
+/* Safety net so an image can never make its container wider than the
+   screen. */
 img, svg {
   max-width: 100%;
 }
 
 /* ---------- 404 Page ---------- */
-/* Reuses .top-link (see Nav Links above) for the "Go Back" button,
-   so it matches the header's Modrinth/GitHub buttons automatically. */
+/* The "Go Back" button reuses .top-link's styling. */
 .not-found {
   display: flex;
   align-items: center;
@@ -1500,8 +1285,8 @@ img, svg {
 }
 
 /* ---------- Back to top button ---------- */
-/* Fixed in the corner, faded/slid out of the way until initBackToTop()
-   in script.js adds .is-visible once you've scrolled down a bit. */
+/* Fixed in the corner, hidden until script.js shows it after you've
+   scrolled down a bit. */
 .back-to-top {
   position: fixed;
   right: 20px;
@@ -1518,7 +1303,7 @@ img, svg {
   cursor: pointer;
   opacity: 0;
   transform: translateY(8px);
-  pointer-events: none; /* can't click it while it's faded out */
+  pointer-events: none; /* not clickable while hidden */
   transition: opacity 0.2s ease, transform 0.2s ease, background-color var(--transition-fast);
   z-index: 40;
 }
@@ -1528,24 +1313,17 @@ img, svg {
   pointer-events: auto;
 }
 .back-to-top:hover {
-  /* --text is already near-white, so there's no lighter shade to hover
-     toward — darken slightly instead, the same way a physical button
-     would dim under a fingertip. */
+  /* Darkens slightly on hover, since the button is already near-white. */
   background: color-mix(in srgb, var(--text), black 12%);
 }
-/* Combines the shrink with the same translateY the visible state uses,
-   rather than joining the shared active-shrink rule elsewhere in this
-   file — that rule only sets `scale()`, which would fight this button's
-   own transform-based show/hide animation and (depending on rule order)
-   silently lose. */
+/* Combines the press-shrink with this button's own position, so they
+   don't fight each other. */
 .back-to-top.is-visible:active {
   transform: translateY(0) scale(0.95);
 }
 
-/* Drawn the same way as the section chevron above: two rotated borders
-   forming a corner, no icon image needed. Points up. Uses --bg (near-
-   black) rather than --text here, since the button itself is now
-   --text-colored and the chevron needs to contrast against it. */
+/* An upward arrow drawn from two rotated borders, same trick as the
+   chevron above. */
 .back-to-top::before {
   content: '';
   width: 9px;
