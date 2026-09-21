@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.15.0 — 2026/09/21
+
+### Added
+- "New" & "Updated" badges that can be dismissed by visitors
+  - When dismissed, it will re-appear when a new version is added to the site
+
 ## v0.14.2 — 2026/09/21
 
 ### Changed
