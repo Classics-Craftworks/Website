@@ -498,8 +498,12 @@ p { margin: 0; }
    script.js's Accordion class. */
 .catalog-section {
   margin-top: 24px;
-  /* Keeps the heading clear of the sticky nav bar when jumped to. */
-  scroll-margin-top: 68px;
+  /* Keeps the heading clear of the sticky nav bar when jumped to.
+   The --sticky-nav-offset custom property is measured in script.js
+   from the bar's real height, since it wraps onto more rows on
+   narrow screens or with more sections; 68px is just a same-page
+   fallback for the instant before that JS runs. */
+  scroll-margin-top: var(--sticky-nav-offset, 68px);
   box-sizing: border-box;
   /* Stops the browser from auto-adjusting scroll position while this
    element's height is animating (open/close). */
@@ -662,7 +666,7 @@ p { margin: 0; }
   align-items: start; /* keeps the thumbnail aligned to the top */
   /* Same as the section's scroll-margin-top above — keeps a linked
    project clear of the sticky nav bar. */
-  scroll-margin-top: 68px;
+  scroll-margin-top: var(--sticky-nav-offset, 68px);
 }
 .project:first-child { padding-top: 4px; }
 .project:last-child { border-bottom: none; }

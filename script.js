@@ -796,6 +796,26 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
     }
   }
 
+  // Keeps section/project headings from landing underneath this bar
+  // when jumped to (jump buttons, deep links, browser back/forward) —
+  // the bar is `position: sticky`, so it visually overlaps whatever
+  // scrolls to its own top edge unless that target reserves space for
+  // it. Recomputed whenever the bar's own height changes, since it
+  // wraps onto more rows on narrow screens, with more sections, or
+  // with a longer expand/collapse label.
+  const syncScrollOffset = () => {
+    const rect = nav.getBoundingClientRect();
+    const navTop = parseFloat(getComputedStyle(nav).top) || 0; // the bar's own `top: 4px` sticky offset
+    const offset = navTop + rect.height + 16; // +16px breathing room below the bar
+    document.documentElement.style.setProperty('--sticky-nav-offset', `${Math.round(offset)}px`);
+  };
+  syncScrollOffset();
+  if (window.ResizeObserver) {
+    new ResizeObserver(syncScrollOffset).observe(nav);
+  } else {
+    window.addEventListener('resize', syncScrollOffset);
+  }
+
   // Exposed so handleDeepLink() can keep the jump buttons and
   // Expand/Collapse All label in sync when it expands a section
   // directly, the same way search and the accordion's own toggle do.
