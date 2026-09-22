@@ -31,6 +31,14 @@
 </head>
 <body>
 
+<!-- First focusable element on the page, so keyboard users can jump
+     straight past the header, primary links, and sticky section-nav
+     (jump buttons + search box) to the project catalog instead of
+     tabbing through all of it first. Hidden until it receives focus
+     (see .skip-link in styles.css). Works even with JS disabled,
+     since it's a plain #catalog fragment link. -->
+<a href="#catalog" class="skip-link">Skip to projects</a>
+
 <!-- Static fallback shown only when JavaScript is disabled/blocked.
      Everything else on this page — brand name/tagline/logo, nav links,
      the project catalog, footer — is built by script.js from data.js,
@@ -68,8 +76,11 @@
 
   <!-- This <main> starts empty on purpose — script.js fills it in with
        every section/project card once the page loads, using the content
-       from data.js. If JavaScript is disabled, this area stays blank. -->
-  <main id="catalog"></main>
+       from data.js. If JavaScript is disabled, this area stays blank.
+       tabindex="-1" lets the skip link above move keyboard focus here
+       (not just scroll to it), without adding it to the normal Tab
+       order. -->
+  <main id="catalog" tabindex="-1"></main>
 
   <footer class="site-footer">
     <div id="social-links" class="social-row" aria-label="Social links"></div>
