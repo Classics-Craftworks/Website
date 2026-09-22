@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.16.1 — 2026/09/22
+
+### Added
+- The site now shows a fallback message with direct links to Modrinth and GitHub pages if JavaScript is disabled or blocked in a browser, instead of a blank page
+- "Skip to projects" link for keyboard users to jump past the header and navigation to the project list without having to tab through everything first
+- Structured data describing the site and its projects, to help search engines understand and surface them more accurately
+
+### Changed
+- Mobile PWA improvements, including proper icon and matching browser theme colour.
+
 ## v0.16.0 — 2026/09/22
 
 ### Added
