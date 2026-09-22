@@ -12,15 +12,13 @@
      to a download label if a build is unavailable. Optionally add a "tooltip" string alongside it to explain
      why - it shows on hover (and on keyboard focus) over the greyed-out button. If "tooltip" is left off, the 
      button still shows as unavailable, just without the extra explanation.
-   - Download versions: a channel's "version" is shown on every download in that channel by default (e.g.
-     both "Data Pack" and "Mod"). If one download needs its own version string - say the Mod build is a
-     point release ahead of the Data Pack - add a "version" directly on that download entry and it takes
-     over just for that button, leaving the others on the channel's version.
+   - Download versions: each download (e.g. "Data Pack", "Mod") shows its own "version" string on its
+     pill. If a download has no "version" set, its pill just shows "N/A" - there's no channel-wide
+     fallback, so give every enabled download its own "version".
    - "New"/"Updated" badge: add `badge: "new"` or `badge: "updated"` to any channel to show a small
      dismissible tag next to its name. Visitors can dismiss it (✕); it quietly comes back on its own the
-     next time you bump that channel's "version" (or any of its downloads' own "version", if you've set
-     one) — no extra flag to remove/reset by hand, so it's safe to just leave `badge: "new"` sitting on a
-     channel across releases.
+     next time you bump any of that channel's downloads' "version" strings — no extra flag to
+     remove/reset by hand, so it's safe to just leave `badge: "new"` sitting on a channel across releases.
    ============================================================ */
 
 // This whole file is one big JavaScript object. script.js reads values
@@ -75,7 +73,6 @@ const SITE_DATA = {
             {
               channel: "stable",
               label: "Release",
-              version: "v8.0.0",
               mcVersion: "26.3",
               downloads: [
                 { label: "Data Pack", icon: "brackets", version: "v8.0.0", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0" },
@@ -85,7 +82,6 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              version: "v8.1.0-beta.1",
               mcVersion: "26.3 – 26.4-snap-1",
               badge: "new",
               downloads: [
@@ -112,7 +108,6 @@ const SITE_DATA = {
             {
               channel: "stable",
               label: "Release",
-              version: "v5.0.0",
               mcVersion: "26.3",
               downloads: [
                 { label: "Data Pack", icon: "brackets", version: "v5.0.0", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0" },
@@ -122,7 +117,6 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              version: "v5.1.0-beta.1",
               mcVersion: "26.3 – 26.4-snap-1",
               badge: "new",
               downloads: [
@@ -149,7 +143,6 @@ const SITE_DATA = {
             {
               channel: "stable",
               label: "Release",
-              version: "v5.0.0",
               mcVersion: "26.3",
               downloads: [
                 { label: "Data Pack", icon: "brackets", version: "v5.0.0", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0" },
@@ -159,7 +152,6 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              version: "N/A",
               mcVersion: "26.3 – 26.4-snap-1",
               downloads: [
                 { label: "Data Pack", icon: "brackets", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
@@ -184,7 +176,6 @@ const SITE_DATA = {
             {
               channel: "unsupported",
               label: "Unsupported",
-              version: "v1.1.2",
               mcVersion: "1.21.5 – 1.21.8",
               downloads: [
                 { label: "Data Pack", icon: "brackets", version: "v1.1.2", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2" },
@@ -216,7 +207,6 @@ const SITE_DATA = {
             {
               channel: "stable",
               label: "Release",
-              version: "v3.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", version: "v3.4.0", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
@@ -225,7 +215,6 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              version: "N/A",
               mcVersion: "1.21.9 – 26.4-snap-1",
               downloads: [
                 { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
@@ -249,7 +238,6 @@ const SITE_DATA = {
             {
               channel: "stable",
               label: "Release",
-              version: "v1.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", version: "v1.4.0", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
@@ -258,7 +246,6 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              version: "N/A",
               mcVersion: "1.21.9 – 26.4-snap-1",
               downloads: [
                 { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
@@ -282,7 +269,6 @@ const SITE_DATA = {
             {
               channel: "stable",
               label: "Release",
-              version: "v2.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", version: "v2.4.0", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
@@ -291,7 +277,6 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              version: "N/A",
               mcVersion: "1.21.9 – 26.4-snap-1",
               downloads: [
                 { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
@@ -313,7 +298,6 @@ const SITE_DATA = {
             {
               channel: "unsupported",
               label: "Limited Support",
-              version: "v2.4.1",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", version: "v2.4.1", url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1" }
