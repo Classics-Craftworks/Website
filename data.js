@@ -154,7 +154,7 @@ const SITE_DATA = {
               label: "Beta",
               mcVersion: "26.3 – 26.4-snap-1",
               downloads: [
-                { label: "Data Pack", icon: "brackets", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
+                { label: "Data Pack", icon: "brackets", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
@@ -217,7 +217,7 @@ const SITE_DATA = {
               label: "Beta",
               mcVersion: "1.21.9 – 26.4-snap-1",
               downloads: [
-                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
+                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
               ]
             }
           ]
@@ -248,7 +248,7 @@ const SITE_DATA = {
               label: "Beta",
               mcVersion: "1.21.9 – 26.4-snap-1",
               downloads: [
-                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
+                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
               ]
             }
           ]
@@ -279,7 +279,7 @@ const SITE_DATA = {
               label: "Beta",
               mcVersion: "1.21.9 – 26.4-snap-1",
               downloads: [
-                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
+                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
               ]
             }
           ]
@@ -347,5 +347,5 @@ const SITE_DATA = {
 };
 
 // TOOLTIP STORAGE
-// NO BETAS: tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing."
+// NO BETAS: tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing."
 // NO MOD BETAS: "Beta mod versions are not published during Minecraft development cycles."
