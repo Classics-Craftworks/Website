@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.16.2.1 — 2026/09/22
+
+### Changed
+- Updated for new Better Craftables & Better Unpackables betas
+- Updated for Java 26.4 development cycle
+
 ## v0.16.2 — 2026/09/22
 
 ### Fixed

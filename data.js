@@ -32,7 +32,7 @@ const SITE_DATA = {
 
   // Website version shown at the very bottom of the page.
    version: {
-    label: "v0.16.2",
+    label: "v0.16.2.1",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -72,7 +72,6 @@ const SITE_DATA = {
               label: "Release",
               version: "v8.0.0",
               mcVersion: "26.3",
-              badge: "new",
               downloads: [
                 { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0" },
                 { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0+mod" }
@@ -80,12 +79,13 @@ const SITE_DATA = {
             },
             {
               channel: "beta",
-              label: "Release Candidate",
-              version: "v8.0.0-rc.1",
-              mcVersion: "26.3-pre-3 – 26.3-rc-3",
+              label: "Beta",
+              version: "v8.1.0-beta.1",
+              mcVersion: "26.3 – 26.4-snap-1",
+              badge: "new",
               downloads: [
-                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0-rc.1" },
-                { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft snapshot development cycles." }
+                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.1" },
+                { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
           ]
@@ -109,7 +109,6 @@ const SITE_DATA = {
               label: "Release",
               version: "v5.0.0",
               mcVersion: "26.3",
-              badge: "new",
               downloads: [
                 { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0" },
                 { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0+mod" }
@@ -117,12 +116,13 @@ const SITE_DATA = {
             },
             {
               channel: "beta",
-              label: "Release Candidate",
-              version: "v5.0.0-rc.1",
-              mcVersion: "26.3-pre-3 – 26.3-rc-3",
+              label: "Beta",
+              version: "v5.1.0-beta.1",
+              mcVersion: "26.3 – 26.4-snap-1",
+              badge: "new",
               downloads: [
-                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0-rc.1" },
-                { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft snapshot development cycles." }
+                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.1" },
+                { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
           ]
@@ -146,7 +146,6 @@ const SITE_DATA = {
               label: "Release",
               version: "v5.0.0",
               mcVersion: "26.3",
-              badge: "new",
               downloads: [
                 { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0" },
                 { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0+mod" }
@@ -154,12 +153,12 @@ const SITE_DATA = {
             },
             {
               channel: "beta",
-              label: "Release Candidate",
-              version: "v5.0.0-rc.1",
-              mcVersion: "26.3-pre-3 – 26.3-rc-3",
+              label: "Beta",
+              version: "N/A",
+              mcVersion: "26.3 – 26.4-snap-1",
               downloads: [
-                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0-rc.1" },
-                { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft snapshot development cycles." }
+                { label: "Data Pack", icon: "brackets", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
+                { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
           ]
@@ -214,18 +213,17 @@ const SITE_DATA = {
               label: "Release",
               version: "v3.4.0",
               mcVersion: "1.21.9 – 26.3",
-              badge: "updated",
               downloads: [
                 { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
               ]
             },
             {
               channel: "beta",
-              label: "Pre-Release",
-              version: "v3.4.0-pre.1",
-              mcVersion: "1.21.9 – 26.3-rc-3",
+              label: "Beta",
+              version: "N/A",
+              mcVersion: "1.21.9 – 26.4-snap-1",
               downloads: [
-                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0-pre.1" }
+                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
               ]
             }
           ]
@@ -248,18 +246,17 @@ const SITE_DATA = {
               label: "Release",
               version: "v1.4.0",
               mcVersion: "1.21.9 – 26.3",
-              badge: "updated",
               downloads: [
                 { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
               ]
             },
             {
               channel: "beta",
-              label: "Pre-Release",
-              version: "v1.4.0-pre.1",
-              mcVersion: "1.21.9 – 26.3-rc-3",
+              label: "Beta",
+              version: "N/A",
+              mcVersion: "1.21.9 – 26.4-snap-1",
               downloads: [
-                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0-pre.1" }
+                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
               ]
             }
           ]
@@ -282,18 +279,17 @@ const SITE_DATA = {
               label: "Release",
               version: "v2.4.0",
               mcVersion: "1.21.9 – 26.3",
-              badge: "updated",
               downloads: [
                 { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
               ]
             },
             {
               channel: "beta",
-              label: "Pre-Release",
-              version: "v2.4.0-pre.1",
-              mcVersion: "1.21.9 – 26.3-rc-3",
+              label: "Beta",
+              version: "N/A",
+              mcVersion: "1.21.9 – 26.4-snap-1",
               downloads: [
-                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0-pre.1" }
+                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing." },
               ]
             }
           ]
@@ -314,7 +310,6 @@ const SITE_DATA = {
               label: "Limited Support",
               version: "v2.4.1",
               mcVersion: "1.21.9 – 26.3",
-              badge: "updated",
               downloads: [
                 { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1" }
               ]
