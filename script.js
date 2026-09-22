@@ -179,13 +179,22 @@ function renderBrand(brand, topLinks) {
 // Builds the little "New"/"Updated" tag shown next to a channel's
 // name. Set via `badge: "new"` or `badge: "updated"` on a channel in
 // data.js. The visitor can dismiss it (✕), and it stays dismissed —
-// until that channel's `version` changes, at which point it comes
-// back automatically, since the dismissal is remembered per-version.
+// until the channel's version, or any of its downloads' own version
+// overrides, change - at which point it comes back automatically,
+// since the dismissal is remembered against that combined fingerprint.
 function renderChannelBadge(ch, badgeKey) {
   const badgeText = String(ch.badge).toLowerCase() === 'updated' ? 'Updated' : 'New';
 
+  // Combines the channel's version with every download's own version
+  // override (if any) into one string. If any of them changes - not
+  // just the channel-level version - this fingerprint changes too, so
+  // a previously-dismissed badge reappears.
+  const versionFingerprint = [ch.version, ...(ch.downloads || []).map(d => d.version)]
+    .filter(Boolean)
+    .join('|');
+
   const dismissedVersion = storageGet(badgeKey);
-  if (dismissedVersion === (ch.version || '')) return null;
+  if (dismissedVersion === versionFingerprint) return null;
 
   // The whole badge is now the clickable/focusable element…
   const wrap = el('button', {
@@ -203,7 +212,7 @@ function renderChannelBadge(ch, badgeKey) {
   wrap.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
-    storageSet(badgeKey, ch.version || '');
+    storageSet(badgeKey, versionFingerprint);
     wrap.classList.add('is-dismissed');
     wrap.addEventListener('transitionend', () => wrap.remove(), { once: true });
     window.setTimeout(() => wrap.remove(), 250);
@@ -258,7 +267,7 @@ function renderChannel(ch, projectId) {
       icon(typeIcon, 'icon-sm'),
       el('span', { class: 'download-type-label', text: d.label }),
       el('span', { class: 'download-col-break', attrs: { 'aria-hidden': 'true' } }),
-      el('span', { class: 'pill' + (isDisabled ? ' disabled-pill' : ''), text: isDisabled ? 'N/A' : ch.version })
+      el('span', { class: 'pill' + (isDisabled ? ' disabled-pill' : ''), text: isDisabled ? 'N/A' : (d.version || ch.version) })
     ];
 
     const colHeader = el('div', {
@@ -330,10 +339,11 @@ function renderProject(p) {
   );
 
   // Text blob the search box matches against — includes the title,
-  // description, and each channel's version, so searching a version
-  // number finds the right project too.
+  // description, and each channel's version (plus any download's own
+  // version override), so searching a version number finds the right
+  // project too.
   const versionText = (p.channels || [])
-    .flatMap(ch => [ch.mcVersion, ch.version])
+    .flatMap(ch => [ch.mcVersion, ch.version, ...(ch.downloads || []).map(d => d.version)])
     .filter(Boolean)
     .join(' ');
   const searchText = [p.title, p.description, versionText].filter(Boolean).join(' ').toLowerCase();
@@ -968,7 +978,11 @@ function renderStructuredData(data) {
         applicationCategory: 'GameApplication',
         operatingSystem: 'Minecraft: Java Edition'
       };
-      if (stable && stable.version) item.softwareVersion = stable.version;
+      // Prefer the specific download's own version (e.g. the Mod build
+      // might carry a different string than the Data Pack), falling
+      // back to the channel-wide version.
+      const softwareVersion = (firstDownload && firstDownload.version) || (stable && stable.version);
+      if (softwareVersion) item.softwareVersion = softwareVersion;
       if (firstDownload) item.downloadUrl = firstDownload.url;
       items.push(item);
     });

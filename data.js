@@ -12,10 +12,15 @@
      to a download label if a build is unavailable. Optionally add a "tooltip" string alongside it to explain
      why - it shows on hover (and on keyboard focus) over the greyed-out button. If "tooltip" is left off, the 
      button still shows as unavailable, just without the extra explanation.
+   - Download versions: a channel's "version" is shown on every download in that channel by default (e.g.
+     both "Data Pack" and "Mod"). If one download needs its own version string - say the Mod build is a
+     point release ahead of the Data Pack - add a "version" directly on that download entry and it takes
+     over just for that button, leaving the others on the channel's version.
    - "New"/"Updated" badge: add `badge: "new"` or `badge: "updated"` to any channel to show a small
      dismissible tag next to its name. Visitors can dismiss it (✕); it quietly comes back on its own the
-     next time you bump that channel's "version" — no extra flag to remove/reset by hand, so it's safe to
-     just leave `badge: "new"` sitting on a channel across releases.
+     next time you bump that channel's "version" (or any of its downloads' own "version", if you've set
+     one) — no extra flag to remove/reset by hand, so it's safe to just leave `badge: "new"` sitting on a
+     channel across releases.
    ============================================================ */
 
 // This whole file is one big JavaScript object. script.js reads values
@@ -73,8 +78,8 @@ const SITE_DATA = {
               version: "v8.0.0",
               mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0" },
-                { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0+mod" }
+                { label: "Data Pack", icon: "brackets", version: "v8.0.0", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0" },
+                { label: "Mod", icon: "box", version: "v8.0.0+mod", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0+mod" }
               ]
             },
             {
@@ -84,7 +89,7 @@ const SITE_DATA = {
               mcVersion: "26.3 – 26.4-snap-1",
               badge: "new",
               downloads: [
-                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.1" },
+                { label: "Data Pack", icon: "brackets", version: "v8.1.0-beta.1", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.1" },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
@@ -110,8 +115,8 @@ const SITE_DATA = {
               version: "v5.0.0",
               mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0" },
-                { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0+mod" }
+                { label: "Data Pack", icon: "brackets", version: "v5.0.0", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0" },
+                { label: "Mod", icon: "box", version: "v5.0.0+mod", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0+mod" }
               ]
             },
             {
@@ -121,7 +126,7 @@ const SITE_DATA = {
               mcVersion: "26.3 – 26.4-snap-1",
               badge: "new",
               downloads: [
-                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.1" },
+                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.1", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.1" },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
@@ -147,8 +152,8 @@ const SITE_DATA = {
               version: "v5.0.0",
               mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0" },
-                { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0+mod" }
+                { label: "Data Pack", icon: "brackets", version: "v5.0.0", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0" },
+                { label: "Mod", icon: "box", version: "v5.0.0+mod", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0+mod" }
               ]
             },
             {
@@ -182,8 +187,8 @@ const SITE_DATA = {
               version: "v1.1.2",
               mcVersion: "1.21.5 – 1.21.8",
               downloads: [
-                { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2" },
-                { label: "Mod", icon: "box", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2+mod" }
+                { label: "Data Pack", icon: "brackets", version: "v1.1.2", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2" },
+                { label: "Mod", icon: "box", version: "v1.1.2+mod", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2+mod" }
               ]
             }
           ]
@@ -214,7 +219,7 @@ const SITE_DATA = {
               version: "v3.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
+                { label: "Resource Pack", icon: "brush", version: "v3.4.0", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
               ]
             },
             {
@@ -247,7 +252,7 @@ const SITE_DATA = {
               version: "v1.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
+                { label: "Resource Pack", icon: "brush", version: "v1.4.0", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
               ]
             },
             {
@@ -280,7 +285,7 @@ const SITE_DATA = {
               version: "v2.4.0",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
+                { label: "Resource Pack", icon: "brush", version: "v2.4.0", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
               ]
             },
             {
@@ -311,7 +316,7 @@ const SITE_DATA = {
               version: "v2.4.1",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1" }
+                { label: "Resource Pack", icon: "brush", version: "v2.4.1", url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1" }
               ]
             }
           ]
@@ -356,3 +361,7 @@ const SITE_DATA = {
     iconCredits: { prefix: "Link icons by ", label: "Icons8", url: "https://icons8.com" }
   }
 };
+
+// TOOLTIP STORAGE
+// NO BETAS: tooltip: "This project usually gets betas later in the Minecraft development cycle, unless changes need testing."
+// NO MOD BETAS: "Beta mod versions are not published during Minecraft development cycles."
