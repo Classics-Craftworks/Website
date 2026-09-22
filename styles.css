@@ -31,23 +31,24 @@
   --white-rgb:     255, 255, 255;  /* used for translucent white fills/borders (nav) */
 
 /* Nav Button & Controls Colors */
---nav-btn-rgb:          56, 189, 248;
+  --nav-accent:           #7DA6E0;
+  --nav-accent-rgb:       125, 166, 224;
+  --nav-btn-rgb:          var(--nav-accent-rgb);
 
---nav-btn-bg:           rgba(var(--nav-btn-rgb), 0.08);
---nav-btn-border:       rgba(var(--nav-btn-rgb), 0.25);
---nav-btn-hover-bg:     rgba(var(--nav-btn-rgb), 0.18);
---nav-btn-hover-border: rgba(var(--nav-btn-rgb), 0.50);
+  --nav-btn-bg:           rgba(var(--nav-btn-rgb), 0.08);
+  --nav-btn-border:       rgba(var(--nav-btn-rgb), 0.25);
+  --nav-btn-hover-bg:     rgba(var(--nav-btn-rgb), 0.18);
+  --nav-btn-hover-border: rgba(var(--nav-btn-rgb), 0.50);
 
-/* Nav Bar Solid Active State */
---nav-btn-active-bg:     #0284c7;
---nav-btn-active-text:   #FFFFFF;
+  --nav-btn-active-bg:     var(--nav-accent);
+  --nav-btn-active-text:   var(--bg);
 
 /* Nav Bar Shadow & Background */
---nav-bg:      color-mix(in srgb, var(--bg, #121318), white 5%);
---nav-border:  rgba(255, 255, 255, 0.08);
---nav-shadow:  
-  0 10px 30px -5px rgba(0, 0, 0, 0.5),
-  0 0 0 1px var(--nav-border);
+  --nav-bg:      color-mix(in srgb, var(--bg, #121318), white 5%);
+  --nav-border:  rgba(255, 255, 255, 0.08);
+  --nav-shadow:  
+    0 10px 30px -5px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--nav-border);
 
 /* Channel Indicators & Colors */
   --ch-stable:     #22C55E;  /* stable channel */
@@ -344,13 +345,13 @@ p { margin: 0; }
    shows what's currently expanded. Uses the nav button color state
    so the active nav state is unmistakably a *navigation* signal. */
 .nav-jump-btn.is-open {
-  background: var(--nav-btn-hover-border);
-  border-color: var(--nav-btn-hover-border);
-  color: #FFFFFF;
+  background: var(--nav-btn-active-bg);
+  border-color: var(--nav-btn-active-bg);
+  color: var(--nav-btn-active-text);
 }
 .nav-jump-btn.is-open:hover {
-  background: color-mix(in srgb, var(--nav-btn-hover-border), white 15%);
-  border-color: color-mix(in srgb, var(--nav-btn-hover-border), white 15%);
+  background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+  border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
 }
 
 /* ---------- Expand/Collapse All + search ---------- */
