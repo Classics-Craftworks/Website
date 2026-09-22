@@ -662,7 +662,8 @@ p { margin: 0; }
   display: grid;
   grid-template-columns: 104px 1fr;
   gap: 20px;
-  padding: 26px 0;
+  padding-top: 24px;
+  padding-bottom: 16px;
   border-bottom: 1px solid rgba(var(--border-rgb), 0.6);
   align-items: start; /* keeps the thumbnail aligned to the top */
   /* Same as the section's scroll-margin-top above — keeps a linked
