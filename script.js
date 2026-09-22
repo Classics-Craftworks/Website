@@ -560,6 +560,14 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
   // collapses anything.
   let lastJumpedIndex = null;
 
+  // Indices currently mid-toggle *because* their jump button just
+  // triggered it (branch below). Checked from the onToggle wiring
+  // further down, so a toggle caused by anything else — a direct
+  // header click, or Expand/Collapse All — can tell lastJumpedIndex
+  // is now stale and clear it, rather than leaving it pointing at a
+  // section the visitor didn't actually just jump to.
+  const jumpTriggeredIndices = new Set();
+
   // Sections the live search (further below) has opened on the
   // visitor's behalf, as opposed to ones already open before they
   // started typing. Read when the search is cleared, to collapse
@@ -597,6 +605,7 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
       if (!sectionEl.open) {
         // Expands the section first if needed, and waits for that
         // animation to finish before scrolling to it.
+        jumpTriggeredIndices.add(i);
         accordion.toggle(true);
         if (accordion.animation) {
           accordion.animation.finished.then(jumpToSection).catch(jumpToSection);
@@ -607,6 +616,7 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
       } else if (lastJumpedIndex === i) {
         // Already open, and this is the section we last jumped to — a
         // second click on the same button collapses it again.
+        jumpTriggeredIndices.add(i);
         accordion.toggle(false);
         lastJumpedIndex = null;
       } else {
@@ -656,12 +666,27 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
     syncToggleAllLabel();
     syncJumpButtonStates();
   };
-  accordions.forEach(a => {
+  accordions.forEach((a, i) => {
     a.onToggle = () => {
       // A direct toggle (click, or Expand/Collapse All) always
       // reflects the visitor's own choice — even if this section
       // happened to still be flagged as opened by search.
       searchOpenedSections.delete(a.el);
+
+      if (jumpTriggeredIndices.has(i)) {
+        // This settle is the jump button's own doing — lastJumpedIndex
+        // was already set (or cleared) by its click handler above, so
+        // leave it alone.
+        jumpTriggeredIndices.delete(i);
+      } else if (lastJumpedIndex === i) {
+        // Something else just changed this section's open state — a
+        // header click, or Expand/Collapse All. Treating it as still
+        // "last jumped to" would make this section's jump button
+        // collapse it out of nowhere on its very next click, instead
+        // of just scrolling to it like a fresh jump normally would.
+        lastJumpedIndex = null;
+      }
+
       onAccordionSettled();
     };
   });
