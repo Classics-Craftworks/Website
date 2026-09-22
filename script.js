@@ -315,6 +315,34 @@ function renderChannel(ch, projectId) {
   }, [badge, header, downloads]);
 }
 
+// Builds the small "Older versions" note shown under a project's
+// channel boxes, linking to Modrinth's version history and the
+// project's GitHub "Versions" wiki page. Built from the project's own
+// Modrinth/GitHub entries in its "links" array in data.js — nothing
+// to configure per-project. Skipped for projects with no channels
+// (nothing to browse older versions of) and for either link that's
+// missing from "links".
+function renderVersionsNote(p) {
+  if (!p.channels || !p.channels.length) return null;
+
+  const modrinthLink = (p.links || []).find(l => (l.label || '').toLowerCase() === 'modrinth');
+  const githubLink = (p.links || []).find(l => (l.label || '').toLowerCase() === 'github');
+  if (!modrinthLink && !githubLink) return null; // nothing to link to
+
+  const note = el('p', { class: 'versions-note' });
+  note.appendChild(document.createTextNode('Older versions: '));
+  if (modrinthLink) {
+    note.appendChild(el('a', { class: 'versions-note-link', href: `${modrinthLink.url}/versions`, text: 'Modrinth' }));
+  }
+  if (modrinthLink && githubLink) {
+    note.appendChild(document.createTextNode(' | '));
+  }
+  if (githubLink) {
+    note.appendChild(el('a', { class: 'versions-note-link', href: `${githubLink.url}/wiki/Versions`, text: 'GitHub' }));
+  }
+  return note;
+}
+
 // Builds one full project card: thumbnail image, title, description,
 // row of links (Modrinth/GitHub/Wiki), and one channel box per channel.
 function renderProject(p) {
@@ -359,7 +387,8 @@ function renderProject(p) {
       titleRow,
       el('p', { class: 'project-description', text: p.description }),
       linkRow,
-      channelRow
+      channelRow,
+      renderVersionsNote(p)
     ])
   ]);
 }

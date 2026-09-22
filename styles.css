@@ -731,6 +731,24 @@ p { margin: 0; }
   background: var(--surface-hover);
 }
 
+/* Small "Older versions" line shown under a project's channel boxes */
+.versions-note {
+  margin-top: 12px;
+  font-size: 0.7rem;
+  color: var(--text-soft);
+}
+
+.versions-note-link {
+  color: var(--text-soft);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--transition-fast);
+}
+
+.versions-note-link:hover {
+  color: var(--text);
+}
+
 /* ---------- Channels (stable / beta / alpha) ---------- */
 .channel-row {
   display: flex;
