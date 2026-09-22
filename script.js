@@ -292,6 +292,21 @@ function renderChannel(ch, projectId) {
         text: 'Not available',
         attrs: unavailableAttrs
       });
+
+      // The tooltip explaining *why* this is unavailable normally only
+      // shows on :hover/:focus-visible, but touch devices have neither —
+      // tapping would otherwise reveal nothing at all. A tap toggles it
+      // open explicitly instead, auto-hiding after a few seconds like
+      // the "Copied!" confirmation above does.
+      if (d.tooltip) {
+        actionEl.addEventListener('click', () => {
+          actionEl.classList.add('tooltip-open');
+          window.clearTimeout(actionEl._tooltipTimer);
+          actionEl._tooltipTimer = window.setTimeout(() => {
+            actionEl.classList.remove('tooltip-open');
+          }, 3000);
+        });
+      }
     } else {
       actionEl = el('a', {
         class: 'download-btn',

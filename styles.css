@@ -845,6 +845,15 @@ p { margin: 0; }
   transform: scale(0.85) translateY(2px);
 }
 
+/* Invisible hit-slop, since the pill itself is quite short. Only the
+   nested .channel-badge-dismiss circle uses ::before/::after, so this
+   element's own ::before is free to use here. */
+.channel-badge::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
 /* A CSS-drawn "×" (two crossed bars) instead of a text glyph — this
    keeps it pixel-centered regardless of font/line-height quirks. */
 .channel-badge-dismiss {
@@ -1061,7 +1070,8 @@ p { margin: 0; }
 }
 
 .download-unavailable[data-tooltip]:hover::after,
-.download-unavailable[data-tooltip]:focus-visible::after {
+.download-unavailable[data-tooltip]:focus-visible::after,
+.download-unavailable[data-tooltip].tooltip-open::after {
   background: color-mix(in srgb, var(--bg), rgb(var(--channel-rgb)) 15%);
   border-color: color-mix(in srgb, var(--channel-color), black 25%);
   color: color-mix(in srgb, var(--text), rgb(var(--channel-rgb)) 10%);
@@ -1110,6 +1120,15 @@ p { margin: 0; }
 .copy-link-btn:focus-visible {
   background: var(--surface-hover);
   color: var(--text);
+}
+/* Invisible hit-slop bringing the actual tap target up to ~44x44
+   (26px visible box + 9px on each side), without changing how big
+   the button looks. Safe to add: the tooltip already uses ::after,
+   so ::before is free here. */
+.copy-link-btn::before {
+  content: '';
+  position: absolute;
+  inset: -9px;
 }
 .copy-link-btn .icon-sm { width: 14px; height: 14px; }
 
@@ -1197,9 +1216,12 @@ p { margin: 0; }
   transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
-/* Show Tooltip on Hover & Keyboard Focus */
+/* Show Tooltip on Hover & Keyboard Focus, or when explicitly toggled
+   open by script.js (see .has-tooltip's click handler) — touch devices
+   have no :hover, so that's the only way a tap reveals it there. */
 [data-tooltip]:hover::after,
-[data-tooltip]:focus-visible::after {
+[data-tooltip]:focus-visible::after,
+[data-tooltip].tooltip-open::after {
   opacity: 1;
   visibility: visible;
   color: var(--text);
@@ -1382,6 +1404,20 @@ p { margin: 0; }
     flex: 1 1 auto;
     min-width: 0;
   }
+  /* 16px is the minimum iOS Safari won't auto-zoom the page in on
+   focus — the 0.85rem (~13.6px) used above is comfortably under that. */
+  .nav-search-input {
+    font-size: 16px;
+    padding-right: 36px; /* room for the larger clear button below */
+  }
+  /* Bigger tap target for the "×" clear button. Its ::before/::after
+   already draw the X glyph, so (unlike copy-link-btn) there's no
+   pseudo-element free for hit-slop — grow the real box instead. */
+  .nav-search-clear {
+    width: 32px;
+    height: 32px;
+    right: 2px;
+  }
 
   /* Same fix as the jump-button row above — a real grid so the link
    chips line up in columns. */
@@ -1416,8 +1452,10 @@ p { margin: 0; }
   .channel-row {
     flex-direction: column;
   }
-  .download-btn {
+  .download-btn,
+  .download-unavailable {
     min-width: 0;
+    padding: 12px 10px; /* taller tap target on touch screens; keeps the disabled state's box the same size so columns still line up */
   }
 
   .section-peek {
