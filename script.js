@@ -560,6 +560,15 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
   // collapses anything.
   let lastJumpedIndex = null;
 
+  // Sections the live search (further below) has opened on the
+  // visitor's behalf, as opposed to ones already open before they
+  // started typing. Read when the search is cleared, to collapse
+  // only the ones search itself opened — see applySearchFilter().
+  // A section leaves this set the moment the visitor toggles it
+  // themselves (a direct click, or Expand/Collapse All — see the
+  // onToggle reassignment below), since that's now their own choice.
+  const searchOpenedSections = new Set();
+
   // Handles to every jump button, same order as sectionEls/accordions.
   const jumpButtons = [];
 
@@ -647,7 +656,15 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
     syncToggleAllLabel();
     syncJumpButtonStates();
   };
-  accordions.forEach(a => { a.onToggle = onAccordionSettled; });
+  accordions.forEach(a => {
+    a.onToggle = () => {
+      // A direct toggle (click, or Expand/Collapse All) always
+      // reflects the visitor's own choice — even if this section
+      // happened to still be flagged as opened by search.
+      searchOpenedSections.delete(a.el);
+      onAccordionSettled();
+    };
+  });
 
   toggleAllBtn.addEventListener('click', () => {
     // If every section is already open, the button collapses all of them;
@@ -728,9 +745,21 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
 
       if (query && sectionHasMatch && !sectionEl.open) {
         // Opens it directly, no animation, so fast typing doesn't
-        // fight the accordion. Stays open once search is cleared.
+        // fight the accordion. Marked as search-opened so clearing
+        // the search collapses it again, instead of leaving every
+        // past match permanently expanded.
         sectionEl.open = true;
         sectionEl.dataset.state = 'expanded';
+        searchOpenedSections.add(sectionEl);
+      } else if (!query && searchOpenedSections.has(sectionEl)) {
+        // Search cleared — put this section back exactly how the
+        // visitor had it before they started typing. Sections the
+        // visitor opened themselves (never added to this set, or
+        // removed from it by the onToggle reassignment above) are
+        // left untouched.
+        sectionEl.open = false;
+        sectionEl.dataset.state = 'collapsed';
+        searchOpenedSections.delete(sectionEl);
       }
     });
 
