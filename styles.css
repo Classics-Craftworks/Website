@@ -30,6 +30,25 @@
   --border-rgb:    78, 78, 88;
   --white-rgb:     255, 255, 255;  /* used for translucent white fills/borders (nav) */
 
+/* Nav Button & Controls Colors */
+--nav-btn-rgb:          250, 175, 54;
+
+--nav-btn-bg:           rgba(var(--nav-btn-rgb), 0.08);
+--nav-btn-border:       rgba(var(--nav-btn-rgb), 0.32);
+--nav-btn-hover-bg:     rgba(var(--nav-btn-rgb), 0.16);
+--nav-btn-hover-border: rgba(var(--nav-btn-rgb), 0.54);
+
+/* Nav Bar Solid Active State */
+--nav-btn-active-bg:     #e49c4a;
+--nav-btn-active-text:   #FFFFFF;
+
+/* Nav Bar Shadow */
+--nav-bg:      color-mix(in srgb, var(--bg, #121318), white 5%);
+--nav-border:  rgba(255, 255, 255, 0.08);
+--nav-shadow:  
+  0 10px 30px -5px rgba(0, 0, 0, 0.5),
+  0 0 0 1px var(--nav-border);
+
 /* Channel Indicators & Colors */
   --ch-stable:     #22C55E;  /* stable channel */
   --ch-stable-rgb: 34, 197, 94;
@@ -257,7 +276,7 @@ p { margin: 0; }
   font-weight: 500;
   background: var(--surface);
   color: var(--text);
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 .top-link:hover, .text-link:hover { background: var(--surface-hover); color: var(--text); }
 
@@ -277,31 +296,36 @@ p { margin: 0; }
    navigation stay reachable. */
 .section-nav {
   position: sticky;
-  top: 0;
+  top: 4px;
+  margin-top: 8px;
   z-index: 30;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 0;
-  background: var(--bg);
-  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  border-radius: 24px;
+  background: var(--nav-bg);
+  border: 1px solid var(--nav-btn-border);
+  box-shadow: var(--nav-shadow);
 }
 
 .nav-jump-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  margin-left: 16px;
 }
 
 /* Styled differently from other buttons on the page so they clearly
    read as navigation. */
 .nav-jump-btn {
-  border: 1px solid rgba(var(--white-rgb), 0.35);
+  border: 1px solid var(--nav-btn-border);
   border-radius: 6px;
-  background: rgba(var(--white-rgb), var(--alpha-faint));
+  background: var(--nav-btn-bg);
   color: var(--text);
   font: inherit;
   font-size: 0.85rem;
@@ -311,21 +335,22 @@ p { margin: 0; }
   transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 .nav-jump-btn:hover {
-  background: rgba(var(--white-rgb), var(--alpha-hover));
-  border-color: rgba(var(--white-rgb), 0.7);
+  background: var(--nav-btn-hover-bg);
+  border-color: var(--nav-btn-hover-border);
 }
 .nav-jump-btn:active { transform: scale(0.97); }
 
 /* Filled-in style for when a section is open, so the jump row also
-   shows what's currently expanded. */
+   shows what's currently expanded. Uses the nav button color state
+   so the active nav state is unmistakably a *navigation* signal. */
 .nav-jump-btn.is-open {
-  background: var(--text);
-  border-color: var(--text);
-  color: var(--bg);
+  background: var(--nav-btn-hover-border);
+  border-color: var(--nav-btn-hover-border);
+  color: #FFFFFF;
 }
 .nav-jump-btn.is-open:hover {
-  background: color-mix(in srgb, var(--text), black 12%);
-  border-color: color-mix(in srgb, var(--text), black 12%);
+  background: color-mix(in srgb, var(--nav-btn-hover-border), white 15%);
+  border-color: color-mix(in srgb, var(--nav-btn-hover-border), white 15%);
 }
 
 /* ---------- Expand/Collapse All + search ---------- */
@@ -334,8 +359,10 @@ p { margin: 0; }
 .nav-controls {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 14px;
   flex-wrap: wrap;
+  flex: 1;
 }
 
 /* A simple vertical divider between the section buttons and
@@ -349,7 +376,7 @@ p { margin: 0; }
 }
 
 .nav-toggle-all {
-  border: 1px solid var(--border);
+  border: 1px solid var(--nav-btn-border);
   border-radius: 6px;
   background: transparent;
   color: var(--text-soft);
@@ -360,7 +387,11 @@ p { margin: 0; }
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
-.nav-toggle-all:hover { color: var(--text); background: var(--surface-hover); }
+.nav-toggle-all:hover {
+  color: var(--text);
+  background: var(--nav-btn-hover-bg);
+  border-color: var(--nav-btn-hover-border);
+}
 .nav-toggle-all:active { transform: scale(0.97); }
 
 .nav-search-wrap {
@@ -368,6 +399,8 @@ p { margin: 0; }
   flex: 0 1 auto;
   width: 220px; /* default before JS measures the top-links row; kept in sync with it on load/resize */
   max-width: 100%;
+  margin-left: auto;
+  margin-right: 16px;
 }
 
 .nav-search-icon {
@@ -385,7 +418,7 @@ p { margin: 0; }
    focus ring shows. */
   -webkit-appearance: none;
   appearance: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--nav-btn-border);
   border-radius: 6px;
   background: var(--surface);
   color: var(--text);
@@ -405,7 +438,7 @@ p { margin: 0; }
    always shows this style instead of the browser default. */
 .nav-search-input:focus {
   outline: none !important;
-  border-color: rgba(var(--white-rgb), 0.8);
+  border-color: var(--nav-btn-hover-border);
 }
 .nav-search-wrap:focus-within .nav-search-icon {
   color: var(--text);
@@ -1291,7 +1324,7 @@ p { margin: 0; }
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
-    padding: 12px 0;
+    padding: 12px 14px;
   }
 
   /* A real 2-column grid instead of wrapping, so buttons line up in
