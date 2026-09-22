@@ -891,6 +891,83 @@ function handleDeepLink(nav) {
   });
 }
 
+// Builds a JSON-LD <script> tag describing the org and its projects,
+// straight from SITE_DATA, and drops it in <head>. This is what gives
+// search engines an explicit, structured picture of the site (an
+// Organization plus a list of SoftwareApplication entries) instead of
+// having to infer one from the visible text — and since it's built
+// from SITE_DATA at render time rather than hand-written in
+// index.html, it can't drift out of sync with the actual catalog.
+function renderStructuredData(data) {
+  // Reuses the <link rel="canonical"> already in index.html as the
+  // site's base URL, rather than hardcoding the domain a second time.
+  const canonical = document.querySelector('link[rel="canonical"]');
+  const siteUrl = canonical ? canonical.href : location.origin + '/';
+
+  // Turns a path from data.js (e.g. "images/logo.png") into an
+  // absolute URL, since structured data should use full URLs.
+  const toAbsolute = path => path ? new URL(path, siteUrl).href : undefined;
+
+  // Strips the tagline down to plain text (it contains a manual <br>
+  // for the on-page line break — not meaningful in a JSON string).
+  const tagline = (data.brand.tagline || '').replace(/<br\s*\/?>/gi, ' ').trim();
+
+  const organization = {
+    '@type': 'Organization',
+    name: data.brand.name,
+    url: siteUrl,
+    logo: toAbsolute(data.brand.logo),
+    description: tagline,
+    // Combines the top nav links (Modrinth/GitHub orgs) and footer
+    // socials into one "these are official profiles" list.
+    sameAs: [...(data.topLinks || []), ...(data.socials || [])].map(l => l.url)
+  };
+
+  // One SoftwareApplication entry per project, across every section
+  // (data packs/mods, resource packs, etc). Pulls version/download
+  // info from the "stable" channel where a project has one.
+  const items = [];
+  (data.sections || []).forEach(section => {
+    (section.projects || []).forEach(project => {
+      const channels = project.channels || [];
+      const stable = channels.find(c => (c.channel || '').toLowerCase() === 'stable') || channels[0];
+      const firstDownload = stable && (stable.downloads || []).find(d => d.url && !d.disabled);
+      const firstLink = (project.links || [])[0];
+
+      const item = {
+        '@type': 'SoftwareApplication',
+        name: project.title,
+        description: project.description,
+        image: toAbsolute(project.image),
+        url: (firstLink && firstLink.url) || siteUrl,
+        applicationCategory: 'GameApplication',
+        operatingSystem: 'Minecraft: Java Edition'
+      };
+      if (stable && stable.version) item.softwareVersion = stable.version;
+      if (firstDownload) item.downloadUrl = firstDownload.url;
+      items.push(item);
+    });
+  });
+
+  const itemList = {
+    '@type': 'ItemList',
+    name: `${data.brand.name} Projects`,
+    itemListElement: items.map((item, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item
+    }))
+  };
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [organization, itemList]
+  });
+  document.head.appendChild(script);
+}
+
 /* ---------- Run everything ----------
    This is the only code that runs on page load — everything above is
    just function definitions until called here. */
@@ -899,6 +976,7 @@ function handleDeepLink(nav) {
   const { sectionEls, accordions, projectsBySection } = renderSections(SITE_DATA.sections);
   const nav = renderSectionNav(SITE_DATA.sections, sectionEls, accordions, projectsBySection);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
+  renderStructuredData(SITE_DATA);
   initBackToTop();
   handleDeepLink(nav);
   // Also handles a hash arriving after the initial load (pasted into
