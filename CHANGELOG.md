@@ -4,11 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.17.1 — 2026/09/22
+
+### Changed
+- Improved search bar behaviour when collapsing and expanding sections - section states are now remembered when the search bar is cleared
+- Improved how navigation buttons, deep links and section header buttons interact
+- Completely removed old code for project version handling
+
+### Fixed
+- Fixed section headers being hidden beneath the navigation bar when navigating to them via a deep link or nav bar buttons
+
 ## v0.17.0 — 2026/09/22
 
 ### Changed
 - Revamped the navigation bar styling to stand out a bit more from the rest of the content (colours to be finalised)
-- Reworked how versions are handled
+- Reworked how project versions are handled
   - Each data pack & mod release can now have its own version number
 
 ## v0.16.2.1 — 2026/09/22
