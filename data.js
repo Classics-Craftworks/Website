@@ -85,7 +85,7 @@ const SITE_DATA = {
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
                 { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0-rc.1" },
-                { label: "Mod", icon: "box", disabled: true, tooltip: "Mod versions are not published during Minecraft Snapshot development cycles." }
+                { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft snapshot development cycles." }
               ]
             }
           ]
@@ -122,7 +122,7 @@ const SITE_DATA = {
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
                 { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.0-rc.1" },
-                { label: "Mod", icon: "box", disabled: true, tooltip: "Mod versions are not published during Minecraft Snapshot development cycles." }
+                { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft snapshot development cycles." }
               ]
             }
           ]
@@ -159,7 +159,7 @@ const SITE_DATA = {
               mcVersion: "26.3-pre-3 – 26.3-rc-3",
               downloads: [
                 { label: "Data Pack", icon: "brackets", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0-rc.1" },
-                { label: "Mod", icon: "box", disabled: true, tooltip: "Mod versions are not published during Minecraft Snapshot development cycles." }
+                { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft snapshot development cycles." }
               ]
             }
           ]
