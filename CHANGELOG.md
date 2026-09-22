@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.17.0 — 2026/09/22
+
+### Changed
+- Revamped the navigation bar styling to stand out a bit more from the rest of the content (colours to be finalised)
+- Reworked how versions are handled
+  - Each data pack & mod release can now have its own version number
+
 ## v0.16.2.1 — 2026/09/22
 
 ### Changed

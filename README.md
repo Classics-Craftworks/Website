@@ -18,17 +18,17 @@ The website currently features:
 
 ### Data Packs & Mods
 
-- Better Craftables
-- Better Unpackables
-- Silly Eatables
-- New Sword Blocking (unsupported)
+- [Better Craftables](https://modrinth.com/datapack/better-craftables)
+- [Better Unpackables](https://modrinth.com/datapack/better-unpackables)
+- [Silly Eatables](https://modrinth.com/datapack/silly-eatables)
+- [New Sword Blocking](https://modrinth.com/datapack/new-sword-blocking) (unsupported)
 
 ### Resource Packs
 
-- Classic's Disc Tweaks
-- Classic's Dye Tweaks
-- Classic's Lantern Tweaks
-- Zisteau Pigmen (limited support)
+- [Classic's Disc Tweaks](https://modrinth.com/resourcepack/classics-disc-tweaks)
+- [Classic's Dye Tweaks](https://modrinth.com/resourcepack/classics-dye-tweaks)
+- [Classic's Lantern Tweaks](https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0)
+- [Zisteau Pigmen](https://modrinth.com/resourcepack/zisteau-pigmen) (limited support)
 
 ### Other Projects
 
