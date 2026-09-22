@@ -85,6 +85,25 @@ function setHashSilently(id) {
   return url;
 }
 
+// Removes any #hash from the address bar without navigating or
+// scrolling. Uses replaceState (not pushState) since this is a side
+// effect of collapsing a section, not something a visitor should be
+// able to "undo" with the back button.
+function clearHashSilently() {
+  const url = `${location.origin}${location.pathname}`;
+  try { history.replaceState(null, '', url); } catch { /* not fatal — the URL just won't update */ }
+}
+
+// True if the current #hash points at this element itself, or at
+// something nested inside it (e.g. a project card within a section).
+// Used to tell whether a section being collapsed should take the
+// address bar's deep link down with it.
+function hashPointsInto(el) {
+  if (!location.hash) return false;
+  const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  return !!target && (target === el || el.contains(target));
+}
+
 // Small "copy link" button used on section headings and project
 // titles. label is used for the tooltip, e.g. "Copy link to X".
 function copyLinkButton(id, label) {
@@ -490,6 +509,12 @@ class Accordion {
       this.el.style.overflow = '';
       this.animation = null;
       this.saveState();
+      // If this section (or a project card inside it) is what the
+      // address bar's #hash is currently pointing at, collapsing it
+      // makes that link stale — the linked content is no longer visible
+      // on the page. Clear it so the URL doesn't keep advertising a
+      // deep link to something that's now hidden.
+      if (!opening && hashPointsInto(this.el)) clearHashSilently();
       this.onToggle?.(); // notify listeners now that the state has actually settled
     };
 
