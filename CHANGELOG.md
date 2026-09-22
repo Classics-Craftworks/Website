@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.16.0 — 2026/09/22
+
+### Added
+- Tooltips when hovering over Unavailable download buttons to inform users why the download is not available
+
 ## v0.15.0 — 2026/09/21
 
 ### Added
