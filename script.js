@@ -249,7 +249,21 @@ function renderChannel(ch, projectId) {
     // Either a clickable "Download" button, or greyed-out "Not available" text
     let actionEl;
     if (isDisabled) {
-      actionEl = el('div', { class: 'download-unavailable', text: 'Not available' });
+      // Optional per-button hover tooltip explaining *why* it's unavailable
+      // (set via "tooltip" on the download entry in data.js). Only added
+      // when provided, and only then made keyboard-focusable, so it also
+      // shows on focus for keyboard users.
+      const unavailableAttrs = {};
+      if (d.tooltip) {
+        unavailableAttrs['data-tooltip'] = d.tooltip;
+        unavailableAttrs['tabindex'] = '0';
+        unavailableAttrs['aria-label'] = `Not available: ${d.tooltip}`;
+      }
+      actionEl = el('div', {
+        class: 'download-unavailable' + (d.tooltip ? ' has-tooltip' : ''),
+        text: 'Not available',
+        attrs: unavailableAttrs
+      });
     } else {
       actionEl = el('a', {
         class: 'download-btn',
