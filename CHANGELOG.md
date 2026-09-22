@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.18.0 — 2026/09/22
+
+### Added
+- Projects now show a link to older versions and snapshots on Modrinth and GitHub, right under the download options
+
+### Changed
+- Reworked the nav bar's colour scheme for better contrast and readability
+- Slightly tightened padding between projects
+- Section headers can now be deep-linked and shared directly - expanding a section updates the URL without jumping to the section
+- Made buttons and icons (copy link, clear search, channel badges, download buttons) easier to tap accurately on touch screens
+- Clicking or tapping on a "Not available" download button now shows why it's unavailable, instead of only working on hover
+- Improved wording of unavailable data/resource pack download tooltip
+
+### Fixed
+- Potentially fixed the search box zooming in unexpectedly when tapped on iPhone/Safari (don't have an iPhone to test this)
+
 ## v0.17.1 — 2026/09/22
 
 ### Changed
