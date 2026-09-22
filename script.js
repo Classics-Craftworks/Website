@@ -516,7 +516,14 @@ class Accordion {
   onClick(e) {
     e.preventDefault();
     if (this.animation) return; // ignore clicks until the current animation finishes
-    this.toggle(!this.el.open);
+    const opening = !this.el.open;
+    // Same address-bar update the nav bar's jump buttons do when they
+    // open a section — clicking a section's own heading is a deep link
+    // too — but with no scrollIntoView call anywhere in this path, so
+    // (unlike the nav buttons) it never moves you off what you're
+    // already looking at.
+    if (opening) setHashSilently(this.el.id);
+    this.toggle(opening);
   }
 
   toggle(shouldOpen) {
