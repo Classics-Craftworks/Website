@@ -1379,6 +1379,7 @@ p { margin: 0; }
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
+    margin-left: 0; /* desktop's spacing margin doesn't apply once this row stacks alone */
   }
   .nav-jump-btn {
     padding: 9px 16px; /* slightly taller tap target on touch screens */
@@ -1400,9 +1401,12 @@ p { margin: 0; }
     gap: 10px;
   }
   .nav-search-wrap {
+    width: auto; /* overrides desktop's fixed 220px so flex-basis comes from flex-grow instead */
     max-width: none;
     flex: 1 1 auto;
     min-width: 0;
+    margin-left: 0; /* desktop's "auto" margin was eating the row's free space instead of letting the box grow */
+    margin-right: 0;
   }
   /* 16px is the minimum iOS Safari won't auto-zoom the page in on
    focus — the 0.85rem (~13.6px) used above is comfortably under that. */
