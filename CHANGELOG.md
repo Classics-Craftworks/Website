@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.19.0 — 2026/09/23
+
+### Changed
+- Switched project icons to WebPs
+- Switched link icons to SVGs
+
 ## v0.18.1 — 2026/09/23
 
 ### Changed
