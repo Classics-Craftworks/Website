@@ -138,6 +138,10 @@ body {
   font-size: 16px;
   line-height: 1.55;
   overflow-x: clip;
+  /* Every tappable element here already has its own :active press
+   effect, so the browser's default gray/blue tap flash just adds
+   visual noise on top of that. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -219,7 +223,11 @@ p { margin: 0; }
 .page {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 28px 24px 24px;
+  /* The env() additions are 0px on any device without a notch/inset,
+   so this is a no-op there — they only matter on phones with a
+   notch, Dynamic Island, or rounded-corner cutout, and when the
+   viewport-fit=cover meta tag lets content draw under them. */
+  padding: calc(28px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
 }
 
 /* ---------- Masthead ---------- */
@@ -297,7 +305,10 @@ p { margin: 0; }
    navigation stay reachable. */
 .section-nav {
   position: sticky;
-  top: 4px;
+  /* Keeps the sticky offset itself clear of a notch/Dynamic Island —
+   matters in standalone/PWA mode where there's no browser chrome
+   already pushing content down. 0px on ordinary devices. */
+  top: calc(4px + env(safe-area-inset-top));
   margin-top: 8px;
   z-index: 30;
   display: flex;
@@ -788,6 +799,13 @@ p { margin: 0; }
   padding-bottom: 12px;
   margin-bottom: 14px;
   border-bottom: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
+  /* Wraps only if the label + version genuinely don't fit next to
+   each other — not tied to the box's width, since a short label
+   ("Release") and a long one ("Experimental") need different amounts
+   of room. The "|" + version move down together as one unit (see
+   .channel-mc-group) rather than the divider being left stranded. */
+  flex-wrap: wrap;
+  row-gap: 4px;
 }
 
 .status-dot {
@@ -894,6 +912,28 @@ p { margin: 0; }
   font-weight: 300;
 }
 
+/* Keeps the "|" and version glued together as a single flex item, so
+   they wrap to a second line as one unit if they don't fit — instead
+   of the version wrapping alone and leaving the separator dangling at
+   the end of the first line. */
+.channel-mc-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+/* Added by syncChannelHeaderWrap() in script.js when either this
+   channel box or a sibling in the same row needed to wrap its header
+   — forces this one onto two lines as well (with a matching indent),
+   even if its own text would have fit, so both boxes' headers end up
+   the same height and nothing downstream (the download buttons)
+   drifts out of alignment. */
+.channel-header.header-force-wrap .channel-mc-group {
+  flex-basis: 100%;
+  padding-left: 18px;
+}
+
 .channel-mc { 
   color: var(--text-soft); 
   font-size: 0.88rem; 
@@ -938,10 +978,26 @@ p { margin: 0; }
   flex-shrink: 0;
 }
 
-/* A spacer that forces a line break on mobile (see below); does
-   nothing on desktop. */
+/* A spacer that forces a line break (see .pills-wrapped below); does
+   nothing by default. */
 .download-col-break {
   display: none;
+}
+
+/* Added by syncDownloadPillWrap() in script.js when either this
+   channel's download columns needed to wrap its pill onto its own
+   line — forces every column's pill in this channel to wrap too, even
+   ones that would have fit, so the Download / Not available buttons
+   below each column all end up level instead of one column's header
+   growing taller than its neighbours. */
+.channel-downloads.pills-wrapped .download-col-break {
+  display: block;
+  flex-basis: 100%;
+  height: 0;
+}
+/* Lines the pill up under the label text instead of under the icon. */
+.channel-downloads.pills-wrapped .download-col-header .pill {
+  margin-left: 23px;
 }
 
 /* ---------- Version Pills ---------- */
@@ -1185,6 +1241,15 @@ p { margin: 0; }
   color: var(--text-soft);
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
+/* Invisible hit-slop bringing the actual tap target up to ~44x44
+   (34px visible box + 5px on each side), same trick as
+   .copy-link-btn::before above — the tooltip already uses ::after,
+   so ::before is free here too. */
+.social-link::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+}
 
 .social-link:hover { 
   background: var(--surface-hover); 
@@ -1294,35 +1359,6 @@ p { margin: 0; }
    narrow because of the device or because it's paired with another
    box. Placed after the base rules it overrides, since @container
    rules don't win on specificity alone. */
-@container (max-width: 360px) {
-  /* Gives the version text its own line if it's too long to fit next
-   to the channel name. */
-  .channel-header {
-    flex-wrap: wrap;
-    row-gap: 4px;
-  }
-  .channel-sep {
-    display: none;
-  }
-  .channel-mc {
-    flex-basis: 100%;
-    padding-left: 18px;
-  }
-
-  /* Forces every version pill onto its own line here, so they all
-   look consistent instead of wrapping only when they don't fit. */
-  .channel-downloads.has-multiple .download-col-break {
-    display: block;
-    flex-basis: 100%;
-    height: 0;
-  }
-
-  /* Lines the pill up under the label text instead of under the icon. */
-  .channel-downloads.has-multiple .download-col-header .pill {
-    margin-left: 23px;
-  }
-}
-
 /* When a channel box gets even tighter, stack its download columns
    instead of shrinking the buttons further. */
 @container (max-width: 300px) {
@@ -1344,7 +1380,7 @@ p { margin: 0; }
 @media (max-width: 620px) {
   /* Smaller side margins on narrow phones, to give rows more room. */
   .page {
-    padding: 20px 16px 20px;
+    padding: calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   }
 
   .masthead {
@@ -1412,14 +1448,16 @@ p { margin: 0; }
    focus — the 0.85rem (~13.6px) used above is comfortably under that. */
   .nav-search-input {
     font-size: 16px;
-    padding-right: 36px; /* room for the larger clear button below */
+    padding-right: 40px; /* room for the larger clear button below */
   }
   /* Bigger tap target for the "×" clear button. Its ::before/::after
    already draw the X glyph, so (unlike copy-link-btn) there's no
-   pseudo-element free for hit-slop — grow the real box instead. */
+   pseudo-element free for hit-slop — grow the real box instead.
+   36px is as far as this can go without crowding the input's own
+   text against the box. */
   .nav-search-clear {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     right: 2px;
   }
 
@@ -1544,8 +1582,10 @@ img, svg {
    scrolled down a bit. */
 .back-to-top {
   position: fixed;
-  right: 20px;
-  bottom: 20px;
+  /* Keeps the button clear of the home-indicator / rounded-corner
+   cutout on notched phones, instead of sitting flush against it. */
+  right: calc(20px + env(safe-area-inset-right));
+  bottom: calc(20px + env(safe-area-inset-bottom));
   width: 44px;
   height: 44px;
   display: flex;

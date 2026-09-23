@@ -68,6 +68,58 @@ function prefersReducedMotion() {
   return reducedMotionQuery.matches;
 }
 
+// ---------- Sibling wrap syncing ----------
+// Two sibling elements sitting side by side (two channel boxes; two
+// download columns inside one channel box) can have different amounts
+// of text — a long version range vs. a short one, a long version
+// number vs. "N/A". Left alone, only the one with more text wraps
+// onto a second line, making it taller than its neighbour and pushing
+// everything below it (buttons, columns) out of vertical alignment.
+// These two helpers check a group of siblings after layout: if *any*
+// of them needed to wrap on their own, a class is added to *all* of
+// them so they wrap together and stay the same height — instead of
+// wrapping everything unconditionally (which wastes space when
+// nothing actually needed to wrap; see .header-force-wrap /
+// .pills-wrapped in styles.css for the CSS side of this).
+
+// Syncs the "Label | Java X.Y" header row across every channel box in
+// one project's .channel-row.
+function syncChannelHeaderWrap(rowEl) {
+  const headers = Array.from(rowEl.querySelectorAll('.channel-header'));
+  if (headers.length < 2) return; // nothing to stay in sync with
+
+  // Clear first, so this re-measures each header's own natural fit
+  // rather than staying wrapped forever from an earlier, narrower check.
+  headers.forEach(h => h.classList.remove('header-force-wrap'));
+
+  const anyWrapped = headers.some(h => {
+    const label = h.querySelector('.channel-label');
+    const group = h.querySelector('.channel-mc-group');
+    // If the version group has dropped onto its own line, it sits
+    // measurably lower than the label it would otherwise sit next to.
+    return label && group && group.offsetTop > label.offsetTop + 1;
+  });
+
+  if (anyWrapped) headers.forEach(h => h.classList.add('header-force-wrap'));
+}
+
+// Same idea, one level down: syncs the version pill across every
+// download column (Data Pack / Mod / etc.) inside one channel box.
+function syncDownloadPillWrap(downloadsEl) {
+  const headers = Array.from(downloadsEl.querySelectorAll('.download-col-header'));
+  if (headers.length < 2) return;
+
+  downloadsEl.classList.remove('pills-wrapped');
+
+  const anyWrapped = headers.some(h => {
+    const label = h.querySelector('.download-type-label');
+    const pill = h.querySelector('.pill');
+    return label && pill && pill.offsetTop > label.offsetTop + 1;
+  });
+
+  if (anyWrapped) downloadsEl.classList.add('pills-wrapped');
+}
+
 // Safe localStorage read/write — some browsers (e.g. Safari private
 // mode) can throw here, so every call in this file goes through these.
 function storageGet(key) {
@@ -234,11 +286,17 @@ function renderChannel(ch, projectId) {
   // version. The badge (if any) isn't part of this row — it's
   // absolutely positioned against the channel box itself, hanging off
   // its top-left corner (see .channel-badge in styles.css).
+  //
+  // The separator + MC version are grouped into their own wrapper so
+  // they move to a second line as one unit if they don't fit — never
+  // leaving the "|" stranded alone at the end of the first line.
   const header = el('div', { class: 'channel-header' }, [
     el('span', { class: 'status-dot' }),
     el('span', { class: 'channel-label', text: ch.label }),
-    el('span', { class: 'channel-sep', text: '|' }),
-    el('span', { class: 'channel-mc', text: 'Java ' + ch.mcVersion })
+    el('span', { class: 'channel-mc-group' }, [
+      el('span', { class: 'channel-sep', text: '|' }),
+      el('span', { class: 'channel-mc', text: 'Java ' + ch.mcVersion })
+    ])
   ]);
 
   const badge = ch.badge ? renderChannelBadge(ch, `badge-dismissed:${projectId}:${channelKey}`) : null;
@@ -323,6 +381,14 @@ function renderChannel(ch, projectId) {
     }, [colHeader, actionEl]));
   });
 
+  // Keeps this channel's download columns' pills in sync with each
+  // other (see syncDownloadPillWrap above) — re-checked whenever this
+  // channel box's size changes, including the moment its section
+  // first expands from collapsed.
+  if (hasMultipleDownloads && window.ResizeObserver) {
+    new ResizeObserver(() => syncDownloadPillWrap(downloads)).observe(downloads);
+  }
+
   // data-channel="stable"/"beta"/"alpha" - read by styles.css to pick the right color theme
   return el('div', {
     class: 'channel-group',
@@ -381,7 +447,14 @@ function renderProject(p) {
     (p.channels || []).map(ch => renderChannel(ch, id))
   );
 
-  // Text blob the search box matches against — includes the title,
+  // Keeps this project's channel boxes' headers in sync with each
+  // other (see syncChannelHeaderWrap above) — re-checked whenever the
+  // row's size changes, including the moment its section first
+  // expands from collapsed.
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => syncChannelHeaderWrap(channelRow)).observe(channelRow);
+  }
+
   // Text blob the search box matches against — includes the title,
   // description, and each download's own version, so searching a
   // version number finds the right project too.
