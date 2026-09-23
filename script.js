@@ -111,6 +111,16 @@ function syncDownloadPillWrap(downloadsEl) {
 
   downloadsEl.classList.remove('pills-wrapped');
 
+  // Below ~300px the channel box's own @container rule stacks the
+  // download columns into a single column (see
+  // .channel-downloads.has-multiple in styles.css) — each column is
+  // already on its own row at that point, so there's no side-by-side
+  // alignment left to protect. Forcing sync here would just drag a
+  // short, unrelated pill (e.g. "N/A") down onto its own line for no
+  // reason whenever a long sibling pill (e.g. a long beta version)
+  // happens to wrap.
+  if (getComputedStyle(downloadsEl).flexDirection === 'column') return;
+
   const anyWrapped = headers.some(h => {
     const label = h.querySelector('.download-type-label');
     const pill = h.querySelector('.pill');
