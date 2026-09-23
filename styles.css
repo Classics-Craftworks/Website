@@ -1364,31 +1364,18 @@ p { margin: 0; }
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 620px) {
-  /* Smaller side margins on narrow phones, to give rows more room. */
-  .page {
-    padding: calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
-  }
-
-  .masthead {
-    grid-template-columns: auto 1fr;
-    /* Top-aligns the logo instead of centering it — on mobile the title
-   wraps to more lines, so a centered logo would drift too low. */
-    align-items: start;
-    gap: 12px;
-  }
-  /* Smaller logo, so the header has more breathing room on mobile. */
-  .brand-logo {
-    width: 64px;
-    height: 64px;
-    transform: none;
-  }
-  .link-row {
-    grid-column: 2 / -1; /* lines up with the brand text instead of the logo */
-    justify-self: start;
-    margin-top: 14px;
-  }
-
+/* The nav bar (section filters + Expand/Collapse All + search) needs
+   more room to lay out in a single row than the rest of the page
+   needs before it switches to its own "phone" treatment below — its
+   3 filter buttons, Expand All, and the search box stop fitting on
+   one line well above 620px. Left at that breakpoint, there's a wide
+   middle range of screen widths where the row's contents wrap
+   one-at-a-time instead (a button pair, then Expand All alone, then
+   search alone) rather than the whole bar switching cleanly to the
+   stacked grid seen below 620px. Broken out into its own, wider
+   breakpoint so it jumps straight from one tidy row to a tidy stack,
+   without a scrappy in-between state. */
+@media (max-width: 970px) {
   .section-nav {
     flex-direction: column;
     align-items: stretch;
@@ -1447,9 +1434,35 @@ p { margin: 0; }
     height: 36px;
     right: 2px;
   }
+}
 
-  /* Same fix as the jump-button row above — a real grid so the link
-   chips line up in columns. */
+@media (max-width: 620px) {
+  /* Smaller side margins on narrow phones, to give rows more room. */
+  .page {
+    padding: calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+  }
+
+  .masthead {
+    grid-template-columns: auto 1fr;
+    /* Top-aligns the logo instead of centering it — on mobile the title
+   wraps to more lines, so a centered logo would drift too low. */
+    align-items: start;
+    gap: 12px;
+  }
+  /* Smaller logo, so the header has more breathing room on mobile. */
+  .brand-logo {
+    width: 64px;
+    height: 64px;
+    transform: none;
+  }
+  .link-row {
+    grid-column: 2 / -1; /* lines up with the brand text instead of the logo */
+    justify-self: start;
+    margin-top: 14px;
+  }
+
+  /* A real grid, same reasoning as the nav bar above — so the link
+   chips line up in columns instead of wrapping one at a time. */
   .project-links {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

@@ -955,12 +955,16 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
   // Keeps the search box the same width as the link buttons above it,
   // re-measuring whenever that row's size changes.
   const topLinks = document.getElementById('top-links');
-  const mobileQuery = window.matchMedia('(max-width: 620px)');
+  // Matches the nav bar's own breakpoint in styles.css (wider than the
+  // rest of the page's, since the nav's row of buttons + search runs
+  // out of room sooner — see the comment above that @media rule).
+  const navStackedQuery = window.matchMedia('(max-width: 970px)');
   if (topLinks) {
     const syncSearchWidth = () => {
-      // On mobile the search box just fills its flexbox space instead
-      // of matching the (now narrower) masthead links.
-      if (mobileQuery.matches) {
+      // Once the nav has stacked, the search box just fills its
+      // flexbox space instead of matching the (now narrower) masthead
+      // links.
+      if (navStackedQuery.matches) {
         searchWrap.style.width = '';
         return;
       }
@@ -975,10 +979,10 @@ function renderSectionNav(sections, sectionEls, accordions, projectsBySection) {
     }
     // Also listen for the breakpoint directly, since the
     // ResizeObserver above can miss it in some cases.
-    if (mobileQuery.addEventListener) {
-      mobileQuery.addEventListener('change', syncSearchWidth);
+    if (navStackedQuery.addEventListener) {
+      navStackedQuery.addEventListener('change', syncSearchWidth);
     } else {
-      mobileQuery.addListener(syncSearchWidth); // Safari <14 fallback
+      navStackedQuery.addListener(syncSearchWidth); // Safari <14 fallback
     }
   }
 
