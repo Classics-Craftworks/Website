@@ -5,8 +5,8 @@
 
    QUICK GUIDE:
    - Text & Links: Update values inside quotes (e.g., label, url).
-   - Images: Place files in /images and set the relative path (e.g., "images/logo.png").
-   - Icons: Place PNG files in /images/icons/ and refer to them by filename without extension.
+   - Images: Place files in /images and set the relative path (e.g., "images/logo.webp").
+   - Icons: Place webp files in /images/icons/ and refer to them by filename without extension.
    - Projects: Copy an existing project object block {...} inside the "projects" array to add a new project.
    - Channels: Each project supports "stable", "beta", "alpha", or "unsupported" channels. Add "disabled: true"
      to a download label if a build is unavailable. Optionally add a "tooltip" string alongside it to explain
@@ -28,7 +28,7 @@ const SITE_DATA = {
 
   // Logo, name and one-line tagline shown at the top of the page.
   brand: {
-    logo: "images/logo.png",
+    logo: "images/logo.webp",
     name: "CLASSIC'S CRAFTWORKS",
     tagline: "Minecraft Java Edition data packs, mods & resource packs.<br>Sometimes useful. Always Minecraft."
   },
@@ -60,7 +60,7 @@ const SITE_DATA = {
 
         // #region ──────── Better Craftables ────────
         {
-          image: "images/better-craftables.png",
+          image: "images/better-craftables.webp",
           title: "Better Craftables",
           description: "Adds some quality-of-life crafting and smelting recipes to the game.",
           links: [
@@ -95,7 +95,7 @@ const SITE_DATA = {
 
         // #region ──────── Better Unpackables ────────
         {
-          image: "images/better-unpackables.png",
+          image: "images/better-unpackables.webp",
           title: "Better Unpackables",
           description: "Adds some quality-of-life unpacking recipes to the game.",
           links: [
@@ -130,7 +130,7 @@ const SITE_DATA = {
 
         // #region ──────── Silly Eatables ────────
         {
-          image: "images/silly-eatables.png",
+          image: "images/silly-eatables.webp",
           title: "Silly Eatables",
           description: "Eat things you shouldn't with these silly food recipes!",
           links: [
@@ -164,7 +164,7 @@ const SITE_DATA = {
 
         // #region ──────── New Sword Blocking ────────
         {
-          image: "images/new-sword-blocking.png",
+          image: "images/new-sword-blocking.webp",
           title: "New Sword Blocking",
           description: "Restores and enhances sword blocking in Minecraft 1.21.5 – 1.21.8!",
           links: [
@@ -195,7 +195,7 @@ const SITE_DATA = {
       projects: [
         // #region ──────── Classic's Disc Tweaks ────────
         {
-          image: "images/disc-tweaks.png",
+          image: "images/disc-tweaks.webp",
           title: "Classic's Disc Tweaks",
           description: "Subtly widens music discs and unifies their design for a more cohesive look.",
           links: [
@@ -226,7 +226,7 @@ const SITE_DATA = {
 
         // #region ──────── Classic's Dye Tweaks ────────
         {
-          image: "images/dye-tweaks.png",
+          image: "images/dye-tweaks.webp",
           title: "Classic's Dye Tweaks",
           description: "Tweaks Minecraft's new dye textures and brings them to older versions of the game!",
           links: [
@@ -257,7 +257,7 @@ const SITE_DATA = {
 
         // #region ──────── Classic's Lantern Tweaks ────────
         {
-          image: "images/lantern-tweaks.png",
+          image: "images/lantern-tweaks.webp",
           title: "Classic's Lantern Tweaks",
           description: "Adjusts the edges of Soul & Copper Lanterns so they better match the regular Lantern. Little details matter!",
           links: [
@@ -288,7 +288,7 @@ const SITE_DATA = {
 
         // #region ──────── Zisteau Pigmen ────────
         {
-          image: "images/zisteau-pigmen.png",
+          image: "images/zisteau-pigmen.webp",
           title: "Zisteau Pigmen",
           description: "Zombified Piglins named 'Zisteau' become Zombie Pigmen.",
           links: [
@@ -317,7 +317,7 @@ const SITE_DATA = {
       projects: [
         // #region ──────── CraftHorizon ────────
         {
-          image: "images/crafthorizon.png",
+          image: "images/crafthorizon.webp",
           title: "CraftHorizon",
           description: "Whitelisted Minecraft server, with a focus on vanilla+ Survival and Creative gameplay.",
           links: [
@@ -342,7 +342,7 @@ const SITE_DATA = {
   footer: {
     copyright: "\u00A9 2023\u20132026 Classic36 / Classic's Craftworks",
     disclaimer: "NOT AN OFFICIAL MINECRAFT PRODUCT OR SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
-    iconCredits: { prefix: "Link icons by ", label: "Icons8", url: "https://icons8.com" }
+    iconCredits: { prefix: "Link icons by ", label: "SVG Repo", url: "https://www.svgrepo.com" }
   }
 };
 

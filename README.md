@@ -36,4 +36,4 @@ The website currently features:
 
 ## Credits
 
-Link icons used on the site were provided by [Icons8](https://icons8.com).
+Link icons used on the site were provided by [SVG Repo](https://svgrepo.com).

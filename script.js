@@ -8,13 +8,13 @@
 
 /* ---------- Small helper functions ---------- */
 
-// Creates one icon. Uses the PNG as a color "mask" so it automatically
+// Creates one icon. Uses the SVG as a color "mask" so it automatically
 // matches the site's theme colors.
 function icon(name, cls) {
   const span = document.createElement('span');
   span.className = 'icon' + (cls ? ' ' + cls : '');
   span.setAttribute('aria-hidden', 'true'); // hide from screen readers — the visible text label next to it is enough
-  const url = `url('images/icons/${name || 'link'}.png')`; // falls back to "link.png" if no icon name is given
+  const url = `url('images/icons/${name || 'link'}.svg')`; // falls back to "link.svg" if no icon name is given
   span.style.webkitMaskImage = url; // needed for Safari
   span.style.maskImage = url; // needed for other browsers
   return span;

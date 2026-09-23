@@ -1134,7 +1134,7 @@ p { margin: 0; }
 }
 
 /* ---------- Icons ---------- */
-/* Icons are PNGs used as color "stencils", so they automatically
+/* Icons are SVGs used as color "stencils", so they automatically
    match whatever text color is active (hover, theme, etc). */
 .icon {
   display: inline-block;
