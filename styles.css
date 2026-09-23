@@ -771,6 +771,21 @@ p { margin: 0; }
   width: 100%;
 }
 
+/* Added by layoutChannelRow() in script.js when a channel box's own
+   header ("Release | Java X.Y") doesn't fit next to its sibling —
+   stacks the boxes full-width instead of letting the header text
+   wrap mid-line. */
+.channel-row.stacked {
+  flex-direction: column;
+}
+/* flex-basis below is a fraction of the row's *main axis*, which
+   switches from width to height once the row above stacks into a
+   column — override it back to a natural height so a box doesn't try
+   to become "50% tall" instead of "100% wide". */
+.channel-row.stacked > .channel-group {
+  flex: 1 1 auto;
+}
+
 /* Card Outer Shell */
 .channel-group {
   /* Sized for two boxes side by side, but won't stretch to fill the
@@ -784,9 +799,6 @@ p { margin: 0; }
   display: flex;
   flex-direction: column;
   position: relative; /* anchors the "new"/"updated" badge, which hangs off the top-left corner */
-  /* Lets the @container rules further down respond to this box's own
-   width, not just the screen size. */
-  container-type: inline-size;
 }
 
 /* ---------- Header ---------- */
@@ -923,12 +935,11 @@ p { margin: 0; }
   min-width: 0;
 }
 
-/* Added by syncChannelHeaderWrap() in script.js when either this
-   channel box or a sibling in the same row needed to wrap its header
-   — forces this one onto two lines as well (with a matching indent),
-   even if its own text would have fit, so both boxes' headers end up
-   the same height and nothing downstream (the download buttons)
-   drifts out of alignment. */
+/* Added by layoutChannelRow() in script.js as a last resort — only
+   when a box's header still doesn't fit even after the box has
+   already claimed the full row width (see .channel-row.stacked
+   above). Indents the wrapped second line so it still reads as one
+   unit with the "|" that introduces it. */
 .channel-header.header-force-wrap .channel-mc-group {
   flex-basis: 100%;
   padding-left: 18px;
@@ -944,6 +955,23 @@ p { margin: 0; }
   display: flex;
   gap: 14px;
   margin-top: auto;
+}
+
+/* Added by layoutChannelRow() in script.js when this box's own
+   download columns (Data Pack/Mod/etc.) don't have room to sit side
+   by side without a version pill wrapping onto its own line — stacks
+   them full-width instead, independently of its sibling channel box. */
+.channel-downloads.downloads-stacked {
+  flex-direction: column;
+  gap: 14px;
+}
+/* Moves the divider from the side to the top, now that the columns
+   are stacked. */
+.channel-downloads.downloads-stacked .download-col + .download-col {
+  padding-left: 0;
+  padding-top: 14px;
+  border-left: none;
+  border-top: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
 }
 
 .download-col {
@@ -969,35 +997,17 @@ p { margin: 0; }
   font-weight: 600;
   color: var(--text);
   min-height: 24px; /* Fixes height shift when icon or pill is missing */
-  flex-wrap: wrap; /* lets the version pill drop to its own line if it doesn't fit */
+  /* Last-resort fallback: lets a single column's own pill drop to its
+     own line if it's genuinely too long to fit even in this state —
+     rare, since .downloads-stacked above already gives each column
+     the full box width before this would ever be needed. */
+  flex-wrap: wrap;
   row-gap: 4px;
 }
 
 .download-type-label {
   white-space: nowrap;
   flex-shrink: 0;
-}
-
-/* A spacer that forces a line break (see .pills-wrapped below); does
-   nothing by default. */
-.download-col-break {
-  display: none;
-}
-
-/* Added by syncDownloadPillWrap() in script.js when either this
-   channel's download columns needed to wrap its pill onto its own
-   line — forces every column's pill in this channel to wrap too, even
-   ones that would have fit, so the Download / Not available buttons
-   below each column all end up level instead of one column's header
-   growing taller than its neighbours. */
-.channel-downloads.pills-wrapped .download-col-break {
-  display: block;
-  flex-basis: 100%;
-  height: 0;
-}
-/* Lines the pill up under the label text instead of under the icon. */
-.channel-downloads.pills-wrapped .download-col-header .pill {
-  margin-left: 23px;
 }
 
 /* ---------- Version Pills ---------- */
@@ -1353,29 +1363,6 @@ p { margin: 0; }
   color: var(--text);
 }
 
-/* ---------- Channel box: narrow-container adjustments ---------- */
-/* Adjusts a channel box's own layout once it gets narrow — based on
-   the box's actual width, not the screen's, so it works whether it's
-   narrow because of the device or because it's paired with another
-   box. Placed after the base rules it overrides, since @container
-   rules don't win on specificity alone. */
-/* When a channel box gets even tighter, stack its download columns
-   instead of shrinking the buttons further. */
-@container (max-width: 300px) {
-  .channel-downloads.has-multiple {
-    flex-direction: column;
-    gap: 14px;
-  }
-  /* Moves the divider from the side to the top, now that the columns
-   are stacked. */
-  .channel-downloads.has-multiple .download-col + .download-col {
-    padding-left: 0;
-    padding-top: 14px;
-    border-left: none;
-    border-top: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
-  }
-}
-
 /* ---------- Responsive ---------- */
 @media (max-width: 620px) {
   /* Smaller side margins on narrow phones, to give rows more room. */
@@ -1491,9 +1478,6 @@ p { margin: 0; }
     transform: none;
   }
 
-  .channel-row {
-    flex-direction: column;
-  }
   .download-btn,
   .download-unavailable {
     min-width: 0;

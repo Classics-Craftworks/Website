@@ -68,66 +68,77 @@ function prefersReducedMotion() {
   return reducedMotionQuery.matches;
 }
 
-// ---------- Sibling wrap syncing ----------
-// Two sibling elements sitting side by side (two channel boxes; two
-// download columns inside one channel box) can have different amounts
-// of text — a long version range vs. a short one, a long version
-// number vs. "N/A". Left alone, only the one with more text wraps
-// onto a second line, making it taller than its neighbour and pushing
-// everything below it (buttons, columns) out of vertical alignment.
-// These two helpers check a group of siblings after layout: if *any*
-// of them needed to wrap on their own, a class is added to *all* of
-// them so they wrap together and stay the same height — instead of
-// wrapping everything unconditionally (which wastes space when
-// nothing actually needed to wrap; see .header-force-wrap /
-// .pills-wrapped in styles.css for the CSS side of this).
+// ---------- Layout: transform instead of wrap ----------
+// A project's channel boxes (Release/Beta/etc.) sit side by side by
+// default, and each box's two download columns (Data Pack/Mod) do the
+// same — the most compact arrangement, but also the tightest on
+// width. Different projects have wildly different amounts of text (a
+// long beta MC-version range, a long beta version number, vs. plain
+// "N/A"), so rather than ever letting that text wrap mid-line, the
+// functions below switch the *arrangement itself* to whichever state
+// in styles.css gives the wrapping content a full line: channel boxes
+// stack full-width if a header needs the room, and — independently,
+// per box, since one box getting more room doesn't imply its sibling
+// needs the same treatment — a box's own download columns stack if
+// its pills need it. Re-run any time the row resizes, including the
+// moment a collapsed section first expands.
 
-// Syncs the "Label | Java X.Y" header row across every channel box in
-// one project's .channel-row.
-function syncChannelHeaderWrap(rowEl) {
-  const headers = Array.from(rowEl.querySelectorAll('.channel-header'));
-  if (headers.length < 2) return; // nothing to stay in sync with
-
-  // Clear first, so this re-measures each header's own natural fit
-  // rather than staying wrapped forever from an earlier, narrower check.
-  headers.forEach(h => h.classList.remove('header-force-wrap'));
-
-  const anyWrapped = headers.some(h => {
-    const label = h.querySelector('.channel-label');
-    const group = h.querySelector('.channel-mc-group');
-    // If the version group has dropped onto its own line, it sits
-    // measurably lower than the label it would otherwise sit next to.
-    return label && group && group.offsetTop > label.offsetTop + 1;
-  });
-
-  if (anyWrapped) headers.forEach(h => h.classList.add('header-force-wrap'));
+// True if `.channel-mc-group` has dropped below `.channel-label`
+// inside a `.channel-header` — i.e. the header wrapped onto 2 lines.
+function headerWraps(header) {
+  const label = header && header.querySelector('.channel-label');
+  const group = header && header.querySelector('.channel-mc-group');
+  return !!(label && group && group.offsetTop > label.offsetTop + 1);
 }
 
-// Same idea, one level down: syncs the version pill across every
-// download column (Data Pack / Mod / etc.) inside one channel box.
-function syncDownloadPillWrap(downloadsEl) {
-  const headers = Array.from(downloadsEl.querySelectorAll('.download-col-header'));
-  if (headers.length < 2) return;
+// True if a download column's `.pill` has dropped below its
+// `.download-type-label` inside a `.download-col-header`.
+function pillWraps(header) {
+  const label = header.querySelector('.download-type-label');
+  const pill = header.querySelector('.pill');
+  return !!(label && pill && pill.offsetTop > label.offsetTop + 1);
+}
 
-  downloadsEl.classList.remove('pills-wrapped');
+function layoutChannelRow(rowEl) {
+  const groups = Array.from(rowEl.querySelectorAll(':scope > .channel-group'));
+  if (!groups.length) return;
 
-  // Below ~300px the channel box's own @container rule stacks the
-  // download columns into a single column (see
-  // .channel-downloads.has-multiple in styles.css) — each column is
-  // already on its own row at that point, so there's no side-by-side
-  // alignment left to protect. Forcing sync here would just drag a
-  // short, unrelated pill (e.g. "N/A") down onto its own line for no
-  // reason whenever a long sibling pill (e.g. a long beta version)
-  // happens to wrap.
-  if (getComputedStyle(downloadsEl).flexDirection === 'column') return;
+  // 1. Measure with boxes side by side — the most compact option, and
+  // the one to fall back to if nothing needs more room. Cleared first
+  // so this re-measures from scratch rather than staying stacked
+  // forever from an earlier, narrower check.
+  rowEl.classList.remove('stacked');
+  const anyHeaderNeedsRoom = groups.some(g => headerWraps(g.querySelector('.channel-header')));
 
-  const anyWrapped = headers.some(h => {
-    const label = h.querySelector('.download-type-label');
-    const pill = h.querySelector('.pill');
-    return label && pill && pill.offsetTop > label.offsetTop + 1;
+  // 2. If any box's header didn't fit next to its sibling, give every
+  // box the full row width instead of letting it wrap mid-line.
+  if (anyHeaderNeedsRoom) rowEl.classList.add('stacked');
+
+  groups.forEach(g => {
+    // 3. Independently, per box: if its header *still* doesn't fit
+    // even with whatever width step 1–2 left it (an extreme case —
+    // very long text on a very narrow screen), fall back to letting
+    // it wrap, with a matching indent so it reads as one unit.
+    const header = g.querySelector('.channel-header');
+    header.classList.remove('header-force-wrap');
+    if (headerWraps(header)) header.classList.add('header-force-wrap');
   });
 
-  if (anyWrapped) downloadsEl.classList.add('pills-wrapped');
+  // 4. Download columns: measured per box, but the resulting layout
+  // is applied to *every* box in the row together. Sibling boxes sit
+  // at the same width as each other (whether side by side or each
+  // full-width after step 1–2), so if any one of them needs its
+  // columns stacked, its sibling(s) get stacked too — otherwise the
+  // stacked box grows taller than its neighbour, and margin-top:auto
+  // (see .channel-downloads in styles.css) shoves the neighbour's
+  // buttons down to match, leaving an odd empty gap above them.
+  const downloadLists = groups.map(g => g.querySelector('.channel-downloads')).filter(Boolean);
+  downloadLists.forEach(dl => dl.classList.remove('downloads-stacked'));
+  const anyPillNeedsRoom = downloadLists.some(dl => {
+    const headers = Array.from(dl.querySelectorAll('.download-col-header'));
+    return headers.length > 1 && headers.some(pillWraps);
+  });
+  if (anyPillNeedsRoom) downloadLists.forEach(dl => dl.classList.add('downloads-stacked'));
 }
 
 // Safe localStorage read/write — some browsers (e.g. Safari private
@@ -311,13 +322,12 @@ function renderChannel(ch, projectId) {
 
   const badge = ch.badge ? renderChannelBadge(ch, `badge-dismissed:${projectId}:${channelKey}`) : null;
 
-  // Holds one column per download (Data Pack, Mod, etc.). "has-multiple"
-  // flags channels with two download types, which need extra mobile
-  // styling (see .download-col-break below).
-  const hasMultipleDownloads = (ch.downloads || []).length > 1;
-  const downloads = el('div', {
-    class: 'channel-downloads' + (hasMultipleDownloads ? ' has-multiple' : '')
-  });
+  // Holds one column per download (Data Pack, Mod, etc.). Whether
+  // these columns sit side by side or stack (when there's more than
+  // one) is decided by layoutChannelRow() up in renderProject, once
+  // the whole row's layout is settled — see .downloads-stacked in
+  // styles.css for the CSS side of this.
+  const downloads = el('div', { class: 'channel-downloads' });
 
   (ch.downloads || []).forEach(d => {
     // Falls back to a box icon if data.js didn't specify one.
@@ -328,13 +338,9 @@ function renderChannel(ch, projectId) {
     const isDisabled = d.disabled || !d.url;
 
     // Header for each download column: icon + label + version pill.
-    // The empty "break" span forces the pill onto its own line on
-    // mobile (see .download-col-break in styles.css); it does nothing
-    // on desktop.
     const headerChildren = [
       icon(typeIcon, 'icon-sm'),
       el('span', { class: 'download-type-label', text: d.label }),
-      el('span', { class: 'download-col-break', attrs: { 'aria-hidden': 'true' } }),
       el('span', { class: 'pill' + (isDisabled ? ' disabled-pill' : ''), text: isDisabled ? 'N/A' : (d.version || 'N/A') })
     ];
 
@@ -390,14 +396,6 @@ function renderChannel(ch, projectId) {
       class: 'download-col' + (isDisabled ? ' is-disabled' : '')
     }, [colHeader, actionEl]));
   });
-
-  // Keeps this channel's download columns' pills in sync with each
-  // other (see syncDownloadPillWrap above) — re-checked whenever this
-  // channel box's size changes, including the moment its section
-  // first expands from collapsed.
-  if (hasMultipleDownloads && window.ResizeObserver) {
-    new ResizeObserver(() => syncDownloadPillWrap(downloads)).observe(downloads);
-  }
 
   // data-channel="stable"/"beta"/"alpha" - read by styles.css to pick the right color theme
   return el('div', {
@@ -457,12 +455,12 @@ function renderProject(p) {
     (p.channels || []).map(ch => renderChannel(ch, id))
   );
 
-  // Keeps this project's channel boxes' headers in sync with each
-  // other (see syncChannelHeaderWrap above) — re-checked whenever the
-  // row's size changes, including the moment its section first
-  // expands from collapsed.
+  // Lays out this project's channel boxes and their download columns
+  // (see layoutChannelRow above) — re-checked whenever the row's size
+  // changes, including the moment its section first expands from
+  // collapsed.
   if (window.ResizeObserver) {
-    new ResizeObserver(() => syncChannelHeaderWrap(channelRow)).observe(channelRow);
+    new ResizeObserver(() => layoutChannelRow(channelRow)).observe(channelRow);
   }
 
   // Text blob the search box matches against — includes the title,
