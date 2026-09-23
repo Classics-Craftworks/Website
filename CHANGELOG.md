@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.18.1 — 2026/09/23
+
+### Changed
+- Improved mobile layouts, including wrapping and alignment
+
+### Fixed
+- Navigation bar button alignment on mobile
+
 ## v0.18.0 — 2026/09/22
 
 ### Added
@@ -28,7 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 - Completely removed old code for project version handling
 
 ### Fixed
-- Fixed section headers being hidden beneath the navigation bar when navigating to them via a deep link or nav bar buttons
+- Section headers being hidden beneath the navigation bar when navigating to them via a deep link or nav bar buttons
 
 ## v0.17.0 — 2026/09/22
 
