@@ -5,7 +5,7 @@
 
    QUICK GUIDE:
    - Text & Links: Update values inside quotes (e.g., label, url).
-   - Images: Place files in /images and set the relative path (e.g., "images/logo.webp").
+   - Images: Place files in /images and set the relative path (e.g., "images/better-craftables.webp").
    - Icons: Place webp files in /images/icons/ and refer to them by filename without extension.
    - Projects: Copy an existing project object block {...} inside the "projects" array to add a new project.
    - Channels: Each project supports "stable", "beta", "alpha", or "unsupported" channels. Add "disabled: true"
@@ -28,7 +28,7 @@ const SITE_DATA = {
 
   // Logo, name and one-line tagline shown at the top of the page.
   brand: {
-    logo: "images/logo.webp",
+    logo: "images/logo.png",
     name: "CLASSIC'S CRAFTWORKS",
     tagline: "Minecraft Java Edition data packs, mods & resource packs.<br>Sometimes useful. Always Minecraft."
   },
