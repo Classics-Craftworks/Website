@@ -46,6 +46,20 @@ const SITE_DATA = {
     { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks" }
   ],
 
+  // Standalone single-section pages (e.g. data-packs-mods.html), plus
+  // the main catalog itself. Used to build the sticky page-nav bar on
+  // each of those pages — add an entry here (with the matching
+  // section heading below) whenever a new section gets its own page,
+  // and it shows up in every page's nav automatically. "All Projects"
+  // has no "section" since it's the full multi-section catalog, not a
+  // single flat section.
+  pages: [
+    { label: "Home", url: "index.html" },
+    { label: "Data Packs & Mods", url: "data-packs-mods.html", section: "Data Packs & Mods" },
+    { label: "Resource Packs", url: "resource-packs.html", section: "Resource Packs" },
+    { label: "Other Projects", url: "other-projects.html", section: "Other Projects" }
+  ],
+
   // The main content: each entry below is a section (a heading
   // plus a list of projects). Add, remove, or reorder sections
   // and projects freely — the layout will adjust automatically.

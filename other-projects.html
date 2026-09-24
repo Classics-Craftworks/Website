@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="canonical" href="https://classicscraftworks.co.uk/other-projects.html">
+<link rel="icon" href="images/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="images/logo.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#18181B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+  <!-- Basic Meta Tags -->
+  <title>Other Projects - Classic's Craftworks</title>
+  <meta name="description" content="Other Minecraft projects from Classic's Craftworks. Sometimes useful. Always Minecraft." />
+
+  <!-- Open Graph Preview Cards (Discord, Facebook, LinkedIn) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Other Projects - Classic's Craftworks" />
+  <meta property="og:description" content="Other Minecraft projects from Classic's Craftworks. Sometimes useful. Always Minecraft." />
+  <meta property="og:image" content="https://classicscraftworks.co.uk/images/logo.png" />
+  <meta property="og:url" content="https://classicscraftworks.co.uk/other-projects.html" />
+
+  <!-- Twitter / X Preview Cards -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Other Projects - Classic's Craftworks" />
+  <meta name="twitter:description" content="Minecraft servers & other projects from Classic's Craftworks. Sometimes useful. Always Minecraft." />
+  <meta name="twitter:image" content="https://classicscraftworks.co.uk/images/logo.png" />
+</head>
+<body>
+
+<!-- Same skip-link pattern as index.html, just pointing at this page's
+     (single, non-collapsible) project list instead of the full catalog. -->
+<a href="#catalog" class="skip-link">Skip to projects</a>
+
+<!-- Static fallback shown only when JavaScript is disabled/blocked, same
+     idea as index.html's noscript block — see section-page.js for how
+     the rest of the page is built from data.js. -->
+<noscript>
+  <div class="noscript-notice">
+    <h1>CLASSIC'S CRAFTWORKS</h1>
+    <p>Minecraft Java Edition servers &amp; other projects.</p>
+    <p>
+      This site needs JavaScript enabled to build its project catalog.
+      In the meantime, you can browse our projects directly on
+      <a href="https://modrinth.com/organization/classics-craftworks">Modrinth</a>
+      or <a href="https://github.com/Classics-Craftworks">GitHub</a>.
+    </p>
+  </div>
+</noscript>
+
+<div class="page">
+
+  <!-- Identical masthead markup/IDs to index.html, filled in by the same
+       renderBrand() logic in section-page.js. -->
+  <header class="masthead">
+    <img id="brand-logo" class="brand-logo" alt="" width="88" height="88">
+    <div class="brand-text">
+      <h1 id="brand-name"></h1>
+      <p id="brand-tagline"></p>
+    </div>
+    <nav id="top-links" class="link-row" aria-label="Primary links"></nav>
+  </header>
+
+  <!-- Sticky page-switcher bar, styled the same as the main page's
+       section-nav but for moving between pages instead of jumping to
+       sections on this one (this page only has one section). Built by
+       renderPageNav() in section-page.js, from SITE_DATA.pages in
+       data.js. -->
+  <nav id="page-nav" class="section-nav page-nav" aria-label="Site pages"></nav>
+
+  <!-- Filled in by section-page.js: a plain-text heading (no
+       collapse/expand — see renderFlatSection()) followed by the
+       Other Projects project cards, using the same renderProject() as
+       the main catalog. -->
+  <main id="catalog" tabindex="-1"></main>
+
+  <footer class="site-footer">
+    <div id="social-links" class="social-row" aria-label="Social links"></div>
+    <p id="copyright" class="footer-line"></p>
+    <p id="disclaimer" class="footer-line footer-disclaimer"></p>
+    <p id="icon-credits" class="footer-line footer-credits"></p>
+    <p id="site-version" class="footer-version"></p>
+  </footer>
+
+  <button id="back-to-top" class="back-to-top" type="button" aria-label="Back to top" data-tooltip="Back to top"></button>
+
+</div>
+
+<script src="data.js" defer></script>
+<script src="section-page.js" defer></script>
+<script src="other-projects.js" defer></script>
+</body>
+</html>

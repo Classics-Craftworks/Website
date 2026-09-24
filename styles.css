@@ -662,6 +662,36 @@ p { margin: 0; }
   pointer-events: none;
 }
 
+/* ---------- Flat section heading ---------- */
+/* Plain-text equivalent of .catalog-section h2 above, used on
+   standalone single-section pages (e.g. data-packs-mods.html) in place
+   of the collapsible <details>/<summary> heading. Sized closer to the
+   brand h1 than the old accordion heading was, since it now carries
+   the whole page's title rather than sitting next to a chevron. */
+.flat-section-heading {
+  font-size: clamp(1.7rem, 4.5vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text);
+  margin: 20px 0 20px;
+  /* Keeps it clear of the sticky page-nav bar when linked/scrolled to
+     directly, same as .catalog-section's scroll-margin-top. */
+  scroll-margin-top: var(--sticky-nav-offset, 68px);
+}
+
+/* ---------- Page nav ---------- */
+/* Modifier on a standalone section page's <nav class="section-nav">,
+   for when it holds nothing but a row of page links (renderPageNav()
+   in data-packs-mods.js) instead of the main page's jump
+   buttons + Expand/Collapse All + search. Centers that single row,
+   since .nav-jump-row's own desktop margin-left assumes it's sitting
+   next to those other controls. */
+.page-nav {
+  justify-content: center;
+}
+.page-nav .nav-jump-row {
+  margin-left: 0;
+}
+
 .project-list {
   display: flex;
   flex-direction: column;
