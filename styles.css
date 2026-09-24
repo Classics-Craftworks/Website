@@ -258,10 +258,9 @@ p { margin: 0; }
   font-family: 'Minercraftory', sans-serif; /* Font only to be used for heading */
   font-size: clamp(1.4rem, 3.8vw, 1.8rem);
   font-weight: 700;
-  letter-spacing: 0.04em; /* Adds a gap between letters */
-  margin-bottom: 0.20rem; /* Increases gap between title and tagline */
-  line-height: 1.35; /* Extra line spacing — this font's capitals sit close together
-   without it. */
+  letter-spacing: 0.04em;
+  margin-bottom: 0.20rem;
+  line-height: 1.35;
   text-wrap: balance;
 }
 
@@ -1436,12 +1435,14 @@ p { margin: 0; }
   }
 }
 
-@media (max-width: 620px) {
-  /* Smaller side margins on narrow phones, to give rows more room. */
-  .page {
-    padding: calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
-  }
-
+/* The masthead's title/tagline column is the part that gives way as
+   the header narrows — the logo and link-row both hold their natural
+   size, so between this breakpoint and the page's general 620px
+   "phone" breakpoint below, the title gets squeezed into wrapping
+   onto 2 lines instead of the header switching to its roomier,
+   already-designed-for-this stacked layout. Broken out on its own,
+   wider breakpoint for the same reason as the nav bar above. */
+@media (max-width: 870px) {
   .masthead {
     grid-template-columns: auto 1fr;
     /* Top-aligns the logo instead of centering it — on mobile the title
@@ -1459,6 +1460,43 @@ p { margin: 0; }
     grid-column: 2 / -1; /* lines up with the brand text instead of the logo */
     justify-self: start;
     margin-top: 14px;
+  }
+}
+
+/* Below this, even the roomier logo-beside-text layout above can't
+   fit the tagline's first sentence on one line without wrapping a
+   second time — the logo and its gap are eating space the text needs
+   more. Stacking everything into one centered column instead frees
+   up the logo's width for the text, which comfortably holds the line
+   count at 3 even on the narrowest phones (checked down to 320px) —
+   and reads better centered than left-aligned once nothing (a logo,
+   a title) is anchoring it to the left anymore. */
+@media (max-width: 870px) {
+  .masthead {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    gap: 10px;
+  }
+  .brand-text {
+    /* Shrinks the title/tagline to their own content width and
+     centers *that*, instead of them staying block-level full-width
+     with only the text inside centering — needed for text-wrap:
+     balance on the title (further up) to have any effect. */
+    align-items: center;
+  }
+  .link-row {
+    grid-column: 1 / -1;
+    justify-self: stretch; /* keeps the row itself the masthead's full width... */
+    justify-content: center; /* ...so this centers the buttons within it */
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 620px) {
+  /* Smaller side margins on narrow phones, to give rows more room. */
+  .page {
+    padding: calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   }
 
   /* A real grid, same reasoning as the nav bar above — so the link
