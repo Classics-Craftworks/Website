@@ -774,8 +774,11 @@ p { margin: 0; }
 
 /* One button per row on phones/small tablets. The four icons move
    into a single row so each button stays short instead of three
-   tall cards stacked on top of each other. */
-@media (max-width: 850px) {
+   tall cards stacked on top of each other. Shares the site-wide
+   870px "collapse to mobile" breakpoint (see the nav bar and
+   masthead below) so every part of the header switches to its
+   stacked layout together instead of at three different widths. */
+@media (max-width: 870px) {
   .home-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 16px;
@@ -1505,7 +1508,7 @@ p { margin: 0; }
    stacked grid seen below 620px. Broken out into its own, wider
    breakpoint so it jumps straight from one tidy row to a tidy stack,
    without a scrappy in-between state. */
-@media (max-width: 970px) {
+@media (max-width: 870px) {
   .section-nav {
     flex-direction: column;
     align-items: stretch;
@@ -1568,11 +1571,11 @@ p { margin: 0; }
 
 /* The masthead's title/tagline column is the part that gives way as
    the header narrows — the logo and link-row both hold their natural
-   size, so between this breakpoint and the page's general 620px
-   "phone" breakpoint below, the title gets squeezed into wrapping
-   onto 2 lines instead of the header switching to its roomier,
-   already-designed-for-this stacked layout. Broken out on its own,
-   wider breakpoint for the same reason as the nav bar above. */
+   size, so the title gets squeezed into wrapping onto 2 lines instead
+   of the header switching to its roomier, already-designed-for-this
+   stacked layout. Shares the nav bar's 870px breakpoint (see above)
+   so the whole header collapses to mobile at one consistent width
+   instead of the masthead and nav bar switching over separately. */
 @media (max-width: 870px) {
   .masthead {
     grid-template-columns: auto 1fr;
@@ -1601,7 +1604,9 @@ p { margin: 0; }
    up the logo's width for the text, which comfortably holds the line
    count at 3 even on the narrowest phones (checked down to 320px) —
    and reads better centered than left-aligned once nothing (a logo,
-   a title) is anchoring it to the left anymore. */
+   a title) is anchoring it to the left anymore. Same 870px breakpoint
+   as the rest of the header (see above), so this and the two-column
+   step above it change over together with the nav bar. */
 @media (max-width: 870px) {
   .masthead {
     grid-template-columns: 1fr;
