@@ -3,7 +3,8 @@
 
    Loaded by every page. It reads SITE_DATA (data.js) and builds the
    brand header, page nav, project cards and footer. The home page's
-   own section buttons live in index.js; each section page just calls
+   own section buttons live in index.js, the nav bar's search box in
+   search.js; each section page just calls
    initSectionPage() from its own tiny script (see the bottom of this
    file), and the 404 page calls renderBrand()/renderFooter() from
    not-found.js.
@@ -32,14 +33,20 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
-const usedSlugs = new Set();
-function assignSlug(text, fallback) {
-  let base = slugify(text) || fallback;
+// Returns a slug for `text` that isn't already in the `used` set (adding
+// "-2", "-3"... if it is), and records it there.
+function uniqueSlug(text, fallback, used) {
+  const base = slugify(text) || fallback;
   let slug = base;
   let n = 2;
-  while (usedSlugs.has(slug)) slug = `${base}-${n++}`;
-  usedSlugs.add(slug);
+  while (used.has(slug)) slug = `${base}-${n++}`;
+  used.add(slug);
   return slug;
+}
+
+const usedSlugs = new Set();
+function assignSlug(text, fallback) {
+  return uniqueSlug(text, fallback, usedSlugs);
 }
 
 function el(tag, opts = {}, children = []) {

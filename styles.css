@@ -303,7 +303,7 @@ p { margin: 0; }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 14px 32px;
   border-radius: 24px;
@@ -318,6 +318,7 @@ p { margin: 0; }
   align-items: center;
   justify-content: center;
   gap: 8px;
+  margin-left: 16px; /* the nav's side padding is overridden to 6px near the bottom of this file, so this keeps the buttons off its rounded corner */
 }
 
 /* Styled differently from other buttons on the page so they clearly
@@ -349,6 +350,189 @@ p { margin: 0; }
 .nav-jump-btn.is-open:hover {
   background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
   border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+}
+
+/* ---------- Search ---------- */
+/* Search box at the right of the nav bar (built by search.js), with a
+   results dropdown that hangs below it. */
+.nav-search {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 170px;
+  max-width: 240px;
+  margin-right: 16px; /* mirrors .nav-jump-row's left margin */
+}
+
+.nav-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-soft);
+  pointer-events: none;
+}
+.nav-search:focus-within .nav-search-icon {
+  color: var(--text);
+}
+
+.nav-search-input {
+  width: 100%;
+  /* Removes the browser's own search-box styling, so only ours shows. */
+  -webkit-appearance: none;
+  appearance: none;
+  border: 1px solid var(--nav-btn-border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 8px 30px 8px 32px; /* room for the icon, and for the clear button so text doesn't shift when it appears */
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.nav-search-input::-webkit-search-decoration,
+.nav-search-input::-webkit-search-cancel-button,
+.nav-search-input::-webkit-search-results-button,
+.nav-search-input::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+.nav-search-input::placeholder { color: var(--text-soft); }
+/* Applies on any focus (not just keyboard), so clicking into the box
+   always shows this ring instead of the browser default. */
+.nav-search-input:focus {
+  outline: none;
+  border-color: var(--nav-btn-hover-border);
+  box-shadow: 0 0 0 3px rgba(var(--nav-accent-rgb), 0.2);
+}
+
+/* Clears the search box. Drawn as a plain "×" out of two rotated bars. */
+.nav-search-clear {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+/* Makes sure the `hidden` attribute actually hides this button,
+   overriding the display: flex above. */
+.nav-search-clear[hidden] {
+  display: none;
+}
+.nav-search-clear:hover,
+.nav-search-clear:focus-visible {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.nav-search-clear::before,
+.nav-search-clear::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+}
+.nav-search-clear::before { transform: rotate(45deg); }
+.nav-search-clear::after { transform: rotate(-45deg); }
+
+/* The dropdown. Sits inside the sticky nav, so it stays above the page
+   content. It's right-aligned with the search box and grows leftwards
+   (the nav clips horizontal overflow, so it must stay inside the nav). */
+.search-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 380px;
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  border: 1px solid var(--nav-btn-border);
+  border-radius: 14px;
+  background: var(--nav-bg);
+  box-shadow: var(--nav-shadow);
+}
+
+.search-result {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: var(--text);
+}
+.search-result.is-active {
+  background: var(--nav-btn-hover-bg);
+}
+
+.search-result-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg);
+}
+
+.search-result-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.search-result-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.search-result-meta {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+.search-result-title,
+.search-result-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Matched text in results. */
+.search-panel mark {
+  padding: 0 1px;
+  border-radius: 3px;
+  background: rgba(var(--nav-accent-rgb), 0.3);
+  color: inherit;
+}
+
+.search-empty {
+  padding: 14px 12px;
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+/* Text for screen readers only (the live result count). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ---------- Flat section heading ---------- */
@@ -1199,11 +1383,37 @@ p { margin: 0; }
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
+    margin-left: 0; /* desktop's spacing margin doesn't apply once this row stacks alone */
   }
   .nav-jump-btn {
     padding: 9px 16px; /* slightly taller tap target on touch screens */
     justify-content: center; /* center the label now that the button fills its grid cell instead of hugging its own text */
     min-width: 0; /* lets the label wrap/shrink instead of forcing its grid column wider than the viewport */
+  }
+
+  /* Full width under the buttons, instead of sitting beside them. */
+  .nav-search {
+    flex: none;
+    max-width: none;
+    min-width: 0;
+    margin-right: 0;
+  }
+  /* 16px is the minimum iOS Safari won't auto-zoom the page in on
+   focus — the 0.85rem used above is under that. */
+  .nav-search-input {
+    font-size: 16px;
+    padding-right: 40px; /* room for the larger clear button below */
+  }
+  /* Bigger tap target for the "×". Its ::before/::after already draw
+   the X, so the real box grows instead of using hit-slop. */
+  .nav-search-clear {
+    width: 36px;
+    height: 36px;
+    right: 2px;
+  }
+  .search-panel {
+    left: 0;
+    width: auto;
   }
 }
 
