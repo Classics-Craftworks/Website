@@ -743,19 +743,29 @@ p { margin: 0; }
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 6cqi 6cqi 7cqi;
+  /* Top/bottom padding sized up from the left/right value on purpose
+   — with the icons shrunk below and the title pinned to the bottom
+   via margin-top: auto, this is what actually opens up the breathing
+   room above the icon row and below the title. */
+  padding: 10cqi 6cqi 11cqi;
 }
 
-/* The four icons, numbered 1–4 left to right, top to bottom. */
+/* The four icons, numbered 1–4 left to right, top to bottom.
+   Columns are exactly one icon wide (30cqi, about what the old
+   70%-of-a-column icons measured) and centered, so the gap between
+   the two columns is the same 5cqi as the gap between the two rows,
+   instead of the icons floating apart in the middle of two wide
+   columns. */
 .home-slots {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6cqi 1cqi; /* top/bottom, left/right */
+  grid-template-columns: repeat(2, 30cqi);
+  justify-content: center;
+  gap: 5cqi;
   justify-items: center;
 }
 .home-slot {
   display: block;
-  width: 85%;
+  width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
   border: 1px solid var(--border);
@@ -774,10 +784,10 @@ p { margin: 0; }
 .home-card-title {
   display: block;
   margin-top: auto; /* pins the name to the bottom of every card, however tall the row ends up */
-  padding-top: 8cqi;
+  padding-top: 12cqi;
   font-family: 'Minercraftory', var(--font);
   font-weight: 500;
-  font-size: min(9.2cqi, 3.6rem);
+  font-size: min(6.6cqi, 2.9rem);
   line-height: 1.25;
   letter-spacing: 0.02em;
   text-align: center;
@@ -801,12 +811,15 @@ p { margin: 0; }
     grid-template-columns: repeat(4, 1fr);
     gap: 3cqi;
   }
+  .home-slot {
+    width: 70%; /* back to the smaller icon inside each of the four columns */
+  }
   .home-card-inner {
-    padding: 3cqi;
+    padding: 4cqi 3cqi 5cqi; /* a bit more top/bottom than left/right, same idea as the desktop layout above */
   }
   .home-card-title {
-    padding-top: 6cqi;
-    font-size: min(7cqi, 2.1rem);
+    padding-top: 5cqi;
+    font-size: min(6cqi, 1.9rem); /* shrunk to match the smaller icons */
   }
 }
 
