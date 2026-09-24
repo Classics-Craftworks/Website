@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+
+## v2.0.0-dev.3 — 2026/09/24
+
+### Added
+- Re-added project counters from the old home page to the header of each project page
+
+### Changed
+- Reduced text and icon sizes on home page buttons
+- Reduced padding around icons on home page buttons
+- Increased padding between icons and text on home page buttons
+- 404 page now has it's own `404.js` and uses `section-page.js` like other pages
+- Updated various comments
+
+### Fixed
+- Nav bar & page alignment
+- Page elements collapsing into their mobile state at different sizes
+- Classic's Craftworks Website GitHub link having a Modrinth icon
+
+### Removed
+- Code for:
+    - Old collapsible sections, including the peek icons, Expand/Collapse All button and option to have sections open by default
+    - Old navigation system, including search and jump buttons
+    - Anything else that was unused or redundant
+
 ## v2.0.0-dev.2 — 2026/09/24
 
 ### Added
