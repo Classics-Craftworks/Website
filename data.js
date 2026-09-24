@@ -345,7 +345,7 @@ const SITE_DATA = {
           title: "Classic's Craftworks Website",
           description: "The hub for all of our projects. You're already here!",
           links: [
-            { label: "GitHub", icon: "modrinth", url: "https://github.com/Classics-Craftworks/Website" }
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Website" }
           ]
         }
         // #endregion Website
