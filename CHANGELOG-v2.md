@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.0.0-dev.4 — 2026/09/24
+
+### Added
+- Re-added search bar - now shows a dropdown of results and takes the user to the correct page when a result is clicked
+- Added a project counter to the home page buttons when there are more than 4 projects in a section
+
+### Fixed
+- 404 page on nested URLs
 
 ## v2.0.0-dev.3 — 2026/09/24
 
