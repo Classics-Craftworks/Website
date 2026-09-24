@@ -337,10 +337,21 @@ const SITE_DATA = {
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/server/crafthorizon" },
             { label: "Trello", icon: "document", url: "https://trello.com/b/TK7pofcG/crafthorizon" },
-            { label: "Wiki", icon: "book", url: "https://classicscraftworks.gitbook.io/crafthorizon/" }
+            { label: "Wiki", icon: "book", url: "https://classicscraftworks.gitbook.io/crafthorizon" }
+          ]
+        },
+        // #endregion CraftHorizon
+
+        // #region ──────── Website ────────
+        {
+          image: "images/craftworks.webp",
+          title: "Classic's Craftworks Website",
+          description: "The hub for all of our projects. You're already here!",
+          links: [
+            { label: "GitHub", icon: "modrinth", url: "https://github.com/Classics-Craftworks/Website" }
           ]
         }
-        // #endregion CraftHorizon
+        // #endregion Website
       ]
     }
     // #endregion OTHER PROJECTS
