@@ -408,7 +408,14 @@ function renderFlatSection(section) {
   if (!main || !section) return [];
 
   const id = assignSlug(section.heading, 'section');
-  const heading = el('h2', { class: 'flat-section-heading', text: section.heading, attrs: { id } });
+  const count = el('span', {
+    class: 'section-count',
+    text: String((section.projects || []).length)
+  });
+  const heading = el('h2', { class: 'flat-section-heading', attrs: { id } }, [
+    el('span', { class: 'heading-label', text: section.heading }),
+    count
+  ]);
 
   const projectEls = section.projects.map(renderProject);
   const list = el('div', { class: 'project-list' }, projectEls);

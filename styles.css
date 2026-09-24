@@ -669,6 +669,9 @@ p { margin: 0; }
    brand h1 than the old accordion heading was, since it now carries
    the whole page's title rather than sitting next to a chevron. */
 .flat-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: clamp(1.7rem, 4.5vw, 2.2rem);
   font-weight: 700;
   color: var(--text);
@@ -676,6 +679,17 @@ p { margin: 0; }
   /* Keeps it clear of the sticky page-nav bar when linked/scrolled to
      directly, same as .catalog-section's scroll-margin-top. */
   scroll-margin-top: var(--sticky-nav-offset, 68px);
+}
+
+/* The count badge sits a size up from its accordion-heading original
+   (.section-count in the collapsible catalog section above) since it
+   now sits next to this page's much larger title instead of a small
+   in-line chevron heading. */
+.flat-section-heading .section-count {
+  min-width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  font-size: 0.95rem;
 }
 
 /* ---------- Page nav ---------- */
