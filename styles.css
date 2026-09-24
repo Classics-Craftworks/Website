@@ -643,6 +643,29 @@ p { margin: 0; }
   border: 1px dashed rgba(var(--border-rgb), 0.6);
   background: transparent;
 }
+/* Last slot of a section with more projects than fit: a "+X" tile
+   counting the ones not shown. */
+.home-slot-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-hover);
+  color: var(--text);
+  font-family: 'Minercraftory', var(--font);
+  font-size: 10cqi;
+  line-height: 1;
+  white-space: nowrap;
+}
+/* The "+": two crossed bars, since the pixel font has no plus glyph. */
+.home-slot-more-plus {
+  flex-shrink: 0;
+  width: 0.62em;
+  height: 0.62em;
+  margin-right: 0.12em;
+  background:
+    linear-gradient(currentColor, currentColor) center / 100% 0.18em no-repeat,
+    linear-gradient(currentColor, currentColor) center / 0.18em 100% no-repeat;
+}
 
 .home-card-title {
   display: block;
@@ -676,6 +699,9 @@ p { margin: 0; }
   }
   .home-slot {
     width: 70%; /* back to the smaller icon inside each of the four columns */
+  }
+  .home-slot-more {
+    font-size: 5cqi; /* scaled down with the smaller slot */
   }
   .home-card-inner {
     padding: 4cqi 3cqi 5cqi; /* a bit more top/bottom than left/right, same idea as the desktop layout above */

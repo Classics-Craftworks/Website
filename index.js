@@ -13,39 +13,54 @@
    and images all come from there).
    ============================================================ */
 
-// How many project icons each button shows. Extra projects beyond
-// this simply don't appear on the home page (they're all still on the
-// section's own page); fewer leaves the remaining slots as empty
-// placeholders so the buttons stay the same shape.
+// How many icon slots each button has. A section with more projects
+// than this shows the first HOME_SLOTS - 1 icons and turns the last slot
+// into a "+X" tile counting the rest (they're all still on the section's
+// own page); fewer leaves the remaining slots as empty placeholders so
+// the buttons stay the same shape.
 const HOME_SLOTS = 4;
 
 // Builds one big section button. `page` is the matching entry from
 // SITE_DATA.pages (its url is where the button goes).
 function renderHomeButton(section, page) {
-  const projects = (section.projects || []).slice(0, HOME_SLOTS);
+  const allProjects = section.projects || [];
+  const overflow = allProjects.length > HOME_SLOTS;
+  const shownCount = overflow ? HOME_SLOTS - 1 : HOME_SLOTS;
+  const projects = allProjects.slice(0, shownCount);
 
   // The icon grid. Not interactive itself — the whole button is the
-  // link — so every image is decorative (alt="") and the empty
-  // placeholders are hidden from screen readers.
+  // link — so every image is decorative (alt="") and the "+X" tile and
+  // empty placeholders are hidden from screen readers.
   const slots = [];
   for (let i = 0; i < HOME_SLOTS; i++) {
     const p = projects[i];
-    slots.push(p
-      ? el('img', {
-          class: 'home-slot',
-          src: p.image,
-          alt: '',
-          attrs: { draggable: 'false' }
-        })
-      : el('span', { class: 'home-slot home-slot-empty', attrs: { 'aria-hidden': 'true' } })
-    );
+    if (p) {
+      slots.push(el('img', {
+        class: 'home-slot',
+        src: p.image,
+        alt: '',
+        attrs: { draggable: 'false' }
+      }));
+    } else if (overflow) {
+      // The "+" is drawn in CSS (.home-slot-more-plus) because the site's
+      // pixel font has no plus glyph; only the number is real text.
+      slots.push(el('span', {
+        class: 'home-slot home-slot-more',
+        attrs: { 'aria-hidden': 'true' }
+      }, [
+        el('span', { class: 'home-slot-more-plus' }),
+        document.createTextNode(String(allProjects.length - shownCount))
+      ]));
+    } else {
+      slots.push(el('span', { class: 'home-slot home-slot-empty', attrs: { 'aria-hidden': 'true' } }));
+    }
   }
 
-  // Screen readers get the project names as the button's description,
+  // Screen readers get every project's name as the button's description,
   // since the icons themselves carry no text. The span is `hidden`
   // (so it isn't part of the button's name, which stays just the
   // section title) but aria-describedby can still point at it.
-  const names = projects.map(p => p.title);
+  const names = allProjects.map(p => p.title);
   const descId = 'home-desc-' + slugify(section.heading);
   const description = names.length
     ? el('span', { text: 'Includes ' + names.join(', '), attrs: { id: descId, hidden: '' } })
