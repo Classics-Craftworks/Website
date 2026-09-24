@@ -1677,9 +1677,9 @@ p { margin: 0; }
 /* Adds a little padding so focus rings on edge elements (like the
    last button in a row) don't get clipped by the overflow rule above.
    The matching negative margin cancels it out visually. */
-.masthead, #section-nav, #catalog, .site-footer {
+.masthead, .section-nav, #catalog, .site-footer {
   overflow-x: clip;
-  max-width: 100%;
+  max-width: calc(100% + 12px);
   padding-left: 6px;
   padding-right: 6px;
   margin-left: -6px;
