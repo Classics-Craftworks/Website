@@ -31,8 +31,7 @@
 </head>
 <body>
 
-<!-- Same skip-link pattern as index.html, just pointing at this page's
-     (single, non-collapsible) project list instead of the full catalog. -->
+<!-- Same skip link as index.html, pointing at this page's project list. -->
 <a href="#catalog" class="skip-link">Skip to projects</a>
 
 <!-- Static fallback shown only when JavaScript is disabled/blocked, same
@@ -64,17 +63,12 @@
     <nav id="top-links" class="link-row" aria-label="Primary links"></nav>
   </header>
 
-  <!-- Sticky page-switcher bar, styled the same as the main page's
-       section-nav but for moving between pages instead of jumping to
-       sections on this one (this page only has one section). Built by
-       renderPageNav() in section-page.js, from SITE_DATA.pages in
-       data.js. -->
-  <nav id="page-nav" class="section-nav page-nav" aria-label="Site pages"></nav>
+  <!-- Sticky page-switcher bar, built by renderPageNav() in
+       section-page.js from SITE_DATA.pages in data.js. -->
+  <nav id="page-nav" class="section-nav" aria-label="Site pages"></nav>
 
-  <!-- Filled in by section-page.js: a plain-text heading (no
-       collapse/expand — see renderFlatSection()) followed by the
-       Resource Packs project cards, using the same renderProject() as
-       the main catalog. -->
+  <!-- Filled in by section-page.js (see renderFlatSection()): the
+       section heading followed by its project cards. -->
   <main id="catalog" tabindex="-1"></main>
 
   <footer class="site-footer">

@@ -17,7 +17,7 @@
 <div class="page">
 
   <!-- Same header markup as index.html — filled in by renderBrand() in
-       script.js, so it stays in sync with data.js automatically. -->
+       section-page.js, so it stays in sync with data.js automatically. -->
   <header class="masthead">
     <img id="brand-logo" class="brand-logo" alt="" width="88" height="88">
     <div class="brand-text">
@@ -27,9 +27,6 @@
     <nav id="top-links" class="link-row" aria-label="Primary links"></nav>
   </header>
 
-  <!-- No id="catalog" here on purpose — renderSections() in script.js
-       skips rendering the project catalog when it can't find that
-       element, so this page just shows the 404 message below instead. -->
   <main class="not-found">
     <div class="not-found-card">
       <p class="not-found-code">404</p>
@@ -53,6 +50,7 @@
 </div>
 
 <script src="data.js" defer></script>
-<script src="script.js" defer></script>
+<script src="section-page.js" defer></script>
+<script src="404.js" defer></script>
 </body>
 </html>

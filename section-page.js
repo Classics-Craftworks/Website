@@ -1,25 +1,18 @@
 /* ============================================================
-   SECTION PAGE — SHARED RENDER SCRIPT
+   SHARED RENDER SCRIPT
 
-   Shared by every standalone single-section page (data-packs-mods.html,
-   resource-packs.html, other-projects.html, and any future ones), and
-   by the home page (index.html) for its brand/nav/footer helpers —
-   the home page's own big buttons live in index.js. It
-   reads the same SITE_DATA (data.js) and reuses the exact same
-   brand/footer/project/channel rendering as the main catalog
-   (script.js), so these pages always look and behave identically to
-   that part of it — only the section heading itself is different:
-   plain text instead of the main page's collapsible <details>/
-   <summary> accordion, and a page-switcher nav bar instead of a
-   jump-to-section one.
+   Loaded by every page. It reads SITE_DATA (data.js) and builds the
+   brand header, page nav, project cards and footer. The home page's
+   own section buttons live in index.js; each section page just calls
+   initSectionPage() from its own tiny script (see the bottom of this
+   file), and the 404 page calls renderBrand()/renderFooter() from
+   not-found.js.
 
-   Edit data.js to change text/links/projects/pages (same as the main
-   page). Edit this file to change how every section page is built.
-   Each page then just has one tiny script of its own — see the
-   bottom of this file for initSectionPage().
+   Edit data.js to change text/links/projects/pages. Edit this file to
+   change how the pages are built.
    ============================================================ */
 
-/* ---------- Small helper functions (same as script.js) ---------- */
+/* ---------- Small helper functions ---------- */
 
 function icon(name, cls) {
   const span = document.createElement('span');
@@ -66,7 +59,10 @@ function prefersReducedMotion() {
   return reducedMotionQuery.matches;
 }
 
-// ---------- Layout: transform instead of wrap (same as script.js) ----------
+// ---------- Layout: transform instead of wrap ----------
+// Channel boxes and their download columns stack instead of letting
+// text wrap mid-line; layoutChannelRow() picks the arrangement that
+// fits and is re-run whenever the row resizes.
 function headerWraps(header) {
   const label = header && header.querySelector('.channel-label');
   const group = header && header.querySelector('.channel-mc-group');
@@ -115,7 +111,7 @@ function setHashSilently(id) {
   return url;
 }
 
-// Small "copy link" button used on project titles (same as script.js).
+// Small "copy link" button used on project titles.
 function copyLinkButton(id, label) {
   const btn = el('button', {
     class: 'copy-link-btn',
@@ -159,7 +155,7 @@ function copyLinkButton(id, label) {
   return btn;
 }
 
-/* ---------- Page pieces (brand/footer identical to script.js) ---------- */
+/* ---------- Page pieces ---------- */
 
 function renderBrand(brand, topLinks) {
   const logo = document.getElementById('brand-logo');
@@ -326,18 +322,12 @@ function renderProject(p) {
     new ResizeObserver(() => layoutChannelRow(channelRow)).observe(channelRow);
   }
 
-  const versionText = (p.channels || [])
-    .flatMap(ch => [ch.mcVersion, ...(ch.downloads || []).map(d => d.version)])
-    .filter(Boolean)
-    .join(' ');
-  const searchText = [p.title, p.description, versionText].filter(Boolean).join(' ').toLowerCase();
-
   const titleRow = el('div', { class: 'project-title-row' }, [
     el('h3', { text: p.title }),
     copyLinkButton(id, p.title)
   ]);
 
-  return el('article', { class: 'project', attrs: { 'data-search': searchText, id } }, [
+  return el('article', { class: 'project', attrs: { id } }, [
     el('img', { class: 'project-image', src: p.image, alt: p.title, attrs: { loading: 'lazy' } }),
     el('div', { class: 'project-body' }, [
       titleRow,
@@ -351,10 +341,7 @@ function renderProject(p) {
 
 // Builds the sticky page-switcher bar: one link per page in
 // SITE_DATA.pages, with whichever one matches currentUrl shown as a
-// filled, non-clickable pill (reusing the main page's
-// .nav-jump-btn/.is-open look for its jump buttons) — in place of the
-// main page's same-page "jump to section" buttons, since each of
-// these pages only has one section to jump to.
+// filled, non-clickable pill.
 function renderPageNav(pages, currentUrl) {
   const nav = document.getElementById('page-nav');
   if (!nav || !pages || !pages.length) return;
@@ -384,7 +371,7 @@ function renderPageNav(pages, currentUrl) {
   nav.appendChild(row);
 
   // Keeps a linked/scrolled-to heading or project clear of this bar
-  // while it's sticky, same idea as the main page's own section-nav.
+  // while it's sticky.
   const syncScrollOffset = () => {
     const rect = nav.getBoundingClientRect();
     const navTop = parseFloat(getComputedStyle(nav).top) || 0;
@@ -399,13 +386,11 @@ function renderPageNav(pages, currentUrl) {
   }
 }
 
-// Builds this page's one section: a plain-text heading (no
-// collapse/expand — see the main page's <details>/<summary> +
-// Accordion class for the version this replaces) followed by its
-// project cards, same markup as the main catalog's .project-list.
+// Builds this page's one section: a heading with a project count,
+// followed by its project cards.
 function renderFlatSection(section) {
   const main = document.getElementById('catalog');
-  if (!main || !section) return [];
+  if (!main || !section) return;
 
   const id = assignSlug(section.heading, 'section');
   const count = el('span', {
@@ -413,17 +398,14 @@ function renderFlatSection(section) {
     text: String((section.projects || []).length)
   });
   const heading = el('h2', { class: 'flat-section-heading', attrs: { id } }, [
-    el('span', { class: 'heading-label', text: section.heading }),
+    el('span', { text: section.heading }),
     count
   ]);
 
-  const projectEls = section.projects.map(renderProject);
-  const list = el('div', { class: 'project-list' }, projectEls);
+  const list = el('div', { class: 'project-list' }, section.projects.map(renderProject));
 
   main.appendChild(heading);
   main.appendChild(list);
-
-  return projectEls;
 }
 
 function renderFooter(socials, footer, version) {
@@ -494,10 +476,8 @@ function initBackToTop() {
   });
 }
 
-// Since nothing on these pages is collapsible, a #project-id or
-// #section-id link just needs a scroll — no expanding required (unlike
-// handleDeepLink() on the main page, which has to open an accordion
-// section first).
+// Scrolls to a #project-id or #section-id link and briefly highlights
+// the project it points to.
 function handleDeepLink() {
   const id = decodeURIComponent(location.hash.slice(1));
   if (!id) return;
@@ -514,10 +494,11 @@ function handleDeepLink() {
   });
 }
 
-// Same idea as script.js's renderStructuredData(), scoped to just one
-// page's one section so search engines get an accurate JSON-LD
-// picture of what's actually on that page. Pass no section (null) to
-// describe every project instead — index.js does this for the home page.
+// Adds a JSON-LD <script> (an Organization plus a list of
+// SoftwareApplication entries) built from SITE_DATA, so search engines
+// get an accurate picture of what's on the page. Pass a section to
+// describe just that section's projects, or null to describe every
+// project (index.js does this for the home page).
 function renderStructuredData(data, section) {
   const canonical = document.querySelector('link[rel="canonical"]');
   const siteUrl = canonical ? canonical.href : location.origin + '/';

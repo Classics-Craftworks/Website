@@ -1,12 +1,12 @@
 /* ============================================================
    SITE DATA
    This is the primary file for updating site text, links and project lists.
-   The layout and rendering are managed automatically by script.js.
+   The layout and rendering are handled automatically by section-page.js and index.js.
 
    QUICK GUIDE:
    - Text & Links: Update values inside quotes (e.g., label, url).
    - Images: Place files in /images and set the relative path (e.g., "images/better-craftables.webp").
-   - Icons: Place webp files in /images/icons/ and refer to them by filename without extension.
+   - Icons: Place SVG files in /images/icons/ and refer to them by filename without extension.
    - Projects: Copy an existing project object block {...} inside the "projects" array to add a new project.
    - Channels: Each project supports "stable", "beta", "alpha", or "unsupported" channels. Add "disabled: true"
      to a download label if a build is unavailable. Optionally add a "tooltip" string alongside it to explain
@@ -21,9 +21,9 @@
      remove/reset by hand, so it's safe to just leave `badge: "new"` sitting on a channel across releases.
    ============================================================ */
 
-// This whole file is one big JavaScript object. script.js reads values
-// out of it (e.g. SITE_DATA.brand.name) to build the page — nothing in
-// here directly draws anything on screen by itself.
+// This whole file is one big JavaScript object. The page scripts read
+// values out of it (e.g. SITE_DATA.brand.name) to build each page —
+// nothing in here directly draws anything on screen by itself.
 const SITE_DATA = {
 
   // Logo, name and one-line tagline shown at the top of the page.
@@ -46,13 +46,11 @@ const SITE_DATA = {
     { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks" }
   ],
 
-  // Standalone single-section pages (e.g. data-packs-mods.html), plus
-  // the main catalog itself. Used to build the sticky page-nav bar on
-  // each of those pages — add an entry here (with the matching
-  // section heading below) whenever a new section gets its own page,
-  // and it shows up in every page's nav automatically. "All Projects"
-  // has no "section" since it's the full multi-section catalog, not a
-  // single flat section.
+  // Every page in the sticky page-nav bar: the home page plus one page
+  // per section. Add an entry here (with the matching section heading
+  // below) whenever a new section gets its own page, and it shows up
+  // in every page's nav automatically. "Home" has no "section" since
+  // it isn't tied to one.
   pages: [
     { label: "Home", url: "index.html" },
     { label: "Data Packs & Mods", url: "data-packs-mods.html", section: "Data Packs & Mods" },
@@ -327,7 +325,6 @@ const SITE_DATA = {
     // #region ▓▓▓▓▓▓▓▓▓▓▓▓  OTHER PROJECTS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Other Projects",
-      defaultOpen: false,
       projects: [
         // #region ──────── CraftHorizon ────────
         {

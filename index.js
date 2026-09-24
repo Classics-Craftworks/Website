@@ -1,9 +1,8 @@
 /* ============================================================
    HOME PAGE
 
-   Replaces the old all-in-one catalog with one big button per
-   section (Data Packs & Mods, Resource Packs, Other Projects). Each
-   button links to that section's own page and shows the section's
+   One big button per section (Data Packs & Mods, Resource Packs,
+   Other Projects). Each button links to that section's own page and shows the section's
    first four project icons in slots 1–4 (left to right, top to
    bottom). The icons are decoration only — the whole button is the
    one link.
