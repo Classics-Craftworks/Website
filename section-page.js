@@ -2,7 +2,9 @@
    SECTION PAGE — SHARED RENDER SCRIPT
 
    Shared by every standalone single-section page (data-packs-mods.html,
-   resource-packs.html, other-projects.html, and any future ones). It
+   resource-packs.html, other-projects.html, and any future ones), and
+   by the home page (index.html) for its brand/nav/footer helpers —
+   the home page's own big buttons live in index.js. It
    reads the same SITE_DATA (data.js) and reuses the exact same
    brand/footer/project/channel rendering as the main catalog
    (script.js), so these pages always look and behave identically to
@@ -507,7 +509,8 @@ function handleDeepLink() {
 
 // Same idea as script.js's renderStructuredData(), scoped to just one
 // page's one section so search engines get an accurate JSON-LD
-// picture of what's actually on that page.
+// picture of what's actually on that page. Pass no section (null) to
+// describe every project instead — index.js does this for the home page.
 function renderStructuredData(data, section) {
   const canonical = document.querySelector('link[rel="canonical"]');
   const siteUrl = canonical ? canonical.href : location.origin + '/';
@@ -523,7 +526,13 @@ function renderStructuredData(data, section) {
     sameAs: [...(data.topLinks || []), ...(data.socials || [])].map(l => l.url)
   };
 
-  const items = (section?.projects || []).map(project => {
+  // One section's projects on a section page, or every section's on the
+  // home page (which passes no section).
+  const projects = section
+    ? (section.projects || [])
+    : (data.sections || []).flatMap(s => s.projects || []);
+
+  const items = projects.map(project => {
     const channels = project.channels || [];
     const stable = channels.find(c => (c.channel || '').toLowerCase() === 'stable') || channels[0];
     const firstDownload = stable && (stable.downloads || []).find(d => d.url && !d.disabled);

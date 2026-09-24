@@ -692,6 +692,107 @@ p { margin: 0; }
   margin-left: 0;
 }
 
+/* ---------- Home page: section buttons ---------- */
+/* index.js builds one of these per section — a big button that links
+   to that section's page, showing its first four project icons above
+   its name. The icons are decoration; the whole card is the link.
+
+   Everything inside a card is sized in cqi (1% of the card's own
+   width, via container-type below), so a card looks the same at any
+   width — icons, type and spacing all just scale together. */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.home-card {
+  display: block;
+  container-type: inline-size;
+  border-radius: 16px;
+  border: 1px solid rgba(var(--white-rgb), 0.05);
+  background: var(--surface);
+  color: var(--text);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+.home-card:hover {
+  background: color-mix(in srgb, var(--surface), var(--nav-accent) 8%);
+  border-color: var(--nav-btn-hover-border);
+}
+.home-card:active { transform: scale(0.99); }
+
+/* Padding lives here rather than on .home-card, because cqi units
+   resolve against an *ancestor* container — .home-card can't size its
+   own padding by its own width. */
+.home-card-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 6cqi 6cqi 7cqi;
+}
+
+/* The four icons, numbered 1–4 left to right, top to bottom. */
+.home-slots {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6cqi 1cqi; /* top/bottom, left/right */
+  justify-items: center;
+}
+.home-slot {
+  display: block;
+  width: 85%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 12%;
+  background: var(--bg);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* Unused slot (a section with fewer than four projects): faint
+   dashed outline so the card keeps its shape without looking broken. */
+.home-slot-empty {
+  border: 1px dashed rgba(var(--border-rgb), 0.6);
+  background: transparent;
+}
+
+.home-card-title {
+  display: block;
+  margin-top: auto; /* pins the name to the bottom of every card, however tall the row ends up */
+  padding-top: 8cqi;
+  font-family: 'Minercraftory', var(--font);
+  font-weight: 500;
+  font-size: min(9.2cqi, 3.6rem);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere; /* last-resort safety so a very long word can't push the card wider */
+}
+
+/* One button per row on phones/small tablets. The four icons move
+   into a single row so each button stays short instead of three
+   tall cards stacked on top of each other. */
+@media (max-width: 850px) {
+  .home-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .home-slots {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3cqi;
+  }
+  .home-card-inner {
+    padding: 3cqi;
+  }
+  .home-card-title {
+    padding-top: 6cqi;
+    font-size: min(7cqi, 2.1rem);
+  }
+}
+
 .project-list {
   display: flex;
   flex-direction: column;
@@ -1594,6 +1695,7 @@ p { margin: 0; }
   .project-links a:active,
   .top-link:active,
   .social-link:active,
+  .home-card:active,
   .catalog-section > summary:active .heading-label {
     transform: none;
   }

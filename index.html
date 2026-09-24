@@ -32,16 +32,15 @@
 <body>
 
 <!-- First focusable element on the page, so keyboard users can jump
-     straight past the header, primary links, and sticky section-nav
-     (jump buttons + search box) to the project catalog instead of
-     tabbing through all of it first. Hidden until it receives focus
-     (see .skip-link in styles.css). Works even with JS disabled,
-     since it's a plain #catalog fragment link. -->
+     straight past the header and page-switcher nav bar to the section
+     buttons instead of tabbing through all of it first. Hidden until it
+     receives focus (see .skip-link in styles.css). Works even with JS
+     disabled, since it's a plain #catalog fragment link. -->
 <a href="#catalog" class="skip-link">Skip to projects</a>
 
 <!-- Static fallback shown only when JavaScript is disabled/blocked.
      Everything else on this page — brand name/tagline/logo, nav links,
-     the project catalog, footer — is built by script.js from data.js,
+     the section buttons, footer — is built by index.js from data.js,
      so without JS the rest of the page stays completely blank. Keep
      the name/tagline/links here roughly in sync with data.js's brand
      and topLinks if those ever change. -->
@@ -69,17 +68,19 @@
     <nav id="top-links" class="link-row" aria-label="Primary links"></nav>
   </header>
 
-  <!-- Sticky sub-nav: jump-to-section buttons, expand/collapse-all, and a
-       live search box. Built entirely by renderSectionNav() in script.js
-       once the sections/data are known — this stays empty otherwise. -->
-  <nav id="section-nav" class="section-nav" aria-label="Section navigation"></nav>
+  <!-- Sticky page-switcher bar, identical to the one on the section
+       pages (data-packs-mods.html etc.): Home plus one link per section
+       page, with the current page shown as the filled pill. Built by
+       renderPageNav() in section-page.js from SITE_DATA.pages in
+       data.js. -->
+  <nav id="page-nav" class="section-nav page-nav" aria-label="Site pages"></nav>
 
-  <!-- This <main> starts empty on purpose — script.js fills it in with
-       every section/project card once the page loads, using the content
-       from data.js. If JavaScript is disabled, this area stays blank.
-       tabindex="-1" lets the skip link above move keyboard focus here
-       (not just scroll to it), without adding it to the normal Tab
-       order. -->
+  <!-- Starts empty on purpose — index.js fills it with one big button
+       per section (icons of that section's first four projects + its
+       name), using the content from data.js. If JavaScript is disabled,
+       this area stays blank. tabindex="-1" lets the skip link above
+       move keyboard focus here (not just scroll to it), without adding
+       it to the normal Tab order. -->
   <main id="catalog" tabindex="-1"></main>
 
   <footer class="site-footer">
@@ -92,13 +93,14 @@
 
   <!-- Fixed-position button that fades in once you've scrolled down a bit
        (see .back-to-top in styles.css) and scrolls back to the top when
-       clicked (see initBackToTop() in script.js). Its position in the DOM
+       clicked (see initBackToTop() in section-page.js). Its position in the DOM
        doesn't matter since it's positioned via CSS, not page flow. -->
   <button id="back-to-top" class="back-to-top" type="button" aria-label="Back to top" data-tooltip="Back to top"></button>
 
 </div>
 
 <script src="data.js" defer></script>
-<script src="script.js" defer></script>
+<script src="section-page.js" defer></script>
+<script src="index.js" defer></script>
 </body>
 </html>
