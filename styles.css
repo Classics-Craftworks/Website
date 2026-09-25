@@ -1245,17 +1245,34 @@ p { margin: 0; }
   color: var(--accent);
 }
 
-/* Briefly highlights a project after jumping to it via a direct link,
-   so it's clear which card the link pointed to. Skipped for anyone
-   who's asked for reduced motion. */
+/* Briefly highlights a project after jumping to it via a direct link
+   (including picking a search result), so it's clear which card the
+   link pointed to. Drawn as a separate ::before rather than a
+   box-shadow directly on .project, and pulled outward with a negative
+   inset, so the ring sits with a small gap around the project instead
+   of running flush along its image and along the page's edge — the
+   -6px inset matches the buffer #catalog already reserves around
+   itself further down this file, so the ring has room to breathe
+   without being clipped. Skipped for anyone who's asked for reduced
+   motion. */
+.is-linked-target {
+  position: relative;
+}
+.is-linked-target::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 14px;
+  pointer-events: none;
+}
 @media (prefers-reduced-motion: no-preference) {
-  .is-linked-target {
+  .is-linked-target::before {
     animation: linked-target-pulse 2s ease-out;
   }
 }
 @keyframes linked-target-pulse {
-  0%   { box-shadow: 0 0 0 2px var(--accent); border-radius: 12px; }
-  100% { box-shadow: 0 0 0 2px transparent; border-radius: 12px; }
+  0%   { box-shadow: 0 0 0 2px var(--accent); }
+  100% { box-shadow: 0 0 0 2px transparent; }
 }
 
 /* ---------- Footer ---------- */
@@ -1532,6 +1549,21 @@ p { margin: 0; }
   padding-right: 6px;
   margin-left: -6px;
   margin-right: -6px;
+}
+
+/* #catalog specifically needs a bigger buffer than the shared 6px
+   above: the project highlight ring (.is-linked-target::before, near
+   the top of this file) sits 6px outside a project's own edges plus
+   another 2px for the ring itself, so it needs about 8px of clipping
+   room. This overrides the 6px from the shared rule just for #catalog,
+   with a couple of spare pixels, while padding and margin still cancel
+   out the same way so nothing shifts visually. */
+#catalog {
+  max-width: calc(100% + 20px);
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: -10px;
+  margin-right: -10px;
 }
 
 /* Turns off the little "press" shrink effect for anyone who's asked
