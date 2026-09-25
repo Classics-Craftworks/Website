@@ -314,7 +314,7 @@ p { margin: 0; }
   justify-content: space-between;
   gap: 12px;
   padding: 14px 32px;
-  border-radius: 24px;
+  border-radius: 14px;
   background: var(--nav-bg);
   border: 1px solid var(--nav-btn-border);
   box-shadow: var(--nav-shadow);
@@ -389,7 +389,7 @@ p { margin: 0; }
   -webkit-appearance: none;
   appearance: none;
   border: 1px solid var(--nav-btn-border);
-  border-radius: 6px;
+  border-radius: 16px;
   background: var(--surface);
   color: var(--text);
   font: inherit;
