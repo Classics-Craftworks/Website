@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.0.0-dev.6 — 2026/09/25
+
+### Visual Refresh (V2)
+- New blue theme
+- Switched Unsupported channel colour from blue to grey
+- Icons added to nav bar buttons
+- Less rounded nav bar
+- More rounded search box
+- Moved the nav bar down slightly when stuck to the top of the page
+
 ## v2.0.0-dev.5 — 2026/09/25
 
 ### Added
