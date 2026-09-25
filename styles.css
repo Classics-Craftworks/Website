@@ -693,10 +693,10 @@ p { margin: 0; }
 /* One button per row on phones/small tablets. The four icons move
    into a single row so each button stays short instead of three
    tall cards stacked on top of each other. Shares the site-wide
-   870px "collapse to mobile" breakpoint (see the nav bar and
+   890px "collapse to mobile" breakpoint (see the nav bar and
    masthead below) so every part of the header switches to its
    stacked layout together instead of at three different widths. */
-@media (max-width: 870px) {
+@media (max-width: 890px) {
   .home-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 16px;
@@ -1423,9 +1423,9 @@ p { margin: 0; }
 }
 
 /* ---------- Responsive ---------- */
-/* Below 870px the header and nav bar switch to their stacked, mobile
+/* Below 890px the header and nav bar switch to their stacked, mobile
    layouts together, at one shared breakpoint. */
-@media (max-width: 870px) {
+@media (max-width: 890px) {
   .section-nav {
     flex-direction: column;
     align-items: stretch;
@@ -1473,7 +1473,7 @@ p { margin: 0; }
   }
 }
 
-@media (max-width: 870px) {
+@media (max-width: 890px) {
   /* One centered column: logo, then title/tagline, then the link row. */
   .masthead {
     grid-template-columns: 1fr;
