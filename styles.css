@@ -28,14 +28,14 @@
   --text-soft:     #8f9bb3; /* secondary text */
 
   /* Accent & Borders */
-  --accent:        #75d2f9; /* primary accent - used for keyboard selections */
+  --accent:        #74c4e7; /* primary accent, used for keyboard selections. */
   --border:        #233044; /* hairline borders/dividers */
   --border-rgb:    35, 48, 68;
   --white-rgb:     255, 255, 255; /* used for translucent white fills/borders (nav) */
 
   /* Nav Controls & Glow Accent */
-  --nav-accent:           #3db4e7;
-  --nav-accent-rgb:       61, 180, 231;
+  --nav-accent:           #41a0c8;
+  --nav-accent-rgb:       65, 160, 200;
   --nav-btn-rgb:          var(--nav-accent-rgb);
 
   --nav-btn-bg:           rgba(var(--nav-btn-rgb), 0.12);
@@ -48,7 +48,7 @@
 
   /* Nav Bar Shadow & Background */
   --nav-bg:      rgba(15, 22, 35);
-  --nav-border:  rgba(56, 189, 248, 0.25);
+  --nav-border:  rgba(var(--nav-accent-rgb), 0.25);
   --nav-shadow:  
     0 10px 30px -5px rgba(0, 0, 0, 0.5),
     0 0 0 1px var(--nav-border);
@@ -79,8 +79,8 @@
   --alpha-border:  0.25;  /* dividers/borders on tinted surfaces */
   --alpha-light:   0.2;   /* faint borders on tinted surfaces */
   --alpha-medium:  0.4;   /* stronger borders */
-  --alpha-bold:    0.6;   /* muted text, "unavailable" state */
-  --alpha-strong:  0.65;  /* muted text on tinted surfaces */
+  --alpha-bold:    0.88;  /* muted text, "unavailable" state */
+  --alpha-strong:  0.92;  /* muted text on tinted surfaces */
 
 /* Fonts */
   --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -594,15 +594,14 @@ p { margin: 0; }
 .home-card {
   display: block;
   container-type: inline-size;
-  border-radius: 16px;
-  border: 1px solid rgba(var(--white-rgb), 0.05);
+  border-radius: 18px;
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.3);
   background: var(--surface);
   color: var(--text);
   transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
 .home-card:hover {
-  background: color-mix(in srgb, var(--surface), var(--nav-accent) 8%);
-  border-color: var(--nav-btn-hover-border);
+  border-color: rgba(var(--nav-accent-rgb), 0.7);
 }
 .home-card:active { transform: scale(0.99); }
 
@@ -613,42 +612,120 @@ p { margin: 0; }
   display: flex;
   flex-direction: column;
   height: 100%;
-  /* Top/bottom padding sized up from the left/right value on purpose
-   — with the icons shrunk below and the title pinned to the bottom
-   via margin-top: auto, this is what actually opens up the breathing
-   room above the icon row and below the title. */
-  padding: 10cqi 6cqi 11cqi;
+  padding: 6cqi 9cqi 11cqi;
+}
+
+/* Small "N PROJECTS" label with a box icon, top-left of the card. */
+.home-card-badge {
+  display: flex;
+  align-items: center;
+  gap: 2.4cqi;
+  margin-bottom: 4cqi;
+  color: var(--nav-accent);
+  font-size: min(3.4cqi, 0.9rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.home-card-badge .icon {
+  width: 1.35em;
+  height: 1.35em;
+}
+
+/* Section title plus the "go to this section" arrow, on one row so
+   the arrow sits at the card's trailing edge next to the heading. */
+.home-card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4cqi;
+  margin-bottom: 6cqi;
+}
+.home-card-title {
+  display: block;
+  font-family: 'Minercraftory', var(--font);
+  font-weight: 500;
+  font-size: min(6.2cqi, 2.6rem);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  /* break-word (not anywhere): anywhere also changes this flex child's
+     automatic minimum width, letting the row shrink it down to almost
+     nothing and wrap word-by-word/letter-by-letter instead of balancing
+     normally. break-word keeps the same "don't let one giant word blow
+     out the card" safety net without that side effect. */
+  overflow-wrap: break-word;
+}
+/* Modifier for headings too long to share the other cards' full title
+   size on one line ("Data Packs & Mods" vs "Resource Packs"): scaled
+   up as close to the shared size as still fits on one line at this
+   card width, with a little less tracking to help it fit. text-wrap:
+   balance above still wraps it cleanly if a viewport is too narrow
+   even for this size, so nothing overflows the card. Reset back to
+   the shared mobile size in the stacked single-column layout below,
+   where every card is wide enough that this isn't needed. */
+.home-card-title--tight {
+  font-size: min(5.8cqi, 2.4rem);
+  letter-spacing: 0;
+}
+/* Pairs with .home-card-title--tight: closes up the gap to the arrow
+   a bit so the larger tight title has the room it needs. */
+.home-card-title-row--tight {
+  gap: 2cqi;
+}
+/* Drawn as a rotated corner (same "shape out of borders" trick as the
+   "+" on the overflow tile below) rather than an image, so it's just
+   two lines and needs no extra icon asset. */
+.home-card-arrow {
+  flex-shrink: 0;
+  width: min(3.2cqi, 1rem);
+  height: min(3.2cqi, 1rem);
+  border-top: 0.16em solid var(--nav-accent);
+  border-right: 0.16em solid var(--nav-accent);
+  transform: rotate(45deg);
+  transition: transform var(--transition-fast);
+}
+.home-card:hover .home-card-arrow {
+  transform: rotate(45deg) translate(12%, -12%);
 }
 
 /* The four icons, numbered 1–4 left to right, top to bottom.
-   Columns are exactly one icon wide (30cqi, about what the old
-   70%-of-a-column icons measured) and centered, so the gap between
-   the two columns is the same 5cqi as the gap between the two rows,
-   instead of the icons floating apart in the middle of two wide
-   columns. */
+   Columns are exactly one icon wide (36cqi, sized up from the plainer
+   30cqi tiles so the icons read clearly instead of floating small in
+   the middle of the card) and centered, so the gap between the two
+   columns matches the 6cqi gap between the two rows, instead of the
+   icons floating apart in the middle of two wide columns. */
 .home-slots {
   display: grid;
-  grid-template-columns: repeat(2, 30cqi);
+  grid-template-columns: repeat(2, 36cqi);
   justify-content: center;
-  gap: 5cqi;
+  gap: 6cqi;
   justify-items: center;
+  margin-top: auto; /* keeps the icon row pinned to the bottom, however tall the header above ends up */
 }
 .home-slot {
   display: block;
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
-  border: 1px solid var(--border);
-  border-radius: 12%;
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.35);
+  border-radius: 10%; /* square-ish corners rather than the old rounder tile */
   background: var(--bg);
+  box-shadow: 0 0 0 1px rgba(var(--nav-accent-rgb), 0.06) inset;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   user-select: none;
   -webkit-user-drag: none;
+}
+.home-card:hover .home-slot {
+  border-color: rgba(var(--nav-accent-rgb), 0.75);
 }
 /* Unused slot (a section with fewer than four projects): faint
    dashed outline so the card keeps its shape without looking broken. */
 .home-slot-empty {
   border: 1px dashed rgba(var(--border-rgb), 0.6);
   background: transparent;
+  box-shadow: none;
 }
 /* Last slot of a section with more projects than fit: a "+X" tile
    counting the ones not shown. */
@@ -674,21 +751,6 @@ p { margin: 0; }
     linear-gradient(currentColor, currentColor) center / 0.18em 100% no-repeat;
 }
 
-.home-card-title {
-  display: block;
-  margin-top: auto; /* pins the name to the bottom of every card, however tall the row ends up */
-  padding-top: 12cqi;
-  font-family: 'Minercraftory', var(--font);
-  font-weight: 500;
-  font-size: min(6.6cqi, 2.9rem);
-  line-height: 1.25;
-  letter-spacing: 0.02em;
-  text-align: center;
-  text-transform: uppercase;
-  text-wrap: balance;
-  overflow-wrap: anywhere; /* last-resort safety so a very long word can't push the card wider */
-}
-
 /* One button per row on phones/small tablets. The four icons move
    into a single row so each button stays short instead of three
    tall cards stacked on top of each other. Shares the site-wide
@@ -705,17 +767,30 @@ p { margin: 0; }
     gap: 3cqi;
   }
   .home-slot {
-    width: 70%; /* back to the smaller icon inside each of the four columns */
+    width: 78%;
   }
   .home-slot-more {
-    font-size: 5cqi; /* scaled down with the smaller slot */
+    font-size: 5cqi;
   }
   .home-card-inner {
-    padding: 4cqi 3cqi 5cqi; /* a bit more top/bottom than left/right, same idea as the desktop layout above */
+    padding: 6cqi 5cqi 6cqi;
   }
-  .home-card-title {
-    padding-top: 5cqi;
+  .home-card-badge {
+    font-size: min(3.6cqi, 0.85rem);
+    margin-bottom: 4cqi;
+  }
+  .home-card-title-row,
+  .home-card-title-row--tight {
+    margin-bottom: 6cqi;
+    gap: 4cqi;
+  }
+  .home-card-title,
+  .home-card-title--tight {
+    /* Every card is nearly full viewport width here, so even the
+       longest heading has plenty of room — reset to the same shared
+       size instead of staying artificially small. */
     font-size: min(6cqi, 1.9rem); /* shrunk to match the smaller icons */
+    letter-spacing: 0.02em;
   }
 }
 

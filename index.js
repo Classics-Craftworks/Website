@@ -74,9 +74,39 @@ function renderHomeButton(section, page) {
   a.href = page.url;
   if (names.length) a.setAttribute('aria-describedby', descId);
 
+  // "N PROJECTS" label, top-left of the card, with an icon matching
+  // the section's own content (data.js's per-section "icon" field —
+  // e.g. "brackets" for data packs, "brush" for resource packs,
+  // "wrench" for other projects). Reuses the same icons already
+  // shipped for the download-type labels elsewhere on the site, so it
+  // needs no new icon assets; falls back to "box" if a section is
+  // missing one.
+  const badge = el('span', { class: 'home-card-badge' }, [
+    icon(section.icon || 'box', 'icon-sm'),
+    document.createTextNode(allProjects.length + ' PROJECT' + (allProjects.length === 1 ? '' : 'S'))
+  ]);
+
+  // Section title with a small arrow after it, showing this whole
+  // card leads somewhere (drawn in CSS — see .home-card-arrow). Longer
+  // headings (e.g. "Data Packs & Mods") get a size-down modifier class
+  // so they still fit on one line at the same width the shorter
+  // headings use at full size, instead of wrapping. text-wrap: balance
+  // still wraps it gracefully if a very narrow viewport can't fit it
+  // even at the smaller size. The row also gets a tighter modifier so
+  // the extra characters can sit closer to the arrow instead of
+  // needing the same gap the short headings use.
+  const isLong = section.heading.length > 15;
+  const titleClass = isLong ? 'home-card-title home-card-title--tight' : 'home-card-title';
+  const rowClass = isLong ? 'home-card-title-row home-card-title-row--tight' : 'home-card-title-row';
+  const titleRow = el('span', { class: rowClass }, [
+    el('span', { class: titleClass, text: section.heading }),
+    el('span', { class: 'home-card-arrow', attrs: { 'aria-hidden': 'true' } })
+  ]);
+
   a.appendChild(el('span', { class: 'home-card-inner' }, [
+    badge,
+    titleRow,
     el('span', { class: 'home-slots' }, slots),
-    el('span', { class: 'home-card-title', text: section.heading }),
     description
   ]));
 

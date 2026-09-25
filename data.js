@@ -65,6 +65,7 @@ const SITE_DATA = {
     // #region ▓▓▓▓▓▓▓▓▓▓▓▓  DATA PACKS & MODS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Data Packs & Mods",
+      icon: "brackets",
       projects: [
         // Each object in this "projects" array becomes one project card
         // on the page. Copy an entire { ... } block like this one and
@@ -204,6 +205,7 @@ const SITE_DATA = {
     // #region ▓▓▓▓▓▓▓▓▓▓▓▓  RESOURCE PACKS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Resource Packs",
+      icon: "brush",
       projects: [
         // #region ──────── Classic's Disc Tweaks ────────
         {
@@ -325,6 +327,7 @@ const SITE_DATA = {
     // #region ▓▓▓▓▓▓▓▓▓▓▓▓  OTHER PROJECTS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Other Projects",
+      icon: "wrench",
       projects: [
         // #region ──────── CraftHorizon ────────
         {
