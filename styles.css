@@ -18,6 +18,12 @@
 /* Named colors/values reused throughout the file. Change one here and
    it updates everywhere it's used. */
 :root {
+  /* The site is always dark, regardless of the visitor's OS setting, so
+     tell the browser rather than let it guess: this keeps browser-drawn
+     UI (scrollbars, form controls, autofill) dark instead of defaulting
+     to light on top of our own dark colors below. */
+  color-scheme: dark;
+
   --bg:            #18181B;  /* page background */
   --surface:       #27272A;  /* thumbnails, chips, panel backgrounds */
   --surface-hover: #3F3F46;  /* hover state for surfaces above */
