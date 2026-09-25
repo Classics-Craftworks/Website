@@ -773,16 +773,17 @@ p { margin: 0; }
     font-size: 5cqi;
   }
   .home-card-inner {
-    padding: 6cqi 5cqi 6cqi;
+    padding: 20px 18px 22px;
   }
   .home-card-badge {
-    font-size: min(3.6cqi, 0.85rem);
-    margin-bottom: 4cqi;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
   }
   .home-card-title-row,
   .home-card-title-row--tight {
-    margin-bottom: 6cqi;
-    gap: 4cqi;
+    justify-content: flex-start;
+    margin-bottom: 14px;
+    gap: 8px;
   }
   .home-card-title,
   .home-card-title--tight {
