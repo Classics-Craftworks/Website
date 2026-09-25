@@ -63,8 +63,8 @@
   --ch-alpha:      #F2607E;  /* alpha channel */
   --ch-alpha-rgb:  242, 96, 126;
 
-  --ch-unsupported:      #5C96DE;  /* unsupported channel */
-  --ch-unsupported-rgb:  92, 150, 222;
+  --ch-unsupported:      #929292;  /* unsupported channel */
+  --ch-unsupported-rgb:  146, 146, 146;
 
   --badge-color:      #efdd65;  /* "new"/"updated" channel badge */
   --badge-color-rgb:  239, 221, 101;
