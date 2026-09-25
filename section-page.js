@@ -2,11 +2,12 @@
    SHARED RENDER SCRIPT
 
    Loaded by every page. It reads SITE_DATA (data.js) and builds the
-   brand header, page nav, project cards and footer. The home page's
-   own section buttons live in index.js, the nav bar's search box in
-   search.js; each section page just calls
-   initSectionPage() from its own tiny script (see the bottom of this
-   file), and the 404 page calls renderBrand()/renderFooter() from
+   brand header, page nav, project cards and footer. A section page
+   (data-packs-mods.html etc.) marks itself with a data-page attribute
+   on <body>, which this file reads at the bottom to build that page
+   automatically — see initSectionPage() below. The home page's own
+   section buttons live in index.js and the nav bar's search box in
+   search.js; the 404 page calls renderBrand()/renderFooter() from
    not-found.js.
 
    Edit data.js to change text/links/projects/pages. Edit this file to
@@ -568,13 +569,20 @@ function renderStructuredData(data, section) {
 }
 
 /* ---------- Entry point ----------
-   Each section page's own tiny script calls this with its own
-   filename (matching a "url" in SITE_DATA.pages, see data.js), e.g.:
+   A section page (data-packs-mods.html, resource-packs.html,
+   other-projects.html) marks itself with a data-page attribute on
+   <body>, matching its own "url" in SITE_DATA.pages (see data.js):
 
-     initSectionPage('data-packs-mods.html');
+     <body data-page="data-packs-mods.html">
 
-   That's the only thing that differs between these pages — everything
-   above is shared. */
+   That attribute is the only thing that differs between these pages'
+   markup — everything else, including this file, is shared. The home
+   page and 404 page have no data-page, so this runs only where it's
+   needed. */
+if (document.body.dataset.page) {
+  initSectionPage(document.body.dataset.page);
+}
+
 function initSectionPage(pageUrl) {
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
 
