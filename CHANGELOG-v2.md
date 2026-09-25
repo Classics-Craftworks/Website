@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.0.0-dev.5 — 2026/09/25
+
+### Added
+- The word "provided" to the link icon credits in the footer
+
+### Changed
+- "Go Back" button on 404 page to "Go Home"
+- Forced browser to use dark colour scheme
+- Title font is now pre-loaded
+- Updated sitemap
+- Reduced the size of the X icon
+- Increased the size of the Download icon
+
+### Fixed
+- Highlighted border overlapping with content when selecting a search result
+
+### Removed
+- Per-page scripts
+
 ## v2.0.0-dev.4 — 2026/09/24
 
 ### Added
