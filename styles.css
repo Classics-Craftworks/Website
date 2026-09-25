@@ -1204,6 +1204,11 @@ p { margin: 0; }
 /* Slightly smaller icon size, just for social buttons. */
 .social-link .icon-md { width: 17px; height: 17px; }
 
+/* Slightly bigger than the shared 15px icon-sm, just for the Download
+   button's own icon, since it's the largest/most prominent button on
+   a project card. */
+.download-btn .icon-sm { width: 18px; height: 18px; }
+
 /* ---------- Deep-linking ("copy link" buttons) ---------- */
 /* Small button for copying a direct link. Always visible (not just
    on hover), so it works for keyboard and touch too. */
