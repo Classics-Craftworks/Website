@@ -18,38 +18,37 @@
 /* Named colors/values reused throughout the file. Change one here and
    it updates everywhere it's used. */
 :root {
-  /* The site is always dark, regardless of the visitor's OS setting, so
-     tell the browser rather than let it guess: this keeps browser-drawn
-     UI (scrollbars, form controls, autofill) dark instead of defaulting
-     to light on top of our own dark colors below. */
   color-scheme: dark;
 
-  --bg:            #18181B;  /* page background */
-  --surface:       #27272A;  /* thumbnails, chips, panel backgrounds */
-  --surface-hover: #3F3F46;  /* hover state for surfaces above */
-  --text:          #F4F4F5;  /* primary text */
-  --text-soft:     #AFAFB8;  /* secondary text */
-  --accent:        #2ff9f3;  /* primary accent - used for keyboard selections */
-  --border:        #4E4E58;  /* hairline borders/dividers */
-  --border-rgb:    78, 78, 88;
-  --white-rgb:     255, 255, 255;  /* used for translucent white fills/borders (nav) */
+  /* Base & Surface Colors */
+  --bg:            #0d111a; /* page background */
+  --surface:       #131a27; /* thumbnails, chips, panel backgrounds */
+  --surface-hover: #1c2638; /* hover state for surfaces above */
+  --text:          #f4f6fa; /* primary text */
+  --text-soft:     #8f9bb3; /* secondary text */
 
-/* Nav Button & Controls Colors */
-  --nav-accent:           #7DA6E0;
-  --nav-accent-rgb:       125, 166, 224;
+  /* Accent & Borders */
+  --accent:        #75d2f9; /* primary accent - used for keyboard selections */
+  --border:        #233044; /* hairline borders/dividers */
+  --border-rgb:    35, 48, 68;
+  --white-rgb:     255, 255, 255; /* used for translucent white fills/borders (nav) */
+
+  /* Nav Controls & Glow Accent */
+  --nav-accent:           #3db4e7;
+  --nav-accent-rgb:       61, 180, 231;
   --nav-btn-rgb:          var(--nav-accent-rgb);
 
-  --nav-btn-bg:           rgba(var(--nav-btn-rgb), 0.08);
-  --nav-btn-border:       rgba(var(--nav-btn-rgb), 0.25);
-  --nav-btn-hover-bg:     rgba(var(--nav-btn-rgb), 0.18);
-  --nav-btn-hover-border: rgba(var(--nav-btn-rgb), 0.50);
+  --nav-btn-bg:           rgba(var(--nav-btn-rgb), 0.12);
+  --nav-btn-border:       rgba(var(--nav-btn-rgb), 0.35);
+  --nav-btn-hover-bg:     rgba(var(--nav-btn-rgb), 0.25);
+  --nav-btn-hover-border: rgba(var(--nav-btn-rgb), 0.65);
 
   --nav-btn-active-bg:     var(--nav-accent);
   --nav-btn-active-text:   var(--bg);
 
-/* Nav Bar Shadow & Background */
-  --nav-bg:      color-mix(in srgb, var(--bg, #121318), white 5%);
-  --nav-border:  rgba(255, 255, 255, 0.08);
+  /* Nav Bar Shadow & Background */
+  --nav-bg:      rgba(15, 22, 35);
+  --nav-border:  rgba(56, 189, 248, 0.25);
   --nav-shadow:  
     0 10px 30px -5px rgba(0, 0, 0, 0.5),
     0 0 0 1px var(--nav-border);
