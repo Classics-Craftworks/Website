@@ -601,6 +601,7 @@ p { margin: 0; }
   transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
 .home-card:hover {
+  background: var(--surface-hover);
   border-color: rgba(var(--nav-accent-rgb), 0.7);
 }
 .home-card:active { transform: scale(0.99); }
@@ -1719,6 +1720,9 @@ img, svg {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
+  border: 1px solid var(--nav-btn-active-bg);
+  background: var(--nav-btn-active-bg);
+  box-shadow: var(--nav-shadow);
   cursor: pointer;
   opacity: 0;
   transform: translateY(8px);
