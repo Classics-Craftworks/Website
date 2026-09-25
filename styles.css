@@ -304,7 +304,7 @@ p { margin: 0; }
   /* Keeps the sticky offset itself clear of a notch/Dynamic Island —
    matters in standalone/PWA mode where there's no browser chrome
    already pushing content down. 0px on ordinary devices. */
-  top: calc(4px + env(safe-area-inset-top));
+  top: calc(6px + env(safe-area-inset-top));
   margin-top: 8px;
   z-index: 30;
   display: flex;
