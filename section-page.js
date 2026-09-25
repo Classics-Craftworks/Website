@@ -361,9 +361,11 @@ function renderPageNav(pages, currentUrl) {
       // readers this is the active page, same as a normal site nav.
       row.appendChild(el('span', {
         class: 'nav-jump-btn is-open',
-        text: p.label,
         attrs: { 'aria-current': 'page' }
-      }));
+      }, [
+        icon(p.icon, 'icon-sm'),
+        el('span', { text: p.label })
+      ]));
       return;
     }
     // Built by hand rather than via el()'s href shortcut — that
@@ -372,8 +374,9 @@ function renderPageNav(pages, currentUrl) {
     // navigation should stay in the same tab.
     const a = document.createElement('a');
     a.className = 'nav-jump-btn';
-    a.textContent = p.label;
     a.href = p.url;
+    a.appendChild(icon(p.icon, 'icon-sm'));
+    a.appendChild(el('span', { text: p.label }));
     row.appendChild(a);
   });
   nav.appendChild(row);

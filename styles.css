@@ -295,6 +295,8 @@ p { margin: 0; }
   align-items: center;
 }
 
+.nav-jump-btn { gap: 7px; }
+
 /* ---------- Page nav ---------- */
 /* The row of page links, sticky at the top of the screen while
    scrolling (built by renderPageNav() in section-page.js). */
