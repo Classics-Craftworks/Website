@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.0.1 — 2026/09/26
+
+### Fixed
+- Nav bar icons using generic link icon instead of page-specific ones
+- Nav bar buttons directing to .html pages
+
 ## v2.0.0 — 2026/09/26
 
 ### Added
