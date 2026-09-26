@@ -344,6 +344,37 @@ function renderProject(p) {
   ]);
 }
 
+// Returns true if any project on `page` (matched via its "section"
+// field to SITE_DATA.sections) has a channel with an undismissed
+// "New"/"Updated" badge.
+function pageHasUndismissedBadge(page) {
+  const section = (SITE_DATA.sections || []).find(s => s.heading === page.section);
+  if (!section) return false;
+
+  const slugs = new Set();
+  return (section.projects || []).some(p => {
+    const projectId = uniqueSlug(p.title, 'project', slugs);
+    return (p.channels || []).some(ch => {
+      if (!ch.badge) return false;
+      const channelKey = (ch.channel || 'stable').toLowerCase();
+      const versionFingerprint = (ch.downloads || [])
+        .map(d => d.version || 'N/A')
+        .join('|');
+      const dismissedVersion = storageGet(`badge-dismissed:${projectId}:${channelKey}`);
+      return dismissedVersion !== versionFingerprint;
+    });
+  });
+}
+
+// Small yellow dot appended to a nav button for a page that still has
+// an undismissed "New"/"Updated" badge somewhere on it - a hint to
+// visit even when that page isn't the one currently open.
+function navBadgeDot() {
+  return el('span', { class: 'nav-jump-dot', attrs: { 'aria-hidden': 'true' } }, [
+    el('span', { class: 'visually-hidden', text: ' — has new updates' })
+  ]);
+}
+
 // Builds the sticky page-switcher bar: one link per page in
 // SITE_DATA.pages, with whichever one matches currentUrl shown as a
 // filled, non-clickable pill.
@@ -351,18 +382,27 @@ function renderPageNav(pages, currentUrl) {
   const nav = document.getElementById('page-nav');
   if (!nav || !pages || !pages.length) return;
 
+  // One entry per nav button, kept around so syncNavBadgeDots() (below)
+  // can re-check and update them later without rebuilding the bar.
+  const badgeTargets = [];
+
   const row = el('div', { class: 'nav-jump-row' });
   pages.forEach(p => {
+    const dot = pageHasUndismissedBadge(p) ? navBadgeDot() : null;
+
     if (p.url === currentUrl) {
       // Not a link — you're already here. aria-current tells screen
       // readers this is the active page, same as a normal site nav.
-      row.appendChild(el('span', {
+      const btn = el('span', {
         class: 'nav-jump-btn is-open',
         attrs: { 'aria-current': 'page' }
       }, [
         icon(p.icon, 'icon-sm'),
-        el('span', { text: p.label })
-      ]));
+        el('span', { text: p.label }),
+        dot
+      ]);
+      row.appendChild(btn);
+      badgeTargets.push({ page: p, target: btn });
       return;
     }
     // Built by hand rather than via el()'s href shortcut — that
@@ -374,9 +414,24 @@ function renderPageNav(pages, currentUrl) {
     a.href = p.url;
     a.appendChild(icon(p.icon, 'icon-sm'));
     a.appendChild(el('span', { text: p.label }));
+    if (dot) a.appendChild(dot);
     row.appendChild(a);
+    badgeTargets.push({ page: p, target: a });
   });
   nav.appendChild(row);
+
+  // A dot is only computed once, at load. If the page is later restored
+  // from the browser's back/forward cache (e.g. after pressing Back)
+  // rather than freshly loaded.
+  window.addEventListener('pageshow', event => {
+    if (!event.persisted) return;
+    badgeTargets.forEach(({ page, target }) => {
+      const existing = target.querySelector('.nav-jump-dot');
+      const shouldShow = pageHasUndismissedBadge(page);
+      if (shouldShow && !existing) target.appendChild(navBadgeDot());
+      else if (!shouldShow && existing) existing.remove();
+    });
+  });
 
   // Keeps a linked/scrolled-to heading or project clear of this bar
   // while it's sticky.
