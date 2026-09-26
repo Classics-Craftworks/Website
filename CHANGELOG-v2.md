@@ -4,10 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.0.0-dev.11 — 2026/09/26
+
+### Added
+- A faint "?" to empty icon slots on home page buttons
+
+### Changed
+- Redesigned project section buttons on the home page
+
 ## v2.0.0-dev.10 — 2026/09/26
 
 ### Added
-- Added a tooltip to the yellow nav bar notification dot
+- A tooltip to the yellow nav bar notification dot
 
 ### Changed
 - Updated yellow nav bar notification dot to include the number of undismissed badges
