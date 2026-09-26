@@ -645,7 +645,7 @@ function renderStructuredData(data, section) {
 
 /* ---------- Entry point ----------
    A section page marks itself with data-page, matching its "url" in
-   SITE_DATA.pages (see data.js): <body data-page="data-packs-mods.html">.
+   SITE_DATA.pages (see data.js): <body data-page="data-packs-mods">.
    The home and 404 pages have no data-page, so this only runs where needed. */
 if (document.body.dataset.page) {
   initSectionPage(document.body.dataset.page);

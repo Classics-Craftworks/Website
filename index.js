@@ -168,7 +168,7 @@ function forwardOldDeepLink(sections, pages) {
   if (forwardOldDeepLink(sections, pages)) return;
 
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
-  renderPageNav(pages, 'index.html');
+  renderPageNav(pages, '/');
   renderHomeButtons(sections, pages);
   renderStats(typeof STATS_DATA !== 'undefined' ? STATS_DATA : null);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);

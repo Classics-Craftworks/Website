@@ -47,10 +47,10 @@ const SITE_DATA = {
   // in every page's nav automatically. "Home" has no "section" since
   // it isn't tied to one.
   pages: [
-    { label: "Home", url: "index.html", icon: "home" },
-    { label: "Data Packs & Mods", url: "data-packs-mods.html", section: "Data Packs & Mods", icon: "brackets" },
-    { label: "Resource Packs", url: "resource-packs.html", section: "Resource Packs", icon: "brush" },
-    { label: "Other Projects", url: "other-projects.html", section: "Other Projects", icon: "wrench" }
+    { label: "Home", url: "/", icon: "home" },
+    { label: "Data Packs & Mods", url: "data-packs-mods", section: "Data Packs & Mods", icon: "brackets" },
+    { label: "Resource Packs", url: "resource-packs", section: "Resource Packs", icon: "brush" },
+    { label: "Other Projects", url: "other-projects", section: "Other Projects", icon: "wrench" }
   ],
 
   // The main content: each entry below is a section (a heading
