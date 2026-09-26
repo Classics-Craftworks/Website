@@ -76,11 +76,11 @@ function renderHomeButton(section, page) {
 
   // "Browse N projects" + the "go to this section" arrow, pinned to
   // the bottom of the card (see margin-top:auto on .home-card-footer).
-  // The section's icon (data.js's per-section "icon" field, falling
-  // back to "box") sits to the left of the label.
+  // The section's icon (from its matching SITE_DATA.pages entry's
+  // "icon" field, falling back to "box") sits to the left of the label.
   const count = allProjects.length;
   const footerLabel = el('span', { class: 'home-card-footer-label' }, [
-    icon(section.icon || 'box', 'home-card-icon'),
+    icon(page.icon || 'box', 'home-card-icon'),
     document.createTextNode('Browse ' + count + ' project' + (count === 1 ? '' : 's'))
   ]);
   const footer = el('span', { class: 'home-card-footer' }, [
