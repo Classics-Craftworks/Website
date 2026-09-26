@@ -4,10 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.0.0-dev.10 — 2026/09/26
+
+### Added
+- Added a tooltip to the yellow nav bar notification dot
+
+### Changed
+- Updated yellow nav bar notification dot to include the number of undismissed badges
+- Improved padding around statistic note
+
 ## v2.0.0-dev.9 — 2026/09/26
 
 ### Added
-- Yellow dot indicator to nav bar when there's an undismissed New or Updated badge
+- Yellow notification dot to nav bar when there's an undismissed New or Updated badge
 
 ### Changed
 - Arrow on home page buttons now moves more on hover
@@ -17,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 ### Fixed
 - Font loading issue
+- No results search message using curly quotation marks
 
 ### Removed
 - Highlighted border from project icons on home buttons on hover
