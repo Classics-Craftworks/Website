@@ -148,7 +148,7 @@ a { color: inherit; text-decoration: none; }
 /* ---------- Skip link ---------- */
 /* Off-screen until it receives keyboard focus (Tab from page load),
    then slides into view at the top-left so sighted keyboard users can
-   see and activate it too — not just screen reader users. */
+   see and activate it too - not just screen reader users. */
 .skip-link {
   position: absolute;
   top: -60px;
@@ -219,7 +219,7 @@ p { margin: 0; }
   max-width: 1100px;
   margin: 0 auto;
   /* The env() additions are 0px on any device without a notch/inset,
-   so this is a no-op there — they only matter on phones with a
+   so this is a no-op there - they only matter on phones with a
    notch, Dynamic Island, or rounded-corner cutout, and when the
    viewport-fit=cover meta tag lets content draw under them. */
   padding: calc(28px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
@@ -294,14 +294,12 @@ p { margin: 0; }
   align-items: center;
 }
 
-.nav-jump-btn { gap: 7px; }
-
 /* ---------- Page nav ---------- */
 /* The row of page links, sticky at the top of the screen while
    scrolling (built by renderPageNav() in section-page.js). */
 .section-nav {
   position: sticky;
-  /* Keeps the sticky offset itself clear of a notch/Dynamic Island —
+  /* Keeps the sticky offset itself clear of a notch/Dynamic Island -
    matters in standalone/PWA mode where there's no browser chrome
    already pushing content down. 0px on ordinary devices. */
   top: calc(6px + env(safe-area-inset-top));
@@ -331,6 +329,7 @@ p { margin: 0; }
 /* Styled differently from other buttons on the page so they clearly
    read as navigation. */
 .nav-jump-btn {
+  gap: 7px;
   border: 1px solid var(--nav-btn-border);
   border-radius: 6px;
   background: var(--nav-btn-bg);
@@ -577,7 +576,7 @@ p { margin: 0; }
 }
 
 /* ---------- Home page: section buttons ---------- */
-/* index.js builds one of these per section — a big link showing its
+/* index.js builds one of these per section - a big link showing its
    first four project icons. Sized in cqi (via container-type below)
    so a card scales uniformly at any width. */
 .home-grid {
@@ -603,7 +602,7 @@ p { margin: 0; }
 .home-card:active { transform: scale(0.99); }
 
 /* Padding lives here rather than on .home-card, because cqi units
-   resolve against an *ancestor* container — .home-card can't size its
+   resolve against an *ancestor* container - .home-card can't size its
    own padding by its own width. */
 .home-card-inner {
   display: flex;
@@ -647,7 +646,7 @@ p { margin: 0; }
   letter-spacing: 0.02em;
   text-transform: uppercase;
   text-wrap: balance;
-  /* break-word, not anywhere — anywhere shrinks this flex child's min
+  /* break-word, not anywhere - anywhere shrinks this flex child's min
      width too, wrapping word-by-word instead of balancing normally. */
   overflow-wrap: break-word;
 }
@@ -770,7 +769,7 @@ p { margin: 0; }
   .home-card-title,
   .home-card-title--tight {
     /* Every card is nearly full viewport width here, so even the
-       longest heading has plenty of room — reset to the same shared
+       longest heading has plenty of room - reset to the same shared
        size instead of staying artificially small. */
     font-size: min(6cqi, 1.9rem);
     letter-spacing: 0.02em;
@@ -790,6 +789,7 @@ p { margin: 0; }
   font-weight: 900;
   font-size: clamp(1.6rem, 3.9vw, 1.9rem);
   color: var(--text);
+  margin-bottom: 16px;
 }
 
 .stats-grid {
@@ -833,6 +833,14 @@ p { margin: 0; }
   color: var(--text-soft);
 }
 
+.stats-updated {
+  margin-top: -22px;
+  margin-bottom: 12px;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+  text-align: left;
+}
+
 .stats-note {
   margin-top: 10px;
   margin-bottom: -10px;
@@ -841,14 +849,6 @@ p { margin: 0; }
   text-align: left;
   max-width: 50ch;
   font-style: italic;
-}
-
-.stats-updated {
-  margin-top: -6px;
-  margin-bottom: 10px;
-  font-size: 0.8rem;
-  color: var(--text-soft);
-  text-align: left;
 }
 
 /* Empty text nodes (no lastUpdated/note in stats.js) collapse to
@@ -878,8 +878,7 @@ p { margin: 0; }
   padding-top: 24px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(var(--border-rgb), 0.6);
-  align-items: start; /* keeps the thumbnail aligned to the top */
-  /* Keeps a linked project clear of the sticky nav bar. */
+  align-items: start;
   scroll-margin-top: var(--sticky-nav-offset, 68px);
 }
 .project:first-child { padding-top: 4px; }
@@ -908,7 +907,7 @@ p { margin: 0; }
   color: var(--text);
   margin-top: 0;
   line-height: 1.1;
-  transform: translateY(-3px); /* fine-tune this if the title looks off-center */
+  transform: translateY(-3px);
 }
 
 .project-description {
@@ -971,7 +970,7 @@ p { margin: 0; }
 }
 
 /* Added by layoutChannelRow() in section-page.js when a channel box's own
-   header ("Release | Java X.Y") doesn't fit next to its sibling —
+   header ("Release | Java X.Y") doesn't fit next to its sibling -
    stacks the boxes full-width instead of letting the header text
    wrap mid-line. */
 .channel-row.stacked {
@@ -979,7 +978,7 @@ p { margin: 0; }
 }
 /* flex-basis below is a fraction of the row's *main axis*, which
    switches from width to height once the row above stacks into a
-   column — override it back to a natural height so a box doesn't try
+   column - override it back to a natural height so a box doesn't try
    to become "50% tall" instead of "100% wide". */
 .channel-row.stacked > .channel-group {
   flex: 1 1 auto;
@@ -1010,7 +1009,7 @@ p { margin: 0; }
   padding-bottom: 12px;
   margin-bottom: 14px;
   border-bottom: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
-  /* Wraps only if label + version don't fit — not tied to box width,
+  /* Wraps only if label + version don't fit - not tied to box width,
      since labels vary in length. The "|" + version move down together
      as one unit (see .channel-mc-group). */
   flex-wrap: wrap;
@@ -1058,7 +1057,7 @@ p { margin: 0; }
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--badge-color);
-  background: var(--bg); /* solid, not tinted yellow — cuts a clean "tag" shape out of the border below it */
+  background: var(--bg); /* solid, not tinted yellow - cuts a clean "tag" shape out of the border below it */
   border: 1.5px solid var(--badge-color);
   transition: opacity var(--transition-fast), transform var(--transition-fast);
   cursor: pointer;
@@ -1078,7 +1077,7 @@ p { margin: 0; }
   inset: -8px;
 }
 
-/* A CSS-drawn "×" (two crossed bars) instead of a text glyph — this
+/* A CSS-drawn "×" (two crossed bars) instead of a text glyph - this
    keeps it pixel-centered regardless of font/line-height quirks. */
 .channel-badge-dismiss {
   position: relative;
@@ -1119,7 +1118,7 @@ p { margin: 0; }
 }
 
 /* Keeps the "|" and version glued together as a single flex item, so
-   they wrap to a second line as one unit if they don't fit — instead
+   they wrap to a second line as one unit if they don't fit - instead
    of the version wrapping alone and leaving the separator dangling at
    the end of the first line. */
 .channel-mc-group {
@@ -1150,7 +1149,7 @@ p { margin: 0; }
 
 /* Added by layoutChannelRow() in section-page.js when this box's own
    download columns (Data Pack/Mod/etc.) don't have room to sit side
-   by side without a version pill wrapping onto its own line — stacks
+   by side without a version pill wrapping onto its own line - stacks
    them full-width instead, independently of its sibling channel box. */
 .channel-downloads.downloads-stacked {
   flex-direction: column;
@@ -1189,7 +1188,7 @@ p { margin: 0; }
   color: var(--text);
   min-height: 24px; /* Fixes height shift when icon or pill is missing */
   /* Last-resort fallback: lets a single column's own pill drop to its
-     own line if it's genuinely too long to fit even in this state —
+     own line if it's genuinely too long to fit even in this state -
      rare, since .downloads-stacked above already gives each column
      the full box width before this would ever be needed. */
   flex-wrap: wrap;
@@ -1219,7 +1218,7 @@ p { margin: 0; }
   text-overflow: ellipsis;
   max-width: 100%;
   min-width: 0;
-  flex-shrink: 0; /* never truncate the version text — it wraps to its own line instead */
+  flex-shrink: 0; /* never truncate the version text - it wraps to its own line instead */
 }
 
 .pill.disabled-pill {
@@ -1443,7 +1442,7 @@ p { margin: 0; }
 }
 /* Invisible hit-slop bringing the actual tap target up to ~44x44
    (34px visible box + 5px on each side), same trick as
-   .copy-link-btn::before above — the tooltip already uses ::after,
+   .copy-link-btn::before above - the tooltip already uses ::after,
    so ::before is free here too. */
 .social-link::before {
   content: '';
@@ -1482,7 +1481,7 @@ p { margin: 0; }
 }
 
 /* Show Tooltip on Hover & Keyboard Focus, or when explicitly toggled
-   open by section-page.js (see .has-tooltip's click handler) — touch devices
+   open by section-page.js (see .has-tooltip's click handler) - touch devices
    have no :hover, so that's the only way a tap reveals it there. */
 [data-tooltip]:hover::after,
 [data-tooltip]:focus-visible::after,
@@ -1586,7 +1585,7 @@ p { margin: 0; }
     margin-right: 0;
   }
   /* 16px is the minimum iOS Safari won't auto-zoom the page in on
-   focus — the 0.85rem used above is under that. */
+   focus - the 0.85rem used above is under that. */
   .nav-search-input {
     font-size: 16px;
     padding-right: 40px; /* room for the larger clear button below */
@@ -1638,7 +1637,7 @@ p { margin: 0; }
     padding: calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   }
 
-  /* A real grid, same reasoning as the nav bar above — so the link
+  /* A real grid, same reasoning as the nav bar above - so the link
    chips line up in columns instead of wrapping one at a time. */
   .project-links {
     display: grid;

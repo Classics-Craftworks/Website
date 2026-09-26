@@ -15,7 +15,7 @@ const STATS_DATA = {
     { icon: "clock", label: "Hours of Playtime", value: "427+" }
   ],
 
-  lastUpdated: "September 26, 2026:",
+  lastUpdated: "September 26, 2026",
 
   note: "Download stats combine totals from Modrinth and SpigotMC. Playtime stats are tracked by Modrinth via the Modrinth App only."
 };

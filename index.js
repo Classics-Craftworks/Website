@@ -57,7 +57,7 @@ function renderHomeButton(section, page) {
     ? el('span', { text: 'Includes ' + names.join(', '), attrs: { id: descId, hidden: '' } })
     : null;
 
-  // Built by hand rather than via el()'s href shortcut — that always
+  // Built by hand rather than via el()'s href shortcut - that always
   // opens links in a new tab (right for external links), but moving
   // between pages of this site should stay in the same tab.
   const a = document.createElement('a');
@@ -107,7 +107,7 @@ function renderHomeButtons(sections, pages) {
   main.appendChild(grid);
 }
 
-// Builds one box of the stats section ({ icon, label, value } — see
+// Builds one box of the stats section ({ icon, label, value } - see
 // stats.js). "icon" is optional; the box just skips it if left off.
 function renderStatBox(stat) {
   return el('div', { class: 'stat-box' }, [
@@ -134,7 +134,7 @@ function renderStats(stats) {
 }
 
 // Old "copy link" URLs (e.g. index.html#better-craftables) now belong
-// on the section pages, which build the same #ids — forward them
+// on the section pages, which build the same #ids - forward them
 // there instead of leaving the visitor with nothing to scroll to.
 // Returns true if it redirected.
 function forwardOldDeepLink(sections, pages) {
