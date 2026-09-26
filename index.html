@@ -32,19 +32,13 @@
 </head>
 <body>
 
-<!-- First focusable element on the page, so keyboard users can jump
-     straight past the header and page-switcher nav bar to the section
-     buttons instead of tabbing through all of it first. Hidden until it
-     receives focus (see .skip-link in styles.css). Works even with JS
-     disabled, since it's a plain #catalog fragment link. -->
+<!-- Lets keyboard users skip straight to the projects, past the nav.
+     Hidden until focused (see .skip-link in styles.css). -->
 <a href="#catalog" class="skip-link">Skip to projects</a>
 
-<!-- Static fallback shown only when JavaScript is disabled/blocked.
-     Everything else on this page — brand name/tagline/logo, nav links,
-     the section buttons, footer — is built by index.js from data.js,
-     so without JS the rest of the page stays completely blank. Keep
-     the name/tagline/links here roughly in sync with data.js's brand
-     and topLinks if those ever change. -->
+<!-- Fallback for JS disabled/blocked — everything else on this page
+     is built by index.js from data.js. Keep in sync with data.js's
+     brand/topLinks if those change. -->
 <noscript>
   <div class="noscript-notice">
     <h1>CLASSIC'S CRAFTWORKS</h1>
@@ -69,25 +63,15 @@
     <nav id="top-links" class="link-row" aria-label="Primary links"></nav>
   </header>
 
-  <!-- Sticky page-switcher bar, identical to the one on the section
-       pages (data-packs-mods.html etc.): Home plus one link per section
-       page, with the current page shown as the filled pill. Built by
-       renderPageNav() in section-page.js from SITE_DATA.pages in
-       data.js. -->
+  <!-- Sticky page-switcher bar, same as on the section pages. Built by
+       renderPageNav() in section-page.js from SITE_DATA.pages. -->
   <nav id="page-nav" class="section-nav" aria-label="Site pages"></nav>
 
-  <!-- Starts empty on purpose — index.js fills it with one big button
-       per section (icons of that section's first four projects + its
-       name), using the content from data.js. If JavaScript is disabled,
-       this area stays blank. tabindex="-1" lets the skip link above
-       move keyboard focus here (not just scroll to it), without adding
-       it to the normal Tab order. -->
+  <!-- Filled by index.js with one big button per section. tabindex="-1"
+       lets the skip link above focus here without joining the Tab order. -->
   <main id="catalog" tabindex="-1"></main>
 
-  <!-- Home page statistics section: three boxes plus a "last
-       updated" line and a note about where the figures come from.
-       Starts empty — renderStats() in index.js fills it in from
-       STATS_DATA (stats.js). Edit stats.js to change the numbers. -->
+  <!-- Filled by renderStats() in index.js from STATS_DATA (stats.js). -->
   <section id="stats-section" class="stats-section" aria-labelledby="stats-heading">
     <h2 id="stats-heading" class="stats-heading">Statistics</h2>
     <p id="stats-updated" class="stats-updated"></p>
@@ -103,10 +87,8 @@
     <p id="site-version" class="footer-version"></p>
   </footer>
 
-  <!-- Fixed-position button that fades in once you've scrolled down a bit
-       (see .back-to-top in styles.css) and scrolls back to the top when
-       clicked (see initBackToTop() in section-page.js). Its position in the DOM
-       doesn't matter since it's positioned via CSS, not page flow. -->
+  <!-- Fades in on scroll and jumps back to top; see initBackToTop() in
+       section-page.js. Positioned via CSS, so its place in the DOM doesn't matter. -->
   <button id="back-to-top" class="back-to-top" type="button" aria-label="Back to top" data-tooltip="Back to top"></button>
 
 </div>

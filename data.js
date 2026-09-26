@@ -1,29 +1,24 @@
 /* ============================================================
    SITE DATA
-   This is the primary file for updating site text, links and project lists.
-   The layout and rendering are handled automatically by section-page.js and index.js.
+   The main file for site text, links and project lists. Layout and
+   rendering are handled by section-page.js and index.js.
 
    QUICK GUIDE:
-   - Text & Links: Update values inside quotes (e.g., label, url).
-   - Images: Place files in /images and set the relative path (e.g., "images/better-craftables.webp").
-   - Icons: Place SVG files in /images/icons/ and refer to them by filename without extension.
-   - Projects: Copy an existing project object block {...} inside the "projects" array to add a new project.
-   - Channels: Each project supports "stable", "beta", "alpha", or "unsupported" channels. Add "disabled: true"
-     to a download label if a build is unavailable. Optionally add a "tooltip" string alongside it to explain
-     why - it shows on hover (and on keyboard focus) over the greyed-out button. If "tooltip" is left off, the 
-     button still shows as unavailable, just without the extra explanation.
-   - Download versions: each download (e.g. "Data Pack", "Mod") shows its own "version" string on its
-     pill. If a download has no "version" set, its pill just shows "N/A" - there's no channel-wide
-     fallback, so give every enabled download its own "version".
-   - "New"/"Updated" badge: add `badge: "new"` or `badge: "updated"` to any channel to show a small
-     dismissible tag next to its name. Visitors can dismiss it (✕); it quietly comes back on its own the
-     next time you bump any of that channel's downloads' "version" strings — no extra flag to
-     remove/reset by hand, so it's safe to just leave `badge: "new"` sitting on a channel across releases.
+   - Text & Links: edit values inside quotes (label, url, etc).
+   - Images: place in /images, set the relative path.
+   - Icons: place SVGs in /images/icons/, refer to by filename (no extension).
+   - Projects: copy an existing project {...} block to add a new one.
+   - Channels: "stable"/"beta"/"alpha"/"unsupported". Add "disabled: true"
+     to a download if unavailable, with an optional "tooltip" explaining why.
+   - Download versions: each download shows its own "version" pill
+     (no channel-wide fallback — give every enabled download one).
+   - "New"/"Updated" badge: add `badge: "new"` or `"updated"` to a channel.
+     Dismissible by visitors; reappears automatically next time that
+     channel's download versions are bumped.
    ============================================================ */
 
-// This whole file is one big JavaScript object. The page scripts read
-// values out of it (e.g. SITE_DATA.brand.name) to build each page —
-// nothing in here directly draws anything on screen by itself.
+// One big object — the page scripts read values out of it (e.g.
+// SITE_DATA.brand.name) to build each page.
 const SITE_DATA = {
 
   // Logo, name and one-line tagline shown at the top of the page.

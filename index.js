@@ -1,25 +1,15 @@
 /* ============================================================
    HOME PAGE
 
-   One big button per section (Data Packs & Mods, Resource Packs,
-   Other Projects). Each button links to that section's own page and shows the section's
-   first four project icons in slots 1–4 (left to right, top to
-   bottom). The icons are decoration only — the whole button is the
-   one link.
-
-   Loaded after data.js and section-page.js, which supply SITE_DATA
-   and the shared brand / nav / footer helpers used below, and after
-   stats.js, which supplies STATS_DATA for the Statistics section
-   further down this file. Edit data.js to change what's shown
-   section order, project order and images all come from there;
-   edit stats.js to change the stat numbers.
+   One big button per section, showing each section's first four
+   project icons. Loaded after data.js/section-page.js (SITE_DATA,
+   shared helpers) and stats.js (STATS_DATA for the stats section
+   below). Edit data.js for section/project content, stats.js for
+   the stat numbers.
    ============================================================ */
 
-// How many icon slots each button has. A section with more projects
-// than this shows the first HOME_SLOTS - 1 icons and turns the last slot
-// into a "+X" tile counting the rest (they're all still on the section's
-// own page); fewer leaves the remaining slots as empty placeholders so
-// the buttons stay the same shape.
+// Icon slots per button. Extra projects collapse the last slot into a
+// "+X" tile; fewer projects leave empty placeholders.
 const HOME_SLOTS = 4;
 
 // Builds one big section button. `page` is the matching entry from
@@ -30,9 +20,8 @@ function renderHomeButton(section, page) {
   const shownCount = overflow ? HOME_SLOTS - 1 : HOME_SLOTS;
   const projects = allProjects.slice(0, shownCount);
 
-  // The icon grid. Not interactive itself — the whole button is the
-  // link — so every image is decorative (alt="") and the "+X" tile and
-  // empty placeholders are hidden from screen readers.
+  // Not interactive itself, so icons are decorative and the "+X"/empty
+  // placeholders are hidden from screen readers.
   const slots = [];
   for (let i = 0; i < HOME_SLOTS; i++) {
     const p = projects[i];
@@ -76,27 +65,15 @@ function renderHomeButton(section, page) {
   a.href = page.url;
   if (names.length) a.setAttribute('aria-describedby', descId);
 
-  // "N PROJECTS" label, top-left of the card, with an icon matching
-  // the section's own content (data.js's per-section "icon" field —
-  // e.g. "brackets" for data packs, "brush" for resource packs,
-  // "wrench" for other projects). Reuses the same icons already
-  // shipped for the download-type labels elsewhere on the site, so it
-  // needs no new icon assets; falls back to "box" if a section is
-  // missing one.
+  // "N PROJECTS" label with the section's icon (data.js's per-section
+  // "icon" field), falling back to "box" if it's missing one.
   const badge = el('span', { class: 'home-card-badge' }, [
     icon(section.icon || 'box', 'icon-sm'),
     document.createTextNode(allProjects.length + ' PROJECT' + (allProjects.length === 1 ? '' : 'S'))
   ]);
 
-  // Section title with a small arrow after it, showing this whole
-  // card leads somewhere (drawn in CSS — see .home-card-arrow). Longer
-  // headings (e.g. "Data Packs & Mods") get a size-down modifier class
-  // so they still fit on one line at the same width the shorter
-  // headings use at full size, instead of wrapping. text-wrap: balance
-  // still wraps it gracefully if a very narrow viewport can't fit it
-  // even at the smaller size. The row also gets a tighter modifier so
-  // the extra characters can sit closer to the arrow instead of
-  // needing the same gap the short headings use.
+  // Longer headings (e.g. "Data Packs & Mods") get a size-down
+  // modifier so they still fit on one line (see .home-card-title--tight).
   const isLong = section.heading.length > 15;
   const titleClass = isLong ? 'home-card-title home-card-title--tight' : 'home-card-title';
   const rowClass = isLong ? 'home-card-title-row home-card-title-row--tight' : 'home-card-title-row';
@@ -140,11 +117,9 @@ function renderStatBox(stat) {
   ]);
 }
 
-// Fills in the Statistics section from STATS_DATA (stats.js):
-// the three boxes, the "last updated" line and the small note under
-// it. Does nothing if stats.js hasn't been loaded, or if any of its
-// fields are left blank, so a missing stats.js can't break the rest
-// of the home page.
+// Fills in the Statistics section from STATS_DATA (stats.js). Does
+// nothing if stats.js hasn't loaded or a field is blank, so it can't
+// break the rest of the home page.
 function renderStats(stats) {
   if (!stats) return;
 
@@ -158,13 +133,10 @@ function renderStats(stats) {
   if (updated && stats.lastUpdated) updated.textContent = 'As of ' + stats.lastUpdated;
 }
 
-// Before the home page became a set of buttons, index.html held every
-// project, and the "copy link" buttons produced links like
-// index.html#better-craftables (or #resource-packs for a whole
-// section). Those links now belong on the section pages, which build
-// the same #ids — so if one arrives here, forward it to the right
-// page instead of leaving the visitor on a home page with nothing to
-// scroll to. Returns true if it redirected.
+// Old "copy link" URLs (e.g. index.html#better-craftables) now belong
+// on the section pages, which build the same #ids — forward them
+// there instead of leaving the visitor with nothing to scroll to.
+// Returns true if it redirected.
 function forwardOldDeepLink(sections, pages) {
   const id = decodeURIComponent(location.hash.slice(1));
   if (!id) return false;

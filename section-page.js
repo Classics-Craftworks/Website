@@ -1,17 +1,13 @@
 /* ============================================================
    SHARED RENDER SCRIPT
 
-   Loaded by every page. It reads SITE_DATA (data.js) and builds the
+   Loaded by every page. Reads SITE_DATA (data.js) and builds the
    brand header, page nav, project cards and footer. A section page
-   (data-packs-mods.html etc.) marks itself with a data-page attribute
-   on <body>, which this file reads at the bottom to build that page
-   automatically — see initSectionPage() below. The home page's own
-   section buttons live in index.js and the nav bar's search box in
-   search.js; the 404 page calls renderBrand()/renderFooter() from
-   not-found.js.
+   marks itself with a data-page attribute on <body>, read at the
+   bottom of this file — see initSectionPage(). The home page's
+   section buttons live in index.js, search in search.js.
 
-   Edit data.js to change text/links/projects/pages. Edit this file to
-   change how the pages are built.
+   Edit data.js for content, this file for how pages are built.
    ============================================================ */
 
 /* ---------- Small helper functions ---------- */
@@ -506,11 +502,9 @@ function handleDeepLink() {
   });
 }
 
-// Adds a JSON-LD <script> (an Organization plus a list of
-// SoftwareApplication entries) built from SITE_DATA, so search engines
-// get an accurate picture of what's on the page. Pass a section to
-// describe just that section's projects, or null to describe every
-// project (index.js does this for the home page).
+// Adds a JSON-LD <script> (Organization + SoftwareApplication list)
+// built from SITE_DATA. Pass a section to describe just its projects,
+// or null for every project (index.js does this on the home page).
 function renderStructuredData(data, section) {
   const canonical = document.querySelector('link[rel="canonical"]');
   const siteUrl = canonical ? canonical.href : location.origin + '/';
@@ -573,16 +567,9 @@ function renderStructuredData(data, section) {
 }
 
 /* ---------- Entry point ----------
-   A section page (data-packs-mods.html, resource-packs.html,
-   other-projects.html) marks itself with a data-page attribute on
-   <body>, matching its own "url" in SITE_DATA.pages (see data.js):
-
-     <body data-page="data-packs-mods.html">
-
-   That attribute is the only thing that differs between these pages'
-   markup — everything else, including this file, is shared. The home
-   page and 404 page have no data-page, so this runs only where it's
-   needed. */
+   A section page marks itself with data-page, matching its "url" in
+   SITE_DATA.pages (see data.js): <body data-page="data-packs-mods.html">.
+   The home and 404 pages have no data-page, so this only runs where needed. */
 if (document.body.dataset.page) {
   initSectionPage(document.body.dataset.page);
 }
@@ -593,9 +580,8 @@ function initSectionPage(pageUrl) {
   const pages = SITE_DATA.pages || [];
   renderPageNav(pages, pageUrl);
 
-  // Looks up which catalog section this page is for via its own entry
-  // in SITE_DATA.pages, so the two can never drift apart. Falls back
-  // to the first section if data.js is ever missing that entry.
+  // Looks up this page's section via SITE_DATA.pages, falling back to
+  // the first section if data.js is missing that entry.
   const pageEntry = pages.find(p => p.url === pageUrl);
   const section = (SITE_DATA.sections || []).find(s => s.heading === (pageEntry && pageEntry.section)) || SITE_DATA.sections[0];
 

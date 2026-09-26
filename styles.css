@@ -577,13 +577,9 @@ p { margin: 0; }
 }
 
 /* ---------- Home page: section buttons ---------- */
-/* index.js builds one of these per section — a big button that links
-   to that section's page, showing its first four project icons above
-   its name. The icons are decoration; the whole card is the link.
-
-   Everything inside a card is sized in cqi (1% of the card's own
-   width, via container-type below), so a card looks the same at any
-   width — icons, type and spacing all just scale together. */
+/* index.js builds one of these per section — a big link showing its
+   first four project icons. Sized in cqi (via container-type below)
+   so a card scales uniformly at any width. */
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -651,21 +647,13 @@ p { margin: 0; }
   letter-spacing: 0.02em;
   text-transform: uppercase;
   text-wrap: balance;
-  /* break-word (not anywhere): anywhere also changes this flex child's
-     automatic minimum width, letting the row shrink it down to almost
-     nothing and wrap word-by-word/letter-by-letter instead of balancing
-     normally. break-word keeps the same "don't let one giant word blow
-     out the card" safety net without that side effect. */
+  /* break-word, not anywhere — anywhere shrinks this flex child's min
+     width too, wrapping word-by-word instead of balancing normally. */
   overflow-wrap: break-word;
 }
-/* Modifier for headings too long to share the other cards' full title
-   size on one line ("Data Packs & Mods" vs "Resource Packs"): scaled
-   up as close to the shared size as still fits on one line at this
-   card width, with a little less tracking to help it fit. text-wrap:
-   balance above still wraps it cleanly if a viewport is too narrow
-   even for this size, so nothing overflows the card. Reset back to
-   the shared mobile size in the stacked single-column layout below,
-   where every card is wide enough that this isn't needed. */
+/* Modifier for headings too long to fit at full size on one line
+   ("Data Packs & Mods"). Reset in the mobile layout below, where
+   every card is wide enough not to need it. */
 .home-card-title--tight {
   font-size: min(5.8cqi, 2.4rem);
   letter-spacing: 0;
@@ -691,12 +679,9 @@ p { margin: 0; }
   transform: rotate(45deg) translate(28%, -28%);
 }
 
-/* The four icons, numbered 1–4 left to right, top to bottom.
-   Columns are exactly one icon wide (36cqi, sized up from the plainer
-   30cqi tiles so the icons read clearly instead of floating small in
-   the middle of the card) and centered, so the gap between the two
-   columns matches the 6cqi gap between the two rows, instead of the
-   icons floating apart in the middle of two wide columns. */
+/* The four icons, 1–4 left to right, top to bottom. Columns are
+   exactly one icon wide (36cqi) and centered, so the gap between them
+   matches the 6cqi row gap. */
 .home-slots {
   display: grid;
   grid-template-columns: repeat(2, 36cqi);
@@ -752,12 +737,8 @@ p { margin: 0; }
     linear-gradient(currentColor, currentColor) center / 0.18em 100% no-repeat;
 }
 
-/* One button per row on phones/small tablets. The four icons move
-   into a single row so each button stays short instead of three
-   tall cards stacked on top of each other. Shares the site-wide
-   890px "collapse to mobile" breakpoint (see the nav bar and
-   masthead below) so every part of the header switches to its
-   stacked layout together instead of at three different widths. */
+/* One button per row on phones/small tablets, icons in a single row.
+   Shares the site-wide 890px "collapse to mobile" breakpoint. */
 @media (max-width: 890px) {
   .home-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -1029,11 +1010,9 @@ p { margin: 0; }
   padding-bottom: 12px;
   margin-bottom: 14px;
   border-bottom: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
-  /* Wraps only if the label + version genuinely don't fit next to
-   each other — not tied to the box's width, since a short label
-   ("Release") and a long one ("Experimental") need different amounts
-   of room. The "|" + version move down together as one unit (see
-   .channel-mc-group) rather than the divider being left stranded. */
+  /* Wraps only if label + version don't fit — not tied to box width,
+     since labels vary in length. The "|" + version move down together
+     as one unit (see .channel-mc-group). */
   flex-wrap: wrap;
   row-gap: 4px;
 }
@@ -1058,13 +1037,10 @@ p { margin: 0; }
 }
 
 /* ---------- "New" / "Updated" Channel Badge ---------- */
-/* Set per-channel via `badge: "new"` or `badge: "updated"` in data.js.
-   Hangs off the channel box's top-left corner, half on/half off the
-   border, like a tag — outlined rather than filled, so it reads as a
-   small flag rather than a solid sticker.
-   Dismissing it is remembered per-version (see renderChannelBadge() in
-   section-page.js), so it quietly comes back the next time that channel's
-   `version` is bumped for a fresh release. */
+/* Set per-channel via `badge: "new"`/`"updated"` in data.js. Hangs off
+   the box's top-left corner like an outlined tag. Dismissal is
+   remembered per-version (renderChannelBadge() in section-page.js),
+   so it reappears when that channel's version is next bumped. */
 .channel-badge {
   position: absolute;
   top: -10px;
@@ -1153,11 +1129,8 @@ p { margin: 0; }
   min-width: 0;
 }
 
-/* Added by layoutChannelRow() in section-page.js as a last resort — only
-   when a box's header still doesn't fit even after the box has
-   already claimed the full row width (see .channel-row.stacked
-   above). Indents the wrapped second line so it still reads as one
-   unit with the "|" that introduces it. */
+/* Added by layoutChannelRow() as a last resort when a header still
+   doesn't fit at full row width. Indents the wrapped second line. */
 .channel-header.header-force-wrap .channel-mc-group {
   flex-basis: 100%;
   padding-left: 18px;
@@ -1416,16 +1389,10 @@ p { margin: 0; }
   color: var(--accent);
 }
 
-/* Briefly highlights a project after jumping to it via a direct link
-   (including picking a search result), so it's clear which card the
-   link pointed to. Drawn as a separate ::before rather than a
-   box-shadow directly on .project, and pulled outward with a negative
-   inset, so the ring sits with a small gap around the project instead
-   of running flush along its image and along the page's edge — the
-   -6px inset matches the buffer #catalog already reserves around
-   itself further down this file, so the ring has room to breathe
-   without being clipped. Skipped for anyone who's asked for reduced
-   motion. */
+/* Briefly highlights a project after jumping to it via a direct link.
+   A separate ::before with a negative inset gives the ring a small
+   gap around the project (-6px matches #catalog's own buffer below,
+   so it isn't clipped). Skipped under reduced motion. */
 .is-linked-target {
   position: relative;
 }
@@ -1722,13 +1689,9 @@ p { margin: 0; }
   margin-right: -6px;
 }
 
-/* #catalog specifically needs a bigger buffer than the shared 6px
-   above: the project highlight ring (.is-linked-target::before, near
-   the top of this file) sits 6px outside a project's own edges plus
-   another 2px for the ring itself, so it needs about 8px of clipping
-   room. This overrides the 6px from the shared rule just for #catalog,
-   with a couple of spare pixels, while padding and margin still cancel
-   out the same way so nothing shifts visually. */
+/* #catalog needs more buffer than the shared 6px: the project
+   highlight ring (.is-linked-target::before) sits ~8px outside a
+   project's edges, so this overrides it with room to spare. */
 #catalog {
   max-width: calc(100% + 20px);
   padding-left: 10px;
@@ -1794,8 +1757,8 @@ img, svg {
 }
 
 /* ---------- Back to top button ---------- */
-/* Fixed in the corner, hidden until initBackToTop() (section-page.js) shows it after you've
-   scrolled down a bit. */
+/* Fixed in the corner, hidden until initBackToTop() (section-page.js)
+   shows it after you've scrolled a bit. */
 .back-to-top {
   position: fixed;
   /* Keeps the button clear of the home-indicator / rounded-corner
