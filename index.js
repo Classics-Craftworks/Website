@@ -65,27 +65,33 @@ function renderHomeButton(section, page) {
   a.href = page.url;
   if (names.length) a.setAttribute('aria-describedby', descId);
 
-  // "N PROJECTS" label with the section's icon (data.js's per-section
-  // "icon" field), falling back to "box" if it's missing one.
-  const badge = el('span', { class: 'home-card-badge' }, [
-    icon(section.icon || 'box', 'icon-sm'),
-    document.createTextNode(allProjects.length + ' PROJECT' + (allProjects.length === 1 ? '' : 'S'))
-  ]);
-
-  // Longer headings (e.g. "Data Packs & Mods") get a size-down
-  // modifier so they still fit on one line (see .home-card-title--tight).
+  // Header: just the heading, centered. Longer headings (e.g. "Data
+  // Packs & Mods") get a size-down modifier so they still fit on one
+  // line (see .home-card-title--tight).
   const isLong = section.heading.length > 15;
   const titleClass = isLong ? 'home-card-title home-card-title--tight' : 'home-card-title';
-  const rowClass = isLong ? 'home-card-title-row home-card-title-row--tight' : 'home-card-title-row';
-  const titleRow = el('span', { class: rowClass }, [
-    el('span', { class: titleClass, text: section.heading }),
+  const header = el('span', { class: 'home-card-header' }, [
+    el('span', { class: titleClass, text: section.heading })
+  ]);
+
+  // "Browse N projects" + the "go to this section" arrow, pinned to
+  // the bottom of the card (see margin-top:auto on .home-card-footer).
+  // The section's icon (data.js's per-section "icon" field, falling
+  // back to "box") sits to the left of the label.
+  const count = allProjects.length;
+  const footerLabel = el('span', { class: 'home-card-footer-label' }, [
+    icon(section.icon || 'box', 'home-card-icon'),
+    document.createTextNode('Browse ' + count + ' project' + (count === 1 ? '' : 's'))
+  ]);
+  const footer = el('span', { class: 'home-card-footer' }, [
+    footerLabel,
     el('span', { class: 'home-card-arrow', attrs: { 'aria-hidden': 'true' } })
   ]);
 
   a.appendChild(el('span', { class: 'home-card-inner' }, [
-    badge,
-    titleRow,
+    header,
     el('span', { class: 'home-slots' }, slots),
+    footer,
     description
   ]));
 

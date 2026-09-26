@@ -651,58 +651,25 @@ p { margin: 0; }
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 6cqi 9cqi 11cqi;
+  padding: 5cqi 7cqi 7cqi;
 }
-
-/* Small "N PROJECTS" label with a box icon, top-left of the card. */
-.home-card-badge {
+.home-card-header {
   display: flex;
-  align-items: center;
-  gap: 2.4cqi;
-  margin-bottom: 4cqi;
-  color: var(--nav-accent);
-  font-size: min(3.4cqi, 0.9rem);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.home-card-badge .icon {
-  width: 1.35em;
-  height: 1.35em;
-}
-
-/* Section title plus the "go to this section" arrow, on one row so
-   the arrow sits at the card's trailing edge next to the heading. */
-.home-card-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4cqi;
+  justify-content: center;
   margin-bottom: 6cqi;
 }
 .home-card-title {
   display: block;
+  width: 100%;
+  text-align: center;
   font-family: 'Minercraftory', var(--font);
-  font-size: min(6.2cqi, 2.6rem);
+  font-size: min(6.4cqi, 2.7rem);
   line-height: 1.25;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  text-wrap: balance;
-  /* break-word, not anywhere - anywhere shrinks this flex child's min
-     width too, wrapping word-by-word instead of balancing normally. */
-  overflow-wrap: break-word;
-}
-/* Modifier for headings too long to fit at full size on one line
-   ("Data Packs & Mods"). Reset in the mobile layout below, where
-   every card is wide enough not to need it. */
-.home-card-title--tight {
-  font-size: min(5.8cqi, 2.4rem);
-  letter-spacing: 0;
-}
-/* Pairs with .home-card-title--tight: closes up the gap to the arrow
-   a bit so the larger tight title has the room it needs. */
-.home-card-title-row--tight {
-  gap: 2cqi;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* Drawn as a rotated corner (same "shape out of borders" trick as the
    "+" on the overflow tile below) rather than an image, so it's just
@@ -720,16 +687,13 @@ p { margin: 0; }
   transform: rotate(45deg) translate(28%, -28%);
 }
 
-/* The four icons, 1–4 left to right, top to bottom. Columns are
-   exactly one icon wide (36cqi) and centered, so the gap between them
-   matches the 6cqi row gap. */
+/* The four icons, 1–4 left to right, top to bottom. 1fr columns fill
+   the card's full content width, so the grid's left/right edges line up
+   exactly with the header icon and footer text/arrow above and below it. */
 .home-slots {
   display: grid;
-  grid-template-columns: repeat(2, 36cqi);
-  justify-content: center;
+  grid-template-columns: repeat(2, 1fr);
   gap: 6cqi;
-  justify-items: center;
-  margin-top: auto; /* keeps the icon row pinned to the bottom, however tall the header above ends up */
 }
 .home-slot {
   display: block;
@@ -745,11 +709,22 @@ p { margin: 0; }
   -webkit-user-drag: none;
 }
 /* Unused slot (a section with fewer than four projects): faint
-   dashed outline so the card keeps its shape without looking broken. */
+   dashed outline so the card keeps its shape without looking broken,
+   plus a faint "?" so it doesn't read as a loading/broken state. */
 .home-slot-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 2px dashed rgba(var(--border-rgb), 0.6);
   background: transparent;
   box-shadow: none;
+}
+.home-slot-empty::after {
+  content: '?';
+  font-family: 'Minercraftory', var(--font);
+  font-size: 14cqi;
+  line-height: 1;
+  color: rgba(var(--border-rgb), 0.6);
 }
 /* Last slot of a section with more projects than fit: a "+X" tile
    counting the ones not shown. */
@@ -775,6 +750,36 @@ p { margin: 0; }
     linear-gradient(currentColor, currentColor) center / 0.18em 100% no-repeat;
 }
 
+/* "Browse N projects" (with the section's icon) + the arrow, pinned
+   to the bottom of the card */
+.home-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4cqi;
+  margin-top: auto;
+  padding-top: 6cqi;
+  color: var(--nav-accent);
+  font-size: min(4.7cqi, 1.15rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.home-card-footer-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-card-icon {
+  width: 1.3em;
+  height: 1.3em;
+  color: var(--nav-accent);
+}
+
 /* One button per row on phones/small tablets, icons in a single row.
    Shares the site-wide 890px "collapse to mobile" breakpoint. */
 @media (max-width: 890px) {
@@ -786,32 +791,26 @@ p { margin: 0; }
     grid-template-columns: repeat(4, 1fr);
     gap: 3cqi;
   }
-  .home-slot {
-    width: 78%;
-  }
   .home-slot-more {
     font-size: 5cqi;
   }
   .home-card-inner {
     padding: 20px 18px 22px;
   }
-  .home-card-badge {
-    font-size: 0.8rem;
-    margin-bottom: 10px;
-  }
-  .home-card-title-row,
-  .home-card-title-row--tight {
-    justify-content: flex-start;
+  .home-card-header {
     margin-bottom: 14px;
-    gap: 8px;
   }
   .home-card-title,
   .home-card-title--tight {
     /* Every card is nearly full viewport width here, so even the
        longest heading has plenty of room - reset to the same shared
        size instead of staying artificially small. */
-    font-size: min(6cqi, 1.9rem);
+    font-size: min(6.6cqi, 2.05rem);
     letter-spacing: 0.02em;
+  }
+  .home-card-footer {
+    font-size: 1.05rem;
+    padding-top: 14px;
   }
 }
 
