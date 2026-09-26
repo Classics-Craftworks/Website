@@ -694,7 +694,7 @@ p { margin: 0; }
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
-  border: 1px solid rgba(var(--nav-accent-rgb), 0.35);
+  border: 1.5px solid rgba(var(--nav-accent-rgb), 0.35);
   border-radius: 10%; /* square-ish corners rather than the old rounder tile */
   background: var(--bg);
   box-shadow: 0 0 0 1px rgba(var(--nav-accent-rgb), 0.06) inset;
@@ -702,13 +702,10 @@ p { margin: 0; }
   user-select: none;
   -webkit-user-drag: none;
 }
-.home-card:hover .home-slot {
-  border-color: rgba(var(--nav-accent-rgb), 0.75);
-}
 /* Unused slot (a section with fewer than four projects): faint
    dashed outline so the card keeps its shape without looking broken. */
 .home-slot-empty {
-  border: 1px dashed rgba(var(--border-rgb), 0.6);
+  border: 2px dashed rgba(var(--border-rgb), 0.6);
   background: transparent;
   box-shadow: none;
 }
