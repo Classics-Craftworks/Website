@@ -375,20 +375,16 @@ function countUndismissedBadges(page) {
 }
 
 // Small yellow count pill appended to a nav button for a page that
-// still has undismissed "New"/"Updated" badges somewhere on it - a
-// hint to visit even when that page isn't the one currently open.
-// Caps the displayed number at 9 ("9+") so the pill doesn't have to
-// grow to fit wider text. `title` gives sighted mouse users a hover
-// tooltip; `aria-label` gives the same "X new updates" wording to
-// screen readers instead of the bare number (which is hidden from
-// them via aria-hidden, since it'd otherwise be read twice).
+// still has undismissed "New"/"Updated" badges somewhere on it.
+// Caps the displayed number at "9+" so the pill doesn't have to
+// grow to fit wider text.
 function navBadgeDot(count) {
   const label = count > 9 ? '9+' : String(count);
   const words = count === 1 ? 'update' : 'updates';
   const text = `${count} new ${words}`;
   return el('span', {
     class: 'nav-jump-dot',
-    attrs: { title: text, 'aria-label': text }
+    attrs: { 'data-tooltip': text, 'aria-label': text }
   }, [
     el('span', { attrs: { 'aria-hidden': 'true' }, text: label })
   ]);

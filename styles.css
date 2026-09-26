@@ -344,14 +344,11 @@ p { margin: 0; }
 }
 
 /* Numbered pill flagging a page with undismissed "New"/"Updated"
-   badges (see countUndismissedBadges() in section-page.js). Sits on
-   the button's outer corner regardless of which page is active, with
-   a border matching the nav bar behind it so it reads as a notch cut
-   into the pill rather than a solid square corner. */
+   badges (see countUndismissedBadges() in section-page.js). */
 .nav-jump-dot {
   position: absolute;
-  top: -7px;
-  right: -7px;
+  top: -5px;
+  right: -5px;
   min-width: 18px;
   height: 18px;
   padding: 0 4px;
@@ -365,7 +362,19 @@ p { margin: 0; }
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: default;
+}
+
+/* Yellow variant of the shared [data-tooltip] hover tooltip */
+.nav-jump-dot[data-tooltip]::after {
+  background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
+  border-color: color-mix(in srgb, var(--badge-color), black 25%);
+  color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
+}
+.nav-jump-dot[data-tooltip]:hover::after,
+.nav-jump-dot[data-tooltip]:focus-visible::after {
+  background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
+  border-color: color-mix(in srgb, var(--badge-color), black 25%);
+  color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
 }
 .nav-jump-btn:hover {
   background: var(--nav-btn-hover-bg);
@@ -373,7 +382,7 @@ p { margin: 0; }
 }
 .nav-jump-btn:active { transform: scale(0.97); }
 
-/* Filled-in style for the page you're currently on. */
+/* Filled-in style for the page you're currently on */
 .nav-jump-btn.is-open {
   background: var(--nav-btn-active-bg);
   border-color: var(--nav-btn-active-bg);
@@ -392,7 +401,7 @@ p { margin: 0; }
   flex: 1 1 0;
   min-width: 170px;
   max-width: 240px;
-  margin-right: 16px; /* mirrors .nav-jump-row's left margin */
+  margin-right: 16px;
 }
 
 .nav-search-icon {
@@ -409,7 +418,6 @@ p { margin: 0; }
 
 .nav-search-input {
   width: 100%;
-  /* Removes the browser's own search-box styling, so only ours shows. */
   -webkit-appearance: none;
   appearance: none;
   border: 1px solid var(--nav-btn-border);
@@ -1089,9 +1097,6 @@ p { margin: 0; }
   transform: scale(0.85) translateY(2px);
 }
 
-/* Invisible hit-slop, since the pill itself is quite short. Only the
-   nested .channel-badge-dismiss circle uses ::before/::after, so this
-   element's own ::before is free to use here. */
 .channel-badge::before {
   content: '';
   position: absolute;
