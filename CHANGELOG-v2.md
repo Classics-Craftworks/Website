@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.0.0-dev.8 — 2026/09/26
+
+### Added
+- Stats section to home page
+
+### Changed
+- Updated Classic's Craftworks project icon
+
 ## v2.0.0-dev.7 — 2026/09/25
 
 ### Added
