@@ -857,7 +857,7 @@ p { margin: 0; }
   font-size: 0.72rem;
   color: var(--text-soft);
   text-align: left;
-  max-width: 50ch;
+  max-width: 120ch;
   font-style: italic;
 }
 
