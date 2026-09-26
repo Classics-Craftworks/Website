@@ -791,8 +791,99 @@ p { margin: 0; }
     /* Every card is nearly full viewport width here, so even the
        longest heading has plenty of room — reset to the same shared
        size instead of staying artificially small. */
-    font-size: min(6cqi, 1.9rem); /* shrunk to match the smaller icons */
+    font-size: min(6cqi, 1.9rem);
     letter-spacing: 0.02em;
+  }
+}
+
+/* ---------- Home page: stats section ---------- */
+/* Three boxes built by renderStats() in index.js from STATS_DATA
+   (stats.js), plus a "last updated" line and a small note
+   underneath. Edit stats.js to change the numbers/text;
+   edit here to change how they look. */
+.stats-section {
+  margin-top: 40px;
+}
+
+.stats-heading {
+  font-family: 'Minercraftory', var(--font);
+  font-weight: 500;
+  font-size: clamp(1.2rem, 3.3vw, 1.4rem);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text);
+  margin: 0 0 16px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-align: center;
+}
+
+.stat-box .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--nav-accent);
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-family: 'Minercraftory', var(--font);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 4.2vw, 2.1rem);
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.stats-note {
+  margin-top: 10px;
+  font-size: 0.72rem;
+  color: var(--text-soft);
+  text-align: left;
+  max-width: 90ch;
+  font-style: italic;
+}
+
+.stats-updated {
+  margin-top: 4px;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  text-align: left;
+  font-style: italic;
+}
+
+/* Empty text nodes (no lastUpdated/note in stats.js) collapse to
+   nothing instead of leaving blank vertical gaps. */
+.stats-updated:empty,
+.stats-note:empty {
+  display: none;
+}
+
+@media (max-width: 890px) {
+  .stats-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
   }
 }
 
@@ -1625,7 +1716,7 @@ p { margin: 0; }
 /* Adds a little padding so focus rings on edge elements (like the
    last button in a row) don't get clipped by the overflow rule above.
    The matching negative margin cancels it out visually. */
-.masthead, .section-nav, #catalog, .site-footer {
+.masthead, .section-nav, #catalog, .stats-section, .site-footer {
   overflow-x: clip;
   max-width: calc(100% + 12px);
   padding-left: 6px;

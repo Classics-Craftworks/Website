@@ -7,10 +7,12 @@
    bottom). The icons are decoration only — the whole button is the
    one link.
 
-   Loaded after data.js and section-page.js, which supply
-   SITE_DATA and the shared brand / nav / footer helpers used below.
-   Edit data.js to change what's shown (section order, project order
-   and images all come from there).
+   Loaded after data.js and section-page.js, which supply SITE_DATA
+   and the shared brand / nav / footer helpers used below, and after
+   stats.js, which supplies STATS_DATA for the Statistics section
+   further down this file. Edit data.js to change what's shown
+   section order, project order and images all come from there;
+   edit stats.js to change the stat numbers.
    ============================================================ */
 
 // How many icon slots each button has. A section with more projects
@@ -128,6 +130,34 @@ function renderHomeButtons(sections, pages) {
   main.appendChild(grid);
 }
 
+// Builds one box of the stats section ({ icon, label, value } — see
+// stats.js). "icon" is optional; the box just skips it if left off.
+function renderStatBox(stat) {
+  return el('div', { class: 'stat-box' }, [
+    stat.icon ? icon(stat.icon, 'icon-md') : null,
+    el('span', { class: 'stat-value', text: stat.value }),
+    el('span', { class: 'stat-label', text: stat.label })
+  ]);
+}
+
+// Fills in the Statistics section from STATS_DATA (stats.js):
+// the three boxes, the "last updated" line and the small note under
+// it. Does nothing if stats.js hasn't been loaded, or if any of its
+// fields are left blank, so a missing stats.js can't break the rest
+// of the home page.
+function renderStats(stats) {
+  if (!stats) return;
+
+  const grid = document.getElementById('stats-grid');
+  if (grid) (stats.stats || []).forEach(s => grid.appendChild(renderStatBox(s)));
+
+  const note = document.getElementById('stats-note');
+  if (note && stats.note) note.textContent = stats.note;
+
+  const updated = document.getElementById('stats-updated');
+  if (updated && stats.lastUpdated) updated.textContent = 'Last updated: ' + stats.lastUpdated;
+}
+
 // Before the home page became a set of buttons, index.html held every
 // project, and the "copy link" buttons produced links like
 // index.html#better-craftables (or #resource-packs for a whole
@@ -162,6 +192,7 @@ function forwardOldDeepLink(sections, pages) {
   renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
   renderPageNav(pages, 'index.html');
   renderHomeButtons(sections, pages);
+  renderStats(typeof STATS_DATA !== 'undefined' ? STATS_DATA : null);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderStructuredData(SITE_DATA, null); // null = describe every project, not just one section
   initBackToTop();

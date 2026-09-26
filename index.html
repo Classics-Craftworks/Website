@@ -84,6 +84,17 @@
        it to the normal Tab order. -->
   <main id="catalog" tabindex="-1"></main>
 
+  <!-- Home page statistics section: three boxes plus a "last
+       updated" line and a note about where the figures come from.
+       Starts empty — renderStats() in index.js fills it in from
+       STATS_DATA (stats.js). Edit stats.js to change the numbers. -->
+  <section id="stats-section" class="stats-section" aria-labelledby="stats-heading">
+    <h2 id="stats-heading" class="stats-heading">Statistics</h2>
+    <div id="stats-grid" class="stats-grid"></div>
+    <p id="stats-note" class="stats-note"></p>
+    <p id="stats-updated" class="stats-updated"></p>
+  </section>
+
   <footer class="site-footer">
     <div id="social-links" class="social-row" aria-label="Social links"></div>
     <p id="copyright" class="footer-line"></p>
@@ -101,6 +112,7 @@
 </div>
 
 <script src="data.js" defer></script>
+<script src="stats.js" defer></script>
 <script src="section-page.js" defer></script>
 <script src="index.js" defer></script>
 <script src="search.js" defer></script>
