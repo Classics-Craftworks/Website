@@ -255,7 +255,7 @@ function initSearch() {
     list.hidden = !results.length;
     empty.hidden = !!results.length;
     if (!results.length) {
-      empty.textContent = `No projects match “${query}”. Try a name or a version number.`;
+      empty.textContent = `No projects match "${query}". Try a name or a version number.`;
     }
     status.textContent = results.length
       ? `${results.length} result${results.length === 1 ? '' : 's'}`
