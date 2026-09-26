@@ -688,7 +688,7 @@ p { margin: 0; }
   transition: transform var(--transition-fast);
 }
 .home-card:hover .home-card-arrow {
-  transform: rotate(45deg) translate(12%, -12%);
+  transform: rotate(45deg) translate(28%, -28%);
 }
 
 /* The four icons, numbered 1–4 left to right, top to bottom.
