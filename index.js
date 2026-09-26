@@ -155,7 +155,7 @@ function renderStats(stats) {
   if (note && stats.note) note.textContent = stats.note;
 
   const updated = document.getElementById('stats-updated');
-  if (updated && stats.lastUpdated) updated.textContent = 'Last updated: ' + stats.lastUpdated;
+  if (updated && stats.lastUpdated) updated.textContent = 'As of ' + stats.lastUpdated;
 }
 
 // Before the home page became a set of buttons, index.html held every
