@@ -18,34 +18,37 @@
 /* Named colors/values reused throughout the file. Change one here and
    it updates everywhere it's used. */
 :root {
-  --bg:            #18181B;  /* page background */
-  --surface:       #27272A;  /* thumbnails, chips, panel backgrounds */
-  --surface-hover: #3F3F46;  /* hover state for surfaces above */
-  --text:          #F4F4F5;  /* primary text */
-  --text-soft:     #AFAFB8;  /* secondary text */
-  --accent:        #2ff9f3;  /* primary accent - used for keyboard selections */
-  --accent-rgb:    47, 249, 243;
-  --accent-hover:  #99fcf9;  /* accent hover */
-  --border:        #4E4E58;  /* hairline borders/dividers */
-  --border-rgb:    78, 78, 88;
-  --white-rgb:     255, 255, 255;  /* used for translucent white fills/borders (nav) */
+  color-scheme: dark;
 
-/* Nav Button & Controls Colors */
-  --nav-accent:           #7DA6E0;
-  --nav-accent-rgb:       125, 166, 224;
+  /* Base & Surface Colors */
+  --bg:            #0d111a; /* page background */
+  --surface:       #131a27; /* thumbnails, chips, panel backgrounds */
+  --surface-hover: #1c2638; /* hover state for surfaces above */
+  --text:          #f4f6fa; /* primary text */
+  --text-soft:     #8f9bb3; /* secondary text */
+
+  /* Accent & Borders */
+  --accent:        #74c4e7; /* primary accent, used for keyboard selections. */
+  --border:        #233044; /* hairline borders/dividers */
+  --border-rgb:    35, 48, 68;
+  --white-rgb:     255, 255, 255; /* used for translucent white fills/borders (nav) */
+
+  /* Nav Controls & Glow Accent */
+  --nav-accent:           #41a0c8;
+  --nav-accent-rgb:       65, 160, 200;
   --nav-btn-rgb:          var(--nav-accent-rgb);
 
-  --nav-btn-bg:           rgba(var(--nav-btn-rgb), 0.08);
-  --nav-btn-border:       rgba(var(--nav-btn-rgb), 0.25);
-  --nav-btn-hover-bg:     rgba(var(--nav-btn-rgb), 0.18);
-  --nav-btn-hover-border: rgba(var(--nav-btn-rgb), 0.50);
+  --nav-btn-bg:           rgba(var(--nav-btn-rgb), 0.12);
+  --nav-btn-border:       rgba(var(--nav-btn-rgb), 0.35);
+  --nav-btn-hover-bg:     rgba(var(--nav-btn-rgb), 0.25);
+  --nav-btn-hover-border: rgba(var(--nav-btn-rgb), 0.65);
 
   --nav-btn-active-bg:     var(--nav-accent);
   --nav-btn-active-text:   var(--bg);
 
-/* Nav Bar Shadow & Background */
-  --nav-bg:      color-mix(in srgb, var(--bg, #121318), white 5%);
-  --nav-border:  rgba(255, 255, 255, 0.08);
+  /* Nav Bar Shadow & Background */
+  --nav-bg:      rgba(15, 22, 35);
+  --nav-border:  rgba(var(--nav-accent-rgb), 0.25);
   --nav-shadow:  
     0 10px 30px -5px rgba(0, 0, 0, 0.5),
     0 0 0 1px var(--nav-border);
@@ -60,8 +63,8 @@
   --ch-alpha:      #F2607E;  /* alpha channel */
   --ch-alpha-rgb:  242, 96, 126;
 
-  --ch-unsupported:      #5C96DE;  /* unsupported channel */
-  --ch-unsupported-rgb:  92, 150, 222;
+  --ch-unsupported:      #929292;  /* unsupported channel */
+  --ch-unsupported-rgb:  146, 146, 146;
 
   --badge-color:      #efdd65;  /* "new"/"updated" channel badge */
   --badge-color-rgb:  239, 221, 101;
@@ -76,8 +79,8 @@
   --alpha-border:  0.25;  /* dividers/borders on tinted surfaces */
   --alpha-light:   0.2;   /* faint borders on tinted surfaces */
   --alpha-medium:  0.4;   /* stronger borders */
-  --alpha-bold:    0.6;   /* muted text, "unavailable" state */
-  --alpha-strong:  0.65;  /* muted text on tinted surfaces */
+  --alpha-bold:    0.88;  /* muted text, "unavailable" state */
+  --alpha-strong:  0.92;  /* muted text on tinted surfaces */
 
 /* Fonts */
   --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -91,7 +94,7 @@
   --transition-snap: 0.1s ease;
 }
 
-/* Each channel box gets a data-channel attribute (set in script.js).
+/* Each channel box gets a data-channel attribute (set in section-page.js).
    These rules point --channel-color at the right color for that
    channel, so the rest of the CSS can just use --channel-color. */
 .channel-group[data-channel="stable"] {
@@ -119,17 +122,13 @@
 /* Reserves space for a scrollbar on desktop, so the page doesn't shift
    when one appears. Turned off on mobile, where scrollbars float over
    the content instead of taking up space. */
-html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; }
+html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; overflow-x: clip; }
 @media (max-width: 620px) {
   html { scrollbar-gutter: auto; }
 }
 
-/* Extra safety net against horizontal scrolling. Uses "clip" instead
-   of "hidden" so it doesn't break the sticky nav bar in Safari. */
-html {
-  overflow-x: clip;
-}
-
+/* html/body use overflow-x: clip (not "hidden") as a safety net against
+   horizontal scrolling, so the sticky nav bar still works in Safari. */
 body {
   margin: 0;
   background-color: var(--bg);
@@ -149,7 +148,7 @@ a { color: inherit; text-decoration: none; }
 /* ---------- Skip link ---------- */
 /* Off-screen until it receives keyboard focus (Tab from page load),
    then slides into view at the top-left so sighted keyboard users can
-   see and activate it too — not just screen reader users. */
+   see and activate it too - not just screen reader users. */
 .skip-link {
   position: absolute;
   top: -60px;
@@ -168,10 +167,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ---------- No-JS fallback ---------- */
-/* Only ever shown when JavaScript is disabled/blocked (see the
-   <noscript> block in index.html) — the rest of the page, including
-   this stylesheet's own body background/color above, still applies
-   normally since those come from plain CSS, not script.js. */
+/* Only shown when JavaScript is disabled/blocked (see the <noscript>
+   blocks in the HTML pages). Everything else on those pages is built
+   by JS, but the body background/color above still apply. */
 .noscript-notice {
   max-width: 480px;
   margin: 15vh auto 0;
@@ -204,7 +202,6 @@ p { margin: 0; }
 /* Same focus ring as above, listed explicitly for the buttons/links
    people tab through most, so a future style change can't accidentally
    remove it. */
-.catalog-section > summary:focus-visible,
 .download-btn:focus-visible,
 .top-link:focus-visible,
 .text-link:focus-visible,
@@ -212,9 +209,7 @@ p { margin: 0; }
 .version-link:focus-visible,
 .credits-link:focus-visible,
 .nav-jump-btn:focus-visible,
-.nav-toggle-all:focus-visible,
-.copy-link-btn:focus-visible,
-.nav-search-clear:focus-visible {
+.copy-link-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
@@ -224,7 +219,7 @@ p { margin: 0; }
   max-width: 1100px;
   margin: 0 auto;
   /* The env() additions are 0px on any device without a notch/inset,
-   so this is a no-op there — they only matter on phones with a
+   so this is a no-op there - they only matter on phones with a
    notch, Dynamic Island, or rounded-corner cutout, and when the
    viewport-fit=cover meta tag lets content draw under them. */
   padding: calc(28px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
@@ -294,20 +289,20 @@ p { margin: 0; }
 /* Shared layout for every button-like element on the page (nav links,
    jump buttons, download buttons). Each keeps its own colors/sizing
    below. */
-.top-link, .text-link, .nav-jump-btn, .nav-toggle-all, .download-btn {
+.top-link, .text-link, .nav-jump-btn, .download-btn {
   display: inline-flex;
   align-items: center;
 }
 
-/* ---------- Section nav (jump links, expand/collapse all, search) ---------- */
-/* Sticks to the top of the screen while scrolling, so search and
-   navigation stay reachable. */
+/* ---------- Page nav ---------- */
+/* The row of page links, sticky at the top of the screen while
+   scrolling (built by renderPageNav() in section-page.js). */
 .section-nav {
   position: sticky;
-  /* Keeps the sticky offset itself clear of a notch/Dynamic Island —
+  /* Keeps the sticky offset itself clear of a notch/Dynamic Island -
    matters in standalone/PWA mode where there's no browser chrome
    already pushing content down. 0px on ordinary devices. */
-  top: calc(4px + env(safe-area-inset-top));
+  top: calc(6px + env(safe-area-inset-top));
   margin-top: 8px;
   z-index: 30;
   display: flex;
@@ -316,7 +311,7 @@ p { margin: 0; }
   justify-content: space-between;
   gap: 12px;
   padding: 14px 32px;
-  border-radius: 24px;
+  border-radius: 14px;
   background: var(--nav-bg);
   border: 1px solid var(--nav-btn-border);
   box-shadow: var(--nav-shadow);
@@ -328,12 +323,14 @@ p { margin: 0; }
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-left: 16px;
+  margin-left: 16px; /* the nav's side padding is overridden to 6px near the bottom of this file, so this keeps the buttons off its rounded corner */
 }
 
 /* Styled differently from other buttons on the page so they clearly
    read as navigation. */
 .nav-jump-btn {
+  position: relative;
+  gap: 7px;
   border: 1px solid var(--nav-btn-border);
   border-radius: 6px;
   background: var(--nav-btn-bg);
@@ -345,15 +342,56 @@ p { margin: 0; }
   cursor: pointer;
   transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
+
+/* Numbered pill flagging a page with undismissed "New"/"Updated"
+   badges (see countUndismissedBadges() in section-page.js). */
+.nav-jump-dot {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--badge-color);
+  border: 2px solid var(--nav-bg);
+  color: var(--bg);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-jump-dot::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: -1px;
+  bottom: -20px;
+  left: -20px;
+}
+
+/* Yellow variant of the shared [data-tooltip] hover tooltip */
+.nav-jump-dot[data-tooltip]::after {
+  background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
+  border-color: color-mix(in srgb, var(--badge-color), black 25%);
+  color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
+}
+.nav-jump-dot[data-tooltip]:hover::after,
+.nav-jump-dot[data-tooltip]:focus-visible::after {
+  background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
+  border-color: color-mix(in srgb, var(--badge-color), black 25%);
+  color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
+}
 .nav-jump-btn:hover {
   background: var(--nav-btn-hover-bg);
   border-color: var(--nav-btn-hover-border);
 }
 .nav-jump-btn:active { transform: scale(0.97); }
 
-/* Filled-in style for when a section is open, so the jump row also
-   shows what's currently expanded. Uses the nav button color state
-   so the active nav state is unmistakably a *navigation* signal. */
+/* Filled-in style for the page you're currently on */
 .nav-jump-btn.is-open {
   background: var(--nav-btn-active-bg);
   border-color: var(--nav-btn-active-bg);
@@ -364,53 +402,14 @@ p { margin: 0; }
   border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
 }
 
-/* ---------- Expand/Collapse All + search ---------- */
-/* Sits at the end of the jump row, since it's a navigation control
-   too — just acting on every section at once. */
-.nav-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  flex-wrap: wrap;
-  flex: 1;
-}
-
-/* A simple vertical divider between the section buttons and
-   Expand/Collapse All. Hidden on mobile. */
-.nav-divider {
-  width: 1px;
-  height: 30px;
-  margin: 0 8px;
-  background: rgba(var(--white-rgb), var(--alpha-border));
-  flex-shrink: 0;
-}
-
-.nav-toggle-all {
-  border: 1px solid var(--nav-btn-border);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--text-soft);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 500;
-  padding: 7px 14px;
-  cursor: pointer;
-  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
-}
-.nav-toggle-all:hover {
-  color: var(--text);
-  background: var(--nav-btn-hover-bg);
-  border-color: var(--nav-btn-hover-border);
-}
-.nav-toggle-all:active { transform: scale(0.97); }
-
-.nav-search-wrap {
+/* ---------- Search ---------- */
+/* Search box at the right of the nav bar (built by search.js), with a
+   results dropdown that hangs below it. */
+.nav-search {
   position: relative;
-  flex: 0 1 auto;
-  width: 220px; /* default before JS measures the top-links row; kept in sync with it on load/resize */
-  max-width: 100%;
-  margin-left: auto;
+  flex: 1 1 0;
+  min-width: 170px;
+  max-width: 240px;
   margin-right: 16px;
 }
 
@@ -422,20 +421,21 @@ p { margin: 0; }
   color: var(--text-soft);
   pointer-events: none;
 }
+.nav-search:focus-within .nav-search-icon {
+  color: var(--text);
+}
 
 .nav-search-input {
   width: 100%;
-  /* Removes the browser's own search-box styling so only our custom
-   focus ring shows. */
   -webkit-appearance: none;
   appearance: none;
   border: 1px solid var(--nav-btn-border);
-  border-radius: 6px;
+  border-radius: 16px;
   background: var(--surface);
   color: var(--text);
   font: inherit;
   font-size: 0.85rem;
-  padding: 8px 30px 8px 32px; /* Reserves room for the clear ("×") button so text doesn't shift when it appears */
+  padding: 8px 30px 8px 32px; /* room for the icon, and for the clear button so text doesn't shift when it appears */
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .nav-search-input::-webkit-search-decoration,
@@ -446,17 +446,14 @@ p { margin: 0; }
 }
 .nav-search-input::placeholder { color: var(--text-soft); }
 /* Applies on any focus (not just keyboard), so clicking into the box
-   always shows this style instead of the browser default. */
+   always shows this ring instead of the browser default. */
 .nav-search-input:focus {
-  outline: none !important;
+  outline: none;
   border-color: var(--nav-btn-hover-border);
-}
-.nav-search-wrap:focus-within .nav-search-icon {
-  color: var(--text);
+  box-shadow: 0 0 0 3px rgba(var(--nav-accent-rgb), 0.2);
 }
 
-/* Clears the search box. Drawn as a plain "×" out of two rotated bars,
-   like the other icon-free shapes in this file. */
+/* Clears the search box. Drawn as a plain "×" out of two rotated bars. */
 .nav-search-clear {
   position: absolute;
   right: 5px;
@@ -475,8 +472,8 @@ p { margin: 0; }
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
-/* Makes sure the `hidden` attribute (set in script.js) actually hides
-   this button, overriding the display: flex above. */
+/* Makes sure the `hidden` attribute actually hides this button,
+   overriding the display: flex above. */
 .nav-search-clear[hidden] {
   display: none;
 }
@@ -497,98 +494,111 @@ p { margin: 0; }
 .nav-search-clear::before { transform: rotate(45deg); }
 .nav-search-clear::after { transform: rotate(-45deg); }
 
-.nav-search-empty {
-  margin: 20px 0 0;
+/* The dropdown. Sits inside the sticky nav, so it stays above the page
+   content. It's right-aligned with the search box and grows leftwards
+   (the nav clips horizontal overflow, so it must stay inside the nav). */
+.search-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 380px;
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  border: 1px solid var(--nav-btn-border);
+  border-radius: 14px;
+  background: var(--nav-bg);
+  box-shadow: var(--nav-shadow);
+}
+
+.search-result {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  color: var(--text);
+}
+.search-result.is-active {
+  background: var(--nav-btn-hover-bg);
+}
+
+.search-result-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--bg);
+}
+
+.search-result-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.search-result-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.search-result-meta {
+  font-size: 0.78rem;
   color: var(--text-soft);
-  font-size: 0.9rem;
+}
+.search-result-title,
+.search-result-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Matched text in results. */
+.search-panel mark {
+  padding: 0 1px;
+  border-radius: 3px;
+  background: rgba(var(--nav-accent-rgb), 0.3);
+  color: inherit;
+}
+
+.search-empty {
+  padding: 14px 12px;
+  color: var(--text-soft);
+  font-size: 0.88rem;
   text-align: center;
 }
 
-/* ---------- Sections ---------- */
-/* Keeps the box model consistent for the open/close animation in
-   script.js's Accordion class. */
-.catalog-section {
-  margin-top: 24px;
-  /* Keeps the heading clear of the sticky nav bar when jumped to.
-   The --sticky-nav-offset custom property is measured in script.js
-   from the bar's real height, since it wraps onto more rows on
-   narrow screens or with more sections; 68px is just a same-page
-   fallback for the instant before that JS runs. */
-  scroll-margin-top: var(--sticky-nav-offset, 68px);
-  box-sizing: border-box;
-  /* Stops the browser from auto-adjusting scroll position while this
-   element's height is animating (open/close). */
-  overflow-anchor: none;
-}
-
-/* The whole bar is clickable, not just the heading text, so it reads
-   as an obvious button for expanding/collapsing. */
-.catalog-section > summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  list-style: none; /* hides the default expand/collapse marker (Firefox/Chrome) */
-  user-select: none;
-  cursor: pointer;
-  padding: 11px 20px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
-}
-.catalog-section > summary:hover {
-  background: var(--surface-hover);
-}
-.catalog-section > summary::-webkit-details-marker {
-  display: none; /* hides the default expand/collapse marker (older Safari) */
-}
-
-/* Groups the heading and count badge on the left. */
-.section-heading-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0; /* lets a long heading truncate instead of overflowing */
-}
-
-/* Pulls the copy-link icon a bit closer to the count badge. */
-.section-heading-group .copy-link-btn {
-  margin-left: -5px;
-}
-
-.catalog-section h2 {
-  font-size: clamp(1.2rem, 3vw, 1.45rem);
-  color: var(--text);
-  padding-left: 22px; /* room for the chevron below */
-  position: relative;
-}
-
-/* Own element so the press-shrink effect doesn't also shrink the
-   chevron. */
-.heading-label {
-  display: inline-block;
-  transition: transform var(--transition-snap);
-}
-
-/* Custom expand/collapse chevron, drawn with borders instead of an
-   image */
-.catalog-section h2::after {
-  content: '';
+/* Text for screen readers only (the live result count). */
+.visually-hidden {
   position: absolute;
-  left: 0;
-  top: 50%;
-  width: 10px;
-  height: 10px;
-  border-right: 2px solid var(--text);
-  border-bottom: 2px solid var(--text);
-  transform: translateY(-50%) rotate(-45deg); /* points right when collapsed */
-  transition: transform 0.3s ease-in-out;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
-/* Flips the chevron to point down when the section is open. */
-.catalog-section[data-state="expanded"] h2::after {
-  transform: translateY(-50%) rotate(45deg);
+/* ---------- Flat section heading ---------- */
+/* The heading of a section page (e.g. data-packs-mods.html), next to
+   its project-count badge. */
+.flat-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: clamp(1.7rem, 4.5vw, 2.2rem);
+  font-weight: 700;
+  color: var(--text);
+  margin: 20px 0 20px;
+  /* Keeps it clear of the sticky nav bar when linked/scrolled to.
+     --sticky-nav-offset is measured from the bar's real height in
+     renderPageNav(); 68px is the fallback until that runs. */
+  scroll-margin-top: var(--sticky-nav-offset, 68px);
 }
 
 /* Small badge showing how many projects are in this section. */
@@ -596,70 +606,300 @@ p { margin: 0; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 24px;
-  height: 24px;
+  min-width: 30px;
+  height: 30px;
   padding: 0 7px;
-  border-radius: 7px;
-  font-size: 0.8rem;
+  border-radius: 9px;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text);
   background: var(--surface-hover);
   border: 1px solid var(--border);
   flex-shrink: 0;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
-/* Darker badge color on hover, so it still stands out. */
-.catalog-section > summary:hover .section-count {
-  background: color-mix(in srgb, var(--surface-hover), white 15%);
-  border-color: color-mix(in srgb, var(--border), white 15%);
+/* ---------- Home page: section buttons ---------- */
+/* index.js builds one of these per section - a big link showing its
+   first four project icons. Sized in cqi (via container-type below)
+   so a card scales uniformly at any width. */
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 24px;
 }
 
-/* A stack of thumbnails that peeks out while the section is
-   collapsed, and fades away once it's opened. */
-.section-peek {
+.home-card {
+  display: block;
+  container-type: inline-size;
+  border-radius: 18px;
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.3);
+  background: var(--surface);
+  color: var(--text);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+.home-card:hover {
+  background: var(--surface-hover);
+  border-color: rgba(var(--nav-accent-rgb), 0.7);
+}
+.home-card:active { transform: scale(0.99); }
+
+/* Padding lives here rather than on .home-card, because cqi units
+   resolve against an *ancestor* container - .home-card can't size its
+   own padding by its own width. */
+.home-card-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 5cqi 7cqi 7cqi;
+}
+.home-card-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 6cqi;
+}
+.home-card-title {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: 'Minercraftory', var(--font);
+  font-size: min(6.4cqi, 2.7rem);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Drawn as a rotated corner (same "shape out of borders" trick as the
+   "+" on the overflow tile below) rather than an image, so it's just
+   two lines and needs no extra icon asset. */
+.home-card-arrow {
+  flex-shrink: 0;
+  width: min(3.2cqi, 1rem);
+  height: min(3.2cqi, 1rem);
+  border-top: 0.16em solid var(--nav-accent);
+  border-right: 0.16em solid var(--nav-accent);
+  transform: rotate(45deg);
+  transition: transform var(--transition-fast);
+}
+.home-card:hover .home-card-arrow {
+  transform: rotate(45deg) translate(28%, -28%);
+}
+
+/* The four icons, 1–4 left to right, top to bottom. 1fr columns fill
+   the card's full content width, so the grid's left/right edges line up
+   exactly with the header icon and footer text/arrow above and below it. */
+.home-slots {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6cqi;
+}
+.home-slot {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 1.5px solid rgba(var(--nav-accent-rgb), 0.35);
+  border-radius: 10%; /* square-ish corners rather than the old rounder tile */
+  background: var(--bg);
+  box-shadow: 0 0 0 1px rgba(var(--nav-accent-rgb), 0.06) inset;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* Unused slot (a section with fewer than four projects): faint
+   dashed outline so the card keeps its shape without looking broken,
+   plus a faint "?" so it doesn't read as a loading/broken state. */
+.home-slot-empty {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
-  opacity: 1;
-  transition: opacity var(--transition-fast);
+  justify-content: center;
+  border: 2px dashed rgba(var(--border-rgb), 0.6);
+  background: transparent;
+  box-shadow: none;
 }
-.catalog-section[data-state="expanded"] .section-peek {
-  opacity: 0;
-  pointer-events: none;
+.home-slot-empty::after {
+  content: '?';
+  font-family: 'Minercraftory', var(--font);
+  font-size: 14cqi;
+  line-height: 1;
+  color: rgba(var(--border-rgb), 0.6);
 }
-
-.section-peek-thumb,
-.section-peek-more {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  flex-shrink: 0;
-  margin-left: -8px;
-  /* Matches the background color so overlapping thumbnails look neatly
-   layered. */
-  border: 2px solid var(--surface);
-}
-.section-peek-thumb:first-child,
-.section-peek-more:first-child {
-  margin-left: 0;
-}
-.section-peek-thumb {
-  object-fit: cover;
-  background: var(--bg);
-}
-.section-peek-more {
+/* Last slot of a section with more projects than fit: a "+X" tile
+   counting the ones not shown. */
+.home-slot-more {
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--surface-hover);
-  color: var(--text-soft);
-  font-size: 0.75rem;
-  font-weight: 600;
+  color: var(--text);
+  font-family: 'Minercraftory', var(--font);
+  font-size: 10cqi;
+  line-height: 1;
+  white-space: nowrap;
+}
+/* The "+": two crossed bars, since the pixel font has no plus glyph. */
+.home-slot-more-plus {
+  flex-shrink: 0;
+  width: 0.62em;
+  height: 0.62em;
+  margin-right: 0.12em;
+  background:
+    linear-gradient(currentColor, currentColor) center / 100% 0.18em no-repeat,
+    linear-gradient(currentColor, currentColor) center / 0.18em 100% no-repeat;
 }
 
-.catalog-section[data-state="collapsed"] .project-list {
-  pointer-events: none;
+/* "Browse N projects" (with the section's icon) + the arrow, pinned
+   to the bottom of the card */
+.home-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4cqi;
+  margin-top: auto;
+  padding-top: 6cqi;
+  color: var(--nav-accent);
+  font-size: min(4.7cqi, 1.15rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.home-card-footer-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-card-icon {
+  width: 1.3em;
+  height: 1.3em;
+  color: var(--nav-accent);
+}
+
+/* One button per row on phones/small tablets, icons in a single row.
+   Shares the site-wide 890px "collapse to mobile" breakpoint. */
+@media (max-width: 890px) {
+  .home-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .home-slots {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3cqi;
+  }
+  .home-slot-more {
+    font-size: 5cqi;
+  }
+  .home-card-inner {
+    padding: 20px 18px 22px;
+  }
+  .home-card-header {
+    margin-bottom: 14px;
+  }
+  .home-card-title,
+  .home-card-title--tight {
+    /* Every card is nearly full viewport width here, so even the
+       longest heading has plenty of room - reset to the same shared
+       size instead of staying artificially small. */
+    font-size: min(6.6cqi, 2.05rem);
+    letter-spacing: 0.02em;
+  }
+  .home-card-footer {
+    font-size: 1.05rem;
+    padding-top: 14px;
+  }
+}
+
+/* ---------- Home page: stats section ---------- */
+/* Three boxes built by renderStats() in index.js from STATS_DATA
+   (stats.js), plus a "last updated" line and a small note
+   underneath. Edit stats.js to change the numbers/text;
+   edit here to change how they look. */
+.stats-section {
+  margin-top: 30px;
+}
+
+.stats-heading {
+  font-weight: 900;
+  font-size: clamp(1.6rem, 3.9vw, 1.9rem);
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-align: center;
+}
+
+.stat-box .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--nav-accent);
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-family: 'Minercraftory', var(--font);
+  font-size: clamp(1.5rem, 4.2vw, 2.1rem);
+  line-height: 1.15;
+  color: var(--text);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.stats-updated {
+  margin-top: -22px;
+  margin-bottom: 12px;
+  font-size: 0.8rem;
+  color: var(--text-soft);
+  text-align: left;
+}
+
+.stats-note {
+  margin-top: 16px;
+  margin-bottom: -20px;
+  font-size: 0.72rem;
+  color: var(--text-soft);
+  text-align: left;
+  max-width: 120ch;
+  font-style: italic;
+}
+
+/* Empty text nodes (no lastUpdated/note in stats.js) collapse to
+   nothing instead of leaving blank vertical gaps. */
+.stats-updated:empty,
+.stats-note:empty {
+  display: none;
+}
+
+@media (max-width: 890px) {
+  .stats-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
 }
 
 .project-list {
@@ -675,9 +915,7 @@ p { margin: 0; }
   padding-top: 24px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(var(--border-rgb), 0.6);
-  align-items: start; /* keeps the thumbnail aligned to the top */
-  /* Same as the section's scroll-margin-top above — keeps a linked
-   project clear of the sticky nav bar. */
+  align-items: start;
   scroll-margin-top: var(--sticky-nav-offset, 68px);
 }
 .project:first-child { padding-top: 4px; }
@@ -706,7 +944,7 @@ p { margin: 0; }
   color: var(--text);
   margin-top: 0;
   line-height: 1.1;
-  transform: translateY(-3px); /* fine-tune this if the title looks off-center */
+  transform: translateY(-3px);
 }
 
 .project-description {
@@ -724,8 +962,7 @@ p { margin: 0; }
 }
 
 /* muted styling, less prominent than the main buttons */
-.project-links a,
-.project-links .top-link {
+.project-links a {
   background-color: transparent;
   border: 1px solid rgba(var(--border-rgb), var(--alpha-medium));
   color: var(--text-soft);
@@ -735,8 +972,7 @@ p { margin: 0; }
 }
 
 /* lights up on hover */
-.project-links a:hover,
-.project-links .top-link:hover {
+.project-links a:hover {
   opacity: 1;
   color: var(--text);
   border-color: var(--border);
@@ -770,8 +1006,8 @@ p { margin: 0; }
   width: 100%;
 }
 
-/* Added by layoutChannelRow() in script.js when a channel box's own
-   header ("Release | Java X.Y") doesn't fit next to its sibling —
+/* Added by layoutChannelRow() in section-page.js when a channel box's own
+   header ("Release | Java X.Y") doesn't fit next to its sibling -
    stacks the boxes full-width instead of letting the header text
    wrap mid-line. */
 .channel-row.stacked {
@@ -779,7 +1015,7 @@ p { margin: 0; }
 }
 /* flex-basis below is a fraction of the row's *main axis*, which
    switches from width to height once the row above stacks into a
-   column — override it back to a natural height so a box doesn't try
+   column - override it back to a natural height so a box doesn't try
    to become "50% tall" instead of "100% wide". */
 .channel-row.stacked > .channel-group {
   flex: 1 1 auto;
@@ -810,11 +1046,9 @@ p { margin: 0; }
   padding-bottom: 12px;
   margin-bottom: 14px;
   border-bottom: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
-  /* Wraps only if the label + version genuinely don't fit next to
-   each other — not tied to the box's width, since a short label
-   ("Release") and a long one ("Experimental") need different amounts
-   of room. The "|" + version move down together as one unit (see
-   .channel-mc-group) rather than the divider being left stranded. */
+  /* Wraps only if label + version don't fit - not tied to box width,
+     since labels vary in length. The "|" + version move down together
+     as one unit (see .channel-mc-group). */
   flex-wrap: wrap;
   row-gap: 4px;
 }
@@ -839,13 +1073,10 @@ p { margin: 0; }
 }
 
 /* ---------- "New" / "Updated" Channel Badge ---------- */
-/* Set per-channel via `badge: "new"` or `badge: "updated"` in data.js.
-   Hangs off the channel box's top-left corner, half on/half off the
-   border, like a tag — outlined rather than filled, so it reads as a
-   small flag rather than a solid sticker.
-   Dismissing it is remembered per-version (see renderChannelBadge() in
-   script.js), so it quietly comes back the next time that channel's
-   `version` is bumped for a fresh release. */
+/* Set per-channel via `badge: "new"`/`"updated"` in data.js. Hangs off
+   the box's top-left corner like an outlined tag. Dismissal is
+   remembered per-version (renderChannelBadge() in section-page.js),
+   so it reappears when that channel's version is next bumped. */
 .channel-badge {
   position: absolute;
   top: -10px;
@@ -863,7 +1094,7 @@ p { margin: 0; }
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--badge-color);
-  background: var(--bg); /* solid, not tinted yellow — cuts a clean "tag" shape out of the border below it */
+  background: var(--bg); /* solid, not tinted yellow - cuts a clean "tag" shape out of the border below it */
   border: 1.5px solid var(--badge-color);
   transition: opacity var(--transition-fast), transform var(--transition-fast);
   cursor: pointer;
@@ -874,16 +1105,13 @@ p { margin: 0; }
   transform: scale(0.85) translateY(2px);
 }
 
-/* Invisible hit-slop, since the pill itself is quite short. Only the
-   nested .channel-badge-dismiss circle uses ::before/::after, so this
-   element's own ::before is free to use here. */
 .channel-badge::before {
   content: '';
   position: absolute;
   inset: -8px;
 }
 
-/* A CSS-drawn "×" (two crossed bars) instead of a text glyph — this
+/* A CSS-drawn "×" (two crossed bars) instead of a text glyph - this
    keeps it pixel-centered regardless of font/line-height quirks. */
 .channel-badge-dismiss {
   position: relative;
@@ -924,7 +1152,7 @@ p { margin: 0; }
 }
 
 /* Keeps the "|" and version glued together as a single flex item, so
-   they wrap to a second line as one unit if they don't fit — instead
+   they wrap to a second line as one unit if they don't fit - instead
    of the version wrapping alone and leaving the separator dangling at
    the end of the first line. */
 .channel-mc-group {
@@ -934,11 +1162,8 @@ p { margin: 0; }
   min-width: 0;
 }
 
-/* Added by layoutChannelRow() in script.js as a last resort — only
-   when a box's header still doesn't fit even after the box has
-   already claimed the full row width (see .channel-row.stacked
-   above). Indents the wrapped second line so it still reads as one
-   unit with the "|" that introduces it. */
+/* Added by layoutChannelRow() as a last resort when a header still
+   doesn't fit at full row width. Indents the wrapped second line. */
 .channel-header.header-force-wrap .channel-mc-group {
   flex-basis: 100%;
   padding-left: 18px;
@@ -956,9 +1181,9 @@ p { margin: 0; }
   margin-top: auto;
 }
 
-/* Added by layoutChannelRow() in script.js when this box's own
+/* Added by layoutChannelRow() in section-page.js when this box's own
    download columns (Data Pack/Mod/etc.) don't have room to sit side
-   by side without a version pill wrapping onto its own line — stacks
+   by side without a version pill wrapping onto its own line - stacks
    them full-width instead, independently of its sibling channel box. */
 .channel-downloads.downloads-stacked {
   flex-direction: column;
@@ -997,7 +1222,7 @@ p { margin: 0; }
   color: var(--text);
   min-height: 24px; /* Fixes height shift when icon or pill is missing */
   /* Last-resort fallback: lets a single column's own pill drop to its
-     own line if it's genuinely too long to fit even in this state —
+     own line if it's genuinely too long to fit even in this state -
      rare, since .downloads-stacked above already gives each column
      the full box width before this would ever be needed. */
   flex-wrap: wrap;
@@ -1027,7 +1252,7 @@ p { margin: 0; }
   text-overflow: ellipsis;
   max-width: 100%;
   min-width: 0;
-  flex-shrink: 0; /* never truncate the version text — it wraps to its own line instead */
+  flex-shrink: 0; /* never truncate the version text - it wraps to its own line instead */
 }
 
 .pill.disabled-pill {
@@ -1051,11 +1276,6 @@ p { margin: 0; }
   transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-snap), filter var(--transition-fast);
 }
 
-/* Prevent project link icons from flashing on hover */
-.project-links .top-link * {
-  transition: none;
-}
-
 /* Extra brightness only for Stable buttons on hover */
 .channel-group[data-channel="stable"] .download-btn:hover {
   filter: brightness(1.18);
@@ -1077,14 +1297,8 @@ p { margin: 0; }
 .download-btn:active,
 .project-links a:active,
 .top-link:active,
-.social-link:active,
-.catalog-section > summary:active .heading-label {
+.social-link:active {
   transform: scale(0.95);
-}
-
-/* Press feedback for the section bar, matching its hover state. */
-.catalog-section > summary:active {
-  background: var(--surface-hover);
 }
 
 /* ---------- Unavailable States ---------- */
@@ -1162,6 +1376,11 @@ p { margin: 0; }
 /* Slightly smaller icon size, just for social buttons. */
 .social-link .icon-md { width: 17px; height: 17px; }
 
+/* Slightly bigger than the shared 15px icon-sm, just for the Download
+   button's own icon, since it's the largest/most prominent button on
+   a project card. */
+.download-btn .icon-sm { width: 18px; height: 18px; }
+
 /* ---------- Deep-linking ("copy link" buttons) ---------- */
 /* Small button for copying a direct link. Always visible (not just
    on hover), so it works for keyboard and touch too. */
@@ -1203,23 +1422,28 @@ p { margin: 0; }
   color: var(--accent);
 }
 
-/* A bit brighter than usual on hover, so it stays visible against the
-   section bar's own hover color. */
-.catalog-section > summary:hover .copy-link-btn:hover {
-  background: color-mix(in srgb, var(--surface-hover), white 15%);
+/* Briefly highlights a project after jumping to it via a direct link.
+   A separate ::before with a negative inset gives the ring a small
+   gap around the project (-6px matches #catalog's own buffer below,
+   so it isn't clipped). Skipped under reduced motion. */
+.is-linked-target {
+  position: relative;
 }
-
-/* Briefly highlights a project after jumping to it via a direct link,
-   so it's clear which card the link pointed to. Skipped for anyone
-   who's asked for reduced motion. */
+.is-linked-target::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 14px;
+  pointer-events: none;
+}
 @media (prefers-reduced-motion: no-preference) {
-  .is-linked-target {
+  .is-linked-target::before {
     animation: linked-target-pulse 2s ease-out;
   }
 }
 @keyframes linked-target-pulse {
-  0%   { box-shadow: 0 0 0 2px var(--accent); border-radius: 12px; }
-  100% { box-shadow: 0 0 0 2px transparent; border-radius: 12px; }
+  0%   { box-shadow: 0 0 0 2px var(--accent); }
+  100% { box-shadow: 0 0 0 2px transparent; }
 }
 
 /* ---------- Footer ---------- */
@@ -1252,7 +1476,7 @@ p { margin: 0; }
 }
 /* Invisible hit-slop bringing the actual tap target up to ~44x44
    (34px visible box + 5px on each side), same trick as
-   .copy-link-btn::before above — the tooltip already uses ::after,
+   .copy-link-btn::before above - the tooltip already uses ::after,
    so ::before is free here too. */
 .social-link::before {
   content: '';
@@ -1291,7 +1515,7 @@ p { margin: 0; }
 }
 
 /* Show Tooltip on Hover & Keyboard Focus, or when explicitly toggled
-   open by script.js (see .has-tooltip's click handler) — touch devices
+   open by section-page.js (see .has-tooltip's click handler) - touch devices
    have no :hover, so that's the only way a tap reveals it there. */
 [data-tooltip]:hover::after,
 [data-tooltip]:focus-visible::after,
@@ -1363,18 +1587,9 @@ p { margin: 0; }
 }
 
 /* ---------- Responsive ---------- */
-/* The nav bar (section filters + Expand/Collapse All + search) needs
-   more room to lay out in a single row than the rest of the page
-   needs before it switches to its own "phone" treatment below — its
-   3 filter buttons, Expand All, and the search box stop fitting on
-   one line well above 620px. Left at that breakpoint, there's a wide
-   middle range of screen widths where the row's contents wrap
-   one-at-a-time instead (a button pair, then Expand All alone, then
-   search alone) rather than the whole bar switching cleanly to the
-   stacked grid seen below 620px. Broken out into its own, wider
-   breakpoint so it jumps straight from one tidy row to a tidy stack,
-   without a scrappy in-between state. */
-@media (max-width: 970px) {
+/* Below 890px the header and nav bar switch to their stacked, mobile
+   layouts together, at one shared breakpoint. */
+@media (max-width: 890px) {
   .section-nav {
     flex-direction: column;
     align-items: stretch;
@@ -1393,62 +1608,43 @@ p { margin: 0; }
   .nav-jump-btn {
     padding: 9px 16px; /* slightly taller tap target on touch screens */
     justify-content: center; /* center the label now that the button fills its grid cell instead of hugging its own text */
-    min-width: 0; /* lets the label wrap/shrink instead of forcing its grid column wider than the viewport if a heading is ever long */
+    min-width: 0; /* lets the label wrap/shrink instead of forcing its grid column wider than the viewport */
   }
 
-  /* Expand/Collapse All sits inside the same grid as the section
-   buttons, so it gets the same layout for free. */
-  .nav-toggle-all {
-    flex-shrink: 0;
-    padding: 9px 14px;
-    justify-content: center;
-  }
-  .nav-divider {
-    display: none; /* a thin vertical line doesn't read as a grouping cue once everything's arranged in a grid instead of a single row */
-  }
-  .nav-controls {
-    gap: 10px;
-  }
-  .nav-search-wrap {
-    width: auto; /* overrides desktop's fixed 220px so flex-basis comes from flex-grow instead */
+  /* Full width under the buttons, instead of sitting beside them. */
+  .nav-search {
+    flex: none;
     max-width: none;
-    flex: 1 1 auto;
     min-width: 0;
-    margin-left: 0; /* desktop's "auto" margin was eating the row's free space instead of letting the box grow */
     margin-right: 0;
   }
   /* 16px is the minimum iOS Safari won't auto-zoom the page in on
-   focus — the 0.85rem (~13.6px) used above is comfortably under that. */
+   focus - the 0.85rem used above is under that. */
   .nav-search-input {
     font-size: 16px;
     padding-right: 40px; /* room for the larger clear button below */
   }
-  /* Bigger tap target for the "×" clear button. Its ::before/::after
-   already draw the X glyph, so (unlike copy-link-btn) there's no
-   pseudo-element free for hit-slop — grow the real box instead.
-   36px is as far as this can go without crowding the input's own
-   text against the box. */
+  /* Bigger tap target for the "×". Its ::before/::after already draw
+   the X, so the real box grows instead of using hit-slop. */
   .nav-search-clear {
     width: 36px;
     height: 36px;
     right: 2px;
   }
+  .search-panel {
+    left: 0;
+    width: auto;
+  }
 }
 
-/* The masthead's title/tagline column is the part that gives way as
-   the header narrows — the logo and link-row both hold their natural
-   size, so between this breakpoint and the page's general 620px
-   "phone" breakpoint below, the title gets squeezed into wrapping
-   onto 2 lines instead of the header switching to its roomier,
-   already-designed-for-this stacked layout. Broken out on its own,
-   wider breakpoint for the same reason as the nav bar above. */
-@media (max-width: 870px) {
+@media (max-width: 890px) {
+  /* One centered column: logo, then title/tagline, then the link row. */
   .masthead {
-    grid-template-columns: auto 1fr;
-    /* Top-aligns the logo instead of centering it — on mobile the title
-   wraps to more lines, so a centered logo would drift too low. */
+    grid-template-columns: 1fr;
     align-items: start;
-    gap: 12px;
+    justify-items: center;
+    text-align: center;
+    gap: 10px;
   }
   /* Smaller logo, so the header has more breathing room on mobile. */
   .brand-logo {
@@ -1456,33 +1652,9 @@ p { margin: 0; }
     height: 64px;
     transform: none;
   }
-  .link-row {
-    grid-column: 2 / -1; /* lines up with the brand text instead of the logo */
-    justify-self: start;
-    margin-top: 14px;
-  }
-}
-
-/* Below this, even the roomier logo-beside-text layout above can't
-   fit the tagline's first sentence on one line without wrapping a
-   second time — the logo and its gap are eating space the text needs
-   more. Stacking everything into one centered column instead frees
-   up the logo's width for the text, which comfortably holds the line
-   count at 3 even on the narrowest phones (checked down to 320px) —
-   and reads better centered than left-aligned once nothing (a logo,
-   a title) is anchoring it to the left anymore. */
-@media (max-width: 870px) {
-  .masthead {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    text-align: center;
-    gap: 10px;
-  }
+  /* Shrinks the title/tagline to their own content width and centers
+   *that*, so text-wrap: balance on the title can take effect. */
   .brand-text {
-    /* Shrinks the title/tagline to their own content width and
-     centers *that*, instead of them staying block-level full-width
-     with only the text inside centering — needed for text-wrap:
-     balance on the title (further up) to have any effect. */
     align-items: center;
   }
   .link-row {
@@ -1499,15 +1671,14 @@ p { margin: 0; }
     padding: calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   }
 
-  /* A real grid, same reasoning as the nav bar above — so the link
+  /* A real grid, same reasoning as the nav bar above - so the link
    chips line up in columns instead of wrapping one at a time. */
   .project-links {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
-  .project-links a,
-  .project-links .top-link {
+  .project-links a {
     justify-content: center;
     min-width: 0; /* lets long labels wrap instead of overflowing */
   }
@@ -1534,10 +1705,6 @@ p { margin: 0; }
     min-width: 0;
     padding: 12px 10px; /* taller tap target on touch screens; keeps the disabled state's box the same size so columns still line up */
   }
-
-  .section-peek {
-    display: none;
-  }
 }
 
 /* A safety net against stray horizontal overflow (e.g. a very long
@@ -1546,25 +1713,35 @@ p { margin: 0; }
 /* Adds a little padding so focus rings on edge elements (like the
    last button in a row) don't get clipped by the overflow rule above.
    The matching negative margin cancels it out visually. */
-.masthead, #section-nav, #catalog, .site-footer {
+.masthead, .section-nav, #catalog, .stats-section, .site-footer {
   overflow-x: clip;
-  max-width: 100%;
+  max-width: calc(100% + 12px);
   padding-left: 6px;
   padding-right: 6px;
   margin-left: -6px;
   margin-right: -6px;
 }
 
+/* #catalog needs more buffer than the shared 6px: the project
+   highlight ring (.is-linked-target::before) sits ~8px outside a
+   project's edges, so this overrides it with room to spare. */
+#catalog {
+  max-width: calc(100% + 20px);
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: -10px;
+  margin-right: -10px;
+}
+
 /* Turns off the little "press" shrink effect for anyone who's asked
    for reduced motion. Color/background feedback stays. */
 @media (prefers-reduced-motion: reduce) {
   .nav-jump-btn:active,
-  .nav-toggle-all:active,
   .download-btn:active,
   .project-links a:active,
   .top-link:active,
   .social-link:active,
-  .catalog-section > summary:active .heading-label {
+  .home-card:active {
     transform: none;
   }
   .back-to-top.is-visible:active {
@@ -1613,8 +1790,8 @@ img, svg {
 }
 
 /* ---------- Back to top button ---------- */
-/* Fixed in the corner, hidden until script.js shows it after you've
-   scrolled down a bit. */
+/* Fixed in the corner, hidden until initBackToTop() (section-page.js)
+   shows it after you've scrolled a bit. */
 .back-to-top {
   position: fixed;
   /* Keeps the button clear of the home-indicator / rounded-corner
@@ -1627,14 +1804,14 @@ img, svg {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  border: none;
-  background: var(--text);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--nav-btn-active-bg);
+  background: var(--nav-btn-active-bg);
+  box-shadow: var(--nav-shadow);
   cursor: pointer;
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none; /* not clickable while hidden */
-  transition: opacity 0.2s ease, transform 0.2s ease, background-color var(--transition-fast);
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color var(--transition-fast), border-color var(--transition-fast);
   z-index: 40;
 }
 .back-to-top.is-visible {
@@ -1643,8 +1820,9 @@ img, svg {
   pointer-events: auto;
 }
 .back-to-top:hover {
-  /* Darkens slightly on hover, since the button is already near-white. */
-  background: color-mix(in srgb, var(--text), black 12%);
+  /* Same lighten-on-hover as .nav-jump-btn.is-open. */
+  background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+  border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
 }
 /* Combines the press-shrink with this button's own position, so they
    don't fight each other. */
@@ -1658,7 +1836,7 @@ img, svg {
   content: '';
   width: 9px;
   height: 9px;
-  border-top: 2px solid var(--bg);
-  border-right: 2px solid var(--bg);
+  border-top: 2px solid var(--nav-btn-active-text);
+  border-right: 2px solid var(--nav-btn-active-text);
   transform: translateY(2px) rotate(-45deg);
 }

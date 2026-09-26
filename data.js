@@ -1,29 +1,24 @@
 /* ============================================================
    SITE DATA
-   This is the primary file for updating site text, links and project lists.
-   The layout and rendering are managed automatically by script.js.
+   The main file for site text, links and project lists. Layout and
+   rendering are handled by section-page.js and index.js.
 
    QUICK GUIDE:
-   - Text & Links: Update values inside quotes (e.g., label, url).
-   - Images: Place files in /images and set the relative path (e.g., "images/better-craftables.webp").
-   - Icons: Place webp files in /images/icons/ and refer to them by filename without extension.
-   - Projects: Copy an existing project object block {...} inside the "projects" array to add a new project.
-   - Channels: Each project supports "stable", "beta", "alpha", or "unsupported" channels. Add "disabled: true"
-     to a download label if a build is unavailable. Optionally add a "tooltip" string alongside it to explain
-     why - it shows on hover (and on keyboard focus) over the greyed-out button. If "tooltip" is left off, the 
-     button still shows as unavailable, just without the extra explanation.
-   - Download versions: each download (e.g. "Data Pack", "Mod") shows its own "version" string on its
-     pill. If a download has no "version" set, its pill just shows "N/A" - there's no channel-wide
-     fallback, so give every enabled download its own "version".
-   - "New"/"Updated" badge: add `badge: "new"` or `badge: "updated"` to any channel to show a small
-     dismissible tag next to its name. Visitors can dismiss it (✕); it quietly comes back on its own the
-     next time you bump any of that channel's downloads' "version" strings — no extra flag to
-     remove/reset by hand, so it's safe to just leave `badge: "new"` sitting on a channel across releases.
+   - Text & Links: edit values inside quotes (label, url, etc).
+   - Images: place in /images, set the relative path.
+   - Icons: place SVGs in /images/icons/, refer to by filename (no extension).
+   - Projects: copy an existing project {...} block to add a new one.
+   - Channels: "stable"/"beta"/"alpha"/"unsupported". Add "disabled: true"
+     to a download if unavailable, with an optional "tooltip" explaining why.
+   - Download versions: each download shows its own "version" pill
+     (no channel-wide fallback — give every enabled download one).
+   - "New"/"Updated" badge: add `badge: "new"` or `"updated"` to a channel.
+     Dismissible by visitors; reappears automatically next time that
+     channel's download versions are bumped.
    ============================================================ */
 
-// This whole file is one big JavaScript object. script.js reads values
-// out of it (e.g. SITE_DATA.brand.name) to build the page — nothing in
-// here directly draws anything on screen by itself.
+// One big object — the page scripts read values out of it (e.g.
+// SITE_DATA.brand.name) to build each page.
 const SITE_DATA = {
 
   // Logo, name and one-line tagline shown at the top of the page.
@@ -35,7 +30,7 @@ const SITE_DATA = {
 
   // Website version shown at the very bottom of the page.
    version: {
-    label: "v1.0.1",
+    label: "v2.0.0",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -46,6 +41,18 @@ const SITE_DATA = {
     { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks" }
   ],
 
+  // Every page in the sticky page-nav bar: the home page plus one page
+  // per section. Add an entry here (with the matching section heading
+  // below) whenever a new section gets its own page, and it shows up
+  // in every page's nav automatically. "Home" has no "section" since
+  // it isn't tied to one.
+  pages: [
+    { label: "Home", url: "index.html" },
+    { label: "Data Packs & Mods", url: "data-packs-mods.html", section: "Data Packs & Mods" },
+    { label: "Resource Packs", url: "resource-packs.html", section: "Resource Packs" },
+    { label: "Other Projects", url: "other-projects.html", section: "Other Projects" }
+  ],
+
   // The main content: each entry below is a section (a heading
   // plus a list of projects). Add, remove, or reorder sections
   // and projects freely — the layout will adjust automatically.
@@ -53,6 +60,7 @@ const SITE_DATA = {
     // #region ▓▓▓▓▓▓▓▓▓▓▓▓  DATA PACKS & MODS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Data Packs & Mods",
+      icon: "brackets",
       projects: [
         // Each object in this "projects" array becomes one project card
         // on the page. Copy an entire { ... } block like this one and
@@ -192,6 +200,7 @@ const SITE_DATA = {
     // #region ▓▓▓▓▓▓▓▓▓▓▓▓  RESOURCE PACKS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Resource Packs",
+      icon: "brush",
       projects: [
         // #region ──────── Classic's Disc Tweaks ────────
         {
@@ -313,7 +322,7 @@ const SITE_DATA = {
     // #region ▓▓▓▓▓▓▓▓▓▓▓▓  OTHER PROJECTS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Other Projects",
-      defaultOpen: false,
+      icon: "wrench",
       projects: [
         // #region ──────── CraftHorizon ────────
         {
@@ -323,10 +332,21 @@ const SITE_DATA = {
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/server/crafthorizon" },
             { label: "Trello", icon: "document", url: "https://trello.com/b/TK7pofcG/crafthorizon" },
-            { label: "Wiki", icon: "book", url: "https://classicscraftworks.gitbook.io/crafthorizon/" }
+            { label: "Wiki", icon: "book", url: "https://classicscraftworks.gitbook.io/crafthorizon" }
+          ]
+        },
+        // #endregion CraftHorizon
+
+        // #region ──────── Website ────────
+        {
+          image: "images/craftworks.webp",
+          title: "Classic's Craftworks Website",
+          description: "The hub for all of our projects. You're already here!",
+          links: [
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Website" }
           ]
         }
-        // #endregion CraftHorizon
+        // #endregion Website
       ]
     }
     // #endregion OTHER PROJECTS
@@ -342,7 +362,7 @@ const SITE_DATA = {
   footer: {
     copyright: "\u00A9 2023\u20132026 Classic36 / Classic's Craftworks",
     disclaimer: "NOT AN OFFICIAL MINECRAFT PRODUCT OR SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
-    iconCredits: { prefix: "Link icons by ", label: "SVG Repo", url: "https://www.svgrepo.com" }
+    iconCredits: { prefix: "Link icons provided by ", label: "SVG Repo", url: "https://www.svgrepo.com" }
   }
 };
 

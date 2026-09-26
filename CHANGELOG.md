@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.0.0 — 2026/09/26
+
+### Added
+- New home page, with big buttons to each project-type page and a stats section
+- New project-type pages
+- Website to Other Projects page
+- New search system with a results dropdown and direct navigation to matching pages
+- Navigation bar icons
+- Notification indicator on the navigation bar for undismissed New and Updated badges
+
+### Changed
+- Visual refresh with a new blue theme
+
+### Fixed
+- Navigation bar and page alignment
+- Some mobile layout inconsistencies
+- Incorrect apostrophes in deep links
+
+### Removed
+- Old navigation systems, including collapsible sections and project-type deep links
+
 ## v1.0.1 — 2026/09/24
 
 ### Changed

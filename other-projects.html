@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="canonical" href="https://classicscraftworks.co.uk/">
+<link rel="canonical" href="https://classicscraftworks.co.uk/other-projects.html">
 <link rel="icon" href="images/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="images/logo.png">
 <link rel="manifest" href="manifest.json">
@@ -13,35 +13,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
   <!-- Basic Meta Tags -->
-  <title>Classic's Craftworks</title>
-  <meta name="description" content="Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft." />
+  <title>Other Projects - Classic's Craftworks</title>
+  <meta name="description" content="Other Minecraft projects from Classic's Craftworks. Sometimes useful. Always Minecraft." />
 
   <!-- Open Graph Preview Cards (Discord, Facebook, LinkedIn) -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Classic's Craftworks" />
-  <meta property="og:description" content="Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft." />
+  <meta property="og:title" content="Other Projects - Classic's Craftworks" />
+  <meta property="og:description" content="Other Minecraft projects from Classic's Craftworks. Sometimes useful. Always Minecraft." />
   <meta property="og:image" content="https://classicscraftworks.co.uk/images/logo.png" />
-  <meta property="og:url" content="https://classicscraftworks.co.uk/" />
+  <meta property="og:url" content="https://classicscraftworks.co.uk/other-projects.html" />
 
   <!-- Twitter / X Preview Cards -->
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Classic's Craftworks" />
-  <meta name="twitter:description" content="Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft." />
+  <meta name="twitter:title" content="Other Projects - Classic's Craftworks" />
+  <meta name="twitter:description" content="Minecraft servers & other projects from Classic's Craftworks. Sometimes useful. Always Minecraft." />
   <meta name="twitter:image" content="https://classicscraftworks.co.uk/images/logo.png" />
 </head>
-<body>
+<body data-page="other-projects.html">
 
-<!-- Lets keyboard users skip straight to the projects, past the nav.
-     Hidden until focused (see .skip-link in styles.css). -->
+<!-- Same skip link as index.html, pointing at this page's project list. -->
 <a href="#catalog" class="skip-link">Skip to projects</a>
 
-<!-- Fallback for JS disabled/blocked - everything else on this page
-     is built by index.js from data.js. Keep in sync with data.js's
-     brand/topLinks if those change. -->
+<!-- Static fallback shown only when JavaScript is disabled/blocked, same
+     idea as index.html's noscript block — see section-page.js for how
+     the rest of the page is built from data.js. -->
 <noscript>
   <div class="noscript-notice">
     <h1>CLASSIC'S CRAFTWORKS</h1>
-    <p>Minecraft Java Edition data packs, mods &amp; resource packs.</p>
+    <p>Minecraft Java Edition servers &amp; other projects.</p>
     <p>
       This site needs JavaScript enabled to build its project catalog.
       In the meantime, you can browse our projects directly on
@@ -53,6 +52,8 @@
 
 <div class="page">
 
+  <!-- Identical masthead markup/IDs to index.html, filled in by the same
+       renderBrand() logic in section-page.js. -->
   <header class="masthead">
     <img id="brand-logo" class="brand-logo" alt="" width="88" height="88">
     <div class="brand-text">
@@ -62,21 +63,13 @@
     <nav id="top-links" class="link-row" aria-label="Primary links"></nav>
   </header>
 
-  <!-- Sticky page-switcher bar, same as on the section pages. Built by
-       renderPageNav() in section-page.js from SITE_DATA.pages. -->
+  <!-- Sticky page-switcher bar, built by renderPageNav() in
+       section-page.js from SITE_DATA.pages in data.js. -->
   <nav id="page-nav" class="section-nav" aria-label="Site pages"></nav>
 
-  <!-- Filled by index.js with one big button per section. tabindex="-1"
-       lets the skip link above focus here without joining the Tab order. -->
+  <!-- Filled in by section-page.js (see renderFlatSection()): the
+       section heading followed by its project cards. -->
   <main id="catalog" tabindex="-1"></main>
-
-  <!-- Filled by renderStats() in index.js from STATS_DATA (stats.js). -->
-  <section id="stats-section" class="stats-section" aria-labelledby="stats-heading">
-    <h2 id="stats-heading" class="stats-heading">Statistics</h2>
-    <p id="stats-updated" class="stats-updated"></p>
-    <div id="stats-grid" class="stats-grid"></div>
-    <p id="stats-note" class="stats-note"></p>
-  </section>
 
   <footer class="site-footer">
     <div id="social-links" class="social-row" aria-label="Social links"></div>
@@ -86,16 +79,12 @@
     <p id="site-version" class="footer-version"></p>
   </footer>
 
-  <!-- Fades in on scroll and jumps back to top; see initBackToTop() in
-       section-page.js. Positioned via CSS, so its place in the DOM doesn't matter. -->
   <button id="back-to-top" class="back-to-top" type="button" aria-label="Back to top" data-tooltip="Back to top"></button>
 
 </div>
 
 <script src="data.js" defer></script>
-<script src="stats.js" defer></script>
 <script src="section-page.js" defer></script>
-<script src="index.js" defer></script>
 <script src="search.js" defer></script>
 </body>
 </html>
