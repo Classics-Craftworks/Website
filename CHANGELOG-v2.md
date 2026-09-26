@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.0.0-dev.9 — 2026/09/26
+
+### Added
+- Yellow dot indicator to nav bar when there's an undismissed New or Updated badge
+
+### Changed
+- Arrow on home page buttons now moves more on hover
+- Tweaked the layout of the home page's Stats section and updated the notice below it
+- Expanded border size around project icons on home buttons
+- Small clean up of code & comments
+
+### Fixed
+- Font loading issue
+
+### Removed
+- Highlighted border from project icons on home buttons on hover
+
 ## v2.0.0-dev.8 — 2026/09/26
 
 ### Added
