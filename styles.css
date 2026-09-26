@@ -640,7 +640,6 @@ p { margin: 0; }
 .home-card-title {
   display: block;
   font-family: 'Minercraftory', var(--font);
-  font-weight: 500;
   font-size: min(6.2cqi, 2.6rem);
   line-height: 1.25;
   letter-spacing: 0.02em;
@@ -816,7 +815,6 @@ p { margin: 0; }
 
 .stat-value {
   font-family: 'Minercraftory', var(--font);
-  font-weight: 500;
   font-size: clamp(1.5rem, 4.2vw, 2.1rem);
   line-height: 1.15;
   color: var(--text);
