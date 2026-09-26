@@ -880,8 +880,8 @@ p { margin: 0; }
 }
 
 .stats-note {
-  margin-top: 10px;
-  margin-bottom: -10px;
+  margin-top: 16px;
+  margin-bottom: -20px;
   font-size: 0.72rem;
   color: var(--text-soft);
   text-align: left;
