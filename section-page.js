@@ -344,34 +344,53 @@ function renderProject(p) {
   ]);
 }
 
-// Returns true if any project on `page` (matched via its "section"
-// field to SITE_DATA.sections) has a channel with an undismissed
-// "New"/"Updated" badge.
-function pageHasUndismissedBadge(page) {
+// Returns the number of undismissed "New"/"Updated" badges across all
+// projects on `page` (matched via its "section" field to
+// SITE_DATA.sections). Mirrors the dismissal check renderChannelBadge()
+// does when actually building a badge, without rendering anything -
+// SITE_DATA has every section's data on every page, so this can be
+// computed for other pages, not just the current one. Slugs are
+// recomputed with a fresh, page-local Set (rather than the shared
+// usedSlugs) so they match what that page's own titles would slugify
+// to when it's the one being rendered.
+function countUndismissedBadges(page) {
   const section = (SITE_DATA.sections || []).find(s => s.heading === page.section);
-  if (!section) return false;
+  if (!section) return 0;
 
   const slugs = new Set();
-  return (section.projects || []).some(p => {
+  let count = 0;
+  (section.projects || []).forEach(p => {
     const projectId = uniqueSlug(p.title, 'project', slugs);
-    return (p.channels || []).some(ch => {
-      if (!ch.badge) return false;
+    (p.channels || []).forEach(ch => {
+      if (!ch.badge) return;
       const channelKey = (ch.channel || 'stable').toLowerCase();
       const versionFingerprint = (ch.downloads || [])
         .map(d => d.version || 'N/A')
         .join('|');
       const dismissedVersion = storageGet(`badge-dismissed:${projectId}:${channelKey}`);
-      return dismissedVersion !== versionFingerprint;
+      if (dismissedVersion !== versionFingerprint) count++;
     });
   });
+  return count;
 }
 
-// Small yellow dot appended to a nav button for a page that still has
-// an undismissed "New"/"Updated" badge somewhere on it - a hint to
-// visit even when that page isn't the one currently open.
-function navBadgeDot() {
-  return el('span', { class: 'nav-jump-dot', attrs: { 'aria-hidden': 'true' } }, [
-    el('span', { class: 'visually-hidden', text: ' — has new updates' })
+// Small yellow count pill appended to a nav button for a page that
+// still has undismissed "New"/"Updated" badges somewhere on it - a
+// hint to visit even when that page isn't the one currently open.
+// Caps the displayed number at 9 ("9+") so the pill doesn't have to
+// grow to fit wider text. `title` gives sighted mouse users a hover
+// tooltip; `aria-label` gives the same "X new updates" wording to
+// screen readers instead of the bare number (which is hidden from
+// them via aria-hidden, since it'd otherwise be read twice).
+function navBadgeDot(count) {
+  const label = count > 9 ? '9+' : String(count);
+  const words = count === 1 ? 'update' : 'updates';
+  const text = `${count} new ${words}`;
+  return el('span', {
+    class: 'nav-jump-dot',
+    attrs: { title: text, 'aria-label': text }
+  }, [
+    el('span', { attrs: { 'aria-hidden': 'true' }, text: label })
   ]);
 }
 
@@ -382,13 +401,15 @@ function renderPageNav(pages, currentUrl) {
   const nav = document.getElementById('page-nav');
   if (!nav || !pages || !pages.length) return;
 
-  // One entry per nav button, kept around so syncNavBadgeDots() (below)
-  // can re-check and update them later without rebuilding the bar.
+  // One entry per nav button, kept around so the pageshow handler
+  // (below) can re-check and update them later without rebuilding the
+  // bar.
   const badgeTargets = [];
 
   const row = el('div', { class: 'nav-jump-row' });
   pages.forEach(p => {
-    const dot = pageHasUndismissedBadge(p) ? navBadgeDot() : null;
+    const count = countUndismissedBadges(p);
+    const dot = count > 0 ? navBadgeDot(count) : null;
 
     if (p.url === currentUrl) {
       // Not a link — you're already here. aria-current tells screen
@@ -427,9 +448,14 @@ function renderPageNav(pages, currentUrl) {
     if (!event.persisted) return;
     badgeTargets.forEach(({ page, target }) => {
       const existing = target.querySelector('.nav-jump-dot');
-      const shouldShow = pageHasUndismissedBadge(page);
-      if (shouldShow && !existing) target.appendChild(navBadgeDot());
-      else if (!shouldShow && existing) existing.remove();
+      const count = countUndismissedBadges(page);
+      if (count > 0) {
+        const fresh = navBadgeDot(count);
+        if (existing) existing.replaceWith(fresh);
+        else target.appendChild(fresh);
+      } else if (existing) {
+        existing.remove();
+      }
     });
   });
 

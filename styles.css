@@ -343,18 +343,29 @@ p { margin: 0; }
   transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
-/* Dot flagging a page with an undismissed "New"/"Updated" badge
-   somewhere on it (see pageHasUndismissedBadge() in section-page.js). */
+/* Numbered pill flagging a page with undismissed "New"/"Updated"
+   badges (see countUndismissedBadges() in section-page.js). Sits on
+   the button's outer corner regardless of which page is active, with
+   a border matching the nav bar behind it so it reads as a notch cut
+   into the pill rather than a solid square corner. */
 .nav-jump-dot {
   position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
+  top: -7px;
+  right: -7px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
   background: var(--badge-color);
-  border: 1.5px solid var(--nav-bg);
-  pointer-events: none;
+  border: 2px solid var(--nav-bg);
+  color: var(--bg);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
 }
 .nav-jump-btn:hover {
   background: var(--nav-btn-hover-bg);
