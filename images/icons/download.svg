@@ -1,2 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg fill="#000000" width="800px" height="800px" viewBox="0 0 24 24" id="download-alt-4" data-name="Flat Line" xmlns="http://www.w3.org/2000/svg" class="icon flat-line"><line id="primary" x1="12" y1="3" x2="12" y2="16" style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></line><polyline id="primary-2" data-name="primary" points="8 12 12 16 16 12" style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></polyline><path id="primary-3" data-name="primary" d="M20,16v4a1.08,1.08,0,0,1-1.14,1H5.14A1.08,1.08,0,0,1,4,20V16" style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"></path></svg>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+<svg fill="#000000" width="800px" height="800px" viewBox="-0.72 -0.72 25.44 25.44" id="download-alt-4" data-name="Flat Line" xmlns="http://www.w3.org/2000/svg" class="icon flat-line">
+<g id="SVGRepo_bgCarrier" stroke-width="0"/>
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="SVGRepo_iconCarrier">
+<line id="primary" x1="12" y1="3" x2="12" y2="16" style="fill: none; stroke: #000000; stroke-linecap: round; stroke-linejoin: round; stroke-width:2.16;"/>
+<polyline id="primary-2" data-name="primary" points="8 12 12 16 16 12" style="fill: none; stroke: #000000; stroke-linecap: round; stroke-linejoin: round; stroke-width:2.16;"/>
+<path id="primary-3" data-name="primary" d="M20,16v4a1.08,1.08,0,0,1-1.14,1H5.14A1.08,1.08,0,0,1,4,20V16" style="fill: none; stroke: #000000; stroke-linecap: round; stroke-linejoin: round; stroke-width:2.16;"/>
+</g>
+</svg>

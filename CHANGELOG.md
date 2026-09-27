@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.1.1 — 2026/09/27
+
+### Changed
+- Updated download, link & bracket icons again
+
 ## v2.1.0 — 2026/09/27
 
 ### Added
