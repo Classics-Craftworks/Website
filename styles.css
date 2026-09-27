@@ -1552,6 +1552,20 @@ p { margin: 0; }
   font-size: 0.72rem;
 }
 
+/* Callout shown above the project list on section pages, warning about
+   unofficial reuploads right before people start clicking downloads. */
+.download-notice {
+  max-width: 120ch;
+  margin: -8px auto 20px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
 .footer-version {
   font-size: 0.77rem;
   color: var(--text-soft);

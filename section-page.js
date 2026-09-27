@@ -490,6 +490,14 @@ function renderFlatSection(section) {
   const list = el('div', { class: 'project-list' }, section.projects.map(renderProject));
 
   main.appendChild(heading);
+
+  if (SITE_DATA.downloadNotice) {
+    main.appendChild(el('p', {
+      class: 'download-notice',
+      text: SITE_DATA.downloadNotice
+    }));
+  }
+
   main.appendChild(list);
 }
 
