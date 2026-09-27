@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.1.3 — 2026/09/27
+
+### Changed
+- Updated footer layout:
+  - Increased font weight of copyright line
+  - Grouped legal disclaimer & link icon credits together
+  - Slightly reduced size of version number
+  - More padding between elements
+  - Swapped positions X/Twitter & Discord buttons
+
 ## v2.1.2 — 2026/09/27
 
 ### Changed
