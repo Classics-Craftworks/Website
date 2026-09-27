@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.1.0 — 2026/09/27
+
+### Added
+- Unaffiliated reupload notice to data pack/mod & resource pack pages
+- "Est. 2017" to the footer
+
+### Changed
+- Increased the size of the notification dot on mobile
+- Updated download, link, spigot, reddit, wrench & bracket icons
+
+### Fixed
+- Notification dot tooltip being cut off by the edge of the screen
+
 ## v2.0.1 — 2026/09/26
 
 ### Fixed
