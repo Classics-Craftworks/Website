@@ -1624,7 +1624,7 @@ p { margin: 0; }
     font-size: 16px;
     padding-right: 40px; /* room for the larger clear button below */
   }
-  /* Bigger tap target for the "×". Its ::before/::after already draw
+  /* Bigger tap target for the "x". Its ::before/::after already draw
    the X, so the real box grows instead of using hit-slop. */
   .nav-search-clear {
     width: 36px;
@@ -1634,6 +1634,27 @@ p { margin: 0; }
   .search-panel {
     left: 0;
     width: auto;
+  }
+
+  /* Bigger notification dot on mobile - easier to spot/tap on a
+   touch screen than the desktop size. */
+  .nav-jump-dot {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 5px;
+    font-size: 0.78rem;
+  }
+
+  /* Move notification dot tooltip left so it doesn't get cut off. */
+  .nav-jump-dot[data-tooltip]::after {
+    left: auto;
+    right: -4px;
+    transform: translateY(-4px);
+  }
+  .nav-jump-dot[data-tooltip]:hover::after,
+  .nav-jump-dot[data-tooltip]:focus-visible::after,
+  .nav-jump-dot[data-tooltip].tooltip-open::after {
+    transform: translateY(-10px);
   }
 }
 
