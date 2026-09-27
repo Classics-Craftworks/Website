@@ -473,6 +473,13 @@ function renderPageNav(pages, currentUrl) {
 
 // Builds this page's one section: a heading with a project count,
 // followed by its project cards.
+// True if any project in this section actually has a downloadable
+// channel (data packs/mods/resource packs), as opposed to a section
+// like "Other Projects" that only links out elsewhere.
+function sectionHasDownloads(section) {
+  return (section.projects || []).some(p => (p.channels || []).length > 0);
+}
+
 function renderFlatSection(section) {
   const main = document.getElementById('catalog');
   if (!main || !section) return;
@@ -491,7 +498,7 @@ function renderFlatSection(section) {
 
   main.appendChild(heading);
 
-  if (SITE_DATA.downloadNotice) {
+  if (SITE_DATA.downloadNotice && sectionHasDownloads(section)) {
     main.appendChild(el('p', {
       class: 'download-notice',
       text: SITE_DATA.downloadNotice
