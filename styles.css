@@ -656,8 +656,8 @@ p { margin: 0; }
 .home-card-header {
   display: flex;
   justify-content: center;
-  margin-top: 2cqi;
-  margin-bottom: 6cqi;
+  margin-top: 3cqi;
+  margin-bottom: 8cqi;
 }
 .home-card-title {
   display: block;
