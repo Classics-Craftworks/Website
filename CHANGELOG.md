@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.1.4 — 2026/09/28
+
+### Changed
+- Reduced amount of padding at the very bottom of all pages
+- Mobile browser toolbar and the installed-app splash screen now match the site's dark blue background
+- The site now has proper 192px and 512px icons for "Install app" or "Add to Home Screen" in some browsers
+- 404 page now fills the whole screen on mobile, matching the rest of the site
+- Link previews now include a site name and image description
+
 ## v2.1.3 — 2026/09/27
 
 ### Changed
