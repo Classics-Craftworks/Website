@@ -222,7 +222,7 @@ p { margin: 0; }
    so this is a no-op there - they only matter on phones with a
    notch, Dynamic Island, or rounded-corner cutout, and when the
    viewport-fit=cover meta tag lets content draw under them. */
-  padding: calc(28px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
+  padding: calc(28px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
 }
 
 /* ---------- Masthead ---------- */
