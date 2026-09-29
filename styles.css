@@ -130,6 +130,9 @@ html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; overflow-x: cli
 /* html/body use overflow-x: clip (not "hidden") as a safety net against
    horizontal scrolling, so the sticky nav bar still works in Safari. */
 body {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   background-color: var(--bg);
   color: var(--text);
@@ -1883,4 +1886,20 @@ img, svg {
   border-top: 2px solid var(--nav-btn-active-text);
   border-right: 2px solid var(--nav-btn-active-text);
   transform: translateY(2px) rotate(-45deg);
+}
+
+/* ============================================================
+   PIXELATED BACKGROUND
+   ============================================================ */
+:root { --px: 4px; }
+@media (max-width: 620px) { :root { --px: 3px; } }
+
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  image-rendering: pixelated;
+  background: url('images/background.png') 0 0 / calc(32 * var(--px)) calc(32 * var(--px)) repeat;
 }

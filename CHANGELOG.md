@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.2.0 — 2026/09/29
+
+### Added
+- Pixelated background
+
 ## v2.1.4 — 2026/09/28
 
 ### Changed
