@@ -229,10 +229,10 @@ p { margin: 0; }
 }
 
 /* ---------- Masthead ---------- */
-/* Header layout: logo, brand text, nav links side by side. */
+/* Header layout: logo and brand text side by side. */
 .masthead {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: center; /* Ensures perfect vertical centering across all columns */
   gap: 16px;
   padding-bottom: 10px;
@@ -266,13 +266,6 @@ p { margin: 0; }
   margin-top: 4px;
   color: var(--text-soft);
   font-size: 0.92rem;
-}
-
-.link-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-self: end;
 }
 
 .top-link, .text-link {
@@ -1685,7 +1678,7 @@ p { margin: 0; }
 }
 
 @media (max-width: 890px) {
-  /* One centered column: logo, then title/tagline, then the link row. */
+  /* One centered column: logo, then title/tagline. */
   .masthead {
     grid-template-columns: 1fr;
     align-items: start;
@@ -1703,12 +1696,6 @@ p { margin: 0; }
    *that*, so text-wrap: balance on the title can take effect. */
   .brand-text {
     align-items: center;
-  }
-  .link-row {
-    grid-column: 1 / -1;
-    justify-self: stretch; /* keeps the row itself the masthead's full width... */
-    justify-content: center; /* ...so this centers the buttons within it */
-    margin-top: 4px;
   }
 }
 

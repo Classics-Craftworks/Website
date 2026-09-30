@@ -34,13 +34,6 @@ const SITE_DATA = {
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
-
-  // Buttons shown next to the logo at the very top of the page.
-  topLinks: [
-    { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/organization/classics-craftworks" },
-    { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks" }
-  ],
-
   // Every page in the sticky page-nav bar: the home page plus one page
   // per section. Add an entry here (with the matching section heading
   // below) whenever a new section gets its own page, and it shows up
@@ -347,11 +340,13 @@ const SITE_DATA = {
     // #endregion OTHER PROJECTS
   ],
 
-  // Social links shown at the bottom of the page.
+  // Link icons shown in the footer at the bottom of every page.
   socials: [
+    { label: "Modrinth", url: "https://modrinth.com/organization/classics-craftworks", icon: "modrinth" },
     { label: "Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" },
     { label: "X / Twitter", url: "https://x.com/C36Craftworks", icon: "x" },
-    { label: "Reddit", url: "https://www.reddit.com/r/ClassicsCraftworks", icon: "reddit" }
+    { label: "Reddit", url: "https://www.reddit.com/r/ClassicsCraftworks", icon: "reddit" },
+    { label: "GitHub", url: "https://github.com/Classics-Craftworks", icon: "github" }
   ],
 
   footer: {

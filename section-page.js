@@ -162,21 +162,13 @@ function copyLinkButton(id, label) {
 
 /* ---------- Page pieces ---------- */
 
-function renderBrand(brand, topLinks) {
+function renderBrand(brand) {
   const logo = document.getElementById('brand-logo');
   logo.src = brand.logo;
   logo.alt = brand.name + ' logo';
 
   document.getElementById('brand-name').textContent = brand.name;
   document.getElementById('brand-tagline').innerHTML = brand.tagline;
-
-  const nav = document.getElementById('top-links');
-  topLinks.forEach(l => {
-    nav.appendChild(el('a', { class: 'top-link', href: l.url }, [
-      icon(l.icon, 'icon-sm'),
-      el('span', { text: l.label })
-    ]));
-  });
 }
 
 function renderChannelBadge(ch, badgeKey) {
@@ -609,7 +601,7 @@ function renderStructuredData(data, section) {
     url: siteUrl,
     logo: toAbsolute(data.brand.logo),
     description: tagline,
-    sameAs: [...(data.topLinks || []), ...(data.socials || [])].map(l => l.url)
+    sameAs: (data.socials || []).map(l => l.url)
   };
 
   // One section's projects on a section page, or every section's on the
@@ -667,7 +659,7 @@ if (document.body.dataset.page) {
 }
 
 function initSectionPage(pageUrl) {
-  renderBrand(SITE_DATA.brand, SITE_DATA.topLinks);
+  renderBrand(SITE_DATA.brand);
 
   const pages = SITE_DATA.pages || [];
   renderPageNav(pages, pageUrl);
