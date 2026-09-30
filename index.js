@@ -161,6 +161,16 @@ function forwardOldDeepLink(sections, pages) {
   return false;
 }
 
+// Fills the heading + subtitle above the section buttons from SITE_DATA.home.
+// Hides the whole block if no heading text is set.
+function renderProjectsIntro(home) {
+  const wrap = document.getElementById('projects-intro');
+  if (!wrap) return;
+  if (!home || !home.projectsHeading) { wrap.hidden = true; return; }
+  document.getElementById('projects-heading').textContent = home.projectsHeading;
+  document.getElementById('projects-subtitle').textContent = home.projectsSubtitle || '';
+}
+
 (function init() {
   const sections = SITE_DATA.sections || [];
   const pages = SITE_DATA.pages || [];
@@ -169,6 +179,7 @@ function forwardOldDeepLink(sections, pages) {
 
   renderBrand(SITE_DATA.brand);
   renderPageNav(pages, '/');
+  renderProjectsIntro(SITE_DATA.home);
   renderHomeButtons(sections, pages);
   renderStats(typeof STATS_DATA !== 'undefined' ? STATS_DATA : null);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);

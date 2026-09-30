@@ -610,6 +610,26 @@ p { margin: 0; }
   flex-shrink: 0;
 }
 
+/* ---------- Home page: projects heading ---------- */
+/* Same look as the Statistics heading below the cards, so the two home
+   sections read as a matching pair. */
+.projects-intro {
+  margin-top: 16px;
+}
+.projects-heading {
+  font-weight: 900;
+  font-size: clamp(1.6rem, 3.9vw, 1.9rem);
+  color: var(--text);
+  margin-bottom: -4px;
+}
+.projects-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-soft);
+}
+.projects-subtitle:empty {
+  display: none;
+}
+
 /* ---------- Home page: section buttons ---------- */
 /* index.js builds one of these per section - a big link showing its
    first four project icons. Sized in cqi (via container-type below)
@@ -618,7 +638,7 @@ p { margin: 0; }
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
-  margin-top: 28px;
+  margin-top: 16px;
 }
 
 .home-card {

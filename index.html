@@ -67,6 +67,13 @@
        renderPageNav() in section-page.js from SITE_DATA.pages. -->
   <nav id="page-nav" class="section-nav" aria-label="Site pages"></nav>
 
+  <!-- Heading for the section buttons below. Text comes from
+       SITE_DATA.home in data.js, filled in by renderProjectsIntro(). -->
+  <section id="projects-intro" class="projects-intro" aria-labelledby="projects-heading">
+    <h2 id="projects-heading" class="projects-heading"></h2>
+    <p id="projects-subtitle" class="projects-subtitle"></p>
+  </section>
+
   <!-- Filled by index.js with one big button per section. tabindex="-1"
        lets the skip link above focus here without joining the Tab order. -->
   <main id="catalog" tabindex="-1"></main>

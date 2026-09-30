@@ -35,6 +35,12 @@ const SITE_DATA = {
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
+  // Heading and one-line subtitle above the section buttons on the home page.
+  home: {
+    projectsHeading: "Projects",
+    projectsSubtitle: "Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft."
+  },
+
   // Every page in the sticky page-nav bar: the home page plus one page
   // per section. Add an entry here (with the matching section heading
   // below) whenever a new section gets its own page, and it shows up
