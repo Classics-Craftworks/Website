@@ -788,22 +788,19 @@ p { margin: 0; }
     font-size: 5cqi;
   }
   .home-card-inner {
-    padding: 20px 18px 22px;
+    padding: 4px 18px 22px;
   }
   .home-card-header {
-    margin-bottom: 14px;
+    margin-bottom: 18px;
   }
   .home-card-title,
   .home-card-title--tight {
-    /* Every card is nearly full viewport width here, so even the
-       longest heading has plenty of room - reset to the same shared
-       size instead of staying artificially small. */
-    font-size: min(6.6cqi, 2.05rem);
+    font-size: min(5.2cqi, 2.05rem);
     letter-spacing: 0.02em;
   }
   .home-card-footer {
-    font-size: 1.05rem;
-    padding-top: 14px;
+    font-size: 0.9rem;
+    padding-top: 18px;
   }
 }
 
