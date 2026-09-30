@@ -225,7 +225,7 @@ p { margin: 0; }
    so this is a no-op there - they only matter on phones with a
    notch, Dynamic Island, or rounded-corner cutout, and when the
    viewport-fit=cover meta tag lets content draw under them. */
-  padding: calc(28px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
+  padding: calc(16px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
 }
 
 /* ---------- Masthead ---------- */
@@ -235,8 +235,7 @@ p { margin: 0; }
   grid-template-columns: auto auto;
   justify-content: center;
   align-items: center; /* Ensures perfect vertical centering across all columns */
-  gap: 16px;
-  padding-bottom: 10px;
+  column-gap: 24px;
 }
 
 .brand-logo {
@@ -244,7 +243,7 @@ p { margin: 0; }
   height: 88px;
   flex-shrink: 0;
   display: block;
-  transform: translateY(-4px); /* Lifts the logo slightly upward */
+  transform: translateY(-5px); /* Lifts the logo slightly upward */
 }
 
 .brand-text {
@@ -257,7 +256,7 @@ p { margin: 0; }
 
 .brand-text h1 {
   font-family: 'Minercraftory', sans-serif; /* Font only to be used for heading */
-  font-size: clamp(1.4rem, 3.8vw, 1.8rem);
+  font-size: clamp(1.4rem, 4.4vw, 2.0rem);
   font-weight: 700;
   letter-spacing: 0.04em;
   margin-bottom: 0.20rem;
@@ -619,7 +618,7 @@ p { margin: 0; }
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
 .home-card {
