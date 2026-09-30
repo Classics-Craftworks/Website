@@ -344,10 +344,10 @@ const SITE_DATA = {
   // Link icons shown in the footer at the bottom of every page.
   socials: [
     { label: "Modrinth", url: "https://modrinth.com/organization/classics-craftworks", icon: "modrinth" },
+    { label: "GitHub", url: "https://github.com/Classics-Craftworks", icon: "github" },
     { label: "Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" },
     { label: "X / Twitter", url: "https://x.com/C36Craftworks", icon: "x" },
-    { label: "Reddit", url: "https://www.reddit.com/r/ClassicsCraftworks", icon: "reddit" },
-    { label: "GitHub", url: "https://github.com/Classics-Craftworks", icon: "github" }
+    { label: "Reddit", url: "https://www.reddit.com/r/ClassicsCraftworks", icon: "reddit" }
   ],
 
   footer: {
