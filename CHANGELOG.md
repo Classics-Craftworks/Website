@@ -4,11 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.3.0 — 2026/09/30
+
+### Added
+- Projects heading above home page buttons
+
+### Changed
+- Moved GitHub & Modrinth links from the header to the footer
+- Centred the logo and text in the header
+- Reduced header size & increased its text size
+- Reduced home button header size & padding on mobile
+
+### Removed
+- Header tagline
+
 ## v2.2.0.1 — 2026/09/29
 
 ### Changed
 - Updated statistics
-- Updated for Java 26.4-snapshot-2 & new betas
+- Updated for Java 26.4-snapshot-2
 
 ## v2.2.0 — 2026/09/29
 
