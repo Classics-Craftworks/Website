@@ -611,8 +611,6 @@ p { margin: 0; }
 }
 
 /* ---------- Home page: projects heading ---------- */
-/* Same look as the Statistics heading below the cards, so the two home
-   sections read as a matching pair. */
 .projects-intro {
   margin-top: 16px;
 }
@@ -625,6 +623,7 @@ p { margin: 0; }
 .projects-subtitle {
   font-size: 0.9rem;
   color: var(--text-soft);
+  margin-bottom: -4px;
 }
 .projects-subtitle:empty {
   display: none;
