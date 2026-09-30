@@ -592,14 +592,14 @@ function renderStructuredData(data, section) {
   const canonical = document.querySelector('link[rel="canonical"]');
   const siteUrl = canonical ? canonical.href : location.origin + '/';
   const toAbsolute = path => path ? new URL(path, siteUrl).href : undefined;
-  const tagline = (data.brand.tagline || '').replace(/<br\s*\/?>/gi, ' ').trim();
+  const siteDescription = (data.home && data.home.projectsSubtitle) || '';
 
   const organization = {
     '@type': 'Organization',
     name: data.brand.name,
     url: siteUrl,
     logo: toAbsolute(data.brand.logo),
-    description: tagline,
+    description: siteDescription,
     sameAs: (data.socials || []).map(l => l.url)
   };
 
