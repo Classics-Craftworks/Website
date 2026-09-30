@@ -168,7 +168,6 @@ function renderBrand(brand) {
   logo.alt = brand.name + ' logo';
 
   document.getElementById('brand-name').textContent = brand.name;
-  document.getElementById('brand-tagline').innerHTML = brand.tagline;
 }
 
 function renderChannelBadge(ch, badgeKey) {

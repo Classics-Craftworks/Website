@@ -229,10 +229,11 @@ p { margin: 0; }
 }
 
 /* ---------- Masthead ---------- */
-/* Header layout: logo and brand text side by side. */
+/* Header layout: logo and brand text side by side, centered as a pair. */
 .masthead {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto auto;
+  justify-content: center;
   align-items: center; /* Ensures perfect vertical centering across all columns */
   gap: 16px;
   padding-bottom: 10px;
@@ -250,6 +251,8 @@ p { margin: 0; }
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
 .brand-text h1 {
@@ -260,12 +263,6 @@ p { margin: 0; }
   margin-bottom: 0.20rem;
   line-height: 1.35;
   text-wrap: balance;
-}
-
-.brand-text p {
-  margin-top: 4px;
-  color: var(--text-soft);
-  font-size: 0.92rem;
 }
 
 .top-link, .text-link {
@@ -1678,7 +1675,7 @@ p { margin: 0; }
 }
 
 @media (max-width: 890px) {
-  /* One centered column: logo, then title/tagline. */
+  /* One centered column: logo, then title. */
   .masthead {
     grid-template-columns: 1fr;
     align-items: start;
@@ -1692,7 +1689,7 @@ p { margin: 0; }
     height: 64px;
     transform: none;
   }
-  /* Shrinks the title/tagline to their own content width and centers
+  /* Shrinks the title to its own content width and centers
    *that*, so text-wrap: balance on the title can take effect. */
   .brand-text {
     align-items: center;

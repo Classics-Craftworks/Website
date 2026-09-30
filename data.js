@@ -21,7 +21,8 @@
 // SITE_DATA.brand.name) to build each page.
 const SITE_DATA = {
 
-  // Logo, name and one-line tagline shown at the top of the page.
+  // Logo and name shown at the top of the page. The tagline isn't shown on
+  // the page; it's only used for the site's structured-data description.
   brand: {
     logo: "images/logo.png",
     name: "CLASSIC'S CRAFTWORKS",
