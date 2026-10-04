@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v2.3.1 — 2026/10/04
+
+### Changed
+- The logo and site name now appear immediately when a page opens, instead of popping in a moment later
+- Improvements for fonts & font loading
+- Project icons now reserve their space as the page loads, so the layout no longer shifts slightly when images arrive
+- Swapped spigot icon again to a more simplified version
+- Updated sitemap
+
+### Fixed
+- 404 page breaking on nested URLs
+
+## v2.3.0.1 — 2026/10/03
+
+### Changed
+- Updated statistics
+
 ## v2.3.0 — 2026/09/30
 
 ### Added
