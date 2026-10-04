@@ -52,23 +52,25 @@
   </div>
 </noscript>
 
-<div class="page">
-
-  <!-- Identical masthead markup/IDs to index.html, filled in by the same
-       renderBrand() logic in section-page.js. -->
-  <!-- Logo and name are written here so they show before the scripts run;
-       renderBrand() sets the same values from data.js. Keep them in sync
-       with SITE_DATA.brand if those change. -->
-  <header class="masthead">
-    <img id="brand-logo" class="brand-logo" src="images/logo.png" alt="Classic's Craftworks logo" width="88" height="88">
-    <div class="brand-text">
-      <h1 id="brand-name">CLASSIC'S CRAFTWORKS</h1>
+<!-- Site header: brand on the left, then Home / Projects dropdown / About,
+     then the search box on the right. The logo and name are written here so
+     they show before the scripts run (renderBrand() sets the same values from
+     data.js - keep them in sync with SITE_DATA.brand). The nav inside
+     #site-nav is built by renderSiteHeader() in section-page.js, and the
+     search box is added to #site-menu by search.js. -->
+<header class="site-header" id="site-header">
+  <div class="site-header-inner" id="site-header-inner">
+    <a class="brand" href="/">
+      <img id="brand-logo" class="brand-logo" src="images/logo.png" alt="" width="44" height="44">
+      <h1 id="brand-name" class="brand-name">CLASSIC'S CRAFTWORKS</h1>
+    </a>
+    <div class="site-menu" id="site-menu">
+      <nav id="site-nav" class="site-nav" aria-label="Main"></nav>
     </div>
-  </header>
+  </div>
+</header>
 
-  <!-- Sticky page-switcher bar, built by renderPageNav() in
-       section-page.js from SITE_DATA.pages in data.js. -->
-  <nav id="page-nav" class="section-nav" aria-label="Site pages"></nav>
+<div class="page">
 
   <!-- Filled in by section-page.js (see renderFlatSection()): the
        section heading followed by its project cards. -->

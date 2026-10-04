@@ -17,19 +17,25 @@
 </head>
 <body>
 
-<div class="page">
-
-  <!-- Same header markup as index.html — filled in by renderBrand() in
-       section-page.js, so it stays in sync with data.js automatically. -->
-  <!-- Logo and name are written here so they show before the scripts run;
-       renderBrand() sets the same values from data.js. Keep them in sync
-       with SITE_DATA.brand if those change. -->
-  <header class="masthead">
-    <img id="brand-logo" class="brand-logo" src="images/logo.png" alt="Classic's Craftworks logo" width="88" height="88">
-    <div class="brand-text">
-      <h1 id="brand-name">CLASSIC'S CRAFTWORKS</h1>
+<!-- Site header: brand on the left, then Home / Projects dropdown / About,
+     then the search box on the right. The logo and name are written here so
+     they show before the scripts run (renderBrand() sets the same values from
+     data.js - keep them in sync with SITE_DATA.brand). The nav inside
+     #site-nav is built by renderSiteHeader() in section-page.js, and the
+     search box is added to #site-menu by search.js. -->
+<header class="site-header" id="site-header">
+  <div class="site-header-inner" id="site-header-inner">
+    <a class="brand" href="/">
+      <img id="brand-logo" class="brand-logo" src="images/logo.png" alt="" width="44" height="44">
+      <h1 id="brand-name" class="brand-name">CLASSIC'S CRAFTWORKS</h1>
+    </a>
+    <div class="site-menu" id="site-menu">
+      <nav id="site-nav" class="site-nav" aria-label="Main"></nav>
     </div>
-  </header>
+  </div>
+</header>
+
+<div class="page">
 
   <main class="not-found">
     <div class="not-found-card">
@@ -56,5 +62,6 @@
 <script src="data.js" defer></script>
 <script src="section-page.js" defer></script>
 <script src="404.js" defer></script>
+<script src="search.js" defer></script>
 </body>
 </html>

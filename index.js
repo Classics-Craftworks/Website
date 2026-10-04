@@ -178,7 +178,7 @@ function renderProjectsIntro(home) {
   if (forwardOldDeepLink(sections, pages)) return;
 
   renderBrand(SITE_DATA.brand);
-  renderPageNav(pages, '/');
+  renderSiteHeader(pages, '/');
   renderProjectsIntro(SITE_DATA.home);
   renderHomeButtons(sections, pages);
   renderStats(typeof STATS_DATA !== 'undefined' ? STATS_DATA : null);

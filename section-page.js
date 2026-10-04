@@ -2,7 +2,7 @@
    SHARED RENDER SCRIPT
 
    Loaded by every page. Reads SITE_DATA (data.js) and builds the
-   brand header, page nav, project cards and footer. A section page
+   brand header, site header nav, project cards and footer. A section page
    marks itself with a data-page attribute on <body>, read at the
    bottom of this file — see initSectionPage(). The home page's
    section buttons live in index.js, search in search.js.
@@ -168,7 +168,7 @@ function renderBrand(brand) {
   // run). Assigning src again, even to the same value, makes some browsers
   // cancel the in-flight request and start over, so only set it if it differs.
   if (logo.getAttribute('src') !== brand.logo) logo.src = brand.logo;
-  logo.alt = brand.name + ' logo';
+  logo.alt = ''; // decorative: the site name next to it already labels the home link
 
   document.getElementById('brand-name').textContent = brand.name;
 }
@@ -368,8 +368,8 @@ function countUndismissedBadges(page) {
   return count;
 }
 
-// Small yellow count pill appended to a nav button for a page that
-// still has undismissed "New"/"Updated" badges somewhere on it.
+// Small yellow count pill appended to a header link (or the mobile menu
+// button) for pages that still have undismissed "New"/"Updated" badges somewhere on it.
 // Caps the displayed number at "9+" so the pill doesn't have to
 // grow to fit wider text.
 function navBadgeDot(count) {
@@ -384,61 +384,44 @@ function navBadgeDot(count) {
   ]);
 }
 
-// Builds the sticky page-switcher bar: one link per page in
-// SITE_DATA.pages, with whichever one matches currentUrl shown as a
-// filled, non-clickable pill.
-function renderPageNav(pages, currentUrl) {
-  const nav = document.getElementById('page-nav');
-  if (!nav || !pages || !pages.length) return;
+// Below this width the header collapses its links and search behind a
+// menu button. Keep in sync with the @media (max-width: 900px) block in
+// styles.css.
+const MOBILE_NAV_QUERY = '(max-width: 900px)';
 
-  // One entry per nav button, kept around so the pageshow handler
-  // (below) can re-check and update them later without rebuilding the
-  // bar.
-  const badgeTargets = [];
+// Builds the sticky site header's navigation (the brand link is plain
+// HTML). Layout, left to right: Home, a "Projects" dropdown holding one
+// link per section page in SITE_DATA.pages, and About. search.js adds the
+// search box to the same menu. On small screens everything sits behind a
+// menu button, and the Projects dropdown becomes an in-place accordion.
+//
+// Pages in SITE_DATA.pages are sorted into slots by shape: url "/" is
+// Home, url "about" is About, and anything with a "section" goes in the
+// Projects dropdown.
+function renderSiteHeader(pages, currentUrl) {
+  const header = document.getElementById('site-header');
+  const inner = document.getElementById('site-header-inner');
+  const menuWrap = document.getElementById('site-menu');
+  const nav = document.getElementById('site-nav');
+  if (!header || !inner || !menuWrap || !nav || !pages || !pages.length) return;
 
-  const row = el('div', { class: 'nav-jump-row' });
-  pages.forEach(p => {
-    const count = countUndismissedBadges(p);
-    const dot = count > 0 ? navBadgeDot(count) : null;
+  const mobile = window.matchMedia(MOBILE_NAV_QUERY);
+  const home = pages.find(p => p.url === '/');
+  const about = pages.find(p => p.url === 'about');
+  const projectPages = pages.filter(p => p.section);
 
-    if (p.url === currentUrl) {
-      // Not a link — you're already here. aria-current tells screen
-      // readers this is the active page, same as a normal site nav.
-      const btn = el('span', {
-        class: 'nav-jump-btn is-open',
-        attrs: { 'aria-current': 'page' }
-      }, [
-        icon(p.icon, 'icon-sm'),
-        el('span', { text: p.label }),
-        dot
-      ]);
-      row.appendChild(btn);
-      badgeTargets.push({ page: p, target: btn });
-      return;
-    }
-    // Built by hand rather than via el()'s href shortcut — that
-    // shortcut always opens links in a new tab (right for the
-    // external Modrinth/GitHub links elsewhere on the page), but page
-    // navigation should stay in the same tab.
-    const a = document.createElement('a');
-    a.className = 'nav-jump-btn';
-    a.href = p.url;
-    a.appendChild(icon(p.icon, 'icon-sm'));
-    a.appendChild(el('span', { text: p.label }));
-    if (dot) a.appendChild(dot);
-    row.appendChild(a);
-    badgeTargets.push({ page: p, target: a });
-  });
-  nav.appendChild(row);
+  // Every element that carries a notification pill, with a function that
+  // says what its count should be right now. syncDots() re-checks them
+  // all, so the same code draws the pills at load and after Back.
+  const dotTargets = [];
+  const trackDots = (target, getCount) => dotTargets.push({ target, getCount });
+  const totalProjectBadges = () =>
+    projectPages.reduce((sum, p) => sum + countUndismissedBadges(p), 0);
 
-  // A dot is only computed once, at load. If the page is later restored
-  // from the browser's back/forward cache (e.g. after pressing Back)
-  // rather than freshly loaded.
-  window.addEventListener('pageshow', event => {
-    if (!event.persisted) return;
-    badgeTargets.forEach(({ page, target }) => {
-      const existing = target.querySelector('.nav-jump-dot');
-      const count = countUndismissedBadges(page);
+  function syncDots() {
+    dotTargets.forEach(({ target, getCount }) => {
+      const existing = target.querySelector(':scope > .nav-jump-dot');
+      const count = getCount();
       if (count > 0) {
         const fresh = navBadgeDot(count);
         if (existing) existing.replaceWith(fresh);
@@ -447,19 +430,155 @@ function renderPageNav(pages, currentUrl) {
         existing.remove();
       }
     });
+  }
+
+  // Built by hand rather than via el()'s href shortcut - that shortcut
+  // always opens links in a new tab (right for the external links
+  // elsewhere), but moving between pages of this site stays in the same tab.
+  function pageLink(page, className) {
+    const a = document.createElement('a');
+    a.className = className;
+    a.href = page.url;
+    if (page.url === currentUrl) {
+      a.classList.add('is-current');
+      a.setAttribute('aria-current', 'page');
+    }
+    a.appendChild(icon(page.icon, 'icon-sm'));
+    a.appendChild(el('span', { text: page.label }));
+    return a;
+  }
+
+  /* ---------- Home ---------- */
+  if (home) nav.appendChild(pageLink(home, 'nav-link'));
+
+  /* ---------- Projects dropdown ---------- */
+  let setDropdown = () => {};
+  if (projectPages.length) {
+    const menuId = 'projects-menu';
+    const onProjectPage = projectPages.some(p => p.url === currentUrl);
+    const label = (SITE_DATA.home && SITE_DATA.home.projectsHeading) || 'Projects';
+
+    const trigger = el('button', {
+      class: 'nav-link nav-dropdown-toggle' + (onProjectPage ? ' is-current' : ''),
+      attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': menuId }
+    }, [
+      icon('box', 'icon-sm'),
+      el('span', { text: label }),
+      el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+    ]);
+    trackDots(trigger, totalProjectBadges);
+
+    const items = projectPages.map(page => {
+      const a = pageLink(page, 'nav-dropdown-item');
+      trackDots(a, () => countUndismissedBadges(page));
+      return a;
+    });
+    const menu = el('div', { class: 'nav-dropdown-menu', attrs: { id: menuId, hidden: '' } }, items);
+    const dropdown = el('div', { class: 'nav-dropdown' }, [trigger, menu]);
+    nav.appendChild(dropdown);
+
+    setDropdown = (open, opts = {}) => {
+      menu.hidden = !open;
+      trigger.setAttribute('aria-expanded', String(open));
+      dropdown.classList.toggle('is-open', open);
+      if (!open && opts.refocus) trigger.focus();
+    };
+
+    trigger.addEventListener('click', () => setDropdown(menu.hidden));
+    trigger.addEventListener('keydown', e => {
+      if (e.key !== 'ArrowDown') return;
+      e.preventDefault();
+      setDropdown(true);
+      items[0].focus();
+    });
+
+    menu.addEventListener('keydown', e => {
+      const i = items.indexOf(document.activeElement);
+      let next = -1;
+      if (e.key === 'ArrowDown') next = (i + 1) % items.length;
+      else if (e.key === 'ArrowUp') next = (i - 1 + items.length) % items.length;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = items.length - 1;
+      else if (e.key === 'Escape') {
+        e.preventDefault();
+        setDropdown(false, { refocus: true });
+        return;
+      }
+      if (next < 0) return;
+      e.preventDefault();
+      items[next].focus();
+    });
+
+    // On desktop the menu is a popover: it closes when focus or a click
+    // goes elsewhere. On mobile it's an accordion in the page flow, so
+    // it stays open until its own button is pressed again.
+    dropdown.addEventListener('focusout', e => {
+      if (!mobile.matches && !dropdown.contains(e.relatedTarget)) setDropdown(false);
+    });
+    document.addEventListener('pointerdown', e => {
+      if (!mobile.matches && !dropdown.contains(e.target)) setDropdown(false);
+    });
+  }
+
+  /* ---------- About ---------- */
+  if (about) nav.appendChild(pageLink(about, 'nav-link'));
+
+  /* ---------- Mobile menu button ---------- */
+  // Its pill totals every project page, so there's still a notification
+  // when the links are folded away.
+  const toggle = el('button', {
+    class: 'nav-toggle',
+    attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': menuWrap.id, 'aria-label': 'Open menu' }
+  }, [
+    el('span', { class: 'nav-toggle-bars', attrs: { 'aria-hidden': 'true' } })
+  ]);
+  trackDots(toggle, totalProjectBadges);
+  inner.insertBefore(toggle, menuWrap);
+
+  const setMenu = open => {
+    header.classList.toggle('is-menu-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  };
+  toggle.addEventListener('click', () => setMenu(!header.classList.contains('is-menu-open')));
+
+  // Escape folds the mobile menu away, unless something inside (the
+  // dropdown, the search box) already used the key.
+  header.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || e.defaultPrevented) return;
+    if (!mobile.matches || !header.classList.contains('is-menu-open')) return;
+    setMenu(false);
+    toggle.focus();
   });
 
-  // Keeps a linked/scrolled-to heading or project clear of this bar
-  // while it's sticky.
+  // Rotating a tablet or resizing a window across the breakpoint
+  // resets both menus, so neither is left half-open in the other layout.
+  mobile.addEventListener('change', () => {
+    setMenu(false);
+    setDropdown(false);
+  });
+
+  /* ---------- Notification pills ---------- */
+  syncDots();
+  // A pill is only computed at load. If the page is later restored from
+  // the browser's back/forward cache (e.g. after pressing Back) rather
+  // than freshly loaded, re-check them.
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) syncDots();
+  });
+
+  /* ---------- Scroll offset ---------- */
+  // Keeps a linked/scrolled-to heading or project clear of the sticky
+  // header. Measured with the mobile menu folded away, since it opens
+  // over the page rather than pushing it down.
   const syncScrollOffset = () => {
-    const rect = nav.getBoundingClientRect();
-    const navTop = parseFloat(getComputedStyle(nav).top) || 0;
-    const offset = navTop + rect.height + 16;
+    if (header.classList.contains('is-menu-open')) return;
+    const offset = header.getBoundingClientRect().height + 16;
     document.documentElement.style.setProperty('--sticky-nav-offset', `${Math.round(offset)}px`);
   };
   syncScrollOffset();
   if (window.ResizeObserver) {
-    new ResizeObserver(syncScrollOffset).observe(nav);
+    new ResizeObserver(syncScrollOffset).observe(header);
   } else {
     window.addEventListener('resize', syncScrollOffset);
   }
@@ -664,7 +783,7 @@ function initSectionPage(pageUrl) {
   renderBrand(SITE_DATA.brand);
 
   const pages = SITE_DATA.pages || [];
-  renderPageNav(pages, pageUrl);
+  renderSiteHeader(pages, pageUrl);
 
   // Looks up this page's section via SITE_DATA.pages, falling back to
   // the first section if data.js is missing that entry.

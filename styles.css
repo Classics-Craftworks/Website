@@ -240,7 +240,10 @@ p { margin: 0; }
 .social-link:focus-visible,
 .version-link:focus-visible,
 .credits-link:focus-visible,
-.nav-jump-btn:focus-visible,
+.brand:focus-visible,
+.nav-link:focus-visible,
+.nav-toggle:focus-visible,
+.nav-dropdown-item:focus-visible,
 .copy-link-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -252,45 +255,10 @@ p { margin: 0; }
   margin: 0 auto;
   /* The env() additions are 0px on any device without a notch/inset,
    so this is a no-op there - they only matter on phones with a
-   notch, Dynamic Island, or rounded-corner cutout, and when the
-   viewport-fit=cover meta tag lets content draw under them. */
-  padding: calc(16px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
-}
-
-/* ---------- Masthead ---------- */
-/* Header layout: logo and brand text side by side, centered as a pair. */
-.masthead {
-  display: grid;
-  grid-template-columns: auto auto;
-  justify-content: center;
-  align-items: center; /* Ensures perfect vertical centering across all columns */
-  column-gap: 24px;
-}
-
-.brand-logo {
-  width: 88px;
-  height: 88px;
-  flex-shrink: 0;
-  display: block;
-  transform: translateY(-5px); /* Lifts the logo slightly upward */
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.brand-text h1 {
-  font-family: 'Minercraftory', sans-serif; /* Font only to be used for heading */
-  font-size: clamp(1.4rem, 4.4vw, 2.0rem);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.20rem;
-  line-height: 1.35;
-  text-wrap: balance;
+   notch or rounded-corner cutout, and when the viewport-fit=cover meta
+   tag lets content draw under them. (The top inset is handled by the
+   site header, which sits above this element.) */
+  padding: 28px calc(24px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
 }
 
 .top-link, .text-link {
@@ -310,62 +278,171 @@ p { margin: 0; }
 /* Shared layout for every button-like element on the page (nav links,
    jump buttons, download buttons). Each keeps its own colors/sizing
    below. */
-.top-link, .text-link, .nav-jump-btn, .download-btn {
+.top-link, .text-link, .download-btn {
   display: inline-flex;
   align-items: center;
 }
 
-/* ---------- Page nav ---------- */
-/* The row of page links, sticky at the top of the screen while
-   scrolling (built by renderPageNav() in section-page.js). */
-.section-nav {
+/* ---------- Site header ---------- */
+/* One sticky bar across the top of every page: brand on the left, then
+   Home / Projects dropdown / About, then the search box on the right.
+   The brand is plain HTML; the links are built by renderSiteHeader() in
+   section-page.js and the search box by search.js. */
+.site-header {
   position: sticky;
-  /* Keeps the sticky offset itself clear of a notch/Dynamic Island -
-   matters in standalone/PWA mode where there's no browser chrome
-   already pushing content down. 0px on ordinary devices. */
-  top: calc(6px + env(safe-area-inset-top));
-  margin-top: 8px;
-  z-index: 30;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 32px;
-  border-radius: 14px;
+  top: 0;
+  z-index: 40;
   background: var(--nav-bg);
-  border: 1px solid var(--nav-btn-border);
-  box-shadow: var(--nav-shadow);
+  border-bottom: 1px solid var(--nav-btn-border);
+  box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.6);
+  /* Keeps the bar clear of a notch / status bar when installed as an app.
+     All 0px on ordinary devices. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
 }
 
-.nav-jump-row {
+.site-header-inner {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-left: 16px; /* the nav's side padding is overridden to 6px near the bottom of this file, so this keeps the buttons off its rounded corner */
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 10px 24px;
 }
 
-/* Styled differently from other buttons on the page so they clearly
-   read as navigation. */
-.nav-jump-btn {
+/* Logo + name, left-aligned, linking home. */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  min-width: 0;
+  border-radius: 8px;
+}
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  display: block;
+  flex-shrink: 0;
+}
+.brand-name {
+  margin: 0;
+  font-family: 'Minercraftory', sans-serif; /* Font only to be used for the site name */
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Everything right of the brand. On desktop it's just a row; on mobile
+   it becomes the folding menu (see the media query at the bottom). */
+.site-menu {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 16px;
+}
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Home, About, the Projects button. Quiet until hovered, so the bar
+   doesn't compete with the page below it. */
+.nav-link {
   position: relative;
+  display: inline-flex;
+  align-items: center;
   gap: 7px;
-  border: 1px solid var(--nav-btn-border);
-  border-radius: 6px;
-  background: var(--nav-btn-bg);
-  color: var(--text);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-soft);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  padding: 7px 14px;
+  padding: 8px 13px;
   cursor: pointer;
   transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
+.nav-link:hover,
+.nav-dropdown.is-open > .nav-link {
+  background: var(--nav-btn-bg);
+  color: var(--text);
+}
+.nav-link:active { transform: scale(0.97); }
 
-/* Numbered pill flagging a page with undismissed "New"/"Updated"
-   badges (see countUndismissedBadges() in section-page.js). */
+/* The page you're on. */
+.nav-link.is-current {
+  background: var(--nav-btn-hover-bg);
+  border-color: var(--nav-btn-hover-border);
+  color: var(--text);
+}
+
+/* Small "v" on the Projects button, drawn from two borders. */
+.nav-chevron {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 2px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--transition-fast), margin var(--transition-fast);
+}
+.nav-dropdown.is-open .nav-chevron {
+  margin-top: 3px;
+  transform: rotate(225deg);
+}
+
+/* ---------- Projects dropdown ---------- */
+.nav-dropdown { position: relative; }
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  min-width: 250px;
+  padding: 6px;
+  border: 1px solid var(--nav-btn-border);
+  border-radius: 14px;
+  background: var(--nav-bg);
+  box-shadow: var(--nav-shadow);
+}
+
+.nav-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+.nav-dropdown-item .icon { color: var(--text-soft); transition: color var(--transition-fast); }
+.nav-dropdown-item:hover,
+.nav-dropdown-item:focus-visible {
+  background: var(--nav-btn-hover-bg);
+}
+.nav-dropdown-item:hover .icon,
+.nav-dropdown-item:focus-visible .icon { color: var(--text); }
+.nav-dropdown-item.is-current {
+  background: var(--nav-btn-bg);
+  color: var(--accent);
+}
+.nav-dropdown-item.is-current .icon { color: var(--accent); }
+/* Inside the menu the focus ring would be clipped by the rounded panel;
+   the filled background already shows where focus is. */
+.nav-dropdown-item:focus-visible { outline-offset: -2px; }
+
+/* ---------- Notification pills ---------- */
+/* Numbered pill flagging a link (or the mobile menu button) that leads
+   to pages with undismissed "New"/"Updated" badges (see
+   countUndismissedBadges() in section-page.js). */
 .nav-jump-dot {
   position: absolute;
   top: -5px;
@@ -394,44 +471,89 @@ p { margin: 0; }
   left: -20px;
 }
 
-/* Yellow variant of the shared [data-tooltip] hover tooltip */
-.nav-jump-dot[data-tooltip]::after {
+/* Inside a dropdown row the pill sits inline at the right edge instead
+   of hanging off a corner. */
+.nav-dropdown-item .nav-jump-dot {
+  position: relative;
+  top: auto;
+  right: auto;
+  margin-left: auto;
+}
+
+/* Yellow variant of the shared [data-tooltip] hover tooltip, opening
+   downwards: the header hugs the top of the screen, so a tooltip above
+   it would be cut off. */
+.site-header .nav-jump-dot[data-tooltip]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+  left: auto;
+  right: -4px;
+  transform: translateY(-4px);
   background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
   border-color: color-mix(in srgb, var(--badge-color), black 25%);
   color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
 }
-.nav-jump-dot[data-tooltip]:hover::after,
-.nav-jump-dot[data-tooltip]:focus-visible::after {
+.site-header .nav-jump-dot[data-tooltip]:hover::after,
+.site-header .nav-jump-dot[data-tooltip]:focus-visible::after,
+.site-header .nav-jump-dot[data-tooltip].tooltip-open::after {
+  transform: translateY(0);
   background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
   border-color: color-mix(in srgb, var(--badge-color), black 25%);
   color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
 }
-.nav-jump-btn:hover {
+
+/* ---------- Mobile menu button ---------- */
+/* Only shown below the mobile breakpoint (see the media query at the
+   bottom of this file). The three bars are drawn from one span plus its
+   ::before/::after, and turn into an "x" while the menu is open. */
+.nav-toggle {
+  position: relative;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--nav-btn-border);
+  border-radius: 10px;
+  background: var(--nav-btn-bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+.nav-toggle:hover {
   background: var(--nav-btn-hover-bg);
   border-color: var(--nav-btn-hover-border);
 }
-.nav-jump-btn:active { transform: scale(0.97); }
-
-/* Filled-in style for the page you're currently on */
-.nav-jump-btn.is-open {
-  background: var(--nav-btn-active-bg);
-  border-color: var(--nav-btn-active-bg);
-  color: var(--nav-btn-active-text);
+.nav-toggle-bars,
+.nav-toggle-bars::before,
+.nav-toggle-bars::after {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform var(--transition-fast), background-color var(--transition-fast), top var(--transition-fast);
 }
-.nav-jump-btn.is-open:hover {
-  background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
-  border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
-}
+.nav-toggle-bars { position: relative; }
+.nav-toggle-bars::before,
+.nav-toggle-bars::after { content: ''; position: absolute; left: 0; }
+.nav-toggle-bars::before { top: -6px; }
+.nav-toggle-bars::after  { top: 6px; }
+.site-header.is-menu-open .nav-toggle-bars { background: transparent; }
+.site-header.is-menu-open .nav-toggle-bars::before { top: 0; transform: rotate(45deg); }
+.site-header.is-menu-open .nav-toggle-bars::after  { top: 0; transform: rotate(-45deg); }
 
 /* ---------- Search ---------- */
-/* Search box at the right of the nav bar (built by search.js), with a
-   results dropdown that hangs below it. */
+/* Search box at the right of the site header (built by search.js), with a
+   results dropdown that hangs below it. margin-left: auto pushes it to
+   the far edge. */
 .nav-search {
   position: relative;
-  flex: 1 1 0;
-  min-width: 170px;
-  max-width: 240px;
-  margin-right: 16px;
+  flex: 0 1 250px;
+  min-width: 150px;
+  margin-left: auto;
 }
 
 .nav-search-icon {
@@ -515,12 +637,11 @@ p { margin: 0; }
 .nav-search-clear::before { transform: rotate(45deg); }
 .nav-search-clear::after { transform: rotate(-45deg); }
 
-/* The dropdown. Sits inside the sticky nav, so it stays above the page
-   content. It's right-aligned with the search box and grows leftwards
-   (the nav clips horizontal overflow, so it must stay inside the nav). */
+/* The dropdown. Sits inside the sticky header, so it stays above the page
+   content. It's right-aligned with the search box and grows leftwards. */
 .search-panel {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 12px);
   right: 0;
   width: 380px;
   max-height: min(60vh, 420px);
@@ -1647,103 +1768,123 @@ p { margin: 0; }
 }
 
 /* ---------- Responsive ---------- */
-/* Below 890px the header and nav bar switch to their stacked, mobile
-   layouts together, at one shared breakpoint. */
-@media (max-width: 890px) {
-  .section-nav {
+/* Below 900px the header folds its links and search behind a menu button.
+   Keep this width in sync with MOBILE_NAV_QUERY in section-page.js. */
+@media (max-width: 900px) {
+  .site-header-inner {
+    flex-wrap: wrap;
+    gap: 0 12px;
+    padding: 8px 16px;
+  }
+
+  .brand { flex: 1 1 0; }
+  .brand-logo { width: 38px; height: 38px; }
+  .brand-name {
+    font-size: clamp(0.95rem, 4.6vw, 1.2rem);
+    white-space: normal; /* lets very narrow phones wrap the name instead of squeezing the menu button off-screen */
+    text-wrap: balance;
+  }
+
+  .nav-toggle { display: flex; }
+
+  /* The folding panel: full width under the brand row, hidden until the
+     menu button is pressed. Capped to the screen so it scrolls inside
+     itself rather than running off the bottom. The side/top padding gives
+     the notification pills room to poke out of their buttons without
+     being clipped by the scroll area. */
+  .site-menu {
+    display: none;
+    flex: 0 0 100%;
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
-    padding: 12px 14px;
+    gap: 14px;
+    max-height: calc(100vh - 72px - env(safe-area-inset-top));
+    max-height: calc(100dvh - 72px - env(safe-area-inset-top));
+    margin: 0 -8px;
+    padding: 12px 8px 8px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
+  .site-header.is-menu-open .site-menu { display: flex; }
 
-  /* A real 2-column grid instead of wrapping, so buttons line up in
-   neat columns regardless of label length. */
-  .nav-jump-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin-left: 0; /* desktop's spacing margin doesn't apply once this row stacks alone */
+  .site-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
   }
-  .nav-jump-btn {
-    padding: 9px 16px; /* slightly taller tap target on touch screens */
-    justify-content: center; /* center the label now that the button fills its grid cell instead of hugging its own text */
-    min-width: 0; /* lets the label wrap/shrink instead of forcing its grid column wider than the viewport */
+  .nav-link {
+    padding: 12px 14px; /* taller tap target on touch screens */
+    font-size: 0.95rem;
+    background: var(--nav-btn-bg);
+    border-color: var(--nav-btn-border);
+    color: var(--text);
   }
+  .nav-link.is-current {
+    background: var(--nav-btn-hover-bg);
+    border-color: var(--nav-btn-hover-border);
+  }
+  .nav-chevron { margin-left: auto; }
+  .nav-dropdown-toggle { width: 100%; }
 
-  /* Full width under the buttons, instead of sitting beside them. */
+  /* The dropdown opens in place, pushing the links below it down,
+     rather than floating over them. */
+  .nav-dropdown-menu {
+    position: static;
+    min-width: 0;
+    margin-top: 6px;
+    padding: 4px;
+    border-radius: 10px;
+    background: rgba(var(--white-rgb), 0.03);
+    box-shadow: none;
+  }
+  .nav-dropdown-item { padding: 12px; }
+
+  /* Full width, with its results listed in the flow underneath. */
   .nav-search {
     flex: none;
-    max-width: none;
     min-width: 0;
-    margin-right: 0;
+    margin-left: 0;
   }
   /* 16px is the minimum iOS Safari won't auto-zoom the page in on
    focus - the 0.85rem used above is under that. */
   .nav-search-input {
+    height: 44px;
     font-size: 16px;
     padding-right: 40px; /* room for the larger clear button below */
   }
+  /* The results list now sits inside the search wrapper (in the page
+   flow), so the icon and "x" are pinned to the input's own centre line
+   rather than the wrapper's. */
+  .nav-search-icon,
+  .nav-search-clear { top: 22px; }
   /* Bigger tap target for the "x". Its ::before/::after already draw
    the X, so the real box grows instead of using hit-slop. */
   .nav-search-clear {
     width: 36px;
     height: 36px;
-    right: 2px;
+    right: 4px;
   }
   .search-panel {
-    left: 0;
+    position: static;
     width: auto;
+    max-height: min(50vh, 360px);
+    margin-top: 8px;
+    box-shadow: none;
   }
 
-  /* Bigger notification dot on mobile - easier to spot/tap on a
-   touch screen than the desktop size. */
+  /* Bigger notification pill on mobile - easier to spot on a touch screen. */
   .nav-jump-dot {
     min-width: 22px;
     height: 22px;
     padding: 0 5px;
     font-size: 0.78rem;
   }
-
-  /* Move notification dot tooltip left so it doesn't get cut off. */
-  .nav-jump-dot[data-tooltip]::after {
-    left: auto;
-    right: -4px;
-    transform: translateY(-4px);
-  }
-  .nav-jump-dot[data-tooltip]:hover::after,
-  .nav-jump-dot[data-tooltip]:focus-visible::after,
-  .nav-jump-dot[data-tooltip].tooltip-open::after {
-    transform: translateY(-10px);
-  }
-}
-
-@media (max-width: 890px) {
-  /* One centered column: logo, then title. */
-  .masthead {
-    grid-template-columns: 1fr;
-    align-items: start;
-    justify-items: center;
-    text-align: center;
-    gap: 10px;
-  }
-  /* Smaller logo, so the header has more breathing room on mobile. */
-  .brand-logo {
-    width: 64px;
-    height: 64px;
-    transform: none;
-  }
-  /* Shrinks the title to its own content width and centers
-   *that*, so text-wrap: balance on the title can take effect. */
-  .brand-text {
-    align-items: center;
-  }
 }
 
 @media (max-width: 620px) {
   /* Smaller side margins on narrow phones, to give rows more room. */
   .page {
-    padding: calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+    padding: 22px calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   }
 
   /* A real grid, same reasoning as the nav bar above - so the link
@@ -1788,7 +1929,7 @@ p { margin: 0; }
 /* Adds a little padding so focus rings on edge elements (like the
    last button in a row) don't get clipped by the overflow rule above.
    The matching negative margin cancels it out visually. */
-.masthead, .section-nav, #catalog, .stats-section, .site-footer {
+#catalog, .stats-section, .site-footer {
   overflow-x: clip;
   max-width: calc(100% + 12px);
   padding-left: 6px;
@@ -1811,7 +1952,7 @@ p { margin: 0; }
 /* Turns off the little "press" shrink effect for anyone who's asked
    for reduced motion. Color/background feedback stays. */
 @media (prefers-reduced-motion: reduce) {
-  .nav-jump-btn:active,
+  .nav-link:active,
   .download-btn:active,
   .project-links a:active,
   .top-link:active,
@@ -1895,7 +2036,7 @@ img, svg {
   pointer-events: auto;
 }
 .back-to-top:hover {
-  /* Same lighten-on-hover as .nav-jump-btn.is-open. */
+  /* Lightens the fill on hover. */
   background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
   border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
 }

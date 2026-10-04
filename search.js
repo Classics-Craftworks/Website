@@ -1,13 +1,12 @@
 /* ============================================================
    SITE SEARCH
 
-   Adds a search box to the nav bar on the home page and every
-   section page. It searches every project on the whole site (title,
+   Adds a search box to the right of the site header on every page. It searches every project on the whole site (title,
    description, section name and version strings) using SITE_DATA from
    data.js, and shows matches in a dropdown that links straight to the
    project on its own page (e.g. resource-packs.html#classics-disc-tweaks).
 
-   Must load after the page's own script, so the nav bar already exists
+   Must load after the page's own script, so the header menu already exists
    (see the <script> tags at the bottom of each HTML page).
    ============================================================ */
 
@@ -29,8 +28,7 @@ function buildSearchIndex(data) {
     (section.projects || []).forEach(project => {
       const id = uniqueSlug(project.title, 'project', used);
 
-      // Minecraft versions and each download's own version, e.g.
-      // "1.21.9 – 26.3" and "v3.4.0". `label` is how it's shown in results.
+      // Minecraft versions and each download's own version
       const versions = [];
       (project.channels || []).forEach(ch => {
         if (ch.mcVersion) versions.push({ text: ch.mcVersion, label: 'Java ' + ch.mcVersion });
@@ -120,8 +118,8 @@ function normalizePath(path) {
 }
 
 function initSearch() {
-  const nav = document.getElementById('page-nav');
-  if (!nav || typeof SITE_DATA === 'undefined') return; // e.g. the home page redirected an old deep link
+  const menu = document.getElementById('site-menu');
+  if (!menu || typeof SITE_DATA === 'undefined') return; // e.g. the home page redirected an old deep link
 
   const entries = buildSearchIndex(SITE_DATA);
   if (!entries.length) return;
@@ -161,7 +159,7 @@ function initSearch() {
     panel,
     status
   ]);
-  nav.appendChild(wrap);
+  menu.appendChild(wrap);
 
   /* ---------- Behaviour ---------- */
   let options = [];  // the result <a> elements currently shown
@@ -285,6 +283,7 @@ function initSearch() {
       case 'Escape':
         if (panelOpen) close();
         else if (input.value) { input.value = ''; update(); }
+        else return;
         break;
       default:
         return;
