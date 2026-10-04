@@ -622,21 +622,38 @@ function renderFlatSection(section) {
 }
 
 function renderFooter(socials, footer, version) {
-  const socialRow = document.getElementById('social-links');
+  // Projects column: one link per section page, same source as the header nav.
+  const projectsList = document.getElementById('footer-projects');
+  if (projectsList && typeof SITE_DATA !== 'undefined') {
+    SITE_DATA.pages.filter(p => p.section).forEach(p => {
+      const a = document.createElement('a');
+      a.className = 'footer-link footer-social';
+      a.href = p.url;
+      a.appendChild(icon(p.icon, 'icon-sm'));
+      a.appendChild(el('span', { text: p.label }));
+      const li = document.createElement('li');
+      li.appendChild(a);
+      projectsList.appendChild(li);
+    });
+  }
+
+  // Links column: icon + visible label for each social.
+  const socialList = document.getElementById('social-links');
   socials.forEach(s => {
-    socialRow.appendChild(el('a', {
-      class: 'social-link',
-      href: s.url,
-      attrs: {
-        'aria-label': s.label,
-        'data-tooltip': s.label
-      }
+    const li = document.createElement('li');
+    li.appendChild(el('a', {
+      class: 'footer-link footer-social',
+      href: s.url
     }, [
-      icon(s.icon, 'icon-md')
+      icon(s.icon, 'icon-sm'),
+      el('span', { text: s.label })
     ]));
+    socialList.appendChild(li);
   });
 
   document.getElementById('copyright').textContent = footer.copyright;
+  const established = document.getElementById('established');
+  if (established && footer.established) established.textContent = footer.established;
   document.getElementById('disclaimer').textContent = footer.disclaimer;
 
   if (footer.iconCredits) {

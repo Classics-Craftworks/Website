@@ -93,11 +93,32 @@
   </section>
 
   <footer class="site-footer">
-    <div id="social-links" class="social-row" aria-label="Social links"></div>
-    <p id="copyright" class="footer-line"></p>
-    <p id="disclaimer" class="footer-line footer-disclaimer"></p>
-    <p id="icon-credits" class="footer-line footer-credits"></p>
-    <p id="site-version" class="footer-version"></p>
+    <div class="footer-grid">
+      <div class="footer-col footer-brand-col">
+        <a class="footer-brand" href="/">
+          <img class="footer-logo" src="images/logo.png" alt="" width="52" height="52">
+          <span class="footer-brand-name">CLASSIC'S CRAFTWORKS</span>
+        </a>
+        <p id="established" class="footer-line footer-established"></p>
+        <p id="copyright" class="footer-line footer-copyright"></p>
+      </div>
+
+      <nav class="footer-col" aria-label="Footer projects">
+        <h2 class="footer-heading">Projects</h2>
+        <ul id="footer-projects" class="footer-list"></ul>
+      </nav>
+
+      <div class="footer-col">
+        <h2 class="footer-heading">Links</h2>
+        <ul id="social-links" class="footer-list" aria-label="Social links"></ul>
+      </div>
+    </div>
+
+    <div class="footer-legal">
+      <p id="disclaimer" class="footer-line footer-disclaimer"></p>
+      <p id="icon-credits" class="footer-line footer-credits"></p>
+      <p id="site-version" class="footer-version"></p>
+    </div>
   </footer>
 
   <!-- Fades in on scroll and jumps back to top; see initBackToTop() in
