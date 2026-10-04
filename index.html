@@ -73,6 +73,22 @@
 
 <div class="page">
 
+  <!-- Splash banner. Text and the featured-project card are filled in by
+       renderSplash() in index.js from SITE_DATA.home.splash (data.js); it
+       stays hidden until then. The background picture is a placeholder:
+       replace images/splash-bg.svg, or point this <img> at your own file. -->
+  <section id="splash" class="splash" aria-labelledby="splash-headline" hidden>
+    <img class="splash-bg" src="images/splash-bg.svg" alt="" aria-hidden="true">
+    <div class="splash-inner">
+      <div class="splash-copy">
+        <h2 id="splash-headline" class="splash-headline"></h2>
+        <p id="splash-subtitle" class="splash-subtitle"></p>
+        <div id="splash-actions" class="splash-actions"></div>
+      </div>
+      <aside id="splash-featured" class="splash-featured" aria-label="Featured project"></aside>
+    </div>
+  </section>
+
   <!-- Heading for the section buttons below. Text comes from
        SITE_DATA.home in data.js, filled in by renderProjectsIntro(). -->
   <section id="projects-intro" class="projects-intro" aria-labelledby="projects-heading">

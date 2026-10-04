@@ -36,8 +36,16 @@ const SITE_DATA = {
 
   // Heading and one-line subtitle above the section buttons on the home page.
   home: {
+    // The big banner at the top of the home page.
+    splash: {
+      headline: ["SOMETIMES USEFUL.", "ALWAYS MINECRAFT."],
+      subtitle: "Minecraft Java Edition data packs, mods & resource packs by Classic's Craftworks",
+      featured: "Better Craftables",
+      featuredImage: "images/featured-banner.webp"
+    },
+
     projectsHeading: "Projects",
-    projectsSubtitle: "Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft."
+    projectsSubtitle: ""
   },
 
   // Every page in the site header. Entries with a "section" appear in the

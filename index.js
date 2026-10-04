@@ -1,7 +1,7 @@
 /* ============================================================
    HOME PAGE
 
-   One big button per section, showing each section's first four
+   A splash banner with a featured project, then one big button per section, showing each section's first four
    project icons. Loaded after data.js/section-page.js (SITE_DATA,
    shared helpers) and stats.js (STATS_DATA for the stats section
    below). Edit data.js for section/project content, stats.js for
@@ -161,6 +161,115 @@ function forwardOldDeepLink(sections, pages) {
   return false;
 }
 
+// Finds a project by title across every section. Returns { project,
+// url } where url is that project's own spot on its section page (the
+// same #id the "copy link" buttons use), or null if there's no match.
+function findProject(title, sections, pages) {
+  for (const section of sections) {
+    const project = (section.projects || []).find(p => p.title === title);
+    const page = pages.find(pg => pg.section === section.heading);
+    if (project && page) return { project, url: page.url + '#' + encodeURIComponent(slugify(project.title)) };
+  }
+  return null;
+}
+
+// Plain same-tab link (el()'s href shortcut always opens a new tab,
+// which is right for external links but not for moving around this site).
+function internalLink(className, href, children) {
+  const a = document.createElement('a');
+  a.className = className;
+  a.href = href;
+  children.forEach(c => c && a.appendChild(c));
+  return a;
+}
+
+// The featured-project card on the right of the splash. The text comes
+// from the project's own data.js entry: its title, description, kinds of
+// download (pills beside the title) and the current stable data pack
+// version + Minecraft version (plain text by the button). `imageSrc` is
+// the card's own picture (SITE_DATA.home.splash.featuredImage) - it is
+// not the project's icon.
+function renderFeaturedCard(found, imageSrc) {
+  const { project, url } = found;
+  const stable = (project.channels || []).find(c => c.channel === 'stable') || (project.channels || [])[0];
+  const downloads = ((stable && stable.downloads) || []).filter(d => !d.disabled);
+
+  // One pill per kind of download ("Data Pack", "Mod"), beside the title.
+  const seen = new Set();
+  const pills = [];
+  downloads.forEach(d => {
+    if (seen.has(d.label)) return;
+    seen.add(d.label);
+    pills.push(el('li', { class: 'splash-chip' }, [icon(d.icon, 'icon-sm'), el('span', { text: d.label })]));
+  });
+
+  // "v8.0.0 | Java 26.3" - the first download's version (the data pack's)
+  // and the Minecraft version, as plain text.
+  const meta = [];
+  const first = downloads.find(d => d.version);
+  if (first) meta.push(el('span', { class: 'splash-meta-version', text: first.version }));
+  if (stable && stable.mcVersion) meta.push(el('span', { text: 'Java ' + stable.mcVersion }));
+
+  return [
+    el('p', { class: 'splash-featured-label', text: 'Featured project' }),
+    imageSrc ? el('div', { class: 'splash-featured-media' }, [
+      el('img', { class: 'splash-featured-img', src: imageSrc, alt: '', attrs: { draggable: 'false' } })
+    ]) : null,
+    el('div', { class: 'splash-featured-head' }, [
+      el('h3', { class: 'splash-featured-title', text: project.title }),
+      pills.length ? el('ul', { class: 'splash-chips' }, pills) : null
+    ]),
+    el('p', { class: 'splash-featured-desc', text: project.description || '' }),
+    el('div', { class: 'splash-featured-foot' }, [
+      el('p', { class: 'splash-meta' }, meta),
+      internalLink('splash-btn splash-btn-ghost', url, [
+        el('span', { text: 'View Project' }),
+        el('span', { class: 'splash-btn-arrow', attrs: { 'aria-hidden': 'true' } })
+      ])
+    ])
+  ];
+}
+
+// Builds the banner at the top of the home page from SITE_DATA.home.splash.
+// Leaves it hidden if there's no splash block.
+function renderSplash(home, sections, pages) {
+  const wrap = document.getElementById('splash');
+  const splash = home && home.splash;
+  if (!wrap || !splash) return;
+
+  // Two-line headline; the second line takes the accent colour.
+  const lines = splash.headline || [];
+  const headline = document.getElementById('splash-headline');
+  lines.forEach((text, i) => {
+    headline.appendChild(el('span', { class: 'splash-line' + (i > 0 ? ' splash-line-accent' : ''), text }));
+  });
+  document.getElementById('splash-subtitle').textContent = splash.subtitle || '';
+
+  // Buttons: jump down to the project buttons, or go to the About page.
+  const actions = document.getElementById('splash-actions');
+  actions.appendChild(internalLink('splash-btn splash-btn-primary', '#projects-intro', [
+    icon('compass', 'icon-sm'),
+    el('span', { text: 'Explore Projects' }),
+    el('span', { class: 'splash-btn-arrow', attrs: { 'aria-hidden': 'true' } })
+  ]));
+  const about = pages.find(p => p.url === 'about');
+  if (about) {
+    actions.appendChild(internalLink('splash-btn splash-btn-ghost', about.url, [
+      icon(about.icon, 'icon-sm'),
+      el('span', { text: 'About' })
+    ]));
+  }
+
+  // Featured project card (skipped, leaving the text full-width, if the
+  // named project can't be found).
+  const found = splash.featured && findProject(splash.featured, sections, pages);
+  const card = document.getElementById('splash-featured');
+  if (found) renderFeaturedCard(found, splash.featuredImage).forEach(n => n && card.appendChild(n));
+  else { card.remove(); wrap.classList.add('splash-no-card'); }
+
+  wrap.hidden = false;
+}
+
 // Fills the heading + subtitle above the section buttons from SITE_DATA.home.
 // Hides the whole block if no heading text is set.
 function renderProjectsIntro(home) {
@@ -179,6 +288,7 @@ function renderProjectsIntro(home) {
 
   renderBrand(SITE_DATA.brand);
   renderSiteHeader(pages, '/');
+  renderSplash(SITE_DATA.home, sections, pages);
   renderProjectsIntro(SITE_DATA.home);
   renderHomeButtons(sections, pages);
   renderStats(typeof STATS_DATA !== 'undefined' ? STATS_DATA : null);

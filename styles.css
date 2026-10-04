@@ -115,6 +115,7 @@
   --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   --measure: 68ch;
+  --page-max: 1300px;
 
 /* Shared timings for hover/press animations. --transition-fast is for
    color/background fades; --transition-snap is the quicker one for
@@ -251,14 +252,14 @@ p { margin: 0; }
 
 /* Page width & padding */
 .page {
-  max-width: 1100px;
+  max-width: var(--page-max);
   margin: 0 auto;
   /* The env() additions are 0px on any device without a notch/inset,
    so this is a no-op there - they only matter on phones with a
    notch or rounded-corner cutout, and when the viewport-fit=cover meta
    tag lets content draw under them. (The top inset is handled by the
    site header, which sits above this element.) */
-  padding: 28px calc(24px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
+  padding: 20px calc(24px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
 }
 
 .top-link, .text-link {
@@ -304,7 +305,7 @@ p { margin: 0; }
   display: flex;
   align-items: center;
   gap: 24px;
-  max-width: 1100px;
+  max-width: var(--page-max);
   margin: 0 auto;
   padding: 10px 24px;
 }
@@ -736,7 +737,7 @@ p { margin: 0; }
   font-size: clamp(1.7rem, 4.5vw, 2.2rem);
   font-weight: 700;
   color: var(--text);
-  margin: 20px 0 20px;
+  margin: 0 0 20px;
   /* Keeps it clear of the sticky nav bar when linked/scrolled to.
      --sticky-nav-offset is measured from the bar's real height in
      renderPageNav(); 68px is the fallback until that runs. */
@@ -760,9 +761,254 @@ p { margin: 0; }
   flex-shrink: 0;
 }
 
+/* ---------- Home page: splash banner ---------- */
+/* Built by renderSplash() in index.js from SITE_DATA.home.splash. A
+   picture fills the banner, with a dark gradient over it so the text
+   stays readable. The copy sits on the left and the featured project
+   card on the right. */
+.splash {
+  position: relative;
+  isolation: isolate; /* keeps the z-index: -1 layers below inside the banner */
+  overflow: hidden;
+  margin-bottom: 36px;
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.4);
+  border-radius: 20px;
+  background: var(--surface);
+}
+.splash[hidden] { display: none; }
+
+.splash-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* Darkens the left (text) side more than the right. */
+.splash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(8, 12, 22, 0.82) 0%, rgba(8, 12, 22, 0.5) 55%, rgba(8, 12, 22, 0.25) 100%),
+    linear-gradient(180deg, rgba(8, 12, 22, 0) 60%, rgba(8, 12, 22, 0.55) 100%);
+}
+
+.splash-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(28px, 4vw, 56px);
+  padding: clamp(28px, 4vw, 52px);
+}
+.splash-no-card .splash-inner { grid-template-columns: minmax(0, 1fr); }
+
+.splash-headline {
+  margin: 0 0 16px;
+  font-family: 'Minercraftory', var(--font);
+  font-size: clamp(1.35rem, 3.2vw, 3rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+}
+.splash-line { display: block; }
+.splash-line-accent { color: var(--accent); }
+
+.splash-subtitle {
+  max-width: 34em;
+  margin: 0 0 28px;
+  color: #d3dcee;
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+.splash-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+/* Buttons: one filled (primary), one outlined (ghost). */
+.splash-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+.splash-btn:active { transform: scale(0.97); }
+.splash-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.splash-btn-primary {
+  background: var(--nav-btn-active-bg);
+  border-color: var(--nav-btn-active-bg);
+  color: var(--nav-btn-active-text);
+}
+.splash-btn-primary:hover {
+  background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+  border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+}
+.splash-btn-ghost {
+  background: rgba(8, 12, 22, 0.5);
+  border-color: var(--nav-btn-hover-border);
+  color: var(--text);
+}
+.splash-btn-ghost:hover {
+  background: var(--nav-btn-hover-bg);
+  border-color: var(--accent);
+}
+/* The ">" after a label, drawn from two borders like the other arrows. */
+.splash-btn-arrow {
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: 2px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--transition-fast);
+}
+.splash-btn:hover .splash-btn-arrow { transform: translateX(3px) rotate(45deg); }
+
+/* Featured project card. */
+.splash-featured {
+  padding: 18px;
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.55);
+  border-radius: 16px;
+  background: rgba(10, 14, 24, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.splash-featured-label {
+  margin: 0 0 14px;
+  color: var(--accent);
+  font-family: 'Minercraftory', var(--font);
+  font-size: 1.2rem;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+/* The card's own picture (SITE_DATA.home.splash.featuredImage), kept to
+   a 5:2 frame so a replacement just needs to match that shape. */
+.splash-featured-media {
+  overflow: hidden;
+  aspect-ratio: 5 / 2;
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.3);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.splash-featured-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* Title with the download-type pills beside it. */
+.splash-featured-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 16px 0 6px;
+}
+.splash-featured-title {
+  margin: 0;
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  font-weight: 800;
+  line-height: 1.2;
+}
+.splash-featured-desc {
+  margin: 0 0 14px;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+}
+.splash-chips {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  gap: 8px;
+}
+.splash-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border: 1px solid var(--nav-btn-border);
+  border-radius: 8px;
+  background: var(--nav-btn-bg);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.splash-chip .icon { color: var(--accent); }
+.splash-featured-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+.splash-featured-foot .splash-btn { padding: 10px 18px; font-size: 0.88rem; }
+
+/* Plain-text "v8.0.0 | Java 26.3" (not pills). */
+.splash-meta {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.splash-meta-version { color: var(--text); }
+.splash-meta > * + *::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 0.95em;
+  margin: 0 12px;
+  vertical-align: -0.1em;
+  background: rgba(var(--white-rgb), 0.25);
+}
+
+/* Narrower screens: the featured card drops underneath the text. */
+@media (max-width: 890px) {
+  .splash { margin-bottom: 28px; border-radius: 16px; }
+  .splash-inner {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 26px 18px;
+  }
+  .splash::before {
+    background: linear-gradient(180deg, rgba(8, 12, 22, 0.7) 0%, rgba(8, 12, 22, 0.55) 100%);
+  }
+  .splash-actions .splash-btn { flex: 1 1 170px; }
+}
+
+/* Phones: the tagline and subtitle are centred. */
+@media (max-width: 620px) {
+  .splash-headline,
+  .splash-subtitle { text-align: center; }
+  .splash-subtitle { margin-left: auto; margin-right: auto; }
+}
+
 /* ---------- Home page: projects heading ---------- */
 .projects-intro {
-  margin-top: 16px;
+  margin-top: 0;
+  scroll-margin-top: var(--sticky-nav-offset, 68px); /* "Explore Projects" lands here */
 }
 .projects-heading {
   font-weight: 900;
@@ -786,7 +1032,7 @@ p { margin: 0; }
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  gap: 32px;
   margin-top: 16px;
 }
 
@@ -825,7 +1071,7 @@ p { margin: 0; }
   width: 100%;
   text-align: center;
   font-family: 'Minercraftory', var(--font);
-  font-size: min(6.4cqi, 2.7rem);
+  font-size: min(6.4cqi, 3.4rem);
   line-height: 1.25;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -838,8 +1084,8 @@ p { margin: 0; }
    two lines and needs no extra icon asset. */
 .home-card-arrow {
   flex-shrink: 0;
-  width: min(3.2cqi, 1rem);
-  height: min(3.2cqi, 1rem);
+  width: min(3.2cqi, 1.4rem);
+  height: min(3.2cqi, 1.4rem);
   border-top: 0.16em solid var(--nav-accent);
   border-right: 0.16em solid var(--nav-accent);
   transform: translateX(-4px) rotate(45deg);
@@ -922,7 +1168,7 @@ p { margin: 0; }
   margin-top: auto;
   padding-top: 6cqi;
   color: var(--nav-accent);
-  font-size: min(4.7cqi, 1.15rem);
+  font-size: min(4.7cqi, 1.6rem);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -1962,7 +2208,7 @@ p { margin: 0; }
 @media (max-width: 620px) {
   /* Smaller side margins on narrow phones, to give rows more room. */
   .page {
-    padding: 22px calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+    padding: 16px calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   }
 
   /* A real grid, same reasoning as the nav bar above - so the link
@@ -2053,7 +2299,6 @@ img, svg {
 /* Built by about.js from the Markdown in about.md. */
 .about {
   min-height: 40vh;
-  padding-top: 8px;
   padding-bottom: 40px;
 }
 .about > :first-child { margin-top: 0; }

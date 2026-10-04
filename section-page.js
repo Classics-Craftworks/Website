@@ -462,7 +462,7 @@ function renderSiteHeader(pages, currentUrl) {
       class: 'nav-link nav-dropdown-toggle' + (onProjectPage ? ' is-current' : ''),
       attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': menuId }
     }, [
-      icon('box', 'icon-sm'),
+      icon('compass', 'icon-sm'),
       el('span', { text: label }),
       el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
     ]);
