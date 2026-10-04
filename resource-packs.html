@@ -57,10 +57,13 @@
 
   <!-- Identical masthead markup/IDs to index.html, filled in by the same
        renderBrand() logic in section-page.js. -->
+  <!-- Logo and name are written here so they show before the scripts run;
+       renderBrand() sets the same values from data.js. Keep them in sync
+       with SITE_DATA.brand if those change. -->
   <header class="masthead">
-    <img id="brand-logo" class="brand-logo" alt="" width="88" height="88">
+    <img id="brand-logo" class="brand-logo" src="images/logo.png" alt="Classic's Craftworks logo" width="88" height="88">
     <div class="brand-text">
-      <h1 id="brand-name"></h1>
+      <h1 id="brand-name">CLASSIC'S CRAFTWORKS</h1>
     </div>
   </header>
 
