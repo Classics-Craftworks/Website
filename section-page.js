@@ -324,7 +324,7 @@ function renderProject(p) {
   ]);
 
   return el('article', { class: 'project', attrs: { id } }, [
-    el('img', { class: 'project-image', src: p.image, alt: p.title, attrs: { loading: 'lazy' } }),
+    el('img', { class: 'project-image', src: p.image, alt: p.title, attrs: { loading: 'lazy', width: '320', height: '320' } }),
     el('div', { class: 'project-body' }, [
       titleRow,
       el('p', { class: 'project-description', text: p.description }),
