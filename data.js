@@ -40,16 +40,17 @@ const SITE_DATA = {
     projectsSubtitle: "Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft."
   },
 
-  // Every page in the sticky page-nav bar: the home page plus one page
-  // per section. Add an entry here (with the matching section heading
-  // below) whenever a new section gets its own page, and it shows up
-  // in every page's nav automatically. "Home" has no "section" since
-  // it isn't tied to one.
+  // Every page in the site header. Entries with a "section" appear in the
+  // Projects dropdown; add one here (with the matching section heading
+  // below) whenever a new section gets its own page. "Home" (url "/")
+  // and "About" (url "about") have no "section" and get their own
+  // buttons in the header instead.
   pages: [
     { label: "Home", url: "/", icon: "home" },
     { label: "Data Packs & Mods", url: "data-packs-mods", section: "Data Packs & Mods", icon: "brackets" },
     { label: "Resource Packs", url: "resource-packs", section: "Resource Packs", icon: "brush" },
-    { label: "Other Projects", url: "other-projects", section: "Other Projects", icon: "wrench" }
+    { label: "Other Projects", url: "other-projects", section: "Other Projects", icon: "wrench" },
+    { label: "About", url: "about", icon: "book" }
   ],
 
   // The main content: each entry below is a section (a heading
