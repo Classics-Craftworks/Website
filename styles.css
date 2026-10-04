@@ -1974,7 +1974,6 @@ img, svg {
 /* ---------- About page ---------- */
 /* Built by about.js from the Markdown in about.md. */
 .about {
-  max-width: var(--measure);
   min-height: 40vh;
   padding-top: 8px;
   padding-bottom: 40px;
