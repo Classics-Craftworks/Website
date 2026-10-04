@@ -164,7 +164,10 @@ function copyLinkButton(id, label) {
 
 function renderBrand(brand) {
   const logo = document.getElementById('brand-logo');
-  logo.src = brand.logo;
+  // The HTML already has the same src (so the logo shows before scripts
+  // run). Assigning src again, even to the same value, makes some browsers
+  // cancel the in-flight request and start over, so only set it if it differs.
+  if (logo.getAttribute('src') !== brand.logo) logo.src = brand.logo;
   logo.alt = brand.name + ' logo';
 
   document.getElementById('brand-name').textContent = brand.name;
