@@ -16,7 +16,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v3.0.0-dev.4",
+    label: "v3.0.0-dev.5",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 

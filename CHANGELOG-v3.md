@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.0.0-dev.5 — 2026/10/05
+
+### Changed
+- Improved home page layout on smaller/narrower screens such as mobile
+- Updated format of versions listed on the home page, dropping "Java"
+- Increased gap between logo & buttons in the header
+- Improvements to how the About page is handled
+- Big clean-ups & optimisations
+
+### Fixed
+- Wide splash buttons on mobile/narrower screens
+- Wide stats boxes on mobile/narrower screens
+
+### Removed
+- Footer from home page project cards
+
 ## v3.0.0-dev.4 — 2026/10/05
 
 ### Changed
