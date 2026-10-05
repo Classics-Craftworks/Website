@@ -321,7 +321,7 @@ p { margin: 0; }
 .site-header-inner {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 36px;
   max-width: var(--page-max);
   margin: 0 auto;
   padding: 10px 24px;
