@@ -770,7 +770,8 @@ p { margin: 0; }
   position: relative;
   isolation: isolate; /* keeps the z-index: -1 layers below inside the banner */
   overflow: hidden;
-  margin-bottom: 36px;
+  margin-top: 24px;
+  margin-bottom: 28px;
   border: 1px solid rgba(var(--nav-accent-rgb), 0.4);
   border-radius: 20px;
   background: var(--surface);
@@ -987,7 +988,7 @@ p { margin: 0; }
 
 /* Narrower screens: the featured card drops underneath the text. */
 @media (max-width: 890px) {
-  .splash { margin-bottom: 28px; border-radius: 16px; }
+  .splash { margin-top: 12px; margin-bottom: 28px; border-radius: 16px; }
   .splash-inner {
     grid-template-columns: minmax(0, 1fr);
     padding: 26px 18px;
