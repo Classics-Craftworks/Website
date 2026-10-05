@@ -250,7 +250,6 @@ p { margin: 0; }
 .copy-link-btn:focus-visible,
 .home-card-header:focus-visible,
 .home-project:focus-visible,
-.home-card-footer:focus-visible,
 .footer-social:focus-visible,
 .versions-note-link:focus-visible,
 .about-link:focus-visible,
@@ -1109,7 +1108,7 @@ p { margin: 0; }
 }
 
 /* ---------- Home page: section cards ---------- */
-/* index.js builds one card per section. The header and footer link to
+/* index.js builds one card per section. The header links to
    the section page; each project row in between links straight to that
    project. */
 .home-grid {
@@ -1129,7 +1128,7 @@ p { margin: 0; }
   overflow: hidden;
 }
 
-/* Header: icon badge, title + count, arrow. */
+/* Header: icon badge, title + count, arrow. Links to the section page. */
 .home-card-header {
   display: flex;
   align-items: center;
@@ -1184,8 +1183,7 @@ p { margin: 0; }
 /* Chevrons are drawn as a rotated corner (two borders) rather than an
    image, so they need no icon asset and inherit their colour. */
 .home-card-arrow,
-.home-project-arrow,
-.home-card-footer-arrow {
+.home-project-arrow {
   flex-shrink: 0;
   width: 0.5rem;
   height: 0.5rem;
@@ -1275,29 +1273,6 @@ p { margin: 0; }
     linear-gradient(currentColor, currentColor) center / 0.18em 100% no-repeat;
 }
 
-/* Footer: pinned to the bottom so cards of different heights still line up. */
-.home-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: auto;
-  padding: 14px 22px;
-  border-top: 1px solid rgba(var(--nav-accent-rgb), 0.18);
-  color: var(--nav-accent);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  white-space: nowrap;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-.home-card-footer span:first-child {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.home-card-footer-arrow { width: 0.6rem; height: 0.6rem; }
-
 @media (hover: hover) {
   .home-card-header:hover { background: rgba(var(--nav-accent-rgb), 0.08); }
   .home-card-header:hover .home-card-badge {
@@ -1315,8 +1290,6 @@ p { margin: 0; }
     transform: translateX(2px) rotate(45deg);
   }
 
-  .home-card-footer:hover { background: rgba(var(--nav-accent-rgb), 0.12); }
-  .home-card-footer:hover .home-card-footer-arrow { transform: translateX(3px) rotate(45deg); }
 }
 .home-project:active { transform: scale(0.99); }
 
@@ -1331,7 +1304,6 @@ p { margin: 0; }
   .home-card-title { font-size: 1.3rem; }
   .home-projects { padding: 8px; }
   .home-project { padding: 10px 12px 10px 8px; } /* taller tap target */
-  .home-card-footer { padding: 14px 16px; }
 }
 
 /* ---------- Home page: stats section ---------- */
@@ -2645,6 +2617,5 @@ body::before {
   background: url('images/background.png') 0 0 / calc(32 * var(--px)) calc(32 * var(--px)) repeat;
 }
 /* The home cards clip their contents, so focus rings sit inside. */
-.home-card-header:focus-visible,
-.home-card-footer:focus-visible { outline-offset: -3px; }
+.home-card-header:focus-visible { outline-offset: -3px; }
 .home-project:focus-visible { outline-offset: -2px; }

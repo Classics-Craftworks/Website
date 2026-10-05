@@ -20,7 +20,7 @@ function projectUrl(page, project) {
   return page.url + '#' + encodeURIComponent(slugify(project.title));
 }
 
-// Subtitle under a project's name: "v8.0.0 \u00b7 Java 26.3" - the current
+// Subtitle under a project's name: "v8.0.0 - 26.3" - the current
 // version (the first enabled download's, as in the featured card) and the
 // Minecraft version it supports, taken from the stable channel (falling
 // back to the first channel). Empty string if there's no version.
@@ -32,8 +32,8 @@ function projectMeta(project) {
   const first = (ch.downloads || []).find(d => !d.disabled && d.version);
   const parts = [];
   if (first) parts.push(first.version);
-  if (ch.mcVersion) parts.push('Java ' + ch.mcVersion);
-  return parts.join(' \u00b7 ');
+  if (ch.mcVersion) parts.push(ch.mcVersion);
+  return parts.join(' - ');
 }
 
 // Plain same-tab link. el()'s href shortcut always opens a new tab
@@ -87,9 +87,9 @@ function renderHomeMore(count, page) {
 }
 
 // Builds one section card. `page` is the matching entry from
-// SITE_DATA.pages (its url is where the header and footer go).
-// The card itself is not a link: the header and footer go to the
-// section page, and every project row inside goes to that project.
+// SITE_DATA.pages (its url is where the header goes).
+// The card itself is not a link: the header goes to the section page,
+// and every project row inside goes to that project.
 function renderHomeButton(section, page) {
   const allProjects = section.projects || [];
   const count = allProjects.length;
@@ -111,15 +111,9 @@ function renderHomeButton(section, page) {
     homeArrow('home-card-arrow')
   ], section.heading + ' - ' + count + ' project' + (count === 1 ? '' : 's'));
 
-  const footer = homeLink('home-card-footer', page.url, [
-    el('span', { text: 'Browse all ' + section.heading }),
-    homeArrow('home-card-footer-arrow')
-  ]);
-
   return el('section', { class: 'home-card', attrs: { 'aria-label': section.heading } }, [
     header,
-    rows.length ? el('ul', { class: 'home-projects' }, rows) : null,
-    footer
+    rows.length ? el('ul', { class: 'home-projects' }, rows) : null
   ]);
 }
 
