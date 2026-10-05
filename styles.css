@@ -321,7 +321,10 @@ p { margin: 0; }
 .site-header-inner {
   display: flex;
   align-items: center;
-  gap: 36px;
+  /* Space between the site name and the nav buttons: 24px just above the
+     mobile breakpoint, growing smoothly to 48px by ~1100px (mobile sets
+     its own gap below). */
+  gap: clamp(24px, calc(24px + (100vw - 901px) * 0.12), 48px);
   max-width: var(--page-max);
   margin: 0 auto;
   padding: 10px 24px;
@@ -345,7 +348,9 @@ p { margin: 0; }
 .brand-name {
   margin: 0;
   font-family: 'Minercraftory', sans-serif; /* Font only to be used for the site name */
-  font-size: 1.3rem;
+  /* 1.1rem just above the mobile breakpoint, growing smoothly to 1.3rem
+     by ~1100px so the header never jumps between sizes. */
+  font-size: clamp(1.1rem, calc(1.1rem + (100vw - 901px) * 0.001), 1.3rem);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.2;
@@ -941,8 +946,10 @@ p { margin: 0; }
   }
 }
 
-/* Featured project card. */
+/* Featured project card. It's a container so the footer row can adapt to
+   the card's own width (see the @container rules below). */
 .splash-featured {
+  container: splash-featured / inline-size;
   padding: 18px;
   border: 1px solid rgba(var(--nav-accent-rgb), 0.55);
   border-radius: 16px;
@@ -976,13 +983,15 @@ p { margin: 0; }
   user-select: none;
   -webkit-user-drag: none;
 }
-/* Title with the download-type pills beside it. */
+/* Title with the download-type pills on their own line underneath. Always
+   stacked, so the card keeps the same shape at every width instead of the
+   pills jumping between beside and below the title. */
 .splash-featured-head {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-  margin: 16px 0 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 16px 0 8px;
 }
 .splash-featured-title {
   margin: 0;
@@ -1017,7 +1026,7 @@ p { margin: 0; }
 .splash-chip .icon { color: var(--accent); }
 .splash-featured-foot {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px 16px;
@@ -1071,13 +1080,28 @@ p { margin: 0; }
     height: clamp(84px, 20vw, 130px);
     border-radius: 8px;
   }
-  .splash-featured-head { margin: 10px 0 4px; gap: 6px 8px; }
+  .splash-featured-head { margin: 10px 0 6px; gap: 6px; }
   .splash-featured-title { font-size: 1.15rem; }
   .splash-chip { padding: 3px 8px; font-size: 0.74rem; }
   .splash-featured-desc { margin-bottom: 10px; font-size: 0.85rem; }
   .splash-meta { font-size: 0.84rem; }
   .splash-featured-foot { gap: 8px 12px; }
   .splash-featured-foot .splash-btn { padding: 8px 14px; font-size: 0.82rem; }
+}
+
+/* Footer row (version + View Project). Rather than letting the button
+   drop under the version at an arbitrary width, the row first tightens
+   (smaller text and button), and only in the very narrowest cards stacks
+   on purpose with a full-width button. Sizes match the phone styles above. */
+@container splash-featured (max-width: 311px) {
+  .splash-featured-foot { gap: 12px; }
+  .splash-meta { font-size: 0.84rem; }
+  .splash-featured-foot .splash-btn { padding: 8px 14px; font-size: 0.82rem; }
+}
+@container splash-featured (max-width: 289px) {
+  .splash-featured-foot { flex-direction: column; align-items: stretch; }
+  .splash-meta { justify-content: center; }
+  .splash-featured-foot .splash-btn { width: 100%; }
 }
 
 /* Phones: the tagline and subtitle are centred. */
@@ -1112,13 +1136,16 @@ p { margin: 0; }
    the section page; each project row in between links straight to that
    project. */
 .home-grid {
+  --home-gap: 24px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  gap: var(--home-gap);
   margin-top: 16px;
 }
 
 .home-card {
+  /* Lets the title size itself from the card's own width (cqw units below). */
+  container-type: inline-size;
   display: flex;
   flex-direction: column;
   border-radius: 18px;
@@ -1166,13 +1193,16 @@ p { margin: 0; }
 .home-card-title {
   display: block;
   font-family: 'Minercraftory', var(--font);
-  font-size: 1.2rem;
+  /* Full size when the card is wide enough, then shrinks smoothly with it
+     (the longest title is ~12.7x its font size wide; 135px is the room the
+     badge, arrow, gaps and padding take). Below 1rem it wraps onto two
+     lines instead of being cut off. */
+  font-size: clamp(1rem, calc((100cqw - 135px) / 12.9), 1.2rem);
   line-height: 1.15;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 .home-card-count {
   font-size: 0.8rem;
@@ -1236,9 +1266,13 @@ p { margin: 0; }
   font-weight: 700;
   font-size: 0.98rem;
   line-height: 1.25;
+  /* Long names wrap (up to two lines) rather than being cut off. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 .home-project-meta {
   font-size: 0.78rem;
@@ -1293,15 +1327,31 @@ p { margin: 0; }
 }
 .home-project:active { transform: scale(0.99); }
 
-/* Tablet/phone: one card per row. Shares the site-wide 900px
-   "collapse to mobile" breakpoint. */
-@media (max-width: 900px) {
-  .home-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
+/* Cards need ~380px each to show full titles and project names, so the
+   grid steps down 3 -> 2 -> 1 columns by available width (not at the
+   site-wide 900px breakpoint, which left the three cards cramped from
+   900px to ~1240px). In the two-column layout the odd card out sits on
+   its own row at one column's width, centred. */
+@media (max-width: 1239px) {
+  .home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-grid > .home-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - var(--home-gap)) / 2); /* one column's width */
   }
+}
+@media (max-width: 820px) {
+  .home-grid {
+    --home-gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .home-grid > .home-card:last-child:nth-child(odd) { grid-column: auto; justify-self: stretch; width: auto; }
+}
+
+/* Phone-sized spacing. Shares the site-wide 900px "collapse to mobile"
+   breakpoint. */
+@media (max-width: 900px) {
   .home-card-header { padding: 16px 16px 14px; }
-  .home-card-title { font-size: 1.3rem; }
   .home-projects { padding: 8px; }
   .home-project { padding: 10px 12px 10px 8px; } /* taller tap target */
 }
