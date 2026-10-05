@@ -2061,6 +2061,15 @@ p { margin: 0; }
 }
 .download-notice .icon { flex: none; }
 
+/* On phones the text wraps to several lines, so the icon sits above it
+   instead of floating beside the middle line. */
+@media (max-width: 620px) {
+  .download-notice {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
 .footer-version {
   text-align: center;
   font-size: 0.75rem;
