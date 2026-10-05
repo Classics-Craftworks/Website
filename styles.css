@@ -808,16 +808,21 @@ p { margin: 0; }
 }
 .splash-no-card .splash-inner { grid-template-columns: minmax(0, 1fr); }
 
+/* The text column is a container so the headline can size itself to its
+   width (cqw): each of its two lines then always fits on one line, at the
+   largest size that allows, up to 3rem. */
+.splash-copy { container: splash-copy / inline-size; }
+
 .splash-headline {
   margin: 0 0 16px;
   font-family: 'Minercraftory', var(--font);
-  font-size: clamp(1.35rem, 3.2vw, 3rem);
+  font-size: clamp(1.2rem, 6.9cqw, 3rem);
   font-weight: 700;
   line-height: 1.2;
   letter-spacing: 0.02em;
   text-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
 }
-.splash-line { display: block; }
+.splash-line { display: block; white-space: nowrap; }
 .splash-line-accent { color: var(--accent); }
 
 .splash-subtitle {
@@ -991,12 +996,35 @@ p { margin: 0; }
   .splash { margin-top: 12px; margin-bottom: 28px; border-radius: 16px; }
   .splash-inner {
     grid-template-columns: minmax(0, 1fr);
-    padding: 26px 18px;
+    padding: 26px 14px;
   }
   .splash::before {
     background: linear-gradient(180deg, rgba(8, 12, 22, 0.7) 0%, rgba(8, 12, 22, 0.55) 100%);
   }
   .splash-actions .splash-btn { flex: 1 1 170px; }
+
+  /* Featured card: smaller on mobile - centred, capped in width, with
+     tighter padding, a shorter picture and slightly smaller text. */
+  .splash-featured {
+    width: 100%;
+    max-width: 520px;
+    margin-inline: auto;
+    padding: 12px;
+    border-radius: 14px;
+  }
+  .splash-featured-label { margin-bottom: 8px; font-size: 1rem; }
+  .splash-featured-media {
+    aspect-ratio: auto;
+    height: clamp(84px, 20vw, 130px);
+    border-radius: 8px;
+  }
+  .splash-featured-head { margin: 10px 0 4px; gap: 6px 8px; }
+  .splash-featured-title { font-size: 1.15rem; }
+  .splash-chip { padding: 3px 8px; font-size: 0.74rem; }
+  .splash-featured-desc { margin-bottom: 10px; font-size: 0.85rem; }
+  .splash-meta { font-size: 0.84rem; }
+  .splash-featured-foot { gap: 8px 12px; }
+  .splash-featured-foot .splash-btn { padding: 8px 14px; font-size: 0.82rem; }
 }
 
 /* Phones: the tagline and subtitle are centred. */
@@ -2053,7 +2081,7 @@ p { margin: 0; }
 /* Callout shown above the project list on section pages, warning about
    unofficial reuploads right before people start clicking downloads. */
 .download-notice {
-  max-width: 120ch;
+  max-width: 123ch;
   margin: -8px auto 20px;
   padding: 10px 16px;
   border: 1px solid var(--border);
