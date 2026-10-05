@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.0.0-dev.4 — 2026/10/05
+
+### Changed
+- Redesigned home page buttons - now list more information and link straight to the project
+- More browsers can now install the website as an app
+- Updated page headings to help screen readers
+
+### Fixed
+- Various inconsistencies, such as hover colours and button radii
+
 ## v3.0.0-dev.3 — 2026/10/05
 
 ### Added
