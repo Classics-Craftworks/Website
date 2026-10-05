@@ -1,11 +1,4 @@
-/* ============================================================
-   HOME PAGE STATS
-
-   Feeds the "Statistics" stats section on the home page (the
-   three boxes above the footer, plus the "last updated" line and the
-   note underneath them). Loaded before index.js, which reads
-   STATS_DATA and builds the section — see renderStats() there.
-   ============================================================ */
+/* Home page statistics, rendered by renderStats() in index.js. */
 
 const STATS_DATA = {
 

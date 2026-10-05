@@ -1,21 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="canonical" href="https://classicscraftworks.co.uk/about">
-<link rel="icon" href="images/favicon.png" type="image/png">
-<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d111a">
-<link rel="preload" href="fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/minercraftory.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css">
-  <!-- Basic Meta Tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="canonical" href="https://classicscraftworks.co.uk/about">
+  <link rel="icon" href="images/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d111a">
+  <link rel="preload" href="fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/minercraftory.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
   <title>About - Classic's Craftworks</title>
   <meta name="description" content="About Classic's Craftworks: Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft." />
 
-  <!-- Open Graph Preview Cards (Discord, Facebook, LinkedIn) -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Classic's Craftworks" />
   <meta property="og:title" content="About - Classic's Craftworks" />
@@ -24,7 +22,6 @@
   <meta property="og:image:alt" content="Classic's Craftworks logo" />
   <meta property="og:url" content="https://classicscraftworks.co.uk/about" />
 
-  <!-- Twitter / X Preview Cards -->
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="About - Classic's Craftworks" />
   <meta name="twitter:description" content="About Classic's Craftworks: Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft." />
@@ -33,12 +30,9 @@
 </head>
 <body>
 
-<!-- Same skip link as the other pages, pointing at this page's content. -->
 <a href="#about" class="skip-link">Skip to content</a>
 
-<!-- Static fallback shown only when JavaScript is disabled/blocked, same
-     idea as index.html's noscript block — see section-page.js for how
-     the rest of the page is built from data.js. -->
+<!-- Fallback when JavaScript is off. -->
 <noscript>
   <div class="noscript-notice">
     <h1>CLASSIC'S CRAFTWORKS</h1>
@@ -52,12 +46,7 @@
   </div>
 </noscript>
 
-<!-- Site header: brand on the left, then Home / Projects dropdown / About,
-     then the search box on the right. The logo and name are written here so
-     they show before the scripts run (renderBrand() sets the same values from
-     data.js - keep them in sync with SITE_DATA.brand). The nav inside
-     #site-nav is built by renderSiteHeader() in section-page.js, and the
-     search box is added to #site-menu by search.js. -->
+<!-- Logo and name are repeated here so they show before scripts run; keep in sync with SITE_DATA.brand. -->
 <header class="site-header" id="site-header">
   <div class="site-header-inner" id="site-header-inner">
     <a class="brand" href="/">
@@ -72,8 +61,6 @@
 
 <div class="page">
 
-  <!-- Filled in by about.js from SITE_DATA.about (data.js). tabindex="-1"
-       lets the skip link above focus here without joining the Tab order. -->
   <main id="about" class="about" tabindex="-1"></main>
 
   <footer class="site-footer">

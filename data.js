@@ -1,40 +1,25 @@
-/* ============================================================
-   SITE DATA
-   The main file for site text, links and project lists. Layout and
-   rendering are handled by section-page.js and index.js.
+/* SITE DATA - all site text, links and project lists.
 
-   QUICK GUIDE:
-   - Text & Links: edit values inside quotes (label, url, etc).
-   - Images: place in /images, set the relative path.
-   - Icons: place SVGs in /images/icons/, refer to by filename (no extension).
-   - Projects: copy an existing project {...} block to add a new one.
-   - Channels: "stable"/"beta"/"alpha"/"unsupported". Add "disabled: true"
-     to a download if unavailable, with an optional "tooltip" explaining why.
-   - Download versions: each download shows its own "version" pill
-     (no channel-wide fallback — give every enabled download one).
-   - "New"/"Updated" badge: add `badge: "new"` or `"updated"` to a channel.
-     Dismissible by visitors; reappears automatically next time that
-     channel's download versions are bumped.
-   ============================================================ */
+   - Icons: SVGs in /images/icons/, referenced by filename without extension.
+   - Channels: "stable" | "beta" | "alpha" | "unsupported".
+   - Downloads: each needs its own "version". Add `disabled: true` (and an
+     optional "tooltip") if unavailable.
+   - Badges: `badge: "new"` or `"updated"` on a channel. Visitors can dismiss
+     it; it returns when that channel's download versions change.
+   - New project: copy an existing project block. */
 
-// One big object — the page scripts read values out of it (e.g.
-// SITE_DATA.brand.name) to build each page.
 const SITE_DATA = {
 
-  // Logo and name shown at the top of the page. The tagline isn't shown on
-  // the page; it's only used for the site's structured-data description.
   brand: {
     logo: "images/logo.png",
-    name: "CLASSIC'S CRAFTWORKS",
+    name: "CLASSIC'S CRAFTWORKS"
   },
 
-  // Website version shown at the very bottom of the page.
-   version: {
+  version: {
     label: "v3.0.0-dev.4",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
-  // Heading and one-line subtitle above the section buttons on the home page.
   home: {
     splash: {
       headline: ["SOMETIMES USEFUL.", "ALWAYS MINECRAFT."],
@@ -47,11 +32,8 @@ const SITE_DATA = {
     projectsSubtitle: ""
   },
 
-  // Every page in the site header. Entries with a "section" appear in the
-  // Projects dropdown; add one here (with the matching section heading
-  // below) whenever a new section gets its own page. "Home" (url "/")
-  // and "About" (url "about") have no "section" and get their own
-  // buttons in the header instead.
+  // Header pages. Entries with a "section" go in the Projects dropdown and
+  // must match a section heading below; Home ("/") and About get their own links.
   pages: [
     { label: "Home", url: "/", icon: "home" },
     { label: "Data Packs & Mods", url: "data-packs-mods", section: "Data Packs & Mods", icon: "brackets" },
@@ -60,18 +42,11 @@ const SITE_DATA = {
     { label: "About", url: "about", icon: "book" }
   ],
 
-  // The main content: each entry below is a section (a heading
-  // plus a list of projects). Add, remove, or reorder sections
-  // and projects freely — the layout will adjust automatically.
   sections: [
     // #region ▓▓▓▓▓▓▓▓▓▓▓▓  DATA PACKS & MODS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Data Packs & Mods",
       projects: [
-        // Each object in this "projects" array becomes one project card
-        // on the page. Copy an entire { ... } block like this one and
-        // paste it here (with a trailing comma) to add a new project.
-
         // #region ──────── Better Craftables ────────
         {
           image: "images/better-craftables.webp",
@@ -354,18 +329,9 @@ const SITE_DATA = {
     // #endregion OTHER PROJECTS
   ],
 
-  // ABOUT PAGE
-  // Each entry in "content" becomes one block, in order:
-  //   "Plain string"                      -> a paragraph
-  //   { heading: "Title" }                -> a subheading
-  //   { list: ["one", "two"] }            -> a bulleted list
-  //   { quote: "Text" }                   -> a pull quote
-  //   { divider: true }                   -> a horizontal line
-  // Any text can contain {projects} (total number of projects listed on
-  // this site) which fills itself in. To put a link, bold or italic inside
-  // text, use an array of pieces instead of a string:
-  //   [ "Find us on ", { link: "Modrinth", url: "https://modrinth.com" }, ".",
-  //     " This is ", { bold: "important" }, " and ", { italic: "subtle" }, "." ]
+  // About page blocks, in order: "paragraph" | { heading } | { list: [] } |
+  // { quote } | { divider: true }. Text may use {projects} (project count) or
+  // be an array mixing strings with { link, url } / { bold } / { italic } / { code }.
   about: {
     heading: "About",
     content: [
@@ -377,7 +343,6 @@ const SITE_DATA = {
     ]
   },
 
-  // Link icons shown in the footer at the bottom of every page.
   socials: [
     { label: "Modrinth", url: "https://modrinth.com/organization/classics-craftworks", icon: "modrinth" },
     { label: "GitHub", url: "https://github.com/Classics-Craftworks", icon: "github" },
@@ -392,7 +357,8 @@ const SITE_DATA = {
     disclaimer: "NOT AN OFFICIAL MINECRAFT PRODUCT OR SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
     iconCredits: { prefix: "Link icons provided by ", label: "SVG Repo", url: "https://www.svgrepo.com" }
   },
-  downloadNotice: "Any reuploads of these projects that are not linked on this website are unofficial, unaffiliated, and may have been modified or contain malicious content.",
+
+  downloadNotice: "Any reuploads of these projects that are not linked on this website are unofficial, unaffiliated, and may have been modified or contain malicious content."
 };
 
 // TOOLTIP STORAGE

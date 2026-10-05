@@ -1,39 +1,29 @@
-/* ============================================================
-   SITE SEARCH
+/* Header search: matches projects by title, description, section and version,
+   and links to each project's own card. Must load after the page's own script
+   so #site-menu exists. */
 
-   Adds a search box to the right of the site header on every page. It searches every project on the whole site (title,
-   description, section name and version strings) using SITE_DATA from
-   data.js, and shows matches in a dropdown that links straight to the
-   project on its own page (e.g. resource-packs.html#classics-disc-tweaks).
-
-   Must load after the page's own script, so the header menu already exists
-   (see the <script> tags at the bottom of each HTML page).
-   ============================================================ */
-
-// Turns SITE_DATA into a flat list of searchable projects. Each entry's
-// url uses the same #id the project gets on its own page (see uniqueSlug()
-// in section-page.js), so the link lands on the right card.
+// Flat list of searchable projects. Each url uses the same #id the project
+// gets on its own page, so links land on the right card.
 function buildSearchIndex(data) {
   const pages = data.pages || [];
   const entries = [];
 
   (data.sections || []).forEach(section => {
     const page = pages.find(p => p.section === section.heading);
-    if (!page) return; // a section with no page has nowhere to link to
+    if (!page) return;
 
-    // Same order as renderFlatSection(): the heading claims its id first.
+    // As in renderFlatSection(), the heading claims its slug first.
     const used = new Set();
     uniqueSlug(section.heading, 'section', used);
 
     (section.projects || []).forEach(project => {
       const id = uniqueSlug(project.title, 'project', used);
 
-      // Minecraft versions and each download's own version
       const versions = [];
       (project.channels || []).forEach(ch => {
         if (ch.mcVersion) versions.push({ text: ch.mcVersion, label: 'Java ' + ch.mcVersion });
         (ch.downloads || []).forEach(d => {
-          // Unavailable downloads show "N/A" on the page, so skip their versions too.
+          // Unavailable downloads show "N/A" on the page.
           if (d.version && d.url && !d.disabled) versions.push({ text: d.version, label: d.version });
         });
       });
@@ -56,8 +46,7 @@ function buildSearchIndex(data) {
   return entries;
 }
 
-// How well one search word matches a project (0 = no match). Title
-// matches rank highest, then versions, section name and description.
+// Score for one word (0 = no match): title, then versions, section, description.
 function scoreSearchWord(entry, word) {
   if (entry.titleLower.startsWith(word)) return 100;
   if (entry.titleWords.some(w => w.startsWith(word))) return 80;
@@ -68,8 +57,8 @@ function scoreSearchWord(entry, word) {
   return 0;
 }
 
-// Every word in the query has to match something (so "disc 3.4" only
-// finds Disc Tweaks). Best matches first; ties keep data.js order.
+// Every word must match something ("disc 3.4" only finds Disc Tweaks).
+// Best first; ties keep data.js order.
 function searchProjects(entries, query) {
   const words = [...new Set(query.toLowerCase().split(/\s+/).filter(Boolean))];
   const results = [];
@@ -88,8 +77,7 @@ function searchProjects(entries, query) {
   return { words, results: results.map(r => r.entry) };
 }
 
-// Returns `text` with each matched word wrapped in <mark>, as DOM nodes
-// (never innerHTML, so project text can't inject markup).
+// `text` with matched words wrapped in <mark>, built from DOM nodes.
 function highlightMatches(text, words) {
   const frag = document.createDocumentFragment();
   const pattern = words
@@ -102,7 +90,7 @@ function highlightMatches(text, words) {
     return frag;
   }
 
-  // Splitting on a capture group puts the matches at the odd indexes.
+  // Splitting on a capture group puts matches at the odd indexes.
   text.split(new RegExp(`(${pattern})`, 'gi')).forEach((part, i) => {
     if (!part) return;
     frag.appendChild(i % 2
@@ -112,19 +100,18 @@ function highlightMatches(text, words) {
   return frag;
 }
 
-// "resource-packs.html" and "/resource-packs" (hosts that hide .html) are the same page.
+// "resource-packs.html" and "/resource-packs" are the same page.
 function normalizePath(path) {
   return path.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, '');
 }
 
 function initSearch() {
   const menu = document.getElementById('site-menu');
-  if (!menu || typeof SITE_DATA === 'undefined') return; // e.g. the home page redirected an old deep link
+  if (!menu || typeof SITE_DATA === 'undefined') return;
 
   const entries = buildSearchIndex(SITE_DATA);
   if (!entries.length) return;
 
-  /* ---------- Markup ---------- */
   const listboxId = 'search-results';
 
   const input = el('input', {
@@ -149,7 +136,7 @@ function initSearch() {
   const list = el('div', { class: 'search-results', attrs: { id: listboxId, role: 'listbox', 'aria-label': 'Search results' } });
   const empty = el('p', { class: 'search-empty', attrs: { hidden: '' } });
   const panel = el('div', { class: 'search-panel', attrs: { hidden: '' } }, [list, empty]);
-  // Screen readers hear the result count here as you type.
+  // Announces the result count to screen readers.
   const status = el('p', { class: 'visually-hidden', attrs: { role: 'status', 'aria-live': 'polite' } });
 
   const wrap = el('div', { class: 'nav-search', attrs: { role: 'search' } }, [
@@ -161,9 +148,8 @@ function initSearch() {
   ]);
   menu.appendChild(wrap);
 
-  /* ---------- Behaviour ---------- */
-  let options = [];  // the result <a> elements currently shown
-  let active = -1;   // index of the highlighted one
+  let options = [];
+  let active = -1;
 
   function setActive(index) {
     options.forEach((o, i) => {
@@ -191,9 +177,8 @@ function initSearch() {
     input.setAttribute('aria-expanded', 'true');
   }
 
-  // Picks a result. On a different page this is a normal link; on the
-  // current page it scrolls to the project directly, since the hash
-  // may not change (or may already match) and the browser wouldn't.
+  // On the current page, scroll directly (the hash may not change); otherwise
+  // let the link navigate.
   function onResultClick(e) {
     const url = new URL(e.currentTarget.href);
     const samePage = normalizePath(url.pathname) === normalizePath(location.pathname);
@@ -209,7 +194,7 @@ function initSearch() {
   function renderResult(entry, index, words) {
     const matchedVersions = entry.versions
       .filter(v => words.some(w => v.text.toLowerCase().includes(w)))
-      .slice(0, 1); // one is enough to show why it matched
+      .slice(0, 1);
 
     const meta = el('span', { class: 'search-result-meta' });
     meta.appendChild(document.createTextNode(entry.section));
@@ -297,12 +282,10 @@ function initSearch() {
     input.focus();
   });
 
-  // Keeps focus in the input while a result is pressed. Otherwise Safari
-  // (which doesn't focus links on click) would close the panel on
-  // mousedown, before the click could land.
+  // Keeps focus in the input; otherwise Safari closes the panel on mousedown,
+  // before the click lands.
   panel.addEventListener('mousedown', e => e.preventDefault());
 
-  // Close when focus or a click moves outside the search box.
   wrap.addEventListener('focusout', e => {
     if (!wrap.contains(e.relatedTarget)) close();
   });
