@@ -402,8 +402,9 @@ p { margin: 0; }
 
 .nav-dropdown-menu {
   position: absolute;
-  top: calc(100% + 12px);
-  left: 0;
+  top: calc(100% + 17px);
+  left: 50%;
+  transform: translateX(-50%); /* centred under the Projects button */
   min-width: 250px;
   padding: 6px;
   border: 1px solid var(--nav-btn-border);
@@ -642,7 +643,7 @@ p { margin: 0; }
    content. It's right-aligned with the search box and grows leftwards. */
 .search-panel {
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 17px);
   right: 0;
   width: 380px;
   max-height: min(60vh, 420px);
@@ -2209,6 +2210,7 @@ p { margin: 0; }
      rather than floating over them. */
   .nav-dropdown-menu {
     position: static;
+    transform: none;
     min-width: 0;
     margin-top: 6px;
     padding: 4px;
