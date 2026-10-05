@@ -1,104 +1,129 @@
 /* ============================================================
    HOME PAGE
 
-   A splash banner with a featured project, then one big button per section, showing each section's first four
-   project icons. Loaded after data.js/section-page.js (SITE_DATA,
+   A splash banner with a featured project, then one card per section.
+   Each card links to its section page and lists the section's first
+   few projects, each of which links straight to that project. Loaded after data.js/section-page.js (SITE_DATA,
    shared helpers) and stats.js (STATS_DATA for the stats section
    below). Edit data.js for section/project content, stats.js for
    the stat numbers.
    ============================================================ */
 
-// Icon slots per button. Extra projects collapse the last slot into a
-// "+X" tile; fewer projects leave empty placeholders.
+// Project rows shown per card. If a section has more projects than
+// this, the last row becomes a "+X more" link to the section page.
 const HOME_SLOTS = 4;
 
-// Builds one big section button. `page` is the matching entry from
-// SITE_DATA.pages (its url is where the button goes).
-function renderHomeButton(section, page) {
-  const allProjects = section.projects || [];
-  const overflow = allProjects.length > HOME_SLOTS;
-  const shownCount = overflow ? HOME_SLOTS - 1 : HOME_SLOTS;
-  const projects = allProjects.slice(0, shownCount);
+// Where a project lives: its own spot on its section page (the same
+// #id the "copy link" buttons use, which the page scrolls to and
+// highlights on load).
+function projectUrl(page, project) {
+  return page.url + '#' + encodeURIComponent(slugify(project.title));
+}
 
-  // Not interactive itself, so icons are decorative and the "+X"/empty
-  // placeholders are hidden from screen readers.
-  const slots = [];
-  for (let i = 0; i < HOME_SLOTS; i++) {
-    const p = projects[i];
-    if (p) {
-      slots.push(el('img', {
-        class: 'home-slot',
-        src: p.image,
-        alt: '',
-        attrs: { draggable: 'false' }
-      }));
-    } else if (overflow) {
-      // The "+" is drawn in CSS (.home-slot-more-plus) because the site's
-      // pixel font has no plus glyph; only the number is real text.
-      slots.push(el('span', {
-        class: 'home-slot home-slot-more',
-        attrs: { 'aria-hidden': 'true' }
-      }, [
-        el('span', { class: 'home-slot-more-plus' }),
-        document.createTextNode(String(allProjects.length - shownCount))
-      ]));
-    } else {
-      slots.push(el('span', { class: 'home-slot home-slot-empty', attrs: { 'aria-hidden': 'true' } }));
-    }
-  }
+// Subtitle under a project's name: "v8.0.0 \u00b7 Java 26.3" - the current
+// version (the first enabled download's, as in the featured card) and the
+// Minecraft version it supports, taken from the stable channel (falling
+// back to the first channel). Empty string if there's no version.
+function projectMeta(project) {
+  const channels = project.channels || [];
+  const ch = channels.find(c => c.channel === 'stable') || channels[0];
+  if (!ch) return '';
 
-  // Screen readers get every project's name as the button's description,
-  // since the icons themselves carry no text. The span is `hidden`
-  // (so it isn't part of the button's name, which stays just the
-  // section title) but aria-describedby can still point at it.
-  const names = allProjects.map(p => p.title);
-  const descId = 'home-desc-' + slugify(section.heading);
-  const description = names.length
-    ? el('span', { text: 'Includes ' + names.join(', '), attrs: { id: descId, hidden: '' } })
-    : null;
+  const first = (ch.downloads || []).find(d => !d.disabled && d.version);
+  const parts = [];
+  if (first) parts.push(first.version);
+  if (ch.mcVersion) parts.push('Java ' + ch.mcVersion);
+  return parts.join(' \u00b7 ');
+}
 
-  // Built by hand rather than via el()'s href shortcut - that always
-  // opens links in a new tab (right for external links), but moving
-  // between pages of this site should stay in the same tab.
+// Plain same-tab link. el()'s href shortcut always opens a new tab
+// (right for external links), but moving around this site should stay
+// in the same tab.
+function homeLink(className, href, children, label) {
   const a = document.createElement('a');
-  a.className = 'home-card';
-  a.href = page.url;
-  if (names.length) a.setAttribute('aria-describedby', descId);
-
-  // Header: just the heading, centered. Longer headings (e.g. "Data
-  // Packs & Mods") get a size-down modifier so they still fit on one
-  // line (see .home-card-title--tight).
-  const isLong = section.heading.length > 15;
-  const titleClass = isLong ? 'home-card-title home-card-title--tight' : 'home-card-title';
-  const header = el('span', { class: 'home-card-header' }, [
-    el('span', { class: titleClass, text: section.heading })
-  ]);
-
-  // "Browse N projects" + the "go to this section" arrow, pinned to
-  // the bottom of the card (see margin-top:auto on .home-card-footer).
-  // The section's icon (from its matching SITE_DATA.pages entry's
-  // "icon" field, falling back to "box") sits to the left of the label.
-  const count = allProjects.length;
-  const footerLabel = el('span', { class: 'home-card-footer-label' }, [
-    icon(page.icon || 'box', 'home-card-icon'),
-    document.createTextNode('Browse ' + count + ' project' + (count === 1 ? '' : 's'))
-  ]);
-  const footer = el('span', { class: 'home-card-footer' }, [
-    footerLabel,
-    el('span', { class: 'home-card-arrow', attrs: { 'aria-hidden': 'true' } })
-  ]);
-
-  a.appendChild(el('span', { class: 'home-card-inner' }, [
-    header,
-    el('span', { class: 'home-slots' }, slots),
-    footer,
-    description
-  ]));
-
+  a.className = className;
+  a.href = href;
+  if (label) a.setAttribute('aria-label', label);
+  children.forEach(c => c && a.appendChild(c));
   return a;
 }
 
-// One button per section, in the same order as data.js. A section is
+// The small "chevron" arrow drawn in CSS (no icon asset needed).
+function homeArrow(className) {
+  return el('span', { class: className, attrs: { 'aria-hidden': 'true' } });
+}
+
+// One clickable project row: icon, title, version info, chevron.
+// Goes straight to that project on its section page.
+function renderHomeProject(project, page) {
+  const meta = projectMeta(project);
+  return el('li', { class: 'home-project-item' }, [
+    homeLink('home-project', projectUrl(page, project), [
+      el('img', { class: 'home-project-img', src: project.image, alt: '', attrs: { draggable: 'false' } }),
+      el('span', { class: 'home-project-text' }, [
+        el('span', { class: 'home-project-title', text: project.title }),
+        meta ? el('span', { class: 'home-project-meta', text: meta }) : null
+      ]),
+      homeArrow('home-project-arrow')
+    ])
+  ]);
+}
+
+// The "+X more" row that closes an overflowing list; goes to the section page.
+function renderHomeMore(count, page) {
+  return el('li', { class: 'home-project-item' }, [
+    homeLink('home-project home-project-more', page.url, [
+      el('span', { class: 'home-project-img home-project-more-tile', attrs: { 'aria-hidden': 'true' } }, [
+        // The "+" is drawn in CSS because the pixel font has no plus glyph.
+        el('span', { class: 'home-slot-more-plus' }),
+        document.createTextNode(String(count))
+      ]),
+      el('span', { class: 'home-project-text' }, [
+        el('span', { class: 'home-project-title', text: 'See all projects' })
+      ]),
+      homeArrow('home-project-arrow')
+    ], count + ' more ' + (count === 1 ? 'project' : 'projects') + ' - see all')
+  ]);
+}
+
+// Builds one section card. `page` is the matching entry from
+// SITE_DATA.pages (its url is where the header and footer go).
+// The card itself is not a link: the header and footer go to the
+// section page, and every project row inside goes to that project.
+function renderHomeButton(section, page) {
+  const allProjects = section.projects || [];
+  const count = allProjects.length;
+  const overflow = count > HOME_SLOTS;
+  const shownCount = overflow ? HOME_SLOTS - 1 : HOME_SLOTS;
+
+  const rows = allProjects.slice(0, shownCount).map(p => renderHomeProject(p, page));
+  if (overflow) rows.push(renderHomeMore(count - shownCount, page));
+
+  // Header: section icon, title and project count, then an arrow.
+  const header = homeLink('home-card-header', page.url, [
+    el('span', { class: 'home-card-badge', attrs: { 'aria-hidden': 'true' } }, [
+      icon(page.icon || 'box', 'home-card-icon')
+    ]),
+    el('span', { class: 'home-card-headtext' }, [
+      el('span', { class: 'home-card-title', text: section.heading }),
+      el('span', { class: 'home-card-count', text: count + ' project' + (count === 1 ? '' : 's') })
+    ]),
+    homeArrow('home-card-arrow')
+  ], section.heading + ' - ' + count + ' project' + (count === 1 ? '' : 's'));
+
+  const footer = homeLink('home-card-footer', page.url, [
+    el('span', { text: 'Browse all ' + section.heading }),
+    homeArrow('home-card-footer-arrow')
+  ]);
+
+  return el('section', { class: 'home-card', attrs: { 'aria-label': section.heading } }, [
+    header,
+    rows.length ? el('ul', { class: 'home-projects' }, rows) : null,
+    footer
+  ]);
+}
+
+// One card per section, in the same order as data.js. A section is
 // skipped if it has no matching entry in SITE_DATA.pages (nowhere to
 // link to).
 function renderHomeButtons(sections, pages) {
@@ -168,7 +193,7 @@ function findProject(title, sections, pages) {
   for (const section of sections) {
     const project = (section.projects || []).find(p => p.title === title);
     const page = pages.find(pg => pg.section === section.heading);
-    if (project && page) return { project, url: page.url + '#' + encodeURIComponent(slugify(project.title)) };
+    if (project && page) return { project, url: projectUrl(page, project) };
   }
   return null;
 }

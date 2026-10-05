@@ -248,7 +248,9 @@ p { margin: 0; }
 .nav-toggle:focus-visible,
 .nav-dropdown-item:focus-visible,
 .copy-link-btn:focus-visible,
-.home-card:focus-visible,
+.home-card-header:focus-visible,
+.home-project:focus-visible,
+.home-card-footer:focus-visible,
 .footer-social:focus-visible,
 .versions-note-link:focus-visible,
 .about-link:focus-visible,
@@ -1106,132 +1108,162 @@ p { margin: 0; }
   display: none;
 }
 
-/* ---------- Home page: section buttons ---------- */
-/* index.js builds one of these per section - a big link showing its
-   first four project icons. Sized in cqi (via container-type below)
-   so a card scales uniformly at any width. */
+/* ---------- Home page: section cards ---------- */
+/* index.js builds one card per section. The header and footer link to
+   the section page; each project row in between links straight to that
+   project. */
 .home-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 32px;
+  gap: 24px;
   margin-top: 16px;
 }
 
 .home-card {
-  display: block;
-  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
   border-radius: 18px;
   border: 1px solid rgba(var(--nav-accent-rgb), 0.3);
   background: var(--surface);
   color: var(--text);
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  overflow: hidden;
 }
-@media (hover: hover) {
-  .home-card:hover {
-    background: var(--surface-hover);
-    border-color: var(--nav-btn-hover-border);
-  }
-}
-.home-card:active { transform: scale(0.99); }
 
-/* Padding lives here rather than on .home-card, because cqi units
-   resolve against an *ancestor* container - .home-card can't size its
-   own padding by its own width. */
-.home-card-inner {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 5cqi 7cqi 7cqi;
-}
+/* Header: icon badge, title + count, arrow. */
 .home-card-header {
   display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px 18px;
+  color: var(--text);
+  border-bottom: 1px solid rgba(var(--nav-accent-rgb), 0.18);
+  transition: background-color var(--transition-fast);
+}
+.home-card-badge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  margin-top: 3cqi;
-  margin-bottom: 8cqi;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(var(--nav-accent-rgb), 0.14);
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.35);
+  color: var(--nav-accent);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+.home-card-icon {
+  width: 24px;
+  height: 24px;
+  color: inherit;
+}
+.home-card-headtext {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .home-card-title {
   display: block;
-  width: 100%;
-  text-align: center;
   font-family: 'Minercraftory', var(--font);
-  font-size: min(6.4cqi, 3.4rem);
-  line-height: 1.25;
+  font-size: 1.2rem;
+  line-height: 1.15;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* Drawn as a rotated corner (same "shape out of borders" trick as the
-   "+" on the overflow tile below) rather than an image, so it's just
-   two lines and needs no extra icon asset. */
-.home-card-arrow {
-  flex-shrink: 0;
-  width: min(3.2cqi, 1.4rem);
-  height: min(3.2cqi, 1.4rem);
-  border-top: 0.16em solid var(--nav-accent);
-  border-right: 0.16em solid var(--nav-accent);
-  transform: translateX(-4px) rotate(45deg);
-  transition: transform var(--transition-fast);
-}
-@media (hover: hover) {
-  .home-card:hover .home-card-arrow {
-    transform: translateX(-4px) rotate(45deg) translate(28%, -28%);
-  }
+.home-card-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-soft);
 }
 
-/* The four icons, 1–4 left to right, top to bottom. 1fr columns fill
-   the card's full content width, so the grid's left/right edges line up
-   exactly with the header icon and footer text/arrow above and below it. */
-.home-slots {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6cqi;
+/* Chevrons are drawn as a rotated corner (two borders) rather than an
+   image, so they need no icon asset and inherit their colour. */
+.home-card-arrow,
+.home-project-arrow,
+.home-card-footer-arrow {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: translateX(-2px) rotate(45deg);
+  transition: transform var(--transition-fast), color var(--transition-fast);
 }
-.home-slot {
+.home-card-arrow { color: var(--nav-accent); width: 0.65rem; height: 0.65rem; }
+
+/* Project rows */
+.home-projects {
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.home-project {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 12px 8px 8px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  color: var(--text);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+.home-project-img {
+  flex-shrink: 0;
   display: block;
-  width: 100%;
-  aspect-ratio: 1;
+  width: 52px;
+  height: 52px;
   object-fit: cover;
+  border-radius: 10px;
   border: 1.5px solid rgba(var(--nav-accent-rgb), 0.35);
-  border-radius: 10%; /* square-ish corners rather than the old rounder tile */
   background: var(--bg);
-  box-shadow: 0 0 0 1px rgba(var(--nav-accent-rgb), 0.06) inset;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   user-select: none;
   -webkit-user-drag: none;
 }
-/* Unused slot (a section with fewer than four projects): faint
-   dashed outline so the card keeps its shape without looking broken,
-   plus a faint "?" so it doesn't read as a loading/broken state. */
-.home-slot-empty {
+.home-project-text {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px dashed rgba(var(--border-rgb), 0.6);
-  background: transparent;
-  box-shadow: none;
+  flex-direction: column;
+  gap: 2px;
 }
-.home-slot-empty::after {
-  content: '?';
-  font-family: 'Minercraftory', var(--font);
-  font-size: 14cqi;
-  line-height: 1;
-  color: rgba(var(--border-rgb), 0.6);
+.home-project-title {
+  font-weight: 700;
+  font-size: 0.98rem;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-/* Last slot of a section with more projects than fit: a "+X" tile
-   counting the ones not shown. */
-.home-slot-more {
+.home-project-meta {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-project-arrow { color: var(--text-soft); }
+
+/* "+X more" row */
+.home-project-more-tile {
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--surface-hover);
   color: var(--text);
   font-family: 'Minercraftory', var(--font);
-  font-size: 10cqi;
+  font-size: 1.15rem;
   line-height: 1;
   white-space: nowrap;
 }
+.home-project-more .home-project-title { color: var(--text-soft); font-weight: 600; }
 /* The "+": two crossed bars, since the pixel font has no plus glyph. */
 .home-slot-more-plus {
   flex-shrink: 0;
@@ -1243,65 +1275,63 @@ p { margin: 0; }
     linear-gradient(currentColor, currentColor) center / 0.18em 100% no-repeat;
 }
 
-/* "Browse N projects" (with the section's icon) + the arrow, pinned
-   to the bottom of the card */
+/* Footer: pinned to the bottom so cards of different heights still line up. */
 .home-card-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4cqi;
+  gap: 12px;
   margin-top: auto;
-  padding-top: 6cqi;
+  padding: 14px 22px;
+  border-top: 1px solid rgba(var(--nav-accent-rgb), 0.18);
   color: var(--nav-accent);
-  font-size: min(4.7cqi, 1.6rem);
+  font-size: 0.85rem;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   white-space: nowrap;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
-.home-card-footer-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
+.home-card-footer span:first-child {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.home-card-icon {
-  width: 1.3em;
-  height: 1.3em;
-  color: var(--nav-accent);
-}
+.home-card-footer-arrow { width: 0.6rem; height: 0.6rem; }
 
-/* One button per row on phones/small tablets, icons in a single row.
-   Shares the site-wide 900px "collapse to mobile" breakpoint. */
+@media (hover: hover) {
+  .home-card-header:hover { background: rgba(var(--nav-accent-rgb), 0.08); }
+  .home-card-header:hover .home-card-badge {
+    background: var(--nav-accent);
+    color: var(--bg);
+  }
+  .home-card-header:hover .home-card-arrow { transform: translateX(2px) rotate(45deg); }
+
+  .home-project:hover {
+    background: var(--surface-hover);
+    border-color: rgba(var(--nav-accent-rgb), 0.35);
+  }
+  .home-project:hover .home-project-arrow {
+    color: var(--nav-accent);
+    transform: translateX(2px) rotate(45deg);
+  }
+
+  .home-card-footer:hover { background: rgba(var(--nav-accent-rgb), 0.12); }
+  .home-card-footer:hover .home-card-footer-arrow { transform: translateX(3px) rotate(45deg); }
+}
+.home-project:active { transform: scale(0.99); }
+
+/* Tablet/phone: one card per row. Shares the site-wide 900px
+   "collapse to mobile" breakpoint. */
 @media (max-width: 900px) {
   .home-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 16px;
   }
-  .home-slots {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 3cqi;
-  }
-  .home-slot-more {
-    font-size: 5cqi;
-  }
-  .home-card-inner {
-    padding: 4px 18px 22px;
-  }
-  .home-card-header {
-    margin-bottom: 18px;
-  }
-  .home-card-title,
-  .home-card-title--tight {
-    font-size: min(5.2cqi, 2.05rem);
-    letter-spacing: 0.02em;
-  }
-  .home-card-footer {
-    font-size: 0.9rem;
-    padding-top: 18px;
-  }
+  .home-card-header { padding: 16px 16px 14px; }
+  .home-card-title { font-size: 1.3rem; }
+  .home-projects { padding: 8px; }
+  .home-project { padding: 10px 12px 10px 8px; } /* taller tap target */
+  .home-card-footer { padding: 14px 16px; }
 }
 
 /* ---------- Home page: stats section ---------- */
@@ -2427,7 +2457,7 @@ p { margin: 0; }
   .project-links a:active,
   .top-link:active,
   .social-link:active,
-  .home-card:active {
+  .home-project:active {
     transform: none;
   }
   .back-to-top.is-visible:active {
@@ -2614,3 +2644,7 @@ body::before {
   image-rendering: pixelated;
   background: url('images/background.png') 0 0 / calc(32 * var(--px)) calc(32 * var(--px)) repeat;
 }
+/* The home cards clip their contents, so focus rings sit inside. */
+.home-card-header:focus-visible,
+.home-card-footer:focus-visible { outline-offset: -3px; }
+.home-project:focus-visible { outline-offset: -2px; }
