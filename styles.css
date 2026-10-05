@@ -61,6 +61,8 @@
   --border:        #233044; /* hairline borders/dividers */
   --border-rgb:    35, 48, 68;
   --white-rgb:     255, 255, 255; /* used for translucent white fills/borders (nav) */
+  --scrim-rgb:     8, 12, 22;     /* dark overlays on the splash banner */
+  --text-bright:   #d3dcee;       /* subtitle text on the splash banner */
 
   /* Nav Controls & Glow Accent */
   --nav-accent:           #41a0c8;
@@ -150,10 +152,10 @@
 * { box-sizing: border-box; }
 
 /* Reserves space for a scrollbar on desktop, so the page doesn't shift
-   when one appears. Turned off on mobile, where scrollbars float over
+   when one appears. Turned off at the mobile breakpoint, where scrollbars float over
    the content instead of taking up space. */
 html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; overflow-x: clip; }
-@media (max-width: 620px) {
+@media (max-width: 900px) {
   html { scrollbar-gutter: auto; }
 }
 
@@ -245,10 +247,18 @@ p { margin: 0; }
 .nav-link:focus-visible,
 .nav-toggle:focus-visible,
 .nav-dropdown-item:focus-visible,
-.copy-link-btn:focus-visible {
+.copy-link-btn:focus-visible,
+.home-card:focus-visible,
+.footer-social:focus-visible,
+.versions-note-link:focus-visible,
+.about-link:focus-visible,
+.back-to-top:focus-visible,
+.search-result:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
+/* Inside scrolling panels the ring would be clipped, so it sits inside. */
+.search-result:focus-visible { outline-offset: -2px; }
 
 /* Page width & padding */
 .page {
@@ -271,7 +281,13 @@ p { margin: 0; }
   color: var(--text);
   transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
-.top-link:hover, .text-link:hover { background: var(--surface-hover); color: var(--text); }
+@media (hover: hover) {
+  .top-link:hover,
+  .text-link:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+}
 
 .top-link { gap: 7px; padding: 8px 14px; }
 .text-link { gap: 6px; padding: 6px 12px; color: var(--text-soft); }
@@ -368,11 +384,18 @@ p { margin: 0; }
   cursor: pointer;
   transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
-.nav-link:hover,
 .nav-dropdown.is-open > .nav-link {
   background: var(--nav-btn-bg);
   border-color: var(--nav-btn-border);
   color: var(--text);
+}
+
+@media (hover: hover) {
+  .nav-link:hover {
+    background: var(--nav-btn-bg);
+    border-color: var(--nav-btn-border);
+    color: var(--text);
+  }
 }
 .nav-link:active { transform: scale(0.97); }
 
@@ -428,12 +451,22 @@ p { margin: 0; }
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 .nav-dropdown-item .icon { color: var(--text-soft); transition: color var(--transition-fast); }
-.nav-dropdown-item:hover,
 .nav-dropdown-item:focus-visible {
   background: var(--nav-btn-hover-bg);
 }
-.nav-dropdown-item:hover .icon,
+
+@media (hover: hover) {
+  .nav-dropdown-item:hover {
+    background: var(--nav-btn-hover-bg);
+  }
+}
 .nav-dropdown-item:focus-visible .icon { color: var(--text); }
+
+@media (hover: hover) {
+  .nav-dropdown-item:hover .icon {
+    color: var(--text);
+  }
+}
 .nav-dropdown-item.is-current {
   background: var(--nav-btn-bg);
   color: var(--accent);
@@ -526,9 +559,11 @@ p { margin: 0; }
   cursor: pointer;
   transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
-.nav-toggle:hover {
-  background: var(--nav-btn-hover-bg);
-  border-color: var(--nav-btn-hover-border);
+@media (hover: hover) {
+  .nav-toggle:hover {
+    background: var(--nav-btn-hover-bg);
+    border-color: var(--nav-btn-hover-border);
+  }
 }
 .nav-toggle-bars,
 .nav-toggle-bars::before,
@@ -624,10 +659,16 @@ p { margin: 0; }
 .nav-search-clear[hidden] {
   display: none;
 }
-.nav-search-clear:hover,
 .nav-search-clear:focus-visible {
   background: var(--surface-hover);
   color: var(--text);
+}
+
+@media (hover: hover) {
+  .nav-search-clear:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
 }
 .nav-search-clear::before,
 .nav-search-clear::after {
@@ -676,7 +717,7 @@ p { margin: 0; }
   height: 40px;
   object-fit: cover;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 10px;
   background: var(--bg);
 }
 
@@ -755,7 +796,7 @@ p { margin: 0; }
   min-width: 30px;
   height: 30px;
   padding: 0 7px;
-  border-radius: 9px;
+  border-radius: 10px;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text);
@@ -798,8 +839,8 @@ p { margin: 0; }
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(90deg, rgba(8, 12, 22, 0.82) 0%, rgba(8, 12, 22, 0.5) 55%, rgba(8, 12, 22, 0.25) 100%),
-    linear-gradient(180deg, rgba(8, 12, 22, 0) 60%, rgba(8, 12, 22, 0.55) 100%);
+    linear-gradient(90deg, rgba(var(--scrim-rgb), 0.82) 0%, rgba(var(--scrim-rgb), 0.5) 55%, rgba(var(--scrim-rgb), 0.25) 100%),
+    linear-gradient(180deg, rgba(var(--scrim-rgb), 0) 60%, rgba(var(--scrim-rgb), 0.55) 100%);
 }
 
 .splash-inner {
@@ -831,7 +872,7 @@ p { margin: 0; }
 .splash-subtitle {
   max-width: 34em;
   margin: 0 0 28px;
-  color: #d3dcee;
+  color: var(--text-bright);
   font-size: clamp(1rem, 1.5vw, 1.2rem);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
 }
@@ -866,18 +907,22 @@ p { margin: 0; }
   border-color: var(--nav-btn-active-bg);
   color: var(--nav-btn-active-text);
 }
-.splash-btn-primary:hover {
-  background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
-  border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+@media (hover: hover) {
+  .splash-btn-primary:hover {
+    background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+    border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+  }
 }
 .splash-btn-ghost {
-  background: rgba(8, 12, 22, 0.5);
+  background: rgba(var(--scrim-rgb), 0.5);
   border-color: var(--nav-btn-hover-border);
   color: var(--text);
 }
-.splash-btn-ghost:hover {
-  background: var(--nav-btn-hover-bg);
-  border-color: var(--nav-btn-hover-border);
+@media (hover: hover) {
+  .splash-btn-ghost:hover {
+    background: var(--nav-btn-hover-bg);
+    border-color: var(--nav-btn-hover-border);
+  }
 }
 /* The ">" after a label, drawn from two borders like the other arrows. */
 .splash-btn-arrow {
@@ -889,14 +934,18 @@ p { margin: 0; }
   transform: rotate(45deg);
   transition: transform var(--transition-fast);
 }
-.splash-btn:hover .splash-btn-arrow { transform: translateX(3px) rotate(45deg); }
+@media (hover: hover) {
+  .splash-btn:hover .splash-btn-arrow {
+    transform: translateX(3px) rotate(45deg);
+  }
+}
 
 /* Featured project card. */
 .splash-featured {
   padding: 18px;
   border: 1px solid rgba(var(--nav-accent-rgb), 0.55);
   border-radius: 16px;
-  background: rgba(10, 14, 24, 0.78);
+  background: rgba(var(--scrim-rgb), 0.78);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -1002,7 +1051,7 @@ p { margin: 0; }
     padding: 26px 14px;
   }
   .splash::before {
-    background: linear-gradient(180deg, rgba(8, 12, 22, 0.7) 0%, rgba(8, 12, 22, 0.55) 100%);
+    background: linear-gradient(180deg, rgba(var(--scrim-rgb), 0.7) 0%, rgba(var(--scrim-rgb), 0.55) 100%);
   }
   .splash-actions .splash-btn { flex: 1 1 170px; }
 
@@ -1077,9 +1126,11 @@ p { margin: 0; }
   color: var(--text);
   transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
-.home-card:hover {
-  background: var(--surface-hover);
-  border-color: var(--nav-btn-hover-border);
+@media (hover: hover) {
+  .home-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--nav-btn-hover-border);
+  }
 }
 .home-card:active { transform: scale(0.99); }
 
@@ -1123,8 +1174,10 @@ p { margin: 0; }
   transform: translateX(-4px) rotate(45deg);
   transition: transform var(--transition-fast);
 }
-.home-card:hover .home-card-arrow {
-  transform: translateX(-4px) rotate(45deg) translate(28%, -28%);
+@media (hover: hover) {
+  .home-card:hover .home-card-arrow {
+    transform: translateX(-4px) rotate(45deg) translate(28%, -28%);
+  }
 }
 
 /* The four icons, 1–4 left to right, top to bottom. 1fr columns fill
@@ -1414,11 +1467,13 @@ p { margin: 0; }
 }
 
 /* lights up on hover */
-.project-links a:hover {
-  opacity: 1;
-  color: var(--text);
-  border-color: var(--border);
-  background: var(--surface-hover);
+@media (hover: hover) {
+  .project-links a:hover {
+    opacity: 1;
+    color: var(--text);
+    border-color: var(--border);
+    background: var(--surface-hover);
+  }
 }
 
 /* Small "Older versions" line shown under a project's channel boxes */
@@ -1435,8 +1490,10 @@ p { margin: 0; }
   transition: color var(--transition-fast);
 }
 
-.versions-note-link:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .versions-note-link:hover {
+    color: var(--text);
+  }
 }
 
 /* ---------- Channels (stable / beta / alpha) ---------- */
@@ -1583,9 +1640,14 @@ p { margin: 0; }
 .channel-badge-dismiss::before { transform: translate(-50%, -50%) rotate(45deg); }
 .channel-badge-dismiss::after  { transform: translate(-50%, -50%) rotate(-45deg); }
 
-.channel-badge-dismiss:hover,
 .channel-badge-dismiss:focus-visible {
   background: rgba(var(--badge-color-rgb), var(--alpha-border));
+}
+
+@media (hover: hover) {
+  .channel-badge-dismiss:hover {
+    background: rgba(var(--badge-color-rgb), var(--alpha-border));
+  }
 }
 
 .channel-sep { 
@@ -1717,12 +1779,15 @@ p { margin: 0; }
   background: var(--channel-color);
   color: var(--bg);
   border: 1px solid var(--channel-color);
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-snap), filter var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-snap);
 }
 
-/* Extra brightness only for Stable buttons on hover */
-.channel-group[data-channel="stable"] .download-btn:hover {
-  filter: brightness(1.18);
+/* Stable buttons lighten on hover, same as the other solid buttons */
+@media (hover: hover) {
+  .channel-group[data-channel="stable"] .download-btn:hover {
+    background: color-mix(in srgb, var(--channel-color), white 15%);
+    border-color: color-mix(in srgb, var(--channel-color), white 15%);
+  }
 }
 
 /* Hover states for non-Stable channel buttons */
@@ -1733,8 +1798,10 @@ p { margin: 0; }
 }
 
 /* Increase brightness of Beta/Alpha buttons on hover */
-.channel-group:not([data-channel="stable"]) .download-btn:hover {
-  background: rgba(var(--channel-rgb), var(--alpha-hover));
+@media (hover: hover) {
+  .channel-group:not([data-channel="stable"]) .download-btn:hover {
+    background: rgba(var(--channel-rgb), var(--alpha-hover));
+  }
 }
 
 /* Shrink slightly when clicked */
@@ -1742,7 +1809,7 @@ p { margin: 0; }
 .project-links a:active,
 .top-link:active,
 .social-link:active {
-  transform: scale(0.95);
+  transform: scale(0.97);
 }
 
 /* ---------- Unavailable States ---------- */
@@ -1839,16 +1906,22 @@ p { margin: 0; }
   height: 26px;
   padding: 0;
   border: none;
-  border-radius: 7px;
+  border-radius: 8px;
   background: transparent;
   color: var(--text-soft);
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
-.copy-link-btn:hover,
 .copy-link-btn:focus-visible {
   background: var(--surface-hover);
   color: var(--text);
+}
+
+@media (hover: hover) {
+  .copy-link-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
 }
 /* Invisible hit-slop bringing the actual tap target up to ~44x44
    (26px visible box + 9px on each side), without changing how big
@@ -1972,15 +2045,25 @@ p { margin: 0; }
   gap: 8px;
   font-size: 0.82rem;
   color: var(--nav-accent);
-  border-radius: 4px;
+  border-radius: 6px;
   transition: color var(--transition-fast);
 }
-.footer-link:hover,
 .footer-link:focus-visible { color: var(--text); }
+
+@media (hover: hover) {
+  .footer-link:hover {
+    color: var(--text);
+  }
+}
 .footer-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .footer-social .icon { color: var(--text-soft); transition: color var(--transition-fast); }
-.footer-social:hover .icon,
 .footer-social:focus-visible .icon { color: var(--text); }
+
+@media (hover: hover) {
+  .footer-social:hover .icon {
+    color: var(--text);
+  }
+}
 
 /* Disclaimer, credits and version, centred under a hairline. */
 .footer-legal {
@@ -2121,9 +2204,11 @@ p { margin: 0; }
   transition: opacity var(--transition-fast);
 }
 
-.footer-version .version-link:hover {
-  opacity: 1;
-  color: var(--text);
+@media (hover: hover) {
+  .footer-version .version-link:hover {
+    opacity: 1;
+    color: var(--text);
+  }
 }
 
 /* Footer Credits */
@@ -2141,9 +2226,11 @@ p { margin: 0; }
   transition: opacity var(--transition-fast), color var(--transition-fast);
 }
 
-.footer-credits .credits-link:hover {
-  opacity: 1;
-  color: var(--text);
+@media (hover: hover) {
+  .footer-credits .credits-link:hover {
+    opacity: 1;
+    color: var(--text);
+  }
 }
 
 /* ---------- Responsive ---------- */
@@ -2385,7 +2472,11 @@ h4.about-h { font-size: 1.1rem; }
   text-underline-offset: 2px;
   transition: color var(--transition-fast);
 }
-.about-link:hover { color: var(--text); }
+@media (hover: hover) {
+  .about-link:hover {
+    color: var(--text);
+  }
+}
 
 .about-quote {
   margin-left: 0;
@@ -2397,7 +2488,7 @@ h4.about-h { font-size: 1.1rem; }
 .about-code {
   padding: 1px 6px;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: 6px;
   background: var(--surface);
   color: var(--text);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -2476,7 +2567,7 @@ h4.about-h { font-size: 1.1rem; }
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none; /* not clickable while hidden */
-  transition: opacity 0.2s ease, transform 0.2s ease, background-color var(--transition-fast), border-color var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast);
   z-index: 40;
 }
 .back-to-top.is-visible {
@@ -2484,15 +2575,17 @@ h4.about-h { font-size: 1.1rem; }
   transform: translateY(0);
   pointer-events: auto;
 }
-.back-to-top:hover {
-  /* Lightens the fill on hover. */
-  background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
-  border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+@media (hover: hover) {
+  .back-to-top:hover {
+    /* Lightens the fill on hover. */
+    background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+    border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+  }
 }
 /* Combines the press-shrink with this button's own position, so they
    don't fight each other. */
 .back-to-top.is-visible:active {
-  transform: translateY(0) scale(0.95);
+  transform: translateY(0) scale(0.97);
 }
 
 /* An upward arrow drawn from two rotated borders, same trick as the
@@ -2510,7 +2603,7 @@ h4.about-h { font-size: 1.1rem; }
    PIXELATED BACKGROUND
    ============================================================ */
 :root { --px: 4px; }
-@media (max-width: 620px) { :root { --px: 3px; } }
+@media (max-width: 900px) { :root { --px: 3px; } }
 
 body::before {
   content: '';
