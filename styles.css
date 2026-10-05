@@ -987,7 +987,7 @@ p { margin: 0; }
 }
 
 /* Narrower screens: the featured card drops underneath the text. */
-@media (max-width: 890px) {
+@media (max-width: 900px) {
   .splash { margin-top: 12px; margin-bottom: 28px; border-radius: 16px; }
   .splash-inner {
     grid-template-columns: minmax(0, 1fr);
@@ -1000,7 +1000,7 @@ p { margin: 0; }
 }
 
 /* Phones: the tagline and subtitle are centred. */
-@media (max-width: 620px) {
+@media (max-width: 900px) {
   .splash-headline,
   .splash-subtitle { text-align: center; }
   .splash-subtitle { margin-left: auto; margin-right: auto; }
@@ -1190,8 +1190,8 @@ p { margin: 0; }
 }
 
 /* One button per row on phones/small tablets, icons in a single row.
-   Shares the site-wide 890px "collapse to mobile" breakpoint. */
-@media (max-width: 890px) {
+   Shares the site-wide 900px "collapse to mobile" breakpoint. */
+@media (max-width: 900px) {
   .home-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 16px;
@@ -1300,7 +1300,7 @@ p { margin: 0; }
   display: none;
 }
 
-@media (max-width: 890px) {
+@media (max-width: 900px) {
   .stats-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
@@ -1335,7 +1335,13 @@ p { margin: 0; }
   background: var(--surface);
 }
 
-.project-body { min-width: 0; }
+.project-body {
+  min-width: 0;
+  /* Lets the download boxes below react to the width actually available
+     to them (see the @container rules in the Channels section), not just
+     the screen width. */
+  container: project / inline-size;
+}
 
 /* Holds the project title next to its copy-link button. */
 .project-title-row {
@@ -1411,19 +1417,18 @@ p { margin: 0; }
   width: 100%;
 }
 
-/* Added by layoutChannelRow() in section-page.js when a channel box's own
-   header ("Release | Java X.Y") doesn't fit next to its sibling -
-   stacks the boxes full-width instead of letting the header text
-   wrap mid-line. */
-.channel-row.stacked {
-  flex-direction: column;
-}
-/* flex-basis below is a fraction of the row's *main axis*, which
-   switches from width to height once the row above stacks into a
-   column - override it back to a natural height so a box doesn't try
-   to become "50% tall" instead of "100% wide". */
-.channel-row.stacked > .channel-group {
-  flex: 1 1 auto;
+/* The Release / Beta boxes sit next to each other, or stack full-width
+   when
+   the project's own column drops below 1000px, so it's decided by CSS
+   alone, with nothing measured in JS. (Inside each box, Data Pack / Mod
+   sit side by side or stacked depending on the box's own width - see
+   Download Columns below.) */
+@container project (max-width: 1000px) {
+  .channel-row { flex-direction: column; }
+  /* flex-basis below is a fraction of the row's *main axis*, which
+     switches from width to height once the row stacks into a column -
+     override it back to a natural height. */
+  .channel-row > .channel-group { flex: 1 1 auto; }
 }
 
 /* Card Outer Shell */
@@ -1439,6 +1444,7 @@ p { margin: 0; }
   display: flex;
   flex-direction: column;
   position: relative; /* anchors the "new"/"updated" badge, which hangs off the top-left corner */
+  container: channel / inline-size; /* lets the download columns react to this box's width */
 }
 
 /* ---------- Header ---------- */
@@ -1580,27 +1586,16 @@ p { margin: 0; }
 }
 
 /* ---------- Download Columns ---------- */
+/* A box's download columns (Data Pack / Mod / etc.) stack by default and
+   sit side by side whenever the box itself is wide enough for them to do
+   so without a version pill wrapping. That's decided by the box's own
+   width (it's a container, see .channel-group), so it works the same
+   whether the boxes are side by side or stacked full-width. */
 .channel-downloads {
   display: flex;
-  gap: 14px;
-  margin-top: auto;
-}
-
-/* Added by layoutChannelRow() in section-page.js when this box's own
-   download columns (Data Pack/Mod/etc.) don't have room to sit side
-   by side without a version pill wrapping onto its own line - stacks
-   them full-width instead, independently of its sibling channel box. */
-.channel-downloads.downloads-stacked {
   flex-direction: column;
   gap: 14px;
-}
-/* Moves the divider from the side to the top, now that the columns
-   are stacked. */
-.channel-downloads.downloads-stacked .download-col + .download-col {
-  padding-left: 0;
-  padding-top: 14px;
-  border-left: none;
-  border-top: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
+  margin-top: auto;
 }
 
 .download-col {
@@ -1611,10 +1606,23 @@ p { margin: 0; }
   min-width: 0;
 }
 
-/* Divider between download columns if there are multiple */
+/* Divider between download columns if there are multiple (on top while
+   stacked, on the side once they sit next to each other). */
 .download-col + .download-col {
-  padding-left: 14px;
-  border-left: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
+  padding-top: 14px;
+  border-top: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
+}
+
+/* 450px is the box's inner width needed for two columns, the longest
+   version pill included, to fit side by side. */
+@container channel (min-width: 450px) {
+  .channel-downloads { flex-direction: row; }
+  .download-col + .download-col {
+    padding-top: 0;
+    padding-left: 14px;
+    border-top: none;
+    border-left: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
+  }
 }
 
 /* Ensure column headers wrap cleanly and align vertically */
@@ -1628,8 +1636,8 @@ p { margin: 0; }
   min-height: 24px; /* Fixes height shift when icon or pill is missing */
   /* Last-resort fallback: lets a single column's own pill drop to its
      own line if it's genuinely too long to fit even in this state -
-     rare, since .downloads-stacked above already gives each column
-     the full box width before this would ever be needed. */
+     rare on wide screens, and when stacked each column has
+     the full box width. */
   flex-wrap: wrap;
   row-gap: 4px;
 }
@@ -1950,14 +1958,14 @@ p { margin: 0; }
   border-top: 1px solid var(--border);
 }
 
-@media (max-width: 890px) {
+@media (max-width: 900px) {
   .footer-grid { grid-template-columns: 1fr 1fr; row-gap: 24px; }
   .footer-brand-col { grid-column: 1 / -1; }
   .footer-brand-name { font-size: 1.3rem; }
   .footer-logo { width: 56px; height: 56px; }
   .footer-col:nth-child(2) { padding-left: 0; border-left: 0; }
 }
-@media (max-width: 520px) {
+@media (max-width: 900px) {
   .footer-grid { grid-template-columns: 1fr; }
   .footer-col,
   .footer-col:nth-child(even) { padding: 0; border-left: 0; }
@@ -2045,7 +2053,7 @@ p { margin: 0; }
 /* Callout shown above the project list on section pages, warning about
    unofficial reuploads right before people start clicking downloads. */
 .download-notice {
-  max-width: 123ch;
+  max-width: 120ch;
   margin: -8px auto 20px;
   padding: 10px 16px;
   border: 1px solid var(--border);
@@ -2063,7 +2071,7 @@ p { margin: 0; }
 
 /* On phones the text wraps to several lines, so the icon sits above it
    instead of floating beside the middle line. */
-@media (max-width: 620px) {
+@media (max-width: 900px) {
   .download-notice {
     flex-direction: column;
     gap: 6px;
@@ -2108,6 +2116,9 @@ p { margin: 0; }
 }
 
 /* ---------- Responsive ---------- */
+/* Every layout collapse on the site happens at this same width: 900px.
+   If you change it, change every @media (max-width: 900px) in this file
+   plus MOBILE_NAV_QUERY in section-page.js. */
 /* Below 900px the header folds its links and search behind a menu button.
    Keep this width in sync with MOBILE_NAV_QUERY in section-page.js. */
 @media (max-width: 900px) {
@@ -2221,7 +2232,7 @@ p { margin: 0; }
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 900px) {
   /* Smaller side margins on narrow phones, to give rows more room. */
   .page {
     padding: 16px calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
