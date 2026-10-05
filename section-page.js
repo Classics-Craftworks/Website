@@ -324,7 +324,7 @@ function renderProject(p) {
   }
 
   const titleRow = el('div', { class: 'project-title-row' }, [
-    el('h3', { text: p.title }),
+    el('h2', { text: p.title }),
     copyLinkButton(id, p.title)
   ]);
 
@@ -604,7 +604,7 @@ function renderFlatSection(section) {
     class: 'section-count',
     text: String((section.projects || []).length)
   });
-  const heading = el('h2', { class: 'flat-section-heading', attrs: { id } }, [
+  const heading = el('h1', { class: 'flat-section-heading', attrs: { id } }, [
     el('span', { text: section.heading }),
     count
   ]);

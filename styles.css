@@ -1434,7 +1434,7 @@ p { margin: 0; }
   gap: 4px;
 }
 
-.project-body h3 {
+.project-body h2 {
   font-size: 1.55rem;
   color: var(--text);
   margin-top: 0;
@@ -2381,7 +2381,7 @@ p { margin: 0; }
     height: 64px;
     border-radius: 12px;
   }
-  .project-body h3 {
+  .project-body h2 {
     font-size: 1.25rem;
     transform: none;
   }
@@ -2450,9 +2450,9 @@ img, svg {
 .about > :first-child { margin-top: 0; }
 
 .about-h { margin: 1.8em 0 0.5em; line-height: 1.25; }
-h2.about-h { margin-bottom: 18px; font-size: clamp(1.6rem, 4vw, 2rem); }
-h3.about-h { font-size: 1.35rem; }
-h4.about-h { font-size: 1.1rem; }
+h1.about-h { margin-bottom: 18px; font-size: clamp(1.6rem, 4vw, 2rem); }
+h2.about-h { font-size: 1.35rem; }
+h3.about-h { font-size: 1.1rem; }
 
 .about-text,
 .about-list,
@@ -2534,7 +2534,7 @@ h4.about-h { font-size: 1.1rem; }
   color: var(--text);
 }
 
-.not-found-card h2 {
+.not-found-card h1 {
   margin: 0 0 10px;
   font-size: 1.4rem;
   color: var(--text);

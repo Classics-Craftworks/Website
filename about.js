@@ -8,8 +8,8 @@
    data.js (helpers come from section-page.js, loaded before this file).
 
    Supported Markdown:
-     # Heading      "#" becomes <h2>, "##" <h3>, "###" <h4> (the site
-                    name is already the page's <h1>)
+     # Heading      "#" becomes <h1> (the page title), "##" <h2>,
+                    "###" <h3>
      paragraphs     separated by a blank line
      **bold**  *italic*  `code`  [link text](https://example.com)
      - bullets      (also * or +)       1. numbered lists
@@ -103,8 +103,8 @@ function parseMarkdown(source) {
 
     let m = heading(line);
     if (m) {
-      // # -> h2, ## -> h3, ### -> h4
-      blocks.push(el('h' + (m[1].length + 1), { class: 'about-h' }, [parseInline(m[2])]));
+      // # -> h1, ## -> h2, ### -> h3
+      blocks.push(el('h' + m[1].length, { class: 'about-h' }, [parseInline(m[2])]));
       i++;
       continue;
     }
@@ -159,7 +159,7 @@ async function renderAbout() {
     if (!blocks.length) throw new Error('empty');
     blocks.forEach(b => main.appendChild(b));
   } catch {
-    main.appendChild(el('h2', { class: 'about-h', text: 'About' }));
+    main.appendChild(el('h1', { class: 'about-h', text: 'About' }));
     main.appendChild(el('p', { class: 'about-text', text: "Sorry, this page's text couldn't be loaded. Try refreshing the page." }));
   }
 }

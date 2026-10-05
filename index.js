@@ -216,7 +216,7 @@ function renderFeaturedCard(found, imageSrc) {
       el('img', { class: 'splash-featured-img', src: imageSrc, alt: '', attrs: { draggable: 'false' } })
     ]) : null,
     el('div', { class: 'splash-featured-head' }, [
-      el('h3', { class: 'splash-featured-title', text: project.title }),
+      el('h2', { class: 'splash-featured-title', text: project.title }),
       pills.length ? el('ul', { class: 'splash-chips' }, pills) : null
     ]),
     el('p', { class: 'splash-featured-desc', text: project.description || '' }),
