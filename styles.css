@@ -370,7 +370,8 @@ p { margin: 0; }
 }
 .nav-link:hover,
 .nav-dropdown.is-open > .nav-link {
-  background: var(--nav-btn-bg);
+  background: var(--nav-btn-hover-bg);
+  border-color: var(--nav-btn-hover-border);
   color: var(--text);
 }
 .nav-link:active { transform: scale(0.97); }
@@ -457,7 +458,7 @@ p { margin: 0; }
   border: 2px solid var(--nav-bg);
   color: var(--bg);
   font-size: 0.68rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -875,7 +876,7 @@ p { margin: 0; }
 }
 .splash-btn-ghost:hover {
   background: var(--nav-btn-hover-bg);
-  border-color: var(--accent);
+  border-color: var(--nav-btn-hover-border);
 }
 /* The ">" after a label, drawn from two borders like the other arrows. */
 .splash-btn-arrow {
@@ -935,7 +936,7 @@ p { margin: 0; }
 .splash-featured-title {
   margin: 0;
   font-size: clamp(1.3rem, 2vw, 1.7rem);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.2;
 }
 .splash-featured-desc {
@@ -1041,7 +1042,7 @@ p { margin: 0; }
   scroll-margin-top: var(--sticky-nav-offset, 68px); /* "Explore Projects" lands here */
 }
 .projects-heading {
-  font-weight: 900;
+  font-weight: 700;
   font-size: clamp(1.6rem, 3.9vw, 1.9rem);
   color: var(--text);
   margin-bottom: -4px;
@@ -1077,7 +1078,7 @@ p { margin: 0; }
 }
 .home-card:hover {
   background: var(--surface-hover);
-  border-color: rgba(var(--nav-accent-rgb), 0.7);
+  border-color: var(--nav-btn-hover-border);
 }
 .home-card:active { transform: scale(0.99); }
 
@@ -1259,7 +1260,7 @@ p { margin: 0; }
 }
 
 .stats-heading {
-  font-weight: 900;
+  font-weight: 700;
   font-size: clamp(1.6rem, 3.9vw, 1.9rem);
   color: var(--text);
   margin-bottom: 16px;
@@ -1508,7 +1509,7 @@ p { margin: 0; }
 
 .channel-label { 
   color: var(--channel-color); 
-  font-weight: 700; 
+  font-weight: 700;
   font-size: 0.98rem;
 }
 
@@ -1588,7 +1589,7 @@ p { margin: 0; }
 
 .channel-sep { 
   color: rgba(var(--channel-rgb), var(--alpha-border));
-  font-weight: 300;
+  font-weight: 400;
 }
 
 /* Keeps the "|" and version glued together as a single flex item, so
@@ -1684,7 +1685,7 @@ p { margin: 0; }
   padding: 3px 8px;
   border-radius: 999px;
   font-size: 0.72rem;
-  font-weight: 450;
+  font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--channel-color);
   background: rgba(var(--channel-rgb), var(--alpha-soft));
