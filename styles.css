@@ -370,17 +370,18 @@ p { margin: 0; }
 }
 .nav-link:hover,
 .nav-dropdown.is-open > .nav-link {
-  background: var(--nav-btn-hover-bg);
-  border-color: var(--nav-btn-hover-border);
+  background: var(--nav-btn-bg);
+  border-color: var(--nav-btn-border);
   color: var(--text);
 }
 .nav-link:active { transform: scale(0.97); }
 
-/* The page you're on. */
+/* The page you're on: stronger fill and border, plus accent-coloured
+   text, so it never looks like a hovered button. */
 .nav-link.is-current {
   background: var(--nav-btn-hover-bg);
   border-color: var(--nav-btn-hover-border);
-  color: var(--text);
+  color: var(--accent);
 }
 
 /* Small "v" on the Projects button, drawn from two borders. */
