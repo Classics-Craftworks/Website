@@ -247,9 +247,11 @@ function renderChannel(ch, projectId) {
       }
       actionEl = el('div', {
         class: 'download-unavailable' + (d.tooltip ? ' has-tooltip' : ''),
-        text: 'Not available',
         attrs: unavailableAttrs
-      });
+      }, [
+        icon('unavailable', 'icon-sm'),
+        el('span', { text: 'Not available' })
+      ]);
 
       if (d.tooltip) {
         actionEl.addEventListener('click', () => {
@@ -612,10 +614,10 @@ function renderFlatSection(section) {
   main.appendChild(heading);
 
   if (SITE_DATA.downloadNotice && sectionHasDownloads(section)) {
-    main.appendChild(el('p', {
-      class: 'download-notice',
-      text: SITE_DATA.downloadNotice
-    }));
+    main.appendChild(el('p', { class: 'download-notice' }, [
+      icon('info', 'icon-sm'),
+      el('span', { text: SITE_DATA.downloadNotice })
+    ]));
   }
 
   main.appendChild(list);

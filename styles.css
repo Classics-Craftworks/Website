@@ -1716,6 +1716,7 @@ p { margin: 0; }
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   padding: 8px 10px;
   border-radius: 8px;
   background: rgba(var(--channel-rgb), var(--alpha-whisper));
@@ -2044,7 +2045,7 @@ p { margin: 0; }
 /* Callout shown above the project list on section pages, warning about
    unofficial reuploads right before people start clicking downloads. */
 .download-notice {
-  max-width: 120ch;
+  max-width: 123ch;
   margin: -8px auto 20px;
   padding: 10px 16px;
   border: 1px solid var(--border);
@@ -2053,7 +2054,12 @@ p { margin: 0; }
   color: var(--text-soft);
   font-size: 0.82rem;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
+.download-notice .icon { flex: none; }
 
 .footer-version {
   text-align: center;
