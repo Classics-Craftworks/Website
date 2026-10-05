@@ -816,3 +816,11 @@ function initSectionPage(pageUrl) {
   handleDeepLink();
   window.addEventListener('hashchange', handleDeepLink);
 }
+
+// Registers the (cache-free) service worker in sw.js, which is what lets
+// Chrome and Edge offer to install the site as an app.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* not fatal */ });
+  });
+}
