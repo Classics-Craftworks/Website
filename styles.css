@@ -1063,7 +1063,10 @@ p { margin: 0; }
   .splash::before {
     background: linear-gradient(180deg, rgba(var(--scrim-rgb), 0.7) 0%, rgba(var(--scrim-rgb), 0.55) 100%);
   }
-  .splash-actions .splash-btn { flex: 1 1 170px; }
+  /* Buttons keep a fixed, modest width and sit centred, rather than
+     stretching across the whole banner. */
+  .splash-actions { justify-content: center; }
+  .splash-actions .splash-btn { flex: 0 1 200px; }
 
   /* Featured card: smaller on mobile - centred, capped in width, with
      tighter padding, a shorter picture and slightly smaller text. */
@@ -1437,9 +1440,13 @@ p { margin: 0; }
 }
 
 @media (max-width: 900px) {
+  /* Single column, but capped and centred so the boxes don't stretch
+     into wide, mostly-empty bars. */
   .stats-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
+    max-width: 420px;
+    margin-inline: auto;
   }
 }
 
