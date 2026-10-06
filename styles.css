@@ -893,7 +893,7 @@ p { margin: 0; }
   -webkit-backdrop-filter: blur(10px);
 }
 .splash-featured-label {
-  margin: 0 0 14px;
+  margin: 4px 0 16px;
   color: var(--accent);
   font-family: 'Minercraftory', var(--font);
   font-size: 1.2rem;
@@ -1005,7 +1005,7 @@ p { margin: 0; }
     padding: 12px;
     border-radius: 14px;
   }
-  .splash-featured-label { margin-bottom: 8px; font-size: 1rem; }
+  .splash-featured-label { margin: 4px 0 12px; font-size: 1rem; }
   .splash-featured-media {
     aspect-ratio: auto;
     height: clamp(84px, 20vw, 130px);
