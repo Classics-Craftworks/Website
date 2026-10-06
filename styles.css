@@ -1357,7 +1357,7 @@ p { margin: 0; }
   .stats-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
-    max-width: 420px;
+    max-width: 260px;
     margin-inline: auto;
   }
 }
