@@ -1,9 +1,10 @@
-/* Home page statistics, rendered by renderStats() in index.js. */
+/* Home page statistics, rendered by renderStats() in index.js.
+   "{projects}" fills in the number of downloadable projects. */
 
 const STATS_DATA = {
 
   stats: [
-    { icon: "box", label: "Downloadable Projects", value: "8" },
+    { icon: "box", label: "Downloadable Projects", value: "{projects}" },
     { icon: "download", label: "Downloads", value: "120,500+" },
     { icon: "clock", label: "Hours of Playtime", value: "460+" }
   ],

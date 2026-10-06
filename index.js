@@ -102,7 +102,7 @@ function renderStats(stats) {
   if (grid) {
     (stats.stats || []).forEach(s => grid.appendChild(el('div', { class: 'stat-box' }, [
       s.icon ? icon(s.icon, 'icon-md') : null,
-      el('span', { class: 'stat-value', text: s.value }),
+      el('span', { class: 'stat-value', text: fillPlaceholders(s.value) }),
       el('span', { class: 'stat-label', text: s.label })
     ])));
   }

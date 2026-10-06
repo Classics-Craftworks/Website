@@ -65,6 +65,18 @@ function stableChannel(project) {
   return channels.find(c => (c.channel || '').toLowerCase() === 'stable') || channels[0];
 }
 
+// Projects with downloads (data packs, mods, resource packs); link-only
+// projects like "Other Projects" aren't counted.
+function countDownloadableProjects() {
+  return (SITE_DATA.sections || []).reduce(
+    (n, s) => n + (s.projects || []).filter(p => (p.channels || []).length > 0).length, 0);
+}
+
+// Fills {projects} in text from data.js / stats.js.
+function fillPlaceholders(text) {
+  return String(text).replace(/\{projects\}/g, countDownloadableProjects());
+}
+
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 function prefersReducedMotion() {
   return reducedMotionQuery.matches;

@@ -1,10 +1,5 @@
 /* About page: renders SITE_DATA.about (data.js; format documented there). */
 
-function fillPlaceholders(text) {
-  const projects = (SITE_DATA.sections || []).reduce((n, s) => n + (s.projects || []).length, 0);
-  return String(text).replace(/\{projects\}/g, projects);
-}
-
 // Only http(s), mailto and relative/anchor links become clickable.
 function isSafeUrl(url) {
   return /^(https?:|mailto:|#|\/|\.\.?\/|[^:]*$)/i.test(url);
