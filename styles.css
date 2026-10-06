@@ -2008,6 +2008,12 @@ p { margin: 0; }
   .footer-brand-col { justify-content: center; text-align: left; }
   .footer-logo { width: 72px; height: 72px; }
   .footer-brand-name { font-size: clamp(0.85rem, 4.3vw, 1.6rem); }
+  /* One line each; scales with the screen so the copyright never wraps. */
+  .footer-brand-col .footer-established,
+  .footer-brand-col .footer-copyright {
+    font-size: clamp(0.5rem, 2.75vw, 0.95rem);
+    white-space: nowrap;
+  }
 
   .footer-list { align-items: center; }
   #social-links { grid-template-columns: max-content; justify-content: center; }
