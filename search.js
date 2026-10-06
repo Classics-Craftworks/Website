@@ -126,7 +126,9 @@ function initSearch() {
       role: 'combobox',
       'aria-expanded': 'false',
       'aria-controls': listboxId,
-      'aria-autocomplete': 'list'
+      'aria-autocomplete': 'list',
+      'aria-keyshortcuts': '/',
+      title: 'Search (Ctrl/Cmd+K)'
     }
   });
   const clearBtn = el('button', {
@@ -280,6 +282,21 @@ function initSearch() {
     input.value = '';
     update();
     input.focus();
+  });
+
+  // "/" or Ctrl/Cmd+K focuses the search; on mobile, the folded menu opens first.
+  document.addEventListener('keydown', e => {
+    if (e.repeat || e.isComposing || e.altKey) return;
+    const combo = e.key.toLowerCase() === 'k' && (e.ctrlKey || e.metaKey);
+    const slash = e.key === '/' && !e.ctrlKey && !e.metaKey;
+    if (!combo && !slash) return;
+    if (slash && e.target instanceof Element && e.target.closest('input, textarea, select, [contenteditable]')) return;
+
+    e.preventDefault();
+    const toggle = document.querySelector('.nav-toggle');
+    if (toggle && toggle.offsetParent !== null && toggle.getAttribute('aria-expanded') !== 'true') toggle.click();
+    input.focus();
+    input.select();
   });
 
   // Keeps focus in the input; otherwise Safari closes the panel on mousedown,
