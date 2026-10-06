@@ -71,7 +71,7 @@ function renderHomeButton(section, page) {
     ]),
     el('span', { class: 'home-card-headtext' }, [
       el('span', { class: 'home-card-title', text: section.heading }),
-      el('span', { class: 'home-card-count', text: pluralProjects(count) })
+      el('span', { class: 'home-card-count', text: `Browse all ${pluralProjects(count)}` })
     ]),
     homeArrow('home-card-arrow')
   ], `${section.heading} - ${pluralProjects(count)}`);
