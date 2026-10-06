@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.0.1 — 2026/10/06
+
+### Changed
+- Changed the "Explore Projects" button to "Explore" on the splash screen
+- Changed project card headers to "Browse all X projects" to make it clearer that they are buttons
+- Reduced height of the splash screen
+- Reduced width of statistics boxes on mobile
+
+### Fixed
+- Featured Project image being cut-off on mobile
+- Inconsistent copyright text wrapping on mobile
+
 ## v3.0.0.1 — 2026/10/06
 
 ### Changed
