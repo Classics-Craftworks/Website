@@ -2,20 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0d111a">
+  <link rel="canonical" href="https://classicscraftworks.co.uk/about">
+  <link rel="icon" href="images/favicon.png" type="image/png">
   <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
   <link rel="manifest" href="manifest.json">
-  <meta name="robots" content="noindex, nofollow">
-  <link rel="icon" href="images/favicon.png" type="image/png">
+  <meta name="theme-color" content="#0d111a">
   <link rel="preload" href="fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/minercraftory.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="styles.css">
-  <title>Page not found - Classic's Craftworks</title>
-  <meta name="description" content="This page doesn't exist. Head back to Classic's Craftworks for Minecraft data packs, mods & resource packs." />
+  <title>About - Classic's Craftworks</title>
+  <meta name="description" content="About Classic's Craftworks: Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft." />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Classic's Craftworks" />
+  <meta property="og:title" content="About - Classic's Craftworks" />
+  <meta property="og:description" content="About Classic's Craftworks: Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft." />
+  <meta property="og:image" content="https://classicscraftworks.co.uk/images/logo.png" />
+  <meta property="og:image:alt" content="Classic's Craftworks logo" />
+  <meta property="og:url" content="https://classicscraftworks.co.uk/about" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="About - Classic's Craftworks" />
+  <meta name="twitter:description" content="About Classic's Craftworks: Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft." />
+  <meta name="twitter:image" content="https://classicscraftworks.co.uk/images/logo.png" />
+  <meta name="twitter:image:alt" content="Classic's Craftworks logo" />
 </head>
 <body>
+
+<a href="#about" class="skip-link">Skip to content</a>
+
+<!-- Fallback when JavaScript is off. -->
+<noscript>
+  <div class="noscript-notice">
+    <h1>CLASSIC'S CRAFTWORKS</h1>
+    <p>Minecraft Java Edition data packs, mods &amp; resource packs.</p>
+    <p>
+      This site needs JavaScript enabled to build its pages.
+      In the meantime, you can browse our projects directly on
+      <a href="https://modrinth.com/organization/classics-craftworks">Modrinth</a>
+      or <a href="https://github.com/Classics-Craftworks">GitHub</a>.
+    </p>
+  </div>
+</noscript>
 
 <!-- Logo and name are repeated here so they show before scripts run; keep in sync with SITE_DATA.brand. -->
 <header class="site-header" id="site-header">
@@ -32,16 +61,7 @@
 
 <div class="page">
 
-  <main class="not-found">
-    <div class="not-found-card">
-      <p class="not-found-code">404</p>
-      <h1>Page not found</h1>
-      <p class="not-found-text">This page doesn't exist. It might have been moved, renamed, or never existed in the first place.</p>
-      <a class="top-link" href="/">
-        <span>Go Home</span>
-      </a>
-    </div>
-  </main>
+  <main id="about" class="about" tabindex="-1"></main>
 
   <footer class="site-footer">
     <div class="footer-grid">
@@ -81,7 +101,7 @@
 <script src="site-error.js" defer></script>
 <script src="data.js" defer></script>
 <script src="section-page.js" defer></script>
-<script src="404.js" defer></script>
+<script src="about.js" defer></script>
 <script src="search.js" defer></script>
 </body>
 </html>

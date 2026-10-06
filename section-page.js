@@ -1,16 +1,8 @@
-/* ============================================================
-   SHARED RENDER SCRIPT
+/* Shared by every page: helpers plus the header, footer and project-card
+   builders, all driven by SITE_DATA (data.js). A section page opts in via
+   <body data-page="..."> (see initSectionPage at the bottom). */
 
-   Loaded by every page. Reads SITE_DATA (data.js) and builds the
-   brand header, page nav, project cards and footer. A section page
-   marks itself with a data-page attribute on <body>, read at the
-   bottom of this file — see initSectionPage(). The home page's
-   section buttons live in index.js, search in search.js.
-
-   Edit data.js for content, this file for how pages are built.
-   ============================================================ */
-
-/* ---------- Small helper functions ---------- */
+/* ---------- Helpers ---------- */
 
 function icon(name, cls) {
   const span = document.createElement('span');
@@ -31,8 +23,7 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
-// Returns a slug for `text` that isn't already in the `used` set (adding
-// "-2", "-3"... if it is), and records it there.
+// Slug for `text` that isn't in `used` yet ("-2", "-3"... if needed); records it.
 function uniqueSlug(text, fallback, used) {
   const base = slugify(text) || fallback;
   let slug = base;
@@ -47,6 +38,7 @@ function assignSlug(text, fallback) {
   return uniqueSlug(text, fallback, usedSlugs);
 }
 
+// Note: the `href` option opens a new tab; use internalLink() for same-site links.
 function el(tag, opts = {}, children = []) {
   const node = document.createElement(tag);
   if (opts.class) node.className = opts.class;
@@ -59,15 +51,54 @@ function el(tag, opts = {}, children = []) {
   return node;
 }
 
+function internalLink(className, href, children, label) {
+  const a = document.createElement('a');
+  a.className = className;
+  a.href = href;
+  if (label) a.setAttribute('aria-label', label);
+  children.forEach(c => c && a.appendChild(c));
+  return a;
+}
+
+function stableChannel(project) {
+  const channels = project.channels || [];
+  return channels.find(c => (c.channel || '').toLowerCase() === 'stable') || channels[0];
+}
+
+// Projects with downloads (data packs, mods, resource packs); link-only
+// projects like "Other Projects" aren't counted.
+function countDownloadableProjects() {
+  return (SITE_DATA.sections || []).reduce(
+    (n, s) => n + (s.projects || []).filter(p => (p.channels || []).length > 0).length, 0);
+}
+
+// Fills {projects} in text from data.js / stats.js.
+function fillPlaceholders(text) {
+  return String(text).replace(/\{projects\}/g, countDownloadableProjects());
+}
+
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 function prefersReducedMotion() {
   return reducedMotionQuery.matches;
 }
 
-// ---------- Layout: transform instead of wrap ----------
-// Channel boxes and their download columns stack instead of letting
-// text wrap mid-line; layoutChannelRow() picks the arrangement that
-// fits and is re-run whenever the row resizes.
+function storageGet(key) {
+  try { return localStorage.getItem(key); } catch { return null; }
+}
+function storageSet(key, value) {
+  try { localStorage.setItem(key, value); } catch { /* storage unavailable */ }
+}
+
+function setHashSilently(id) {
+  const url = `${location.origin}${location.pathname}#${id}`;
+  try { history.pushState(null, '', url); } catch { /* not fatal */ }
+  return url;
+}
+
+/* ---------- Channel row layout ----------
+   Channel boxes and download columns stack rather than wrap mid-line;
+   layoutChannelRow() picks the arrangement that fits on every resize. */
+
 function headerWraps(header) {
   const label = header && header.querySelector('.channel-label');
   const group = header && header.querySelector('.channel-mc-group');
@@ -85,8 +116,7 @@ function layoutChannelRow(rowEl) {
   if (!groups.length) return;
 
   rowEl.classList.remove('stacked');
-  const anyHeaderNeedsRoom = groups.some(g => headerWraps(g.querySelector('.channel-header')));
-  if (anyHeaderNeedsRoom) rowEl.classList.add('stacked');
+  if (groups.some(g => headerWraps(g.querySelector('.channel-header')))) rowEl.classList.add('stacked');
 
   groups.forEach(g => {
     const header = g.querySelector('.channel-header');
@@ -96,120 +126,128 @@ function layoutChannelRow(rowEl) {
 
   const downloadLists = groups.map(g => g.querySelector('.channel-downloads')).filter(Boolean);
   downloadLists.forEach(dl => dl.classList.remove('downloads-stacked'));
-  const anyPillNeedsRoom = downloadLists.some(dl => {
+  const pillNeedsRoom = downloadLists.some(dl => {
     const headers = Array.from(dl.querySelectorAll('.download-col-header'));
     return headers.length > 1 && headers.some(pillWraps);
   });
-  if (anyPillNeedsRoom) downloadLists.forEach(dl => dl.classList.add('downloads-stacked'));
+  if (pillNeedsRoom) downloadLists.forEach(dl => dl.classList.add('downloads-stacked'));
 }
 
-function storageGet(key) {
-  try { return localStorage.getItem(key); } catch { return null; }
-}
-function storageSet(key, value) {
-  try { localStorage.setItem(key, value); } catch { /* quota / privacy error — ignore */ }
-}
+/* ---------- Project cards ---------- */
 
-function setHashSilently(id) {
-  const url = `${location.origin}${location.pathname}#${id}`;
-  try { history.pushState(null, '', url); } catch { /* not fatal */ }
-  return url;
-}
-
-// Small "copy link" button used on project titles.
 function copyLinkButton(id, label) {
   const btn = el('button', {
     class: 'copy-link-btn',
-    attrs: {
-      type: 'button',
-      'aria-label': 'Copy link to ' + label,
-      'data-tooltip': 'Copy link'
-    }
+    attrs: { type: 'button', 'aria-label': 'Copy link to ' + label, 'data-tooltip': 'Copy link' }
   }, [icon('link', 'icon-sm')]);
+
+  const showCopied = () => {
+    btn.classList.add('is-copied');
+    btn.setAttribute('data-tooltip', 'Copied!');
+    window.clearTimeout(btn._copiedTimer);
+    btn._copiedTimer = window.setTimeout(() => {
+      btn.classList.remove('is-copied');
+      btn.setAttribute('data-tooltip', 'Copy link');
+    }, 1500);
+  };
 
   btn.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
-
     const url = setHashSilently(id);
-
-    const showCopied = () => {
-      btn.classList.add('is-copied');
-      btn.setAttribute('data-tooltip', 'Copied!');
-      window.clearTimeout(btn._copiedTimer);
-      btn._copiedTimer = window.setTimeout(() => {
-        btn.classList.remove('is-copied');
-        btn.setAttribute('data-tooltip', 'Copy link');
-      }, 1500);
-    };
 
     if (navigator.clipboard?.writeText) {
       navigator.clipboard.writeText(url).then(showCopied).catch(() => {});
-    } else {
-      const temp = document.createElement('textarea');
-      temp.value = url;
-      temp.style.position = 'fixed';
-      temp.style.opacity = '0';
-      document.body.appendChild(temp);
-      temp.select();
-      try { document.execCommand('copy'); showCopied(); } catch { /* copy unsupported */ }
-      document.body.removeChild(temp);
+      return;
     }
+    const temp = document.createElement('textarea');
+    temp.value = url;
+    temp.style.position = 'fixed';
+    temp.style.opacity = '0';
+    document.body.appendChild(temp);
+    temp.select();
+    try { document.execCommand('copy'); showCopied(); } catch { /* copy unsupported */ }
+    document.body.removeChild(temp);
   });
 
   return btn;
 }
 
-/* ---------- Page pieces ---------- */
-
 function renderBrand(brand) {
   const logo = document.getElementById('brand-logo');
-  // The HTML already has the same src (so the logo shows before scripts
-  // run). Assigning src again, even to the same value, makes some browsers
-  // cancel the in-flight request and start over, so only set it if it differs.
+  // Re-assigning an identical src can restart the request in some browsers.
   if (logo.getAttribute('src') !== brand.logo) logo.src = brand.logo;
-  logo.alt = brand.name + ' logo';
-
+  logo.alt = '';
   document.getElementById('brand-name').textContent = brand.name;
 }
 
-function renderChannelBadge(ch, badgeKey) {
-  const badgeText = String(ch.badge).toLowerCase() === 'updated' ? 'Updated' : 'New';
+// A badge reappears when the versions it was dismissed against change.
+const badgeFingerprint = ch => (ch.downloads || []).map(d => d.version || 'N/A').join('|');
+const badgeKey = (projectId, ch) => `badge-dismissed:${projectId}:${(ch.channel || 'stable').toLowerCase()}`;
 
-  const versionFingerprint = (ch.downloads || [])
-    .map(d => d.version || 'N/A')
-    .join('|');
+function renderChannelBadge(ch, key) {
+  const fingerprint = badgeFingerprint(ch);
+  if (storageGet(key) === fingerprint) return null;
 
-  const dismissedVersion = storageGet(badgeKey);
-  if (dismissedVersion === versionFingerprint) return null;
-
-  const wrap = el('button', {
+  const text = String(ch.badge).toLowerCase() === 'updated' ? 'Updated' : 'New';
+  const badge = el('button', {
     class: 'channel-badge',
-    attrs: {
-      type: 'button',
-      'data-badge': badgeText.toLowerCase(),
-      'aria-label': 'Dismiss "' + badgeText + '" label'
-    }
+    attrs: { type: 'button', 'data-badge': text.toLowerCase(), 'aria-label': `Dismiss "${text}" label` }
   }, [
-    el('span', { class: 'channel-badge-text', text: badgeText }),
+    el('span', { class: 'channel-badge-text', text }),
     el('span', { class: 'channel-badge-dismiss' })
   ]);
 
-  wrap.addEventListener('click', e => {
+  badge.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
-    storageSet(badgeKey, versionFingerprint);
-    wrap.classList.add('is-dismissed');
-    wrap.addEventListener('transitionend', () => wrap.remove(), { once: true });
-    window.setTimeout(() => wrap.remove(), 250);
+    storageSet(key, fingerprint);
+    badge.classList.add('is-dismissed');
+    badge.addEventListener('transitionend', () => badge.remove(), { once: true });
+    window.setTimeout(() => badge.remove(), 250);
   });
 
-  return wrap;
+  return badge;
+}
+
+function renderDownload(d) {
+  const disabled = d.disabled || !d.url;
+
+  const colHeader = el('div', { class: 'download-col-header' + (disabled ? ' is-disabled' : '') }, [
+    icon(d.icon || 'box', 'icon-sm'),
+    el('span', { class: 'download-type-label', text: d.label }),
+    el('span', { class: 'pill' + (disabled ? ' disabled-pill' : ''), text: disabled ? 'N/A' : (d.version || 'N/A') })
+  ]);
+
+  let action;
+  if (disabled) {
+    const attrs = d.tooltip
+      ? { 'data-tooltip': d.tooltip, tabindex: '0', 'aria-label': `Not available: ${d.tooltip}` }
+      : {};
+    action = el('div', { class: 'download-unavailable' + (d.tooltip ? ' has-tooltip' : ''), attrs }, [
+      icon('unavailable', 'icon-sm'),
+      el('span', { text: 'Not available' })
+    ]);
+
+    // Touch devices have no hover, so a tap shows the tooltip briefly.
+    if (d.tooltip) {
+      action.addEventListener('click', () => {
+        action.classList.add('tooltip-open');
+        window.clearTimeout(action._tooltipTimer);
+        action._tooltipTimer = window.setTimeout(() => action.classList.remove('tooltip-open'), 3000);
+      });
+    }
+  } else {
+    action = el('a', { class: 'download-btn', href: d.url }, [
+      icon('download', 'icon-sm'),
+      el('span', { text: 'Download' })
+    ]);
+  }
+
+  return el('div', { class: 'download-col' + (disabled ? ' is-disabled' : '') }, [colHeader, action]);
 }
 
 function renderChannel(ch, projectId) {
-  const channelKey = (ch.channel || 'stable').toLowerCase();
-
   const header = el('div', { class: 'channel-header' }, [
     el('span', { class: 'status-dot' }),
     el('span', { class: 'channel-label', text: ch.label }),
@@ -219,117 +257,47 @@ function renderChannel(ch, projectId) {
     ])
   ]);
 
-  const badge = ch.badge ? renderChannelBadge(ch, `badge-dismissed:${projectId}:${channelKey}`) : null;
-
-  const downloads = el('div', { class: 'channel-downloads' });
-
-  (ch.downloads || []).forEach(d => {
-    const typeIcon = d.icon || 'box';
-    const isDisabled = d.disabled || !d.url;
-
-    const headerChildren = [
-      icon(typeIcon, 'icon-sm'),
-      el('span', { class: 'download-type-label', text: d.label }),
-      el('span', { class: 'pill' + (isDisabled ? ' disabled-pill' : ''), text: isDisabled ? 'N/A' : (d.version || 'N/A') })
-    ];
-
-    const colHeader = el('div', {
-      class: 'download-col-header' + (isDisabled ? ' is-disabled' : '')
-    }, headerChildren);
-
-    let actionEl;
-    if (isDisabled) {
-      const unavailableAttrs = {};
-      if (d.tooltip) {
-        unavailableAttrs['data-tooltip'] = d.tooltip;
-        unavailableAttrs['tabindex'] = '0';
-        unavailableAttrs['aria-label'] = `Not available: ${d.tooltip}`;
-      }
-      actionEl = el('div', {
-        class: 'download-unavailable' + (d.tooltip ? ' has-tooltip' : ''),
-        text: 'Not available',
-        attrs: unavailableAttrs
-      });
-
-      if (d.tooltip) {
-        actionEl.addEventListener('click', () => {
-          actionEl.classList.add('tooltip-open');
-          window.clearTimeout(actionEl._tooltipTimer);
-          actionEl._tooltipTimer = window.setTimeout(() => {
-            actionEl.classList.remove('tooltip-open');
-          }, 3000);
-        });
-      }
-    } else {
-      actionEl = el('a', {
-        class: 'download-btn',
-        href: d.url
-      }, [
-        icon('download', 'icon-sm'),
-        el('span', { text: 'Download' })
-      ]);
-    }
-
-    downloads.appendChild(el('div', {
-      class: 'download-col' + (isDisabled ? ' is-disabled' : '')
-    }, [colHeader, actionEl]));
-  });
+  const badge = ch.badge ? renderChannelBadge(ch, badgeKey(projectId, ch)) : null;
+  const downloads = el('div', { class: 'channel-downloads' }, (ch.downloads || []).map(renderDownload));
 
   return el('div', {
     class: 'channel-group',
-    attrs: { 'data-channel': channelKey }
+    attrs: { 'data-channel': (ch.channel || 'stable').toLowerCase() }
   }, [badge, header, downloads]);
 }
 
 function renderVersionsNote(p) {
-  if (!p.channels || !p.channels.length) return null;
+  if (!(p.channels || []).length) return null;
 
-  const modrinthLink = (p.links || []).find(l => (l.label || '').toLowerCase() === 'modrinth');
-  const githubLink = (p.links || []).find(l => (l.label || '').toLowerCase() === 'github');
-  if (!modrinthLink && !githubLink) return null;
+  const findLink = name => (p.links || []).find(l => (l.label || '').toLowerCase() === name);
+  const modrinth = findLink('modrinth');
+  const github = findLink('github');
+  if (!modrinth && !github) return null;
 
   const note = el('p', { class: 'versions-note' });
   note.appendChild(document.createTextNode('Older versions: '));
-  if (modrinthLink) {
-    note.appendChild(el('a', { class: 'versions-note-link', href: `${modrinthLink.url}/versions`, text: 'Modrinth' }));
-  }
-  if (modrinthLink && githubLink) {
-    note.appendChild(document.createTextNode(' | '));
-  }
-  if (githubLink) {
-    note.appendChild(el('a', { class: 'versions-note-link', href: `${githubLink.url}/wiki/Versions`, text: 'GitHub' }));
-  }
+  if (modrinth) note.appendChild(el('a', { class: 'versions-note-link', href: `${modrinth.url}/versions`, text: 'Modrinth' }));
+  if (modrinth && github) note.appendChild(document.createTextNode(' | '));
+  if (github) note.appendChild(el('a', { class: 'versions-note-link', href: `${github.url}/wiki/Versions`, text: 'GitHub' }));
   return note;
 }
 
 function renderProject(p) {
-  const linkRow = el('div', { class: 'project-links' });
-  (p.links || []).forEach(l => {
-    linkRow.appendChild(el('a', { class: 'text-link', href: l.url }, [
-      icon(l.icon, 'icon-sm'),
-      el('span', { text: l.label })
-    ]));
-  });
-
   const id = assignSlug(p.title, 'project');
 
-  const channelRow = el('div', { class: 'channel-row' },
-    (p.channels || []).map(ch => renderChannel(ch, id))
-  );
+  const linkRow = el('div', { class: 'project-links' }, (p.links || []).map(l =>
+    el('a', { class: 'text-link', href: l.url }, [icon(l.icon, 'icon-sm'), el('span', { text: l.label })])
+  ));
 
+  const channelRow = el('div', { class: 'channel-row' }, (p.channels || []).map(ch => renderChannel(ch, id)));
   if (window.ResizeObserver) {
     new ResizeObserver(() => layoutChannelRow(channelRow)).observe(channelRow);
   }
 
-  const titleRow = el('div', { class: 'project-title-row' }, [
-    el('h3', { text: p.title }),
-    copyLinkButton(id, p.title)
-  ]);
-
   return el('article', { class: 'project', attrs: { id } }, [
     el('img', { class: 'project-image', src: p.image, alt: p.title, attrs: { loading: 'lazy', width: '320', height: '320' } }),
     el('div', { class: 'project-body' }, [
-      titleRow,
+      el('div', { class: 'project-title-row' }, [el('h2', { text: p.title }), copyLinkButton(id, p.title)]),
       el('p', { class: 'project-description', text: p.description }),
       linkRow,
       channelRow,
@@ -338,15 +306,10 @@ function renderProject(p) {
   ]);
 }
 
-// Returns the number of undismissed "New"/"Updated" badges across all
-// projects on `page` (matched via its "section" field to
-// SITE_DATA.sections). Mirrors the dismissal check renderChannelBadge()
-// does when actually building a badge, without rendering anything -
-// SITE_DATA has every section's data on every page, so this can be
-// computed for other pages, not just the current one. Slugs are
-// recomputed with a fresh, page-local Set (rather than the shared
-// usedSlugs) so they match what that page's own titles would slugify
-// to when it's the one being rendered.
+/* ---------- Header ---------- */
+
+// Undismissed "New"/"Updated" badges on a page's projects. Slugs use a fresh
+// Set so they match that page's own ids, whichever page is showing.
 function countUndismissedBadges(page) {
   const section = (SITE_DATA.sections || []).find(s => s.heading === page.section);
   if (!section) return 0;
@@ -356,89 +319,51 @@ function countUndismissedBadges(page) {
   (section.projects || []).forEach(p => {
     const projectId = uniqueSlug(p.title, 'project', slugs);
     (p.channels || []).forEach(ch => {
-      if (!ch.badge) return;
-      const channelKey = (ch.channel || 'stable').toLowerCase();
-      const versionFingerprint = (ch.downloads || [])
-        .map(d => d.version || 'N/A')
-        .join('|');
-      const dismissedVersion = storageGet(`badge-dismissed:${projectId}:${channelKey}`);
-      if (dismissedVersion !== versionFingerprint) count++;
+      if (ch.badge && storageGet(badgeKey(projectId, ch)) !== badgeFingerprint(ch)) count++;
     });
   });
   return count;
 }
 
-// Small yellow count pill appended to a nav button for a page that
-// still has undismissed "New"/"Updated" badges somewhere on it.
-// Caps the displayed number at "9+" so the pill doesn't have to
-// grow to fit wider text.
+// Count pill for nav items; shows "9+" above nine.
 function navBadgeDot(count) {
-  const label = count > 9 ? '9+' : String(count);
-  const words = count === 1 ? 'update' : 'updates';
-  const text = `${count} new ${words}`;
+  const text = `${count} new ${count === 1 ? 'update' : 'updates'}`;
   return el('span', {
     class: 'nav-jump-dot',
     attrs: { 'data-tooltip': text, 'aria-label': text }
   }, [
-    el('span', { attrs: { 'aria-hidden': 'true' }, text: label })
+    el('span', { attrs: { 'aria-hidden': 'true' }, text: count > 9 ? '9+' : String(count) })
   ]);
 }
 
-// Builds the sticky page-switcher bar: one link per page in
-// SITE_DATA.pages, with whichever one matches currentUrl shown as a
-// filled, non-clickable pill.
-function renderPageNav(pages, currentUrl) {
-  const nav = document.getElementById('page-nav');
-  if (!nav || !pages || !pages.length) return;
+// Keep in sync with the 900px breakpoint in styles.css.
+const MOBILE_NAV_QUERY = '(max-width: 900px)';
 
-  // One entry per nav button, kept around so the pageshow handler
-  // (below) can re-check and update them later without rebuilding the
-  // bar.
-  const badgeTargets = [];
+// Builds the nav: Home, a Projects dropdown (pages with a "section"), About.
+// search.js adds the search box to the same menu. On small screens the whole
+// menu folds behind a button and the dropdown becomes an accordion.
+function renderSiteHeader(pages, currentUrl) {
+  const header = document.getElementById('site-header');
+  const inner = document.getElementById('site-header-inner');
+  const menuWrap = document.getElementById('site-menu');
+  const nav = document.getElementById('site-nav');
+  if (!header || !inner || !menuWrap || !nav || !pages || !pages.length) return;
 
-  const row = el('div', { class: 'nav-jump-row' });
-  pages.forEach(p => {
-    const count = countUndismissedBadges(p);
-    const dot = count > 0 ? navBadgeDot(count) : null;
+  const mobile = window.matchMedia(MOBILE_NAV_QUERY);
+  const home = pages.find(p => p.url === '/');
+  const about = pages.find(p => p.url === 'about');
+  const projectPages = pages.filter(p => p.section);
 
-    if (p.url === currentUrl) {
-      // Not a link — you're already here. aria-current tells screen
-      // readers this is the active page, same as a normal site nav.
-      const btn = el('span', {
-        class: 'nav-jump-btn is-open',
-        attrs: { 'aria-current': 'page' }
-      }, [
-        icon(p.icon, 'icon-sm'),
-        el('span', { text: p.label }),
-        dot
-      ]);
-      row.appendChild(btn);
-      badgeTargets.push({ page: p, target: btn });
-      return;
-    }
-    // Built by hand rather than via el()'s href shortcut — that
-    // shortcut always opens links in a new tab (right for the
-    // external Modrinth/GitHub links elsewhere on the page), but page
-    // navigation should stay in the same tab.
-    const a = document.createElement('a');
-    a.className = 'nav-jump-btn';
-    a.href = p.url;
-    a.appendChild(icon(p.icon, 'icon-sm'));
-    a.appendChild(el('span', { text: p.label }));
-    if (dot) a.appendChild(dot);
-    row.appendChild(a);
-    badgeTargets.push({ page: p, target: a });
-  });
-  nav.appendChild(row);
+  // Elements that carry a count pill, each with a function giving its count.
+  // syncDots() redraws them all, at load and after a back/forward restore.
+  const dotTargets = [];
+  const trackDots = (target, getCount) => dotTargets.push({ target, getCount });
+  const totalProjectBadges = () => projectPages.reduce((sum, p) => sum + countUndismissedBadges(p), 0);
 
-  // A dot is only computed once, at load. If the page is later restored
-  // from the browser's back/forward cache (e.g. after pressing Back)
-  // rather than freshly loaded.
-  window.addEventListener('pageshow', event => {
-    if (!event.persisted) return;
-    badgeTargets.forEach(({ page, target }) => {
-      const existing = target.querySelector('.nav-jump-dot');
-      const count = countUndismissedBadges(page);
+  function syncDots() {
+    dotTargets.forEach(({ target, getCount }) => {
+      const existing = target.querySelector(':scope > .nav-jump-dot');
+      const count = getCount();
       if (count > 0) {
         const fresh = navBadgeDot(count);
         if (existing) existing.replaceWith(fresh);
@@ -447,29 +372,139 @@ function renderPageNav(pages, currentUrl) {
         existing.remove();
       }
     });
+  }
+
+  function pageLink(page, className) {
+    const a = internalLink(className, page.url, [icon(page.icon, 'icon-sm'), el('span', { text: page.label })]);
+    if (page.url === currentUrl) {
+      a.classList.add('is-current');
+      a.setAttribute('aria-current', 'page');
+    }
+    return a;
+  }
+
+  if (home) nav.appendChild(pageLink(home, 'nav-link'));
+
+  let setDropdown = () => {};
+  if (projectPages.length) {
+    const menuId = 'projects-menu';
+    const onProjectPage = projectPages.some(p => p.url === currentUrl);
+    const label = (SITE_DATA.home && SITE_DATA.home.projectsHeading) || 'Projects';
+
+    const trigger = el('button', {
+      class: 'nav-link nav-dropdown-toggle' + (onProjectPage ? ' is-current' : ''),
+      attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': menuId }
+    }, [
+      icon('compass', 'icon-sm'),
+      el('span', { text: label }),
+      el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+    ]);
+    trackDots(trigger, totalProjectBadges);
+
+    const items = projectPages.map(page => {
+      const a = pageLink(page, 'nav-dropdown-item');
+      trackDots(a, () => countUndismissedBadges(page));
+      return a;
+    });
+    const menu = el('div', { class: 'nav-dropdown-menu', attrs: { id: menuId, hidden: '' } }, items);
+    const dropdown = el('div', { class: 'nav-dropdown' }, [trigger, menu]);
+    nav.appendChild(dropdown);
+
+    setDropdown = (open, opts = {}) => {
+      menu.hidden = !open;
+      trigger.setAttribute('aria-expanded', String(open));
+      dropdown.classList.toggle('is-open', open);
+      if (!open && opts.refocus) trigger.focus();
+    };
+
+    trigger.addEventListener('click', () => setDropdown(menu.hidden));
+    trigger.addEventListener('keydown', e => {
+      if (e.key !== 'ArrowDown') return;
+      e.preventDefault();
+      setDropdown(true);
+      items[0].focus();
+    });
+
+    menu.addEventListener('keydown', e => {
+      const i = items.indexOf(document.activeElement);
+      let next = -1;
+      if (e.key === 'ArrowDown') next = (i + 1) % items.length;
+      else if (e.key === 'ArrowUp') next = (i - 1 + items.length) % items.length;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = items.length - 1;
+      else if (e.key === 'Escape') {
+        e.preventDefault();
+        setDropdown(false, { refocus: true });
+        return;
+      }
+      if (next < 0) return;
+      e.preventDefault();
+      items[next].focus();
+    });
+
+    // A popover on desktop (closes on outside focus/click); an accordion on
+    // mobile (stays open until its button is pressed again).
+    dropdown.addEventListener('focusout', e => {
+      if (!mobile.matches && !dropdown.contains(e.relatedTarget)) setDropdown(false);
+    });
+    document.addEventListener('pointerdown', e => {
+      if (!mobile.matches && !dropdown.contains(e.target)) setDropdown(false);
+    });
+  }
+
+  if (about) nav.appendChild(pageLink(about, 'nav-link'));
+
+  // Mobile menu button; its pill totals every project page.
+  const toggle = el('button', {
+    class: 'nav-toggle',
+    attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': menuWrap.id, 'aria-label': 'Open menu' }
+  }, [
+    el('span', { class: 'nav-toggle-bars', attrs: { 'aria-hidden': 'true' } })
+  ]);
+  trackDots(toggle, totalProjectBadges);
+  inner.insertBefore(toggle, menuWrap);
+
+  const setMenu = open => {
+    header.classList.toggle('is-menu-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  };
+  toggle.addEventListener('click', () => setMenu(!header.classList.contains('is-menu-open')));
+
+  // Escape folds the mobile menu unless the dropdown or search already used it.
+  header.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || e.defaultPrevented) return;
+    if (!mobile.matches || !header.classList.contains('is-menu-open')) return;
+    setMenu(false);
+    toggle.focus();
   });
 
-  // Keeps a linked/scrolled-to heading or project clear of this bar
-  // while it's sticky.
+  // Crossing the breakpoint resets both menus.
+  mobile.addEventListener('change', () => {
+    setMenu(false);
+    setDropdown(false);
+  });
+
+  syncDots();
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) syncDots();
+  });
+
+  // Keeps linked headings clear of the sticky header. Skipped while the
+  // mobile menu is open, since it overlays the page rather than pushing it.
   const syncScrollOffset = () => {
-    const rect = nav.getBoundingClientRect();
-    const navTop = parseFloat(getComputedStyle(nav).top) || 0;
-    const offset = navTop + rect.height + 16;
+    if (header.classList.contains('is-menu-open')) return;
+    const offset = header.getBoundingClientRect().height + 16;
     document.documentElement.style.setProperty('--sticky-nav-offset', `${Math.round(offset)}px`);
   };
   syncScrollOffset();
-  if (window.ResizeObserver) {
-    new ResizeObserver(syncScrollOffset).observe(nav);
-  } else {
-    window.addEventListener('resize', syncScrollOffset);
-  }
+  if (window.ResizeObserver) new ResizeObserver(syncScrollOffset).observe(header);
+  else window.addEventListener('resize', syncScrollOffset);
 }
 
-// Builds this page's one section: a heading with a project count,
-// followed by its project cards.
-// True if any project in this section actually has a downloadable
-// channel (data packs/mods/resource packs), as opposed to a section
-// like "Other Projects" that only links out elsewhere.
+/* ---------- Section page & footer ---------- */
+
+// Sections like "Other Projects" only link out, so they get no download notice.
 function sectionHasDownloads(section) {
   return (section.projects || []).some(p => (p.channels || []).length > 0);
 }
@@ -479,103 +514,82 @@ function renderFlatSection(section) {
   if (!main || !section) return;
 
   const id = assignSlug(section.heading, 'section');
-  const count = el('span', {
-    class: 'section-count',
-    text: String((section.projects || []).length)
-  });
-  const heading = el('h2', { class: 'flat-section-heading', attrs: { id } }, [
+  main.appendChild(el('h1', { class: 'flat-section-heading', attrs: { id } }, [
     el('span', { text: section.heading }),
-    count
-  ]);
-
-  const list = el('div', { class: 'project-list' }, section.projects.map(renderProject));
-
-  main.appendChild(heading);
+    el('span', { class: 'section-count', text: String((section.projects || []).length) })
+  ]));
 
   if (SITE_DATA.downloadNotice && sectionHasDownloads(section)) {
-    main.appendChild(el('p', {
-      class: 'download-notice',
-      text: SITE_DATA.downloadNotice
-    }));
+    main.appendChild(el('p', { class: 'download-notice' }, [
+      icon('info', 'icon-sm'),
+      el('span', { text: SITE_DATA.downloadNotice })
+    ]));
   }
 
-  main.appendChild(list);
+  main.appendChild(el('div', { class: 'project-list' }, section.projects.map(renderProject)));
+}
+
+function footerLink(href, iconName, label) {
+  const a = internalLink('footer-link footer-social', href, [icon(iconName, 'icon-sm'), el('span', { text: label })]);
+  const li = document.createElement('li');
+  li.appendChild(a);
+  return li;
 }
 
 function renderFooter(socials, footer, version) {
-  const socialRow = document.getElementById('social-links');
+  const projectsList = document.getElementById('footer-projects');
+  if (projectsList) {
+    SITE_DATA.pages.filter(p => p.section).forEach(p => projectsList.appendChild(footerLink(p.url, p.icon, p.label)));
+  }
+
+  const socialList = document.getElementById('social-links');
   socials.forEach(s => {
-    socialRow.appendChild(el('a', {
-      class: 'social-link',
-      href: s.url,
-      attrs: {
-        'aria-label': s.label,
-        'data-tooltip': s.label
-      }
-    }, [
-      icon(s.icon, 'icon-md')
-    ]));
+    const li = footerLink(s.url, s.icon, s.label);
+    const a = li.firstChild;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    socialList.appendChild(li);
   });
 
   document.getElementById('copyright').textContent = footer.copyright;
+  const established = document.getElementById('established');
+  if (established && footer.established) established.textContent = footer.established;
   document.getElementById('disclaimer').textContent = footer.disclaimer;
 
-  if (footer.iconCredits) {
+  const credits = footer.iconCredits;
+  if (credits) {
     const creditsEl = document.getElementById('icon-credits');
-    creditsEl.innerHTML = '';
-    if (footer.iconCredits.prefix) {
-      creditsEl.appendChild(document.createTextNode(footer.iconCredits.prefix));
-    }
-    creditsEl.appendChild(el('a', {
-      href: footer.iconCredits.url,
-      class: 'credits-link',
-      text: footer.iconCredits.label
-    }));
+    if (credits.prefix) creditsEl.appendChild(document.createTextNode(credits.prefix));
+    creditsEl.appendChild(el('a', { href: credits.url, class: 'credits-link', text: credits.label }));
   }
 
   if (version) {
     const versionEl = document.getElementById('site-version');
-    versionEl.innerHTML = '';
-
-    const versionLabel = typeof version === 'object' ? version.label : version;
-    const versionUrl = typeof version === 'object' ? version.url : null;
-
-    if (versionUrl) {
-      versionEl.appendChild(el('a', {
-        href: versionUrl,
-        class: 'version-link',
-        text: versionLabel
-      }));
-    } else {
-      versionEl.textContent = versionLabel;
-    }
+    const { label, url } = typeof version === 'object' ? version : { label: version };
+    if (url) versionEl.appendChild(el('a', { href: url, class: 'version-link', text: label }));
+    else versionEl.textContent = label;
   }
 }
+
+/* ---------- Page behaviour ---------- */
 
 function initBackToTop() {
   const btn = document.getElementById('back-to-top');
   if (!btn) return;
 
-  const SHOW_AFTER = 400;
-
-  const updateVisibility = () => {
-    btn.classList.toggle('is-visible', window.scrollY > SHOW_AFTER);
-  };
-  updateVisibility();
-  window.addEventListener('scroll', updateVisibility, { passive: true });
+  const update = () => btn.classList.toggle('is-visible', window.scrollY > 400);
+  update();
+  window.addEventListener('scroll', update, { passive: true });
 
   btn.addEventListener('click', () => {
-    const reduceMotion = prefersReducedMotion();
-    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
   });
 }
 
-// Scrolls to a #project-id or #section-id link and briefly highlights
-// the project it points to.
+// Scrolls to the #id in the URL and briefly highlights it if it's a project.
 function handleDeepLink() {
   const id = decodeURIComponent(location.hash.slice(1));
-  if (!id) return;
-  const target = document.getElementById(id);
+  const target = id && document.getElementById(id);
   if (!target) return;
 
   requestAnimationFrame(() => {
@@ -588,33 +602,28 @@ function handleDeepLink() {
   });
 }
 
-// Adds a JSON-LD <script> (Organization + SoftwareApplication list)
-// built from SITE_DATA. Pass a section to describe just its projects,
-// or null for every project (index.js does this on the home page).
+// Adds JSON-LD (Organization + project list). Pass a section for just its
+// projects, or null for every project.
 function renderStructuredData(data, section) {
   const canonical = document.querySelector('link[rel="canonical"]');
   const siteUrl = canonical ? canonical.href : location.origin + '/';
   const toAbsolute = path => path ? new URL(path, siteUrl).href : undefined;
-  const siteDescription = (data.home && data.home.projectsSubtitle) || '';
 
   const organization = {
     '@type': 'Organization',
     name: data.brand.name,
     url: siteUrl,
     logo: toAbsolute(data.brand.logo),
-    description: siteDescription,
+    description: (data.home && data.home.projectsSubtitle) || '',
     sameAs: (data.socials || []).map(l => l.url)
   };
 
-  // One section's projects on a section page, or every section's on the
-  // home page (which passes no section).
   const projects = section
     ? (section.projects || [])
     : (data.sections || []).flatMap(s => s.projects || []);
 
   const items = projects.map(project => {
-    const channels = project.channels || [];
-    const stable = channels.find(c => (c.channel || '').toLowerCase() === 'stable') || channels[0];
+    const stable = stableChannel(project);
     const firstDownload = stable && (stable.downloads || []).find(d => d.url && !d.disabled);
     const firstLink = (project.links || [])[0];
 
@@ -627,8 +636,7 @@ function renderStructuredData(data, section) {
       applicationCategory: 'GameApplication',
       operatingSystem: 'Minecraft: Java Edition'
     };
-    const softwareVersion = firstDownload && firstDownload.version;
-    if (softwareVersion) item.softwareVersion = softwareVersion;
+    if (firstDownload && firstDownload.version) item.softwareVersion = firstDownload.version;
     if (firstDownload) item.downloadUrl = firstDownload.url;
     return item;
   });
@@ -636,38 +644,24 @@ function renderStructuredData(data, section) {
   const itemList = {
     '@type': 'ItemList',
     name: `${data.brand.name} ${section ? section.heading : 'Projects'}`,
-    itemListElement: items.map((item, i) => ({
-      '@type': 'ListItem',
-      position: i + 1,
-      item
-    }))
+    itemListElement: items.map((item, i) => ({ '@type': 'ListItem', position: i + 1, item }))
   };
 
   const script = document.createElement('script');
   script.type = 'application/ld+json';
-  script.textContent = JSON.stringify({
-    '@context': 'https://schema.org',
-    '@graph': [organization, itemList]
-  });
+  script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': [organization, itemList] });
   document.head.appendChild(script);
 }
 
 /* ---------- Entry point ----------
-   A section page marks itself with data-page, matching its "url" in
-   SITE_DATA.pages (see data.js): <body data-page="data-packs-mods">.
-   The home and 404 pages have no data-page, so this only runs where needed. */
-if (document.body.dataset.page) {
-  initSectionPage(document.body.dataset.page);
-}
+   Section pages set data-page to their "url" in SITE_DATA.pages. */
 
 function initSectionPage(pageUrl) {
   renderBrand(SITE_DATA.brand);
 
   const pages = SITE_DATA.pages || [];
-  renderPageNav(pages, pageUrl);
+  renderSiteHeader(pages, pageUrl);
 
-  // Looks up this page's section via SITE_DATA.pages, falling back to
-  // the first section if data.js is missing that entry.
   const pageEntry = pages.find(p => p.url === pageUrl);
   const section = (SITE_DATA.sections || []).find(s => s.heading === (pageEntry && pageEntry.section)) || SITE_DATA.sections[0];
 
@@ -677,4 +671,13 @@ function initSectionPage(pageUrl) {
   initBackToTop();
   handleDeepLink();
   window.addEventListener('hashchange', handleDeepLink);
+}
+
+if (document.body.dataset.page) initSectionPage(document.body.dataset.page);
+
+// Cache-free service worker (sw.js) so Chrome/Edge offer to install the site.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* not fatal */ });
+  });
 }

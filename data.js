@@ -1,69 +1,52 @@
-/* ============================================================
-   SITE DATA
-   The main file for site text, links and project lists. Layout and
-   rendering are handled by section-page.js and index.js.
+/* SITE DATA - all site text, links and project lists.
 
-   QUICK GUIDE:
-   - Text & Links: edit values inside quotes (label, url, etc).
-   - Images: place in /images, set the relative path.
-   - Icons: place SVGs in /images/icons/, refer to by filename (no extension).
-   - Projects: copy an existing project {...} block to add a new one.
-   - Channels: "stable"/"beta"/"alpha"/"unsupported". Add "disabled: true"
-     to a download if unavailable, with an optional "tooltip" explaining why.
-   - Download versions: each download shows its own "version" pill
-     (no channel-wide fallback — give every enabled download one).
-   - "New"/"Updated" badge: add `badge: "new"` or `"updated"` to a channel.
-     Dismissible by visitors; reappears automatically next time that
-     channel's download versions are bumped.
-   ============================================================ */
+   - Icons: SVGs in /images/icons/, referenced by filename without extension.
+   - Channels: "stable" | "beta" | "alpha" | "unsupported".
+   - Downloads: each needs its own "version". Add `disabled: true` (and an
+     optional "tooltip") if unavailable.
+   - Badges: `badge: "new"` or `"updated"` on a channel. Visitors can dismiss
+     it; it returns when that channel's download versions change.
+   - New project: copy an existing project block. */
 
-// One big object — the page scripts read values out of it (e.g.
-// SITE_DATA.brand.name) to build each page.
 const SITE_DATA = {
 
-  // Logo and name shown at the top of the page. The tagline isn't shown on
-  // the page; it's only used for the site's structured-data description.
   brand: {
     logo: "images/logo.png",
-    name: "CLASSIC'S CRAFTWORKS",
+    name: "CLASSIC'S CRAFTWORKS"
   },
 
-  // Website version shown at the very bottom of the page.
-   version: {
-    label: "v2.3.1",
+  version: {
+    label: "v3.0.0",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
-  // Heading and one-line subtitle above the section buttons on the home page.
   home: {
+    splash: {
+      headline: ["SOMETIMES USEFUL.", "ALWAYS MINECRAFT."],
+      subtitle: "Minecraft Java Edition data packs, mods & resource packs by Classic's Craftworks",
+      featured: "Better Craftables",
+      featuredImage: "images/featured-banner.webp"
+    },
+
     projectsHeading: "Projects",
-    projectsSubtitle: "Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft."
+    projectsSubtitle: ""
   },
 
-  // Every page in the sticky page-nav bar: the home page plus one page
-  // per section. Add an entry here (with the matching section heading
-  // below) whenever a new section gets its own page, and it shows up
-  // in every page's nav automatically. "Home" has no "section" since
-  // it isn't tied to one.
+  // Header pages. Entries with a "section" go in the Projects dropdown and
+  // must match a section heading below; Home ("/") and About get their own links.
   pages: [
     { label: "Home", url: "/", icon: "home" },
     { label: "Data Packs & Mods", url: "data-packs-mods", section: "Data Packs & Mods", icon: "brackets" },
     { label: "Resource Packs", url: "resource-packs", section: "Resource Packs", icon: "brush" },
-    { label: "Other Projects", url: "other-projects", section: "Other Projects", icon: "wrench" }
+    { label: "Other Projects", url: "other-projects", section: "Other Projects", icon: "wrench" },
+    { label: "About", url: "about", icon: "book" }
   ],
 
-  // The main content: each entry below is a section (a heading
-  // plus a list of projects). Add, remove, or reorder sections
-  // and projects freely — the layout will adjust automatically.
   sections: [
     // #region ▓▓▓▓▓▓▓▓▓▓▓▓  DATA PACKS & MODS  ▓▓▓▓▓▓▓▓▓▓▓▓
     {
       heading: "Data Packs & Mods",
       projects: [
-        // Each object in this "projects" array becomes one project card
-        // on the page. Copy an entire { ... } block like this one and
-        // paste it here (with a trailing comma) to add a new project.
-
         // #region ──────── Better Craftables ────────
         {
           image: "images/better-craftables.webp",
@@ -346,7 +329,20 @@ const SITE_DATA = {
     // #endregion OTHER PROJECTS
   ],
 
-  // Link icons shown in the footer at the bottom of every page.
+  // About page blocks, in order: "paragraph" | { heading } | { list: [] } |
+  // { quote } | { divider: true }. Text may use {projects} (number of downloadable projects) or
+  // be an array mixing strings with { link, url } / { bold } / { italic } / { code }.
+  about: {
+    heading: "About",
+    content: [
+      "Started in 2017, Classic's Craftworks is a workshop for Minecraft ideas, focused on creating data packs, mods, resource packs and other projects for Minecraft: Java Edition. What began as a collection of small experiments and ideas has grown into a place for projects of all shapes and sizes... though, admittedly, mostly on the smaller side.",
+      "The projects themselves vary quite a bit. Some are designed to improve existing features, add useful quality-of-life changes or solve problems that Minecraft doesn't quite solve on its own. Others simply exist because they seemed like a good idea at the time. Spoiler alert: they're not always good ideas... Ultimately, some are useful, some are experimental, and some are questionable. Sometimes useful. Always Minecraft.",
+      "Classic's Craftworks aims to keep its projects accessible and straightforward. Releases, documentation and additional information are provided wherever possible, making it easy to find what you need and get a project running in your own Minecraft world.",
+      "Since 2023, Classic's Craftworks has published {projects} projects. Every project has its own section on this website, containing a brief description, relevant links, release information and downloads.",
+      "Of course, not every project has survived the years. Some were discontinued, some were removed, and some probably should never have existed in the first place. Classic's Craftworks (and Minecraft itself, for that matter) has changed quite a bit since 2017, and not everything has needed to stick around."
+    ]
+  },
+
   socials: [
     { label: "Modrinth", url: "https://modrinth.com/organization/classics-craftworks", icon: "modrinth" },
     { label: "GitHub", url: "https://github.com/Classics-Craftworks", icon: "github" },
@@ -356,11 +352,13 @@ const SITE_DATA = {
   ],
 
   footer: {
-    copyright: "\u00A9 2023\u20132026 Classic36 / Classic's Craftworks · Est. 2017",
+    copyright: "\u00A9 2023\u20132026 Classic36 / Classic's Craftworks",
+    established: "Est. 2017",
     disclaimer: "NOT AN OFFICIAL MINECRAFT PRODUCT OR SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
-    iconCredits: { prefix: "Link icons provided by ", label: "SVG Repo", url: "https://www.svgrepo.com" }
+    iconCredits: { prefix: "Icons provided by ", label: "SVG Repo", url: "https://www.svgrepo.com" }
   },
-  downloadNotice: "Any reuploads of these projects that are not linked on this website are unofficial, unaffiliated, and may have been modified or contain malicious content.",
+
+  downloadNotice: "Any reuploads of these projects that are not linked on this website are unofficial, unaffiliated, and may have been modified or contain malicious content."
 };
 
 // TOOLTIP STORAGE

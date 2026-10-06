@@ -1,21 +1,19 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="canonical" href="https://classicscraftworks.co.uk/">
-<link rel="icon" href="images/favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="images/logo.png">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d111a">
-<link rel="preload" href="fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/minercraftory.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="styles.css">
-  <!-- Basic Meta Tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="canonical" href="https://classicscraftworks.co.uk/">
+  <link rel="icon" href="images/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d111a">
+  <link rel="preload" href="fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/minercraftory.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
   <title>Classic's Craftworks</title>
   <meta name="description" content="Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft." />
 
-  <!-- Open Graph Preview Cards (Discord, Facebook, LinkedIn) -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Classic's Craftworks" />
   <meta property="og:title" content="Classic's Craftworks" />
@@ -24,7 +22,6 @@
   <meta property="og:image:alt" content="Classic's Craftworks logo" />
   <meta property="og:url" content="https://classicscraftworks.co.uk/" />
 
-  <!-- Twitter / X Preview Cards -->
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Classic's Craftworks" />
   <meta name="twitter:description" content="Minecraft Java Edition data packs, mods & resource packs. Sometimes useful. Always Minecraft." />
@@ -33,13 +30,9 @@
 </head>
 <body>
 
-<!-- Lets keyboard users skip straight to the projects, past the nav.
-     Hidden until focused (see .skip-link in styles.css). -->
 <a href="#catalog" class="skip-link">Skip to projects</a>
 
-<!-- Fallback for JS disabled/blocked - everything else on this page
-     is built by index.js from data.js. Keep in sync with data.js's
-     brand/socials if those change. -->
+<!-- Fallback when JavaScript is off. -->
 <noscript>
   <div class="noscript-notice">
     <h1>CLASSIC'S CRAFTWORKS</h1>
@@ -53,34 +46,40 @@
   </div>
 </noscript>
 
+<!-- Logo and name are repeated here so they show before scripts run; keep in sync with SITE_DATA.brand. -->
+<header class="site-header" id="site-header">
+  <div class="site-header-inner" id="site-header-inner">
+    <a class="brand" href="/">
+      <img id="brand-logo" class="brand-logo" src="images/logo.png" alt="" width="44" height="44">
+      <span id="brand-name" class="brand-name">CLASSIC'S CRAFTWORKS</span>
+    </a>
+    <div class="site-menu" id="site-menu">
+      <nav id="site-nav" class="site-nav" aria-label="Main"></nav>
+    </div>
+  </div>
+</header>
+
 <div class="page">
 
-  <!-- Logo and name are written here so they show before the scripts run;
-       renderBrand() sets the same values from data.js. Keep them in sync
-       with SITE_DATA.brand if those change. -->
-  <header class="masthead">
-    <img id="brand-logo" class="brand-logo" src="images/logo.png" alt="Classic's Craftworks logo" width="88" height="88">
-    <div class="brand-text">
-      <h1 id="brand-name">CLASSIC'S CRAFTWORKS</h1>
+  <section id="splash" class="splash" aria-labelledby="splash-headline" hidden>
+    <img class="splash-bg" src="images/splash-bg.webp" alt="" aria-hidden="true">
+    <div class="splash-inner">
+      <div class="splash-copy">
+        <h1 id="splash-headline" class="splash-headline"></h1>
+        <p id="splash-subtitle" class="splash-subtitle"></p>
+        <div id="splash-actions" class="splash-actions"></div>
+      </div>
+      <aside id="splash-featured" class="splash-featured" aria-label="Featured project"></aside>
     </div>
-  </header>
+  </section>
 
-  <!-- Sticky page-switcher bar, same as on the section pages. Built by
-       renderPageNav() in section-page.js from SITE_DATA.pages. -->
-  <nav id="page-nav" class="section-nav" aria-label="Site pages"></nav>
-
-  <!-- Heading for the section buttons below. Text comes from
-       SITE_DATA.home in data.js, filled in by renderProjectsIntro(). -->
   <section id="projects-intro" class="projects-intro" aria-labelledby="projects-heading">
     <h2 id="projects-heading" class="projects-heading"></h2>
     <p id="projects-subtitle" class="projects-subtitle"></p>
   </section>
 
-  <!-- Filled by index.js with one big button per section. tabindex="-1"
-       lets the skip link above focus here without joining the Tab order. -->
   <main id="catalog" tabindex="-1"></main>
 
-  <!-- Filled by renderStats() in index.js from STATS_DATA (stats.js). -->
   <section id="stats-section" class="stats-section" aria-labelledby="stats-heading">
     <h2 id="stats-heading" class="stats-heading">Statistics</h2>
     <p id="stats-updated" class="stats-updated"></p>
@@ -89,19 +88,43 @@
   </section>
 
   <footer class="site-footer">
-    <div id="social-links" class="social-row" aria-label="Social links"></div>
-    <p id="copyright" class="footer-line"></p>
-    <p id="disclaimer" class="footer-line footer-disclaimer"></p>
-    <p id="icon-credits" class="footer-line footer-credits"></p>
-    <p id="site-version" class="footer-version"></p>
+    <div class="footer-grid">
+      <div class="footer-col footer-brand-col">
+        <a class="footer-logo-link" href="/" tabindex="-1" aria-hidden="true">
+          <img class="footer-logo" src="images/logo.png" alt="" width="84" height="84">
+        </a>
+        <div class="footer-brand-text">
+          <a class="footer-brand" href="/">
+            <span class="footer-brand-name">CLASSIC'S CRAFTWORKS</span>
+          </a>
+          <p id="established" class="footer-line footer-established"></p>
+          <p id="copyright" class="footer-line footer-copyright"></p>
+        </div>
+      </div>
+
+      <nav class="footer-col" aria-label="Footer projects">
+        <h2 class="footer-heading">Projects</h2>
+        <ul id="footer-projects" class="footer-list"></ul>
+      </nav>
+
+      <div class="footer-col">
+        <h2 class="footer-heading">Links</h2>
+        <ul id="social-links" class="footer-list" aria-label="Social links"></ul>
+      </div>
+    </div>
+
+    <div class="footer-legal">
+      <p id="disclaimer" class="footer-line footer-disclaimer"></p>
+      <p id="icon-credits" class="footer-line footer-credits"></p>
+      <p id="site-version" class="footer-version"></p>
+    </div>
   </footer>
 
-  <!-- Fades in on scroll and jumps back to top; see initBackToTop() in
-       section-page.js. Positioned via CSS, so its place in the DOM doesn't matter. -->
   <button id="back-to-top" class="back-to-top" type="button" aria-label="Back to top" data-tooltip="Back to top"></button>
 
 </div>
 
+<script src="site-error.js" defer></script>
 <script src="data.js" defer></script>
 <script src="stats.js" defer></script>
 <script src="section-page.js" defer></script>

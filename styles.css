@@ -1,12 +1,5 @@
-/* ============================================================
-   SITE STYLES & THEME TOKENS
+/* Site styles. Colours and fonts are tokens in :root; channel colours are --ch-*. */
 
-   To change site-wide colors or fonts, edit the :root section below.
-   To change channel colors/shapes, edit --ch-stable, --ch-beta,
-   --ch-alpha and --ch-unsupported.
-   ============================================================ */
-
-/* Header Font */
 @font-face {
   font-family: 'Minercraftory';
   src: url('fonts/minercraftory.woff2') format('woff2');
@@ -44,23 +37,23 @@
   font-display: swap;
 }
 
-/* Named colors/values reused throughout the file. Change one here and
-   it updates everywhere it's used. */
 :root {
   color-scheme: dark;
 
   /* Base & Surface Colors */
-  --bg:            #0d111a; /* page background */
-  --surface:       #131a27; /* thumbnails, chips, panel backgrounds */
-  --surface-hover: #1c2638; /* hover state for surfaces above */
-  --text:          #f4f6fa; /* primary text */
-  --text-soft:     #8f9bb3; /* secondary text */
+  --bg:            #0d111a;
+  --surface:       #131a27;
+  --surface-hover: #1c2638;
+  --text:          #f4f6fa;
+  --text-soft:     #8f9bb3;
 
   /* Accent & Borders */
   --accent:        #74c4e7; /* primary accent, used for keyboard selections. */
-  --border:        #233044; /* hairline borders/dividers */
+  --border:        #233044;
   --border-rgb:    35, 48, 68;
   --white-rgb:     255, 255, 255; /* used for translucent white fills/borders (nav) */
+  --scrim-rgb:     8, 12, 22;     /* dark overlays on the splash banner */
+  --text-bright:   #d3dcee;       /* subtitle text on the splash banner */
 
   /* Nav Controls & Glow Accent */
   --nav-accent:           #41a0c8;
@@ -83,16 +76,16 @@
     0 0 0 1px var(--nav-border);
 
 /* Channel Indicators & Colors */
-  --ch-stable:     #22C55E;  /* stable channel */
+  --ch-stable:     #22C55E;
   --ch-stable-rgb: 34, 197, 94;
   
-  --ch-beta:       #FF9D47;  /* beta channel */
+  --ch-beta:       #FF9D47;
   --ch-beta-rgb:   255, 157, 71;
 
-  --ch-alpha:      #F2607E;  /* alpha channel */
+  --ch-alpha:      #F2607E;
   --ch-alpha-rgb:  242, 96, 126;
 
-  --ch-unsupported:      #929292;  /* unsupported channel */
+  --ch-unsupported:      #929292;
   --ch-unsupported-rgb:  146, 146, 146;
 
   --badge-color:      #efdd65;  /* "new"/"updated" channel badge */
@@ -115,17 +108,14 @@
   --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   --measure: 68ch;
+  --page-max: 1300px;
 
-/* Shared timings for hover/press animations. --transition-fast is for
-   color/background fades; --transition-snap is the quicker one for
-   button-press effects. */
+/* Shared transition timings: fast for colour fades, snap for button presses. */
   --transition-fast: 0.15s ease;
   --transition-snap: 0.1s ease;
 }
 
-/* Each channel box gets a data-channel attribute (set in section-page.js).
-   These rules point --channel-color at the right color for that
-   channel, so the rest of the CSS can just use --channel-color. */
+/* Points --channel-color at the colour for each box's data-channel. */
 .channel-group[data-channel="stable"] {
   --channel-color: var(--ch-stable);
   --channel-rgb: var(--ch-stable-rgb);
@@ -148,11 +138,9 @@
 
 * { box-sizing: border-box; }
 
-/* Reserves space for a scrollbar on desktop, so the page doesn't shift
-   when one appears. Turned off on mobile, where scrollbars float over
-   the content instead of taking up space. */
+/* Reserves scrollbar space on desktop so the page doesn't shift; off at the mobile breakpoint, where scrollbars float. */
 html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; overflow-x: clip; }
-@media (max-width: 620px) {
+@media (max-width: 900px) {
   html { scrollbar-gutter: auto; }
 }
 
@@ -169,18 +157,14 @@ body {
   font-size: 16px;
   line-height: 1.55;
   overflow-x: clip;
-  /* Every tappable element here already has its own :active press
-   effect, so the browser's default gray/blue tap flash just adds
-   visual noise on top of that. */
+  /* Every tappable element has its own :active effect, so the default tap flash is redundant. */
   -webkit-tap-highlight-color: transparent;
 }
 
 a { color: inherit; text-decoration: none; }
 
 /* ---------- Skip link ---------- */
-/* Off-screen until it receives keyboard focus (Tab from page load),
-   then slides into view at the top-left so sighted keyboard users can
-   see and activate it too - not just screen reader users. */
+/* Off-screen until keyboard-focused, then slides into view. */
 .skip-link {
   position: absolute;
   top: -60px;
@@ -199,9 +183,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* ---------- No-JS fallback ---------- */
-/* Only shown when JavaScript is disabled/blocked (see the <noscript>
-   blocks in the HTML pages). Everything else on those pages is built
-   by JS, but the body background/color above still apply. */
+/* Shown only when JavaScript is disabled (see the <noscript> blocks). */
 .noscript-notice {
   max-width: 480px;
   margin: 15vh auto 0;
@@ -231,66 +213,36 @@ p { margin: 0; }
   outline-offset: 3px;
 }
 
-/* Same focus ring as above, listed explicitly for the buttons/links
-   people tab through most, so a future style change can't accidentally
-   remove it. */
+/* Explicit focus ring for the most-tabbed controls, so a style change can't remove it. */
 .download-btn:focus-visible,
 .top-link:focus-visible,
 .text-link:focus-visible,
 .social-link:focus-visible,
 .version-link:focus-visible,
 .credits-link:focus-visible,
-.nav-jump-btn:focus-visible,
-.copy-link-btn:focus-visible {
+.brand:focus-visible,
+.nav-link:focus-visible,
+.nav-toggle:focus-visible,
+.nav-dropdown-item:focus-visible,
+.copy-link-btn:focus-visible,
+.home-card-header:focus-visible,
+.home-project:focus-visible,
+.footer-social:focus-visible,
+.versions-note-link:focus-visible,
+.about-link:focus-visible,
+.back-to-top:focus-visible,
+.search-result:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
+/* Inside scrolling panels the ring would be clipped, so it sits inside. */
+.search-result:focus-visible { outline-offset: -2px; }
 
-/* Page width & padding */
 .page {
-  max-width: 1100px;
+  max-width: var(--page-max);
   margin: 0 auto;
-  /* The env() additions are 0px on any device without a notch/inset,
-   so this is a no-op there - they only matter on phones with a
-   notch, Dynamic Island, or rounded-corner cutout, and when the
-   viewport-fit=cover meta tag lets content draw under them. */
-  padding: calc(16px + env(safe-area-inset-top)) calc(24px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
-}
-
-/* ---------- Masthead ---------- */
-/* Header layout: logo and brand text side by side, centered as a pair. */
-.masthead {
-  display: grid;
-  grid-template-columns: auto auto;
-  justify-content: center;
-  align-items: center; /* Ensures perfect vertical centering across all columns */
-  column-gap: 24px;
-}
-
-.brand-logo {
-  width: 88px;
-  height: 88px;
-  flex-shrink: 0;
-  display: block;
-  transform: translateY(-5px); /* Lifts the logo slightly upward */
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.brand-text h1 {
-  font-family: 'Minercraftory', sans-serif; /* Font only to be used for heading */
-  font-size: clamp(1.4rem, 4.4vw, 2.0rem);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.20rem;
-  line-height: 1.35;
-  text-wrap: balance;
+  /* env() insets are 0px except on notched phones (viewport-fit=cover). */
+  padding: 20px calc(24px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(24px + env(safe-area-inset-left));
 }
 
 .top-link, .text-link {
@@ -302,70 +254,195 @@ p { margin: 0; }
   color: var(--text);
   transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
-.top-link:hover, .text-link:hover { background: var(--surface-hover); color: var(--text); }
+@media (hover: hover) {
+  .top-link:hover,
+  .text-link:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+}
 
 .top-link { gap: 7px; padding: 8px 14px; }
 .text-link { gap: 6px; padding: 6px 12px; color: var(--text-soft); }
 
-/* Shared layout for every button-like element on the page (nav links,
-   jump buttons, download buttons). Each keeps its own colors/sizing
-   below. */
-.top-link, .text-link, .nav-jump-btn, .download-btn {
+/* Shared layout for button-like elements; each sets its own colours and sizing. */
+.top-link, .text-link, .download-btn {
   display: inline-flex;
   align-items: center;
 }
 
-/* ---------- Page nav ---------- */
-/* The row of page links, sticky at the top of the screen while
-   scrolling (built by renderPageNav() in section-page.js). */
-.section-nav {
+/* ---------- Site header ---------- */
+/* Sticky top bar: brand, nav (renderSiteHeader), search (search.js). */
+.site-header {
   position: sticky;
-  /* Keeps the sticky offset itself clear of a notch/Dynamic Island -
-   matters in standalone/PWA mode where there's no browser chrome
-   already pushing content down. 0px on ordinary devices. */
-  top: calc(6px + env(safe-area-inset-top));
-  margin-top: 8px;
-  z-index: 30;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 32px;
-  border-radius: 14px;
+  top: 0;
+  z-index: 40;
   background: var(--nav-bg);
-  border: 1px solid var(--nav-btn-border);
-  box-shadow: var(--nav-shadow);
+  border-bottom: 1px solid var(--nav-btn-border);
+  box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.6);
+  /* Keeps the bar clear of a notch / status bar when installed as an app.
+     All 0px on ordinary devices. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
 }
 
-.nav-jump-row {
+.site-header-inner {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-left: 16px; /* the nav's side padding is overridden to 6px near the bottom of this file, so this keeps the buttons off its rounded corner */
+  /* 24px above the mobile breakpoint, growing to 48px by ~1100px. */
+  gap: clamp(24px, calc(24px + (100vw - 901px) * 0.12), 48px);
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 10px 24px;
 }
 
-/* Styled differently from other buttons on the page so they clearly
-   read as navigation. */
-.nav-jump-btn {
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  min-width: 0;
+  border-radius: 8px;
+}
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  display: block;
+  flex-shrink: 0;
+}
+.brand-name {
+  margin: 0;
+  font-family: 'Minercraftory', sans-serif; /* Font only to be used for the site name */
+  /* 1.1rem growing to 1.3rem by ~1100px, so the size never jumps. */
+  font-size: clamp(1.1rem, calc(1.1rem + (100vw - 901px) * 0.001), 1.3rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Plain row on desktop; the folding menu on mobile. */
+.site-menu {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 16px;
+}
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Quiet until hovered so the bar doesn't compete with the page. */
+.nav-link {
   position: relative;
+  display: inline-flex;
+  align-items: center;
   gap: 7px;
-  border: 1px solid var(--nav-btn-border);
-  border-radius: 6px;
-  background: var(--nav-btn-bg);
-  color: var(--text);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-soft);
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  padding: 7px 14px;
+  padding: 8px 13px;
   cursor: pointer;
   transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
+.nav-dropdown.is-open > .nav-link {
+  background: var(--nav-btn-bg);
+  border-color: var(--nav-btn-border);
+  color: var(--text);
+}
 
-/* Numbered pill flagging a page with undismissed "New"/"Updated"
-   badges (see countUndismissedBadges() in section-page.js). */
+@media (hover: hover) {
+  .nav-link:hover {
+    background: var(--nav-btn-bg);
+    border-color: var(--nav-btn-border);
+    color: var(--text);
+  }
+}
+.nav-link:active { transform: scale(0.97); }
+
+/* Current page: stronger fill and accent text, distinct from hover. */
+.nav-link.is-current {
+  background: var(--nav-btn-hover-bg);
+  border-color: var(--nav-btn-hover-border);
+  color: var(--accent);
+}
+
+.nav-chevron {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 2px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--transition-fast), margin var(--transition-fast);
+}
+.nav-dropdown.is-open .nav-chevron {
+  margin-top: 3px;
+  transform: rotate(225deg);
+}
+
+/* ---------- Projects dropdown ---------- */
+.nav-dropdown { position: relative; }
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 17px);
+  left: 50%;
+  transform: translateX(-50%); /* centred under the Projects button */
+  min-width: 250px;
+  padding: 6px;
+  border: 1px solid var(--nav-btn-border);
+  border-radius: 14px;
+  background: var(--nav-bg);
+  box-shadow: var(--nav-shadow);
+}
+
+.nav-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+.nav-dropdown-item .icon { color: var(--text-soft); transition: color var(--transition-fast); }
+.nav-dropdown-item:focus-visible {
+  background: var(--nav-btn-hover-bg);
+}
+
+@media (hover: hover) {
+  .nav-dropdown-item:hover {
+    background: var(--nav-btn-hover-bg);
+  }
+}
+.nav-dropdown-item:focus-visible .icon { color: var(--text); }
+
+@media (hover: hover) {
+  .nav-dropdown-item:hover .icon {
+    color: var(--text);
+  }
+}
+.nav-dropdown-item.is-current {
+  background: var(--nav-btn-bg);
+  color: var(--accent);
+}
+.nav-dropdown-item.is-current .icon { color: var(--accent); }
+/* Inside the menu the focus ring would be clipped by the rounded panel;
+   the filled background already shows where focus is. */
+.nav-dropdown-item:focus-visible { outline-offset: -2px; }
+
+/* ---------- Notification pills ---------- */
+/* Count pill on links leading to undismissed "New"/"Updated" badges. */
 .nav-jump-dot {
   position: absolute;
   top: -5px;
@@ -378,7 +455,7 @@ p { margin: 0; }
   border: 2px solid var(--nav-bg);
   color: var(--bg);
   font-size: 0.68rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   display: flex;
   align-items: center;
@@ -394,44 +471,85 @@ p { margin: 0; }
   left: -20px;
 }
 
-/* Yellow variant of the shared [data-tooltip] hover tooltip */
-.nav-jump-dot[data-tooltip]::after {
-  background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
-  border-color: color-mix(in srgb, var(--badge-color), black 25%);
-  color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
+/* Inside a dropdown row the pill sits inline at the right edge instead
+   of hanging off a corner. */
+.nav-dropdown-item .nav-jump-dot {
+  position: relative;
+  top: auto;
+  right: auto;
+  margin-left: auto;
 }
-.nav-jump-dot[data-tooltip]:hover::after,
-.nav-jump-dot[data-tooltip]:focus-visible::after {
-  background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
-  border-color: color-mix(in srgb, var(--badge-color), black 25%);
-  color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
-}
-.nav-jump-btn:hover {
-  background: var(--nav-btn-hover-bg);
-  border-color: var(--nav-btn-hover-border);
-}
-.nav-jump-btn:active { transform: scale(0.97); }
 
-/* Filled-in style for the page you're currently on */
-.nav-jump-btn.is-open {
-  background: var(--nav-btn-active-bg);
-  border-color: var(--nav-btn-active-bg);
-  color: var(--nav-btn-active-text);
+/* Opens downwards: a tooltip above the header would be cut off. */
+.site-header .nav-jump-dot[data-tooltip]::after {
+  bottom: auto;
+  top: calc(100% + 6px);
+  left: auto;
+  right: -4px;
+  transform: translateY(-4px);
+  background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
+  border-color: color-mix(in srgb, var(--badge-color), black 25%);
+  color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
 }
-.nav-jump-btn.is-open:hover {
-  background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
-  border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+.site-header .nav-jump-dot[data-tooltip]:hover::after,
+.site-header .nav-jump-dot[data-tooltip]:focus-visible::after,
+.site-header .nav-jump-dot[data-tooltip].tooltip-open::after {
+  transform: translateY(0);
+  background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
+  border-color: color-mix(in srgb, var(--badge-color), black 25%);
+  color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
 }
+
+/* ---------- Mobile menu button ---------- */
+/* Mobile only. Three bars from one span plus ::before/::after; becomes an "x" when open. */
+.nav-toggle {
+  position: relative;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--nav-btn-border);
+  border-radius: 10px;
+  background: var(--nav-btn-bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+@media (hover: hover) {
+  .nav-toggle:hover {
+    background: var(--nav-btn-hover-bg);
+    border-color: var(--nav-btn-hover-border);
+  }
+}
+.nav-toggle-bars,
+.nav-toggle-bars::before,
+.nav-toggle-bars::after {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform var(--transition-fast), background-color var(--transition-fast), top var(--transition-fast);
+}
+.nav-toggle-bars { position: relative; }
+.nav-toggle-bars::before,
+.nav-toggle-bars::after { content: ''; position: absolute; left: 0; }
+.nav-toggle-bars::before { top: -6px; }
+.nav-toggle-bars::after  { top: 6px; }
+.site-header.is-menu-open .nav-toggle-bars { background: transparent; }
+.site-header.is-menu-open .nav-toggle-bars::before { top: 0; transform: rotate(45deg); }
+.site-header.is-menu-open .nav-toggle-bars::after  { top: 0; transform: rotate(-45deg); }
 
 /* ---------- Search ---------- */
-/* Search box at the right of the nav bar (built by search.js), with a
-   results dropdown that hangs below it. */
+/* Search box with a results dropdown below it. */
 .nav-search {
   position: relative;
-  flex: 1 1 0;
-  min-width: 170px;
-  max-width: 240px;
-  margin-right: 16px;
+  flex: 0 1 250px;
+  min-width: 150px;
+  margin-left: auto;
 }
 
 .nav-search-icon {
@@ -474,7 +592,6 @@ p { margin: 0; }
   box-shadow: 0 0 0 3px rgba(var(--nav-accent-rgb), 0.2);
 }
 
-/* Clears the search box. Drawn as a plain "×" out of two rotated bars. */
 .nav-search-clear {
   position: absolute;
   right: 5px;
@@ -498,10 +615,16 @@ p { margin: 0; }
 .nav-search-clear[hidden] {
   display: none;
 }
-.nav-search-clear:hover,
 .nav-search-clear:focus-visible {
   background: var(--surface-hover);
   color: var(--text);
+}
+
+@media (hover: hover) {
+  .nav-search-clear:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
 }
 .nav-search-clear::before,
 .nav-search-clear::after {
@@ -515,12 +638,10 @@ p { margin: 0; }
 .nav-search-clear::before { transform: rotate(45deg); }
 .nav-search-clear::after { transform: rotate(-45deg); }
 
-/* The dropdown. Sits inside the sticky nav, so it stays above the page
-   content. It's right-aligned with the search box and grows leftwards
-   (the nav clips horizontal overflow, so it must stay inside the nav). */
+/* Right-aligned with the search box, growing leftwards. */
 .search-panel {
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 17px);
   right: 0;
   width: 380px;
   max-height: min(60vh, 420px);
@@ -551,7 +672,7 @@ p { margin: 0; }
   height: 40px;
   object-fit: cover;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 10px;
   background: var(--bg);
 }
 
@@ -577,7 +698,6 @@ p { margin: 0; }
   white-space: nowrap;
 }
 
-/* Matched text in results. */
 .search-panel mark {
   padding: 0 1px;
   border-radius: 3px;
@@ -592,7 +712,6 @@ p { margin: 0; }
   text-align: center;
 }
 
-/* Text for screen readers only (the live result count). */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -606,8 +725,7 @@ p { margin: 0; }
 }
 
 /* ---------- Flat section heading ---------- */
-/* The heading of a section page (e.g. data-packs-mods.html), next to
-   its project-count badge. */
+/* Section page heading with its project-count badge. */
 .flat-section-heading {
   display: flex;
   align-items: center;
@@ -615,14 +733,11 @@ p { margin: 0; }
   font-size: clamp(1.7rem, 4.5vw, 2.2rem);
   font-weight: 700;
   color: var(--text);
-  margin: 20px 0 20px;
-  /* Keeps it clear of the sticky nav bar when linked/scrolled to.
-     --sticky-nav-offset is measured from the bar's real height in
-     renderPageNav(); 68px is the fallback until that runs. */
+  margin: 0 0 20px;
+  /* Keeps it clear of the sticky header; --sticky-nav-offset is measured in renderSiteHeader(), 68px until then. */
   scroll-margin-top: var(--sticky-nav-offset, 68px);
 }
 
-/* Small badge showing how many projects are in this section. */
 .section-count {
   display: inline-flex;
   align-items: center;
@@ -630,7 +745,7 @@ p { margin: 0; }
   min-width: 30px;
   height: 30px;
   padding: 0 7px;
-  border-radius: 9px;
+  border-radius: 10px;
   font-size: 0.95rem;
   font-weight: 700;
   color: var(--text);
@@ -639,12 +754,297 @@ p { margin: 0; }
   flex-shrink: 0;
 }
 
+/* ---------- Home page: splash banner ---------- */
+/* Background picture with a dark gradient for legibility; copy on the left, featured card on the right. */
+.splash {
+  position: relative;
+  isolation: isolate; /* keeps the z-index: -1 layers below inside the banner */
+  overflow: hidden;
+  margin-top: 24px;
+  margin-bottom: 28px;
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.4);
+  border-radius: 20px;
+  background: var(--surface);
+}
+.splash[hidden] { display: none; }
+
+.splash-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* Darkens the left (text) side more than the right. */
+.splash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(var(--scrim-rgb), 0.82) 0%, rgba(var(--scrim-rgb), 0.5) 55%, rgba(var(--scrim-rgb), 0.25) 100%),
+    linear-gradient(180deg, rgba(var(--scrim-rgb), 0) 60%, rgba(var(--scrim-rgb), 0.55) 100%);
+}
+
+.splash-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(28px, 4vw, 56px);
+  padding: clamp(28px, 4vw, 52px);
+}
+.splash-no-card .splash-inner { grid-template-columns: minmax(0, 1fr); }
+
+/* A container, so the headline sizes to its width (cqw) and each line fits at up to 3rem. */
+.splash-copy { container: splash-copy / inline-size; }
+
+.splash-headline {
+  margin: 0 0 16px;
+  font-family: 'Minercraftory', var(--font);
+  font-size: clamp(1.2rem, 6.9cqw, 3rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+}
+.splash-line { display: block; white-space: nowrap; }
+.splash-line-accent { color: var(--accent); }
+
+.splash-subtitle {
+  max-width: 34em;
+  margin: 0 0 28px;
+  color: var(--text-bright);
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+
+.splash-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.splash-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+.splash-btn:active { transform: scale(0.97); }
+.splash-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.splash-btn-primary {
+  background: var(--nav-btn-active-bg);
+  border-color: var(--nav-btn-active-bg);
+  color: var(--nav-btn-active-text);
+}
+@media (hover: hover) {
+  .splash-btn-primary:hover {
+    background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+    border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+  }
+}
+.splash-btn-ghost {
+  background: rgba(var(--scrim-rgb), 0.5);
+  border-color: var(--nav-btn-hover-border);
+  color: var(--text);
+}
+@media (hover: hover) {
+  .splash-btn-ghost:hover {
+    background: var(--nav-btn-hover-bg);
+    border-color: var(--nav-btn-hover-border);
+  }
+}
+.splash-btn-arrow {
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: 2px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--transition-fast);
+}
+@media (hover: hover) {
+  .splash-btn:hover .splash-btn-arrow {
+    transform: translateX(3px) rotate(45deg);
+  }
+}
+
+/* A container, so the footer row adapts to the card's width (see @container below). */
+.splash-featured {
+  container: splash-featured / inline-size;
+  padding: 18px;
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.55);
+  border-radius: 16px;
+  background: rgba(var(--scrim-rgb), 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.splash-featured-label {
+  margin: 4px 0 16px;
+  color: var(--accent);
+  font-family: 'Minercraftory', var(--font);
+  font-size: 1.2rem;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+/* 5:2 frame; replacement images should match. */
+.splash-featured-media {
+  overflow: hidden;
+  aspect-ratio: 5 / 2;
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.3);
+  border-radius: 10px;
+  background: var(--bg);
+}
+.splash-featured-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+/* Pills always sit below the title so the card keeps one shape at every width. */
+.splash-featured-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 16px 0 8px;
+}
+.splash-featured-title {
+  margin: 0;
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.splash-featured-desc {
+  margin: 0 0 14px;
+  color: var(--text-soft);
+  font-size: 0.95rem;
+}
+.splash-chips {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  gap: 8px;
+}
+.splash-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border: 1px solid var(--nav-btn-border);
+  border-radius: 8px;
+  background: var(--nav-btn-bg);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.splash-chip .icon { color: var(--accent); }
+.splash-featured-foot {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+}
+.splash-featured-foot .splash-btn { padding: 10px 18px; font-size: 0.88rem; }
+
+.splash-meta {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.splash-meta-version { color: var(--text); }
+.splash-meta > * + *::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 0.95em;
+  margin: 0 12px;
+  vertical-align: -0.1em;
+  background: rgba(var(--white-rgb), 0.25);
+}
+
+@media (max-width: 900px) {
+  .splash { margin-top: 12px; margin-bottom: 28px; border-radius: 16px; }
+  .splash-inner {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 26px 14px;
+  }
+  .splash::before {
+    background: linear-gradient(180deg, rgba(var(--scrim-rgb), 0.7) 0%, rgba(var(--scrim-rgb), 0.55) 100%);
+  }
+  /* Fixed-width, centred buttons rather than stretching across the banner. */
+  .splash-actions { justify-content: center; }
+  .splash-actions .splash-btn { flex: 0 1 200px; }
+
+  /* Mobile featured card: centred, width-capped, tighter. */
+  .splash-featured {
+    width: 100%;
+    max-width: 520px;
+    margin-inline: auto;
+    padding: 12px;
+    border-radius: 14px;
+  }
+  .splash-featured-label { margin: 4px 0 12px; font-size: 1rem; }
+  .splash-featured-media {
+    aspect-ratio: auto;
+    height: clamp(84px, 20vw, 130px);
+    border-radius: 8px;
+  }
+  .splash-featured-head { margin: 10px 0 6px; gap: 6px; }
+  .splash-featured-title { font-size: 1.15rem; }
+  .splash-chip { padding: 3px 8px; font-size: 0.74rem; }
+  .splash-featured-desc { margin-bottom: 10px; font-size: 0.85rem; }
+  .splash-meta { font-size: 0.84rem; }
+  .splash-featured-foot { gap: 8px 12px; }
+  .splash-featured-foot .splash-btn { padding: 8px 14px; font-size: 0.82rem; }
+}
+
+/* Footer row: tightens first, and stacks with a full-width button only in the narrowest cards. */
+@container splash-featured (max-width: 311px) {
+  .splash-featured-foot { gap: 12px; }
+  .splash-meta { font-size: 0.84rem; }
+  .splash-featured-foot .splash-btn { padding: 8px 14px; font-size: 0.82rem; }
+}
+@container splash-featured (max-width: 289px) {
+  .splash-featured-foot { flex-direction: column; align-items: stretch; }
+  .splash-meta { justify-content: center; }
+  .splash-featured-foot .splash-btn { width: 100%; }
+}
+
+@media (max-width: 900px) {
+  .splash-headline,
+  .splash-subtitle { text-align: center; }
+  .splash-subtitle { margin-left: auto; margin-right: auto; }
+}
+
 /* ---------- Home page: projects heading ---------- */
 .projects-intro {
-  margin-top: 16px;
+  margin-top: 0;
+  scroll-margin-top: var(--sticky-nav-offset, 68px);
 }
 .projects-heading {
-  font-weight: 900;
+  font-weight: 700;
   font-size: clamp(1.6rem, 3.9vw, 1.9rem);
   color: var(--text);
   margin-bottom: -4px;
@@ -658,128 +1058,162 @@ p { margin: 0; }
   display: none;
 }
 
-/* ---------- Home page: section buttons ---------- */
-/* index.js builds one of these per section - a big link showing its
-   first four project icons. Sized in cqi (via container-type below)
-   so a card scales uniformly at any width. */
+/* ---------- Home page: section cards ---------- */
+/* Header links to the section page; each row links to its project. */
 .home-grid {
+  --home-gap: 24px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  gap: var(--home-gap);
   margin-top: 16px;
 }
 
 .home-card {
-  display: block;
+  /* Lets the title size from the card's width (cqw). */
   container-type: inline-size;
+  display: flex;
+  flex-direction: column;
   border-radius: 18px;
   border: 1px solid rgba(var(--nav-accent-rgb), 0.3);
   background: var(--surface);
   color: var(--text);
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  overflow: hidden;
 }
-.home-card:hover {
-  background: var(--surface-hover);
-  border-color: rgba(var(--nav-accent-rgb), 0.7);
-}
-.home-card:active { transform: scale(0.99); }
 
-/* Padding lives here rather than on .home-card, because cqi units
-   resolve against an *ancestor* container - .home-card can't size its
-   own padding by its own width. */
-.home-card-inner {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 5cqi 7cqi 7cqi;
-}
 .home-card-header {
   display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px 18px;
+  color: var(--text);
+  border-bottom: 1px solid rgba(var(--nav-accent-rgb), 0.18);
+  transition: background-color var(--transition-fast);
+}
+.home-card-badge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  margin-top: 3cqi;
-  margin-bottom: 8cqi;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: rgba(var(--nav-accent-rgb), 0.14);
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.35);
+  color: var(--nav-accent);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+.home-card-icon {
+  width: 24px;
+  height: 24px;
+  color: inherit;
+}
+.home-card-headtext {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 .home-card-title {
   display: block;
-  width: 100%;
-  text-align: center;
   font-family: 'Minercraftory', var(--font);
-  font-size: min(6.4cqi, 2.7rem);
-  line-height: 1.25;
+  /* Shrinks with the card (longest title is ~12.7x its font size; 135px is badge, arrow, gaps and padding), wrapping to two lines below 1rem. */
+  font-size: clamp(1rem, calc((100cqw - 135px) / 12.9), 1.2rem);
+  line-height: 1.15;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.home-card-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+/* Chevrons are drawn from two borders, so no asset is needed. */
+.home-card-arrow,
+.home-project-arrow {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: translateX(-2px) rotate(45deg);
+  transition: transform var(--transition-fast), color var(--transition-fast);
+}
+.home-card-arrow { color: var(--nav-accent); width: 0.65rem; height: 0.65rem; }
+
+.home-projects {
+  list-style: none;
+  margin: 0;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.home-project {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 12px 8px 8px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  color: var(--text);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+.home-project-img {
+  flex-shrink: 0;
+  display: block;
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1.5px solid rgba(var(--nav-accent-rgb), 0.35);
+  background: var(--bg);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.home-project-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.home-project-title {
+  font-weight: 700;
+  font-size: 0.98rem;
+  line-height: 1.25;
+  /* Long names wrap (up to two lines) rather than being cut off. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+.home-project-meta {
+  font-size: 0.78rem;
+  color: var(--text-soft);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-/* Drawn as a rotated corner (same "shape out of borders" trick as the
-   "+" on the overflow tile below) rather than an image, so it's just
-   two lines and needs no extra icon asset. */
-.home-card-arrow {
-  flex-shrink: 0;
-  width: min(3.2cqi, 1rem);
-  height: min(3.2cqi, 1rem);
-  border-top: 0.16em solid var(--nav-accent);
-  border-right: 0.16em solid var(--nav-accent);
-  transform: translateX(-4px) rotate(45deg);
-  transition: transform var(--transition-fast);
-}
-.home-card:hover .home-card-arrow {
-  transform: translateX(-4px) rotate(45deg) translate(28%, -28%);
-}
+.home-project-arrow { color: var(--text-soft); }
 
-/* The four icons, 1–4 left to right, top to bottom. 1fr columns fill
-   the card's full content width, so the grid's left/right edges line up
-   exactly with the header icon and footer text/arrow above and below it. */
-.home-slots {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6cqi;
-}
-.home-slot {
-  display: block;
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border: 1.5px solid rgba(var(--nav-accent-rgb), 0.35);
-  border-radius: 10%; /* square-ish corners rather than the old rounder tile */
-  background: var(--bg);
-  box-shadow: 0 0 0 1px rgba(var(--nav-accent-rgb), 0.06) inset;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
-  user-select: none;
-  -webkit-user-drag: none;
-}
-/* Unused slot (a section with fewer than four projects): faint
-   dashed outline so the card keeps its shape without looking broken,
-   plus a faint "?" so it doesn't read as a loading/broken state. */
-.home-slot-empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px dashed rgba(var(--border-rgb), 0.6);
-  background: transparent;
-  box-shadow: none;
-}
-.home-slot-empty::after {
-  content: '?';
-  font-family: 'Minercraftory', var(--font);
-  font-size: 14cqi;
-  line-height: 1;
-  color: rgba(var(--border-rgb), 0.6);
-}
-/* Last slot of a section with more projects than fit: a "+X" tile
-   counting the ones not shown. */
-.home-slot-more {
+.home-project-more-tile {
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--surface-hover);
   color: var(--text);
   font-family: 'Minercraftory', var(--font);
-  font-size: 10cqi;
+  font-size: 1.15rem;
   line-height: 1;
   white-space: nowrap;
 }
+.home-project-more .home-project-title { color: var(--text-soft); font-weight: 600; }
 /* The "+": two crossed bars, since the pixel font has no plus glyph. */
 .home-slot-more-plus {
   flex-shrink: 0;
@@ -791,78 +1225,56 @@ p { margin: 0; }
     linear-gradient(currentColor, currentColor) center / 0.18em 100% no-repeat;
 }
 
-/* "Browse N projects" (with the section's icon) + the arrow, pinned
-   to the bottom of the card */
-.home-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4cqi;
-  margin-top: auto;
-  padding-top: 6cqi;
-  color: var(--nav-accent);
-  font-size: min(4.7cqi, 1.15rem);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
+@media (hover: hover) {
+  .home-card-header:hover { background: rgba(var(--nav-accent-rgb), 0.08); }
+  .home-card-header:hover .home-card-badge {
+    background: var(--nav-accent);
+    color: var(--bg);
+  }
+  .home-card-header:hover .home-card-arrow { transform: translateX(2px) rotate(45deg); }
+
+  .home-project:hover {
+    background: var(--surface-hover);
+    border-color: rgba(var(--nav-accent-rgb), 0.35);
+  }
+  .home-project:hover .home-project-arrow {
+    color: var(--nav-accent);
+    transform: translateX(2px) rotate(45deg);
+  }
+
 }
-.home-card-footer-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.home-project:active { transform: scale(0.99); }
+
+/* Cards need ~380px each, so the grid steps 3 -> 2 -> 1 columns by available width rather than at 900px. In two columns the odd card sits centred on its own row. */
+@media (max-width: 1239px) {
+  .home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-grid > .home-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc((100% - var(--home-gap)) / 2);
+  }
 }
-.home-card-icon {
-  width: 1.3em;
-  height: 1.3em;
-  color: var(--nav-accent);
+@media (max-width: 820px) {
+  .home-grid {
+    --home-gap: 16px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .home-grid > .home-card:last-child:nth-child(odd) { grid-column: auto; justify-self: stretch; width: auto; }
 }
 
-/* One button per row on phones/small tablets, icons in a single row.
-   Shares the site-wide 890px "collapse to mobile" breakpoint. */
-@media (max-width: 890px) {
-  .home-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
-  }
-  .home-slots {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 3cqi;
-  }
-  .home-slot-more {
-    font-size: 5cqi;
-  }
-  .home-card-inner {
-    padding: 4px 18px 22px;
-  }
-  .home-card-header {
-    margin-bottom: 18px;
-  }
-  .home-card-title,
-  .home-card-title--tight {
-    font-size: min(5.2cqi, 2.05rem);
-    letter-spacing: 0.02em;
-  }
-  .home-card-footer {
-    font-size: 0.9rem;
-    padding-top: 18px;
-  }
+@media (max-width: 900px) {
+  .home-card-header { padding: 16px 16px 14px; }
+  .home-projects { padding: 8px; }
+  .home-project { padding: 10px 12px 10px 8px; }
 }
 
 /* ---------- Home page: stats section ---------- */
-/* Three boxes built by renderStats() in index.js from STATS_DATA
-   (stats.js), plus a "last updated" line and a small note
-   underneath. Edit stats.js to change the numbers/text;
-   edit here to change how they look. */
 .stats-section {
   margin-top: 30px;
 }
 
 .stats-heading {
-  font-weight: 900;
+  font-weight: 700;
   font-size: clamp(1.6rem, 3.9vw, 1.9rem);
   color: var(--text);
   margin-bottom: 16px;
@@ -918,7 +1330,6 @@ p { margin: 0; }
 
 .stats-note {
   margin-top: 16px;
-  margin-bottom: -20px;
   font-size: 0.72rem;
   color: var(--text-soft);
   text-align: left;
@@ -926,17 +1337,20 @@ p { margin: 0; }
   font-style: italic;
 }
 
-/* Empty text nodes (no lastUpdated/note in stats.js) collapse to
-   nothing instead of leaving blank vertical gaps. */
+/* Collapses when empty. */
 .stats-updated:empty,
 .stats-note:empty {
   display: none;
 }
 
-@media (max-width: 890px) {
+@media (max-width: 900px) {
+  /* Single column, but capped and centred so the boxes don't stretch
+     into wide, mostly-empty bars. */
   .stats-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
+    max-width: 420px;
+    margin-inline: auto;
   }
 }
 
@@ -968,16 +1382,19 @@ p { margin: 0; }
   background: var(--surface);
 }
 
-.project-body { min-width: 0; }
+.project-body {
+  min-width: 0;
+  /* Lets the download boxes respond to available width (see @container below). */
+  container: project / inline-size;
+}
 
-/* Holds the project title next to its copy-link button. */
 .project-title-row {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
-.project-body h3 {
+.project-body h2 {
   font-size: 1.55rem;
   color: var(--text);
   margin-top: 0;
@@ -999,7 +1416,6 @@ p { margin: 0; }
   margin-top: 14px;
 }
 
-/* muted styling, less prominent than the main buttons */
 .project-links a {
   background-color: transparent;
   border: 1px solid rgba(var(--border-rgb), var(--alpha-medium));
@@ -1009,15 +1425,15 @@ p { margin: 0; }
   transition: opacity var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-snap);
 }
 
-/* lights up on hover */
-.project-links a:hover {
-  opacity: 1;
-  color: var(--text);
-  border-color: var(--border);
-  background: var(--surface-hover);
+@media (hover: hover) {
+  .project-links a:hover {
+    opacity: 1;
+    color: var(--text);
+    border-color: var(--border);
+    background: var(--surface-hover);
+  }
 }
 
-/* Small "Older versions" line shown under a project's channel boxes */
 .versions-note {
   margin-top: 12px;
   font-size: 0.7rem;
@@ -1031,8 +1447,10 @@ p { margin: 0; }
   transition: color var(--transition-fast);
 }
 
-.versions-note-link:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .versions-note-link:hover {
+    color: var(--text);
+  }
 }
 
 /* ---------- Channels (stable / beta / alpha) ---------- */
@@ -1044,22 +1462,13 @@ p { margin: 0; }
   width: 100%;
 }
 
-/* Added by layoutChannelRow() in section-page.js when a channel box's own
-   header ("Release | Java X.Y") doesn't fit next to its sibling -
-   stacks the boxes full-width instead of letting the header text
-   wrap mid-line. */
-.channel-row.stacked {
-  flex-direction: column;
-}
-/* flex-basis below is a fraction of the row's *main axis*, which
-   switches from width to height once the row above stacks into a
-   column - override it back to a natural height so a box doesn't try
-   to become "50% tall" instead of "100% wide". */
-.channel-row.stacked > .channel-group {
-  flex: 1 1 auto;
+/* Release/Beta boxes sit side by side, or stack when the project column is under 1000px (pure CSS). */
+@container project (max-width: 1000px) {
+  .channel-row { flex-direction: column; }
+  /* Resets flex-basis, which becomes height once the row stacks. */
+  .channel-row > .channel-group { flex: 1 1 auto; }
 }
 
-/* Card Outer Shell */
 .channel-group {
   /* Sized for two boxes side by side, but won't stretch to fill the
    row if there's only one. */
@@ -1071,7 +1480,8 @@ p { margin: 0; }
   padding: 14px 14px 16px;
   display: flex;
   flex-direction: column;
-  position: relative; /* anchors the "new"/"updated" badge, which hangs off the top-left corner */
+  position: relative;
+  container: channel / inline-size; /* lets the download columns react to this box's width */
 }
 
 /* ---------- Header ---------- */
@@ -1084,9 +1494,7 @@ p { margin: 0; }
   padding-bottom: 12px;
   margin-bottom: 14px;
   border-bottom: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
-  /* Wraps only if label + version don't fit - not tied to box width,
-     since labels vary in length. The "|" + version move down together
-     as one unit (see .channel-mc-group). */
+  /* Wraps only if label + version don't fit; the "|" and version wrap together. */
   flex-wrap: wrap;
   row-gap: 4px;
 }
@@ -1106,15 +1514,12 @@ p { margin: 0; }
 
 .channel-label { 
   color: var(--channel-color); 
-  font-weight: 700; 
+  font-weight: 700;
   font-size: 0.98rem;
 }
 
 /* ---------- "New" / "Updated" Channel Badge ---------- */
-/* Set per-channel via `badge: "new"`/`"updated"` in data.js. Hangs off
-   the box's top-left corner like an outlined tag. Dismissal is
-   remembered per-version (renderChannelBadge() in section-page.js),
-   so it reappears when that channel's version is next bumped. */
+/* Set via `badge` in data.js; hangs off the top-left corner. Dismissal is stored per version. */
 .channel-badge {
   position: absolute;
   top: -10px;
@@ -1149,8 +1554,7 @@ p { margin: 0; }
   inset: -8px;
 }
 
-/* A CSS-drawn "×" (two crossed bars) instead of a text glyph - this
-   keeps it pixel-centered regardless of font/line-height quirks. */
+/* Drawn with CSS bars so it stays pixel-centred. */
 .channel-badge-dismiss {
   position: relative;
   display: inline-block;
@@ -1179,20 +1583,22 @@ p { margin: 0; }
 .channel-badge-dismiss::before { transform: translate(-50%, -50%) rotate(45deg); }
 .channel-badge-dismiss::after  { transform: translate(-50%, -50%) rotate(-45deg); }
 
-.channel-badge-dismiss:hover,
 .channel-badge-dismiss:focus-visible {
   background: rgba(var(--badge-color-rgb), var(--alpha-border));
 }
 
-.channel-sep { 
-  color: rgba(var(--channel-rgb), var(--alpha-border));
-  font-weight: 300;
+@media (hover: hover) {
+  .channel-badge-dismiss:hover {
+    background: rgba(var(--badge-color-rgb), var(--alpha-border));
+  }
 }
 
-/* Keeps the "|" and version glued together as a single flex item, so
-   they wrap to a second line as one unit if they don't fit - instead
-   of the version wrapping alone and leaving the separator dangling at
-   the end of the first line. */
+.channel-sep { 
+  color: rgba(var(--channel-rgb), var(--alpha-border));
+  font-weight: 400;
+}
+
+/* Keeps "|" and the version together so they wrap as one unit. */
 .channel-mc-group {
   display: inline-flex;
   align-items: center;
@@ -1200,8 +1606,7 @@ p { margin: 0; }
   min-width: 0;
 }
 
-/* Added by layoutChannelRow() as a last resort when a header still
-   doesn't fit at full row width. Indents the wrapped second line. */
+/* Added by layoutChannelRow() when a header still doesn't fit; indents the wrapped line. */
 .channel-header.header-force-wrap .channel-mc-group {
   flex-basis: 100%;
   padding-left: 18px;
@@ -1213,27 +1618,12 @@ p { margin: 0; }
 }
 
 /* ---------- Download Columns ---------- */
+/* Columns stack by default and sit side by side when the box (a container) is wide enough. */
 .channel-downloads {
   display: flex;
-  gap: 14px;
-  margin-top: auto;
-}
-
-/* Added by layoutChannelRow() in section-page.js when this box's own
-   download columns (Data Pack/Mod/etc.) don't have room to sit side
-   by side without a version pill wrapping onto its own line - stacks
-   them full-width instead, independently of its sibling channel box. */
-.channel-downloads.downloads-stacked {
   flex-direction: column;
   gap: 14px;
-}
-/* Moves the divider from the side to the top, now that the columns
-   are stacked. */
-.channel-downloads.downloads-stacked .download-col + .download-col {
-  padding-left: 0;
-  padding-top: 14px;
-  border-left: none;
-  border-top: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
+  margin-top: auto;
 }
 
 .download-col {
@@ -1244,13 +1634,23 @@ p { margin: 0; }
   min-width: 0;
 }
 
-/* Divider between download columns if there are multiple */
+/* Divider between columns: above when stacked, beside when side by side. */
 .download-col + .download-col {
-  padding-left: 14px;
-  border-left: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
+  padding-top: 14px;
+  border-top: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
 }
 
-/* Ensure column headers wrap cleanly and align vertically */
+/* 450px: inner width for two columns with the longest pill. */
+@container channel (min-width: 450px) {
+  .channel-downloads { flex-direction: row; }
+  .download-col + .download-col {
+    padding-top: 0;
+    padding-left: 14px;
+    border-top: none;
+    border-left: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
+  }
+}
+
 .download-col-header {
   display: flex;
   align-items: center;
@@ -1259,10 +1659,7 @@ p { margin: 0; }
   font-weight: 600;
   color: var(--text);
   min-height: 24px; /* Fixes height shift when icon or pill is missing */
-  /* Last-resort fallback: lets a single column's own pill drop to its
-     own line if it's genuinely too long to fit even in this state -
-     rare, since .downloads-stacked above already gives each column
-     the full box width before this would ever be needed. */
+  /* Last resort: lets a long pill wrap to its own line. */
   flex-wrap: wrap;
   row-gap: 4px;
 }
@@ -1280,7 +1677,7 @@ p { margin: 0; }
   padding: 3px 8px;
   border-radius: 999px;
   font-size: 0.72rem;
-  font-weight: 450;
+  font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--channel-color);
   background: rgba(var(--channel-rgb), var(--alpha-soft));
@@ -1303,7 +1700,7 @@ p { margin: 0; }
 .download-btn {
   justify-content: center;
   gap: 6px;
-  padding: 8px 10px; /* Tighter padding for side-by-side layout */
+  padding: 8px 10px;
   border-radius: 8px;
   font-size: 0.82rem;
   font-weight: 600;
@@ -1311,32 +1708,33 @@ p { margin: 0; }
   background: var(--channel-color);
   color: var(--bg);
   border: 1px solid var(--channel-color);
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-snap), filter var(--transition-fast);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-snap);
 }
 
-/* Extra brightness only for Stable buttons on hover */
-.channel-group[data-channel="stable"] .download-btn:hover {
-  filter: brightness(1.18);
+@media (hover: hover) {
+  .channel-group[data-channel="stable"] .download-btn:hover {
+    background: color-mix(in srgb, var(--channel-color), white 15%);
+    border-color: color-mix(in srgb, var(--channel-color), white 15%);
+  }
 }
 
-/* Hover states for non-Stable channel buttons */
 .channel-group:not([data-channel="stable"]) .download-btn {
   background: transparent;
   color: var(--channel-color);
   border: 1px solid var(--channel-color);
 }
 
-/* Increase brightness of Beta/Alpha buttons on hover */
-.channel-group:not([data-channel="stable"]) .download-btn:hover {
-  background: rgba(var(--channel-rgb), var(--alpha-hover));
+@media (hover: hover) {
+  .channel-group:not([data-channel="stable"]) .download-btn:hover {
+    background: rgba(var(--channel-rgb), var(--alpha-hover));
+  }
 }
 
-/* Shrink slightly when clicked */
 .download-btn:active,
 .project-links a:active,
 .top-link:active,
 .social-link:active {
-  transform: scale(0.95);
+  transform: scale(0.97);
 }
 
 /* ---------- Unavailable States ---------- */
@@ -1345,10 +1743,11 @@ p { margin: 0; }
 }
 
 .download-unavailable {
-  position: relative; /* anchors its optional tooltip below (see .has-tooltip) */
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   padding: 8px 10px;
   border-radius: 8px;
   background: rgba(var(--channel-rgb), var(--alpha-whisper));
@@ -1370,10 +1769,7 @@ p { margin: 0; }
   border-radius: 8px;
 }
 
-/* These explanations run much longer than the site's other hover
-   tooltips, so wraps onto multiple lines and is capped to a comfortable 
-   reading width instead of the default single-line, nowrap tooltip.
-   Styled to match a hovered (non-stable) download button */
+/* Longer than other tooltips, so it wraps at a readable width; styled like a hovered non-stable download button. */
 .download-unavailable[data-tooltip]::after {
   white-space: normal;
   width: max-content;
@@ -1395,8 +1791,7 @@ p { margin: 0; }
 }
 
 /* ---------- Icons ---------- */
-/* Icons are SVGs used as color "stencils", so they automatically
-   match whatever text color is active (hover, theme, etc). */
+/* SVG masks coloured by currentColor. */
 .icon {
   display: inline-block;
   background-color: currentColor;
@@ -1411,19 +1806,16 @@ p { margin: 0; }
 .icon-sm { width: 15px; height: 15px; }
 .icon-md { width: 19px; height: 19px; }
 
-/* Slightly smaller icon size, just for social buttons. */
 .social-link .icon-md { width: 17px; height: 17px; }
 
-/* Slightly bigger than the shared 15px icon-sm, just for the Download
-   button's own icon, since it's the largest/most prominent button on
-   a project card. */
+/* Larger than icon-sm: the Download button is the most prominent. */
 .download-btn .icon-sm { width: 18px; height: 18px; }
 
 /* ---------- Deep-linking ("copy link" buttons) ---------- */
 /* Small button for copying a direct link. Always visible (not just
    on hover), so it works for keyboard and touch too. */
 .copy-link-btn {
-  position: relative; /* anchors the tooltip below */
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1432,21 +1824,24 @@ p { margin: 0; }
   height: 26px;
   padding: 0;
   border: none;
-  border-radius: 7px;
+  border-radius: 8px;
   background: transparent;
   color: var(--text-soft);
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
-.copy-link-btn:hover,
 .copy-link-btn:focus-visible {
   background: var(--surface-hover);
   color: var(--text);
 }
-/* Invisible hit-slop bringing the actual tap target up to ~44x44
-   (26px visible box + 9px on each side), without changing how big
-   the button looks. Safe to add: the tooltip already uses ::after,
-   so ::before is free here. */
+
+@media (hover: hover) {
+  .copy-link-btn:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+}
+/* Invisible hit-slop making the tap target ~44x44 (26px + 9px each side). */
 .copy-link-btn::before {
   content: '';
   position: absolute;
@@ -1454,16 +1849,11 @@ p { margin: 0; }
 }
 .copy-link-btn .icon-sm { width: 14px; height: 14px; }
 
-/* Briefly changes color while the "Copied!" tooltip is showing, as
-   extra confirmation. */
 .copy-link-btn.is-copied {
   color: var(--accent);
 }
 
-/* Briefly highlights a project after jumping to it via a direct link.
-   A separate ::before with a negative inset gives the ring a small
-   gap around the project (-6px matches #catalog's own buffer below,
-   so it isn't clipped). Skipped under reduced motion. */
+/* Brief highlight after a direct link. The ring is a ::before with -6px inset so #catalog's buffer doesn't clip it; off under reduced motion. */
 .is-linked-target {
   position: relative;
 }
@@ -1486,49 +1876,135 @@ p { margin: 0; }
 
 /* ---------- Footer ---------- */
 .site-footer {
-  margin-top: 52px;
-  padding-top: 24px;
+  margin-top: 36px;
+  padding-top: 18px;
   border-top: 1px solid var(--border);
-  text-align: center;
+  text-align: left;
 }
 
-.social-row {
+/* Four columns with thin dividers on desktop. */
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr;
+  gap: 0;
+  align-items: start;
+}
+.footer-col {
+  padding: 2px 28px;
+  border-left: 1px solid var(--border);
+  min-width: 0;
+}
+.footer-col:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+/* Logo on the left; name, est. and copyright stacked to its right. */
+.footer-brand-col {
   display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.social-link {
-  position: relative; /* anchors the tooltip's absolute positioning below */
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--surface);
-  color: var(--text-soft);
-  transition: background-color var(--transition-fast), color var(--transition-fast);
+  align-self: center;
+  gap: 16px;
 }
-/* Invisible hit-slop bringing the actual tap target up to ~44x44
-   (34px visible box + 5px on each side), same trick as
-   .copy-link-btn::before above - the tooltip already uses ::after,
-   so ::before is free here too. */
-.social-link::before {
-  content: '';
-  position: absolute;
-  inset: -5px;
+.footer-logo-link {
+  flex: none;
+  border-radius: 12px;
 }
+.footer-brand-text { min-width: 0; }
+.footer-logo {
+  display: block;
+  width: clamp(68px, 8vw, 98px);
+  height: clamp(68px, 8vw, 98px);
+  transform: translateY(-6px);
+}
+.footer-brand {
+  width: fit-content;
+  border-radius: 8px;
+}
+.footer-brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.footer-brand-name {
+  font-family: 'Minercraftory', sans-serif;
+  font-size: clamp(1.1rem, calc(2.5vw - 4px), 1.5rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.footer-brand-col .footer-established,
+.footer-brand-col .footer-copyright { font-size: 0.95rem; text-wrap: balance; }
+.footer-brand-col .footer-established { margin: 6px 0 0; }
+.footer-brand-col .footer-copyright { margin: 2px 0 0; }
 
-.social-link:hover,
-.social-link:focus-visible {
-  background: var(--surface-hover);
+.footer-heading {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: var(--text);
 }
+.footer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+#social-links {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  column-gap: 22px;
+  row-gap: 3px;
+}
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--nav-accent);
+  border-radius: 6px;
+  transition: color var(--transition-fast);
+}
+.footer-link:focus-visible { color: var(--text); }
 
-/* Tooltips on hover */
+@media (hover: hover) {
+  .footer-link:hover {
+    color: var(--text);
+  }
+}
+.footer-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.footer-social .icon { color: var(--text-soft); transition: color var(--transition-fast); }
+.footer-social:focus-visible .icon { color: var(--text); }
+
+@media (hover: hover) {
+  .footer-social:hover .icon {
+    color: var(--text);
+  }
+}
+
+.footer-legal {
+  margin-top: 18px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    row-gap: 20px;
+  }
+  .footer-col,
+  .footer-col:nth-child(even) { padding: 0; border-left: 0; }
+
+  .footer-brand-col { justify-content: center; text-align: left; }
+  .footer-logo { width: 72px; height: 72px; }
+  .footer-brand-name { font-size: clamp(0.85rem, 4.3vw, 1.6rem); }
+
+  .footer-list { align-items: center; }
+  #social-links { grid-template-columns: max-content; justify-content: center; }
+}
+
 [data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
@@ -1536,7 +2012,6 @@ p { margin: 0; }
   left: 50%;
   transform: translateX(-50%) translateY(-4px);
   
-  /* Tooltip size */
   padding: 5px 10px;
   font-size: 0.80rem;
   border-radius: 6px;
@@ -1553,9 +2028,7 @@ p { margin: 0; }
   transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
 
-/* Show Tooltip on Hover & Keyboard Focus, or when explicitly toggled
-   open by section-page.js (see .has-tooltip's click handler) - touch devices
-   have no :hover, so that's the only way a tap reveals it there. */
+/* Shown on hover, keyboard focus, or when toggled open by a tap (touch has no :hover). */
 [data-tooltip]:hover::after,
 [data-tooltip]:focus-visible::after,
 [data-tooltip].tooltip-open::after {
@@ -1566,8 +2039,7 @@ p { margin: 0; }
   transform: translateX(-50%) translateY(-10px);
 }
 
-/* The back-to-top button sits at the screen edge, so its tooltip is
-   right-aligned instead of centered, to avoid poking off-screen. */
+/* Right-aligned: the button sits at the screen edge. */
 #back-to-top[data-tooltip]::after {
   left: auto;
   right: 0;
@@ -1592,15 +2064,15 @@ p { margin: 0; }
 .footer-disclaimer {
   max-width: 128ch;
   margin-inline: auto;
-  margin-top: 14px;
+  margin-top: 8px;
+  text-align: center;
   font-size: 0.72rem;
   color: var(--text-soft);
 }
 
-/* Callout shown above the project list on section pages, warning about
-   unofficial reuploads right before people start clicking downloads. */
+/* Warning about unofficial reuploads, shown above the project list. */
 .download-notice {
-  max-width: 120ch;
+  max-width: 123ch;
   margin: -8px auto 20px;
   padding: 10px 16px;
   border: 1px solid var(--border);
@@ -1609,12 +2081,26 @@ p { margin: 0; }
   color: var(--text-soft);
   font-size: 0.82rem;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.download-notice .icon { flex: none; }
+
+/* On phones the icon sits above the wrapped text. */
+@media (max-width: 900px) {
+  .download-notice {
+    flex-direction: column;
+    gap: 6px;
+  }
 }
 
 .footer-version {
+  text-align: center;
   font-size: 0.75rem;
   color: var(--text-soft);
-  margin-top: 20px;
+  margin: 6px 0 0;
 }
 
 .footer-version .version-link {
@@ -1622,13 +2108,15 @@ p { margin: 0; }
   transition: opacity var(--transition-fast);
 }
 
-.footer-version .version-link:hover {
-  opacity: 1;
-  color: var(--text);
+@media (hover: hover) {
+  .footer-version .version-link:hover {
+    opacity: 1;
+    color: var(--text);
+  }
 }
 
-/* Footer Credits */
 .footer-credits {
+  text-align: center;
   font-size: 0.75rem;
   color: var(--text-soft);
   margin-top: 4px;
@@ -1641,113 +2129,122 @@ p { margin: 0; }
   transition: opacity var(--transition-fast), color var(--transition-fast);
 }
 
-.footer-credits .credits-link:hover {
-  opacity: 1;
-  color: var(--text);
+@media (hover: hover) {
+  .footer-credits .credits-link:hover {
+    opacity: 1;
+    color: var(--text);
+  }
 }
 
 /* ---------- Responsive ---------- */
-/* Below 890px the header and nav bar switch to their stacked, mobile
-   layouts together, at one shared breakpoint. */
-@media (max-width: 890px) {
-  .section-nav {
+/* All layout collapses happen at 900px. If changed, update every @media (max-width: 900px) here and MOBILE_NAV_QUERY in section-page.js. */
+@media (max-width: 900px) {
+  .site-header-inner {
+    flex-wrap: wrap;
+    gap: 0 12px;
+    padding: 8px 16px;
+  }
+
+  .brand { flex: 1 1 0; }
+  .brand-logo { width: 38px; height: 38px; }
+  .brand-name {
+    font-size: clamp(0.95rem, 4.6vw, 1.2rem);
+    white-space: normal; /* lets very narrow phones wrap the name instead of squeezing the menu button off-screen */
+    text-wrap: balance;
+  }
+
+  .nav-toggle { display: flex; }
+
+  /* Folding panel, full width under the brand row, capped to the screen so it scrolls. Padding leaves room for notification pills. */
+  .site-menu {
+    display: none;
+    flex: 0 0 100%;
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 14px;
+    max-height: calc(100vh - 72px - env(safe-area-inset-top));
+    max-height: calc(100dvh - 72px - env(safe-area-inset-top));
+    margin: 0 -8px;
+    padding: 12px 8px 8px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .site-header.is-menu-open .site-menu { display: flex; }
+
+  .site-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .nav-link {
     padding: 12px 14px;
+    font-size: 0.95rem;
+    background: var(--nav-btn-bg);
+    border-color: var(--nav-btn-border);
+    color: var(--text);
   }
+  .nav-link.is-current {
+    background: var(--nav-btn-hover-bg);
+    border-color: var(--nav-btn-hover-border);
+  }
+  .nav-chevron { margin-left: auto; }
+  .nav-dropdown-toggle { width: 100%; }
 
-  /* A real 2-column grid instead of wrapping, so buttons line up in
-   neat columns regardless of label length. */
-  .nav-jump-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin-left: 0; /* desktop's spacing margin doesn't apply once this row stacks alone */
+  /* Opens in place, pushing the links below down. */
+  .nav-dropdown-menu {
+    position: static;
+    transform: none;
+    min-width: 0;
+    margin-top: 6px;
+    padding: 4px;
+    border-radius: 10px;
+    background: rgba(var(--white-rgb), 0.03);
+    box-shadow: none;
   }
-  .nav-jump-btn {
-    padding: 9px 16px; /* slightly taller tap target on touch screens */
-    justify-content: center; /* center the label now that the button fills its grid cell instead of hugging its own text */
-    min-width: 0; /* lets the label wrap/shrink instead of forcing its grid column wider than the viewport */
-  }
+  .nav-dropdown-item { padding: 12px; }
 
-  /* Full width under the buttons, instead of sitting beside them. */
   .nav-search {
     flex: none;
-    max-width: none;
     min-width: 0;
-    margin-right: 0;
+    margin-left: 0;
   }
-  /* 16px is the minimum iOS Safari won't auto-zoom the page in on
-   focus - the 0.85rem used above is under that. */
+  /* 16px stops iOS Safari zooming in on focus. */
   .nav-search-input {
+    height: 44px;
     font-size: 16px;
-    padding-right: 40px; /* room for the larger clear button below */
+    padding-right: 40px;
   }
-  /* Bigger tap target for the "x". Its ::before/::after already draw
-   the X, so the real box grows instead of using hit-slop. */
+  /* Icon and "x" pinned to the input's centre line, since results now sit in the wrapper. */
+  .nav-search-icon,
+  .nav-search-clear { top: 22px; }
+  /* Bigger tap target; the real box grows instead of using hit-slop. */
   .nav-search-clear {
     width: 36px;
     height: 36px;
-    right: 2px;
+    right: 4px;
   }
   .search-panel {
-    left: 0;
+    position: static;
     width: auto;
+    max-height: min(50vh, 360px);
+    margin-top: 8px;
+    box-shadow: none;
   }
 
-  /* Bigger notification dot on mobile - easier to spot/tap on a
-   touch screen than the desktop size. */
   .nav-jump-dot {
     min-width: 22px;
     height: 22px;
     padding: 0 5px;
     font-size: 0.78rem;
   }
-
-  /* Move notification dot tooltip left so it doesn't get cut off. */
-  .nav-jump-dot[data-tooltip]::after {
-    left: auto;
-    right: -4px;
-    transform: translateY(-4px);
-  }
-  .nav-jump-dot[data-tooltip]:hover::after,
-  .nav-jump-dot[data-tooltip]:focus-visible::after,
-  .nav-jump-dot[data-tooltip].tooltip-open::after {
-    transform: translateY(-10px);
-  }
 }
 
-@media (max-width: 890px) {
-  /* One centered column: logo, then title. */
-  .masthead {
-    grid-template-columns: 1fr;
-    align-items: start;
-    justify-items: center;
-    text-align: center;
-    gap: 10px;
-  }
-  /* Smaller logo, so the header has more breathing room on mobile. */
-  .brand-logo {
-    width: 64px;
-    height: 64px;
-    transform: none;
-  }
-  /* Shrinks the title to its own content width and centers
-   *that*, so text-wrap: balance on the title can take effect. */
-  .brand-text {
-    align-items: center;
-  }
-}
-
-@media (max-width: 620px) {
-  /* Smaller side margins on narrow phones, to give rows more room. */
+@media (max-width: 900px) {
   .page {
-    padding: calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+    padding: 16px calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   }
 
-  /* A real grid, same reasoning as the nav bar above - so the link
-   chips line up in columns instead of wrapping one at a time. */
+  /* A grid so chips align in columns. */
   .project-links {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1755,11 +2252,10 @@ p { margin: 0; }
   }
   .project-links a {
     justify-content: center;
-    min-width: 0; /* lets long labels wrap instead of overflowing */
+    min-width: 0;
   }
 
-  /* Keeps the project thumbnail small and square on mobile, instead of
-   stretching it into a wide banner. */
+  /* Small square thumbnail instead of a wide banner. */
   .project {
     grid-template-columns: 64px 1fr;
     gap: 14px;
@@ -1770,7 +2266,7 @@ p { margin: 0; }
     height: 64px;
     border-radius: 12px;
   }
-  .project-body h3 {
+  .project-body h2 {
     font-size: 1.25rem;
     transform: none;
   }
@@ -1782,13 +2278,9 @@ p { margin: 0; }
   }
 }
 
-/* A safety net against stray horizontal overflow (e.g. a very long
-   word). Scoped narrowly so it doesn't break the sticky nav bar in
-   Safari, which is sensitive to overflow on its parent elements. */
-/* Adds a little padding so focus rings on edge elements (like the
-   last button in a row) don't get clipped by the overflow rule above.
-   The matching negative margin cancels it out visually. */
-.masthead, .section-nav, #catalog, .stats-section, .site-footer {
+/* Guards against horizontal overflow; scoped narrowly because Safari's sticky header is sensitive to parent overflow. */
+/* Padding stops focus rings on edge elements being clipped; the negative margin cancels it visually. */
+#catalog, .stats-section, .site-footer {
   overflow-x: clip;
   max-width: calc(100% + 12px);
   padding-left: 6px;
@@ -1797,9 +2289,7 @@ p { margin: 0; }
   margin-right: -6px;
 }
 
-/* #catalog needs more buffer than the shared 6px: the project
-   highlight ring (.is-linked-target::before) sits ~8px outside a
-   project's edges, so this overrides it with room to spare. */
+/* More buffer than the shared 6px: the highlight ring (.is-linked-target::before) sits ~8px outside the project. */
 #catalog {
   max-width: calc(100% + 20px);
   padding-left: 10px;
@@ -1808,15 +2298,14 @@ p { margin: 0; }
   margin-right: -10px;
 }
 
-/* Turns off the little "press" shrink effect for anyone who's asked
-   for reduced motion. Color/background feedback stays. */
+/* No press-shrink under reduced motion; colour feedback stays. */
 @media (prefers-reduced-motion: reduce) {
-  .nav-jump-btn:active,
+  .nav-link:active,
   .download-btn:active,
   .project-links a:active,
   .top-link:active,
   .social-link:active,
-  .home-card:active {
+  .home-project:active {
     transform: none;
   }
   .back-to-top.is-visible:active {
@@ -1830,8 +2319,63 @@ img, svg {
   max-width: 100%;
 }
 
+/* ---------- About page ---------- */
+/* Built by about.js. Its heading uses .flat-section-heading, so it matches the project pages. */
+.about {
+  min-height: 40vh;
+  padding-bottom: 40px;
+}
+
+.about-h { margin: 1.8em 0 0.5em; line-height: 1.25; }
+h2.about-h { font-size: 1.35rem; }
+
+.about-text,
+.about-list,
+.about-quote { margin-bottom: 14px; }
+.about-text,
+.about-list { color: var(--text-soft); font-size: 1.05rem; }
+.about strong { color: var(--text); }
+
+.about-list { padding-left: 1.4em; }
+.about-list li { margin-bottom: 4px; }
+.about-list li::marker { color: var(--nav-accent); }
+
+.about-link {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--transition-fast);
+}
+@media (hover: hover) {
+  .about-link:hover {
+    color: var(--text);
+  }
+}
+
+.about-quote {
+  margin-left: 0;
+  padding: 4px 0 4px 16px;
+  border-left: 3px solid var(--nav-btn-border);
+  color: var(--text-soft);
+}
+
+.about-code {
+  padding: 1px 6px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.about-rule {
+  margin: 28px 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
 /* ---------- 404 Page ---------- */
-/* The "Go Back" button reuses .top-link's styling. */
 .not-found {
   display: flex;
   align-items: center;
@@ -1853,7 +2397,7 @@ img, svg {
   color: var(--text);
 }
 
-.not-found-card h2 {
+.not-found-card h1 {
   margin: 0 0 10px;
   font-size: 1.4rem;
   color: var(--text);
@@ -1865,12 +2409,9 @@ img, svg {
 }
 
 /* ---------- Back to top button ---------- */
-/* Fixed in the corner, hidden until initBackToTop() (section-page.js)
-   shows it after you've scrolled a bit. */
+/* Hidden until initBackToTop() shows it after scrolling. */
 .back-to-top {
   position: fixed;
-  /* Keeps the button clear of the home-indicator / rounded-corner
-   cutout on notched phones, instead of sitting flush against it. */
   right: calc(20px + env(safe-area-inset-right));
   bottom: calc(20px + env(safe-area-inset-bottom));
   width: 44px;
@@ -1886,7 +2427,7 @@ img, svg {
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none; /* not clickable while hidden */
-  transition: opacity 0.2s ease, transform 0.2s ease, background-color var(--transition-fast), border-color var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast);
   z-index: 40;
 }
 .back-to-top.is-visible {
@@ -1894,19 +2435,17 @@ img, svg {
   transform: translateY(0);
   pointer-events: auto;
 }
-.back-to-top:hover {
-  /* Same lighten-on-hover as .nav-jump-btn.is-open. */
-  background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
-  border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+@media (hover: hover) {
+  .back-to-top:hover {
+    background: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+    border-color: color-mix(in srgb, var(--nav-btn-active-bg), white 15%);
+  }
 }
-/* Combines the press-shrink with this button's own position, so they
-   don't fight each other. */
+/* Combines press-shrink with the button's own position. */
 .back-to-top.is-visible:active {
-  transform: translateY(0) scale(0.95);
+  transform: translateY(0) scale(0.97);
 }
 
-/* An upward arrow drawn from two rotated borders, same trick as the
-   chevron above. */
 .back-to-top::before {
   content: '';
   width: 9px;
@@ -1916,11 +2455,36 @@ img, svg {
   transform: translateY(2px) rotate(-45deg);
 }
 
-/* ============================================================
-   PIXELATED BACKGROUND
-   ============================================================ */
+/* ---------- Load-error notice (site-error.js) ---------- */
+.site-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 14px;
+  padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+  border-bottom: 1px solid rgba(var(--ch-alpha-rgb), 0.5);
+  background: rgba(var(--ch-alpha-rgb), 0.14);
+  font-size: 0.9rem;
+  text-align: center;
+}
+.site-error p { margin: 0; }
+.site-error button {
+  padding: 4px 12px;
+  border: 1px solid rgba(var(--ch-alpha-rgb), 0.6);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .site-error button:hover { background: rgba(var(--ch-alpha-rgb), 0.2); }
+}
+
+/* Pixelated background */
 :root { --px: 4px; }
-@media (max-width: 620px) { :root { --px: 3px; } }
+@media (max-width: 900px) { :root { --px: 3px; } }
 
 body::before {
   content: '';
@@ -1931,3 +2495,6 @@ body::before {
   image-rendering: pixelated;
   background: url('images/background.png') 0 0 / calc(32 * var(--px)) calc(32 * var(--px)) repeat;
 }
+/* The home cards clip their contents, so focus rings sit inside. */
+.home-card-header:focus-visible { outline-offset: -3px; }
+.home-project:focus-visible { outline-offset: -2px; }
