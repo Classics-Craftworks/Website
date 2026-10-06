@@ -1885,7 +1885,7 @@ p { margin: 0; }
 /* Four columns with thin dividers on desktop. */
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr;
+  grid-template-columns: 1.8fr 1fr 1fr;
   gap: 0;
   align-items: start;
 }
@@ -1899,33 +1899,41 @@ p { margin: 0; }
   border-left: 0;
 }
 
-.footer-brand {
-  margin-top: -7px;
+/* Logo on the left; name, est. and copyright stacked to its right. */
+.footer-brand-col {
   display: flex;
-  width: fit-content;
   align-items: center;
-  gap: 12px;
+  align-self: center;
+  gap: 16px;
+}
+.footer-logo-link {
+  flex: none;
+  border-radius: 12px;
+}
+.footer-brand-text { min-width: 0; }
+.footer-logo {
+  display: block;
+  width: clamp(68px, 8vw, 98px);
+  height: clamp(68px, 8vw, 98px);
+  transform: translateY(-6px);
+}
+.footer-brand {
+  width: fit-content;
   border-radius: 8px;
 }
 .footer-brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.footer-logo { width: clamp(48px, 5.5vw, 60px); height: clamp(48px, 5.5vw, 60px); display: block; flex-shrink: 0; }
 .footer-brand-name {
   font-family: 'Minercraftory', sans-serif;
-  font-size: clamp(0.95rem, calc(2.25vw - 5.3px), 1.22rem);
+  font-size: clamp(1.1rem, calc(2.5vw - 4px), 1.5rem);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.2;
   white-space: nowrap;
 }
-.footer-brand-col .footer-copyright {
-  margin: 2px 0 0;
-  font-size: 0.82rem;
-}
-
-.footer-brand-col .footer-established {
-  margin: 14px 0 0;
-  font-size: 0.82rem;
-}
+.footer-brand-col .footer-established,
+.footer-brand-col .footer-copyright { font-size: 0.95rem; text-wrap: balance; }
+.footer-brand-col .footer-established { margin: 6px 0 0; }
+.footer-brand-col .footer-copyright { margin: 2px 0 0; }
 
 .footer-heading {
   margin: 0 0 8px;
@@ -1974,28 +1982,25 @@ p { margin: 0; }
 }
 
 .footer-legal {
-  margin-top: 14px;
+  margin-top: 18px;
   padding-top: 4px;
   border-top: 1px solid var(--border);
 }
 
 @media (max-width: 900px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; row-gap: 24px; }
-  .footer-brand-col { grid-column: 1 / -1; }
-  .footer-brand-name { font-size: 1.3rem; }
-  .footer-logo { width: 56px; height: 56px; }
-  .footer-col:nth-child(2) { padding-left: 0; border-left: 0; }
-}
-@media (max-width: 900px) {
-  .footer-grid { grid-template-columns: 1fr; }
+  .footer-grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    row-gap: 20px;
+  }
   .footer-col,
   .footer-col:nth-child(even) { padding: 0; border-left: 0; }
 
-  .footer-logo { width: 48px; height: 48px; }
-  .footer-brand-name { font-size: clamp(0.8rem, 4.6vw, 1.1rem); }
+  .footer-brand-col { justify-content: center; text-align: left; }
+  .footer-logo { width: 72px; height: 72px; }
+  .footer-brand-name { font-size: clamp(0.85rem, 4.3vw, 1.6rem); }
 
-  .footer-grid { justify-items: center; text-align: center; row-gap: 20px; }
-  .footer-brand-col { display: flex; flex-direction: column; align-items: center; }
   .footer-list { align-items: center; }
   #social-links { justify-content: center; }
 }
