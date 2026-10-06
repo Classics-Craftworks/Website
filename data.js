@@ -355,7 +355,7 @@ const SITE_DATA = {
     copyright: "\u00A9 2023\u20132026 Classic36 / Classic's Craftworks",
     established: "Est. 2017",
     disclaimer: "NOT AN OFFICIAL MINECRAFT PRODUCT OR SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
-    iconCredits: { prefix: "Link icons provided by ", label: "SVG Repo", url: "https://www.svgrepo.com" }
+    iconCredits: { prefix: "Icons provided by ", label: "SVG Repo", url: "https://www.svgrepo.com" }
   },
 
   downloadNotice: "Any reuploads of these projects that are not linked on this website are unofficial, unaffiliated, and may have been modified or contain malicious content."
