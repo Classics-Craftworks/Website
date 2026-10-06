@@ -16,7 +16,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v3.0.0",
+    label: "v3.0.0.1",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -71,9 +71,10 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              mcVersion: "26.3 – 26.4-snap-2",
+              mcVersion: "26.3 – 26.4-snap-3",
+              badge: "updated",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v8.1.0-beta.1", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.1" },
+                { label: "Data Pack", icon: "brackets", version: "v8.1.0-beta.2", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.2" },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
@@ -105,9 +106,10 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              mcVersion: "26.3 – 26.4-snap-2",
+              mcVersion: "26.3 – 26.4-snap-3",
+              badge: "updated",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.1", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.1" },
+                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.2", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.2" },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
@@ -139,7 +141,7 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              mcVersion: "26.3 – 26.4-snap-2",
+              mcVersion: "26.3 – 26.4-snap-3",
               downloads: [
                 { label: "Data Pack", icon: "brackets", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
@@ -202,7 +204,7 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              mcVersion: "1.21.9 – 26.4-snap-2",
+              mcVersion: "1.21.9 – 26.4-snap-3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
               ]
@@ -233,7 +235,7 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              mcVersion: "1.21.9 – 26.4-snap-2",
+              mcVersion: "1.21.9 – 26.4-snap-3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
               ]
@@ -264,7 +266,7 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              mcVersion: "1.21.9 – 26.4-snap-2",
+              mcVersion: "1.21.9 – 26.4-snap-3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
               ]
