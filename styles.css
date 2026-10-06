@@ -2455,6 +2455,33 @@ h2.about-h { font-size: 1.35rem; }
   transform: translateY(2px) rotate(-45deg);
 }
 
+/* ---------- Load-error notice (site-error.js) ---------- */
+.site-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 14px;
+  padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+  border-bottom: 1px solid rgba(var(--ch-alpha-rgb), 0.5);
+  background: rgba(var(--ch-alpha-rgb), 0.14);
+  font-size: 0.9rem;
+  text-align: center;
+}
+.site-error p { margin: 0; }
+.site-error button {
+  padding: 4px 12px;
+  border: 1px solid rgba(var(--ch-alpha-rgb), 0.6);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .site-error button:hover { background: rgba(var(--ch-alpha-rgb), 0.2); }
+}
+
 /* Pixelated background */
 :root { --px: 4px; }
 @media (max-width: 900px) { :root { --px: 3px; } }
