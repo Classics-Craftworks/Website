@@ -195,7 +195,7 @@ function renderSplash(home, sections, pages) {
   const actions = document.getElementById('splash-actions');
   actions.appendChild(internalLink('splash-btn splash-btn-primary', '#projects-intro', [
     icon('compass', 'icon-sm'),
-    el('span', { text: 'Explore Projects' }),
+    el('span', { text: 'Explore' }),
     el('span', { class: 'splash-btn-arrow', attrs: { 'aria-hidden': 'true' } })
   ]));
   const about = pages.find(p => p.url === 'about');
