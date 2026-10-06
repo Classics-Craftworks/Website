@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.0.0-dev.6 — 2026/10/06
+
+### Added
+- Project count placeholder, used in the Home page's Stats section & About page
+- `/` and `Ctrl+K` or `Cmd+K` keyboard shortcuts for Search
+- Warning when page fails to load
+
+### Changed
+- Improved layout of logo and copyright information in the footer
+- Increased padding around Featured Project heading
+- Links in the footer on mobile are no longer split into two columns
+- Updated statistics
+- Updated sitemap
+
 ## v3.0.0-dev.5 — 2026/10/05
 
 ### Changed

@@ -33,6 +33,7 @@ The website currently features:
 ### Other Projects
 
 - CraftHorizon
+- Classic's Craftworks Website (you're already here!)
 
 ## Credits
 
