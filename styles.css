@@ -2002,7 +2002,7 @@ p { margin: 0; }
   .footer-brand-name { font-size: clamp(0.85rem, 4.3vw, 1.6rem); }
 
   .footer-list { align-items: center; }
-  #social-links { justify-content: center; }
+  #social-links { grid-template-columns: max-content; justify-content: center; }
 }
 
 [data-tooltip]::after {
