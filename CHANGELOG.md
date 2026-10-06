@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.0.0 — 2026/10/06
+
+### Added
+- New home page splash screen featuring a featured project
+- New About page
+- Project count placeholder for the Home page's Stats section and About page
+- `/` and `Ctrl+K` / `Cmd+K` keyboard shortcuts for Search
+- Icons for unavailable download buttons
+- Icons for redistribution notices
+- Warning when a page fails to load
+
+### Changed
+- Redesigned and consolidated the header and navigation bar
+- Redesigned home page project buttons to display more information and link directly to projects
+- Redesigned footer
+- Widened pages
+- Updated page headings for improved screen-reader accessibility
+- Improved support for installing the website as an app across more browsers
+- Updated hover colours, button radii, font weights, and other visual inconsistencies
+- Improved layout and spacing throughout the site
+- Various clean-ups and optimisations
+- Updated statistics
+- Updated sitemap
+
+### Fixed
+- Various layout issues on mobile
+- Inconsistent hover colours and other visual styling inconsistencies
+- Incorrect font weights
+
 ## v2.3.1 — 2026/10/04
 
 ### Changed
