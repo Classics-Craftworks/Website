@@ -155,23 +155,17 @@ function renderFeaturedCard({ project, url }, imageSrc) {
     el('li', { class: 'splash-chip' }, [icon(d.icon, 'icon-sm'), el('span', { text: d.label })])
   );
 
-  const meta = [];
-  const first = downloads.find(d => d.version);
-  if (first) meta.push(el('span', { class: 'splash-meta-version', text: first.version }));
-  if (stable && stable.mcVersion) meta.push(el('span', { text: 'Java ' + stable.mcVersion }));
-
   return [
     el('p', { class: 'splash-featured-label', text: 'Featured project' }),
     imageSrc ? el('div', { class: 'splash-featured-media' }, [
       el('img', { class: 'splash-featured-img', src: imageSrc, alt: '', attrs: { draggable: 'false' } })
     ]) : null,
     el('div', { class: 'splash-featured-head' }, [
-      el('h2', { class: 'splash-featured-title', text: project.title }),
-      pills.length ? el('ul', { class: 'splash-chips' }, pills) : null
+      el('h2', { class: 'splash-featured-title', text: project.title })
     ]),
     el('p', { class: 'splash-featured-desc', text: project.description || '' }),
     el('div', { class: 'splash-featured-foot' }, [
-      el('p', { class: 'splash-meta' }, meta),
+      pills.length ? el('ul', { class: 'splash-chips' }, pills) : el('span'),
       internalLink('splash-btn splash-btn-ghost', url, [
         el('span', { text: 'View Project' }),
         el('span', { class: 'splash-btn-arrow', attrs: { 'aria-hidden': 'true' } })
