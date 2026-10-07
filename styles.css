@@ -454,6 +454,7 @@ p { margin: 0; }
   background: var(--badge-color);
   border: 2px solid var(--nav-bg);
   color: var(--bg);
+  font-family: var(--font);
   font-size: 0.68rem;
   font-weight: 700;
   line-height: 1;
@@ -465,10 +466,10 @@ p { margin: 0; }
 .nav-jump-dot::before {
   content: '';
   position: absolute;
-  top: -10px;
+  top: -6px;
   right: -1px;
-  bottom: -20px;
-  left: -20px;
+  bottom: -12px;
+  left: -12px;
 }
 
 /* Inside a dropdown row the pill sits inline at the right edge instead
@@ -499,6 +500,12 @@ p { margin: 0; }
   border-color: color-mix(in srgb, var(--badge-color), black 25%);
   color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
 }
+
+/* The open menu already lists the updates, so the header dots step aside:
+   Projects while its dropdown is open, the hamburger while the mobile menu is open.
+   (Pills on the items inside the menu stay.) */
+.nav-dropdown.is-open > .nav-link > .nav-jump-dot,
+.site-header.is-menu-open .nav-toggle > .nav-jump-dot { display: none; }
 
 /* ---------- Mobile menu button ---------- */
 /* Mobile only. Three bars from one span plus ::before/::after; becomes an "x" when open. */
@@ -2227,8 +2234,8 @@ p { margin: 0; }
   .nav-jump-dot {
     min-width: 22px;
     height: 22px;
-    padding: 0 5px;
-    font-size: 0.78rem;
+    padding: 1px 5px 0;
+    font-size: 0.76rem;
   }
 }
 
