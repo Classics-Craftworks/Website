@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.1.0 — 2026/10/07
+
+### Changed
+- The "#projects-intro" deep link has been renamed to "#projects"
+  - Bookmarks or links still using "#projects-intro" will direct to the top of home page instead of the Projects section
+- The notification dot is now hidden from the header when the dropdown is open
+- Reduced the notification tooltip hover area
+- Moved the "data pack" and "mod" labels to the bottom of the Featured Project box
+- Increased padding above and below the Featured Project heading
+
+### Fixed
+- Notification counter not using the right font
+- Notification counter being slightly misaligned in dropdowns on mobile
+
+### Removed
+- Removed version numbers from the Featured Project box
+
 ## v3.0.1 — 2026/10/06
 
 ### Changed
