@@ -187,7 +187,7 @@ function renderSplash(home, sections, pages) {
   document.getElementById('splash-subtitle').textContent = splash.subtitle || '';
 
   const actions = document.getElementById('splash-actions');
-  actions.appendChild(internalLink('splash-btn splash-btn-primary', '#projects-intro', [
+  actions.appendChild(internalLink('splash-btn splash-btn-primary', '#projects', [
     icon('compass', 'icon-sm'),
     el('span', { text: 'Explore' }),
     el('span', { class: 'splash-btn-arrow', attrs: { 'aria-hidden': 'true' } })
@@ -214,7 +214,7 @@ function renderSplash(home, sections, pages) {
 }
 
 function renderProjectsIntro(home) {
-  const wrap = document.getElementById('projects-intro');
+  const wrap = document.getElementById('projects');
   if (!wrap) return;
   if (!home || !home.projectsHeading) { wrap.hidden = true; return; }
   document.getElementById('projects-heading').textContent = home.projectsHeading;
