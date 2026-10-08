@@ -135,11 +135,18 @@ function layoutChannelRow(rowEl) {
 
 /* ---------- Project cards ---------- */
 
+// The project title itself is the button (clicking it copies a direct link),
+// with a link icon after it. It sits inside the <h2>, so the heading is still
+// the title; the visually hidden text tells screen readers what it does.
 function copyLinkButton(id, label) {
   const btn = el('button', {
     class: 'copy-link-btn',
-    attrs: { type: 'button', 'aria-label': 'Copy link to ' + label, 'data-tooltip': 'Copy link' }
-  }, [icon('link', 'icon-sm')]);
+    attrs: { type: 'button', 'data-tooltip': 'Copy link' }
+  }, [
+    el('span', { text: label }),
+    el('span', { class: 'visually-hidden', text: ' (copy link)' }),
+    icon('link', 'icon-sm')
+  ]);
 
   const showCopied = () => {
     btn.classList.add('is-copied');
@@ -294,12 +301,19 @@ function renderProject(p) {
     new ResizeObserver(() => layoutChannelRow(channelRow)).observe(channelRow);
   }
 
-  return el('article', { class: 'project', attrs: { id } }, [
+  // On wide screens the info block (title, description, links) and the channel
+  // boxes sit side by side and share a height; narrower screens stack them
+  // (see "Project layout" in styles.css). Link-only projects have no channels.
+  const hasChannels = (p.channels || []).length > 0;
+
+  return el('article', { class: 'project' + (hasChannels ? ' has-channels' : ''), attrs: { id } }, [
     el('img', { class: 'project-image', src: p.image, alt: '', attrs: { loading: 'lazy', width: '320', height: '320' } }),
     el('div', { class: 'project-body' }, [
-      el('div', { class: 'project-title-row' }, [el('h2', { text: p.title }), copyLinkButton(id, p.title)]),
-      el('p', { class: 'project-description', text: p.description }),
-      linkRow,
+      el('div', { class: 'project-info' }, [
+        el('h2', {}, [copyLinkButton(id, p.title)]),
+        el('p', { class: 'project-description', text: p.description }),
+        linkRow
+      ]),
       channelRow,
       renderVersionsNote(p)
     ])

@@ -144,8 +144,7 @@ html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; overflow-x: cli
   html { scrollbar-gutter: auto; }
 }
 
-/* html/body use overflow-x: clip (not "hidden") as a safety net against
-   horizontal scrolling, so the sticky nav bar still works in Safari. */
+/* overflow-x: clip (not "hidden") guards against horizontal scroll while keeping the sticky nav working in Safari. */
 body {
   position: relative;
   min-height: 100vh;
@@ -280,8 +279,7 @@ p { margin: 0; }
   background: var(--nav-bg);
   border-bottom: 1px solid var(--nav-btn-border);
   box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.6);
-  /* Keeps the bar clear of a notch / status bar when installed as an app.
-     All 0px on ordinary devices. */
+  /* Keeps the bar clear of a notch / status bar when installed as an app. */
   padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
 }
 
@@ -437,8 +435,7 @@ p { margin: 0; }
   color: var(--accent);
 }
 .nav-dropdown-item.is-current .icon { color: var(--accent); }
-/* Inside the menu the focus ring would be clipped by the rounded panel;
-   the filled background already shows where focus is. */
+/* The focus ring would be clipped by the rounded panel; the filled background shows focus instead. */
 .nav-dropdown-item:focus-visible { outline-offset: -2px; }
 
 /* ---------- Notification pills ---------- */
@@ -472,8 +469,7 @@ p { margin: 0; }
   left: -12px;
 }
 
-/* Inside a dropdown row the pill sits inline at the right edge instead
-   of hanging off a corner. */
+/* In a dropdown row the pill sits inline at the right edge. */
 .nav-dropdown-item .nav-jump-dot {
   position: relative;
   top: auto;
@@ -481,8 +477,7 @@ p { margin: 0; }
   margin-left: auto;
 }
 
-/* Opens to the left of the dot without touching the top of the page
-   and without covering all of the Projects label. */
+/* Opens left of the dot, clear of the page top and the Projects label. */
 .site-header .nav-jump-dot[data-tooltip]::after {
   bottom: auto;
   top: 50%;
@@ -502,9 +497,8 @@ p { margin: 0; }
   color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
 }
 
-/* The open menu already lists the updates, so the header dots step aside:
-   Projects while its dropdown is open, the hamburger while the mobile menu is open.
-   (Pills on the items inside the menu stay.) */
+/* The open menu already lists the updates, so the header dots step aside
+   (the pills on items inside the menu stay). */
 .nav-dropdown.is-open > .nav-link > .nav-jump-dot,
 .site-header.is-menu-open .nav-toggle > .nav-jump-dot { display: none; }
 
@@ -592,8 +586,7 @@ p { margin: 0; }
   -webkit-appearance: none;
 }
 .nav-search-input::placeholder { color: var(--text-soft); }
-/* Applies on any focus (not just keyboard), so clicking into the box
-   always shows this ring instead of the browser default. */
+/* Applies on any focus, so clicking in shows this ring, not the browser default. */
 .nav-search-input:focus {
   outline: none;
   border-color: var(--nav-btn-hover-border);
@@ -618,8 +611,7 @@ p { margin: 0; }
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
-/* Makes sure the `hidden` attribute actually hides this button,
-   overriding the display: flex above. */
+/* Lets `hidden` override the display: flex above. */
 .nav-search-clear[hidden] {
   display: none;
 }
@@ -763,7 +755,7 @@ p { margin: 0; }
 }
 
 /* ---------- Home page: splash banner ---------- */
-/* Background picture with a dark gradient for legibility; copy on the left, featured card on the right. */
+/* Background picture with a dark gradient; copy on the left, featured card on the right. */
 .splash {
   position: relative;
   isolation: isolate; /* keeps the z-index: -1 layers below inside the banner */
@@ -1112,7 +1104,7 @@ p { margin: 0; }
 .home-card-title {
   display: block;
   font-family: 'Minercraftory', var(--font);
-  /* Shrinks with the card (longest title is ~12.7x its font size; 135px is badge, arrow, gaps and padding), wrapping to two lines below 1rem. */
+  /* Shrinks with the card, wrapping to two lines below 1rem. */
   font-size: clamp(1rem, calc((100cqw - 135px) / 12.9), 1.2rem);
   line-height: 1.15;
   letter-spacing: 0.02em;
@@ -1240,7 +1232,7 @@ p { margin: 0; }
 }
 .home-project:active { transform: scale(0.99); }
 
-/* Cards need ~380px each, so the grid steps 3 -> 2 -> 1 columns by available width rather than at 900px. In two columns the odd card sits centred on its own row. */
+/* Cards need ~380px each, so the grid steps 3 -> 2 -> 1 columns by available width; in two columns the odd card is centred. */
 @media (max-width: 1239px) {
   .home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-grid > .home-card:last-child:nth-child(odd) {
@@ -1339,8 +1331,7 @@ p { margin: 0; }
 }
 
 @media (max-width: 900px) {
-  /* Single column, but capped and centred so the boxes don't stretch
-     into wide, mostly-empty bars. */
+  /* Single column, capped and centred so the boxes don't stretch into wide bars. */
   .stats-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
@@ -1381,12 +1372,6 @@ p { margin: 0; }
   min-width: 0;
   /* Lets the download boxes respond to available width (see @container below). */
   container: project / inline-size;
-}
-
-.project-title-row {
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
 .project-body h2 {
@@ -1472,7 +1457,7 @@ p { margin: 0; }
   border: 1.5px solid rgba(var(--channel-rgb), var(--alpha-medium));
   border-radius: 12px;
   background: rgba(var(--channel-rgb), var(--alpha-faint)); 
-  padding: 14px 14px 16px;
+  padding: 11px 14px 11px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -1486,8 +1471,8 @@ p { margin: 0; }
   gap: 9px;
   font-size: 0.9rem;
   color: var(--text-soft);
-  padding-bottom: 12px;
-  margin-bottom: 14px;
+  padding-bottom: 9px;
+  margin-bottom: 11px;
   border-bottom: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
   /* Wraps only if label + version don't fit; the "|" and version wrap together. */
   flex-wrap: wrap;
@@ -1514,11 +1499,11 @@ p { margin: 0; }
 }
 
 /* ---------- "New" / "Updated" Channel Badge ---------- */
-/* Set via `badge` in data.js; hangs off the top-left corner. Dismissal is stored per version. */
+/* Set via `badge` in data.js; hangs off the top-right corner. Dismissal is stored per version. */
 .channel-badge {
   position: absolute;
   top: -10px;
-  left: 2px;
+  right: 2px;
   z-index: 1;
   display: inline-flex;
   align-items: center;
@@ -1756,15 +1741,14 @@ p { margin: 0; }
   pointer-events: auto; /* Ensures the cursor: not-allowed actually displays */
 }
 
-/* Focus ring for keyboard users tabbing onto a disabled button that
-   has a tooltip explanation attached (see .has-tooltip on the JS side). */
+/* Focus ring for keyboard users on a disabled button with a tooltip. */
 .download-unavailable.has-tooltip:focus-visible {
   outline: 2px solid var(--channel-color);
   outline-offset: 2px;
   border-radius: 8px;
 }
 
-/* Longer than other tooltips, so it wraps at a readable width; styled like a hovered non-stable download button. */
+/* Wraps at a readable width; styled like a hovered non-stable download button. */
 .download-unavailable[data-tooltip]::after {
   white-space: normal;
   width: max-content;
@@ -1783,6 +1767,140 @@ p { margin: 0; }
   background: color-mix(in srgb, var(--bg), rgb(var(--channel-rgb)) 15%);
   border-color: color-mix(in srgb, var(--channel-color), black 25%);
   color: color-mix(in srgb, var(--text), rgb(var(--channel-rgb)) 10%);
+}
+
+/* ---------- Project layout (wide screens) ---------- */
+/* From 1210px of list width, a project becomes three columns:
+     [ image | title, description, links | Release + Beta boxes ]
+                                          [ Older versions note ]
+   Each download is a compact row. Narrower lists and mobile keep the stacked
+   layout; link-only projects never get the extra column. Keep 1210px in step
+   with the box width the rows need (~330px of content). */
+.project-list { container: project-list / inline-size; }
+
+@container project-list (min-width: 1210px) {
+  .project.has-channels {
+    grid-template-columns: 107px minmax(0, 0.75fr) minmax(0, 1.75fr);
+    column-gap: 24px;
+    row-gap: 0;
+    align-items: stretch;
+  }
+
+  /* .project-body drops out of the layout so its children sit in the grid. */
+  .project.has-channels .project-body { display: contents; }
+
+  .project.has-channels .project-image {
+    grid-row: 1 / span 2;
+    align-self: start;
+  }
+
+  .project.has-channels .project-info {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  /* Links follow the description rather than sitting on the boxes' bottom edge.
+     Three or more links form two columns when the boxes have two downloads;
+     with one download, up to three stay on one row and four or more use columns. */
+  .project.has-channels .project-description { margin-top: 2px; }
+  .project.has-channels .project-links {
+    margin-top: 0;
+    padding-top: 8px;
+  }
+  .project.has-channels .project-links:has(> :nth-child(4)),
+  .project.has-channels:has(.download-col + .download-col) .project-links:has(> :nth-child(3)) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Buttons stretch to fill the info column. */
+  .project.has-channels .project-links a {
+    justify-content: center;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .project.has-channels .channel-row {
+    grid-column: 3;
+    grid-row: 1;
+    margin-top: 0;
+    flex-direction: row;
+  }
+
+  /* Boxes with a single download keep their natural height. */
+  .project.has-channels:not(:has(.download-col + .download-col)) .channel-row {
+    align-self: start;
+  }
+  /* The info block spans the "Older versions" row, which takes the leftover
+     height so the note stays right under the boxes. */
+  .project.has-channels:not(:has(.download-col + .download-col)) {
+    grid-template-rows: auto 1fr;
+  }
+  .project.has-channels:not(:has(.download-col + .download-col)) .project-info {
+    grid-row: 1 / span 2;
+  }
+
+  .project.has-channels .versions-note {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  /* Download rows: type + version on the left, button on the right. Rows share
+     the box height so the gap is equal above, between and below the buttons
+     (the box's bottom padding and the header's bottom margin are dropped). */
+  .project.has-channels .channel-group { padding-top: 8px; padding-bottom: 0; }
+  .project.has-channels .channel-header { margin-bottom: 0; padding-bottom: 7px; }
+
+  .project.has-channels .channel-downloads {
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 0;
+  }
+
+  .project.has-channels .download-col {
+    flex: 1 1 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 0;
+  }
+
+  .project.has-channels .download-col + .download-col {
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
+  }
+
+  .project.has-channels .download-col-header {
+    flex-wrap: nowrap;
+    min-height: 0;
+  }
+
+  /* Fixed width so the buttons line up whatever the label. */
+  .project.has-channels .download-btn,
+  .project.has-channels .download-unavailable {
+    flex: 0 0 124px;
+    width: 124px;
+    padding: 8px;
+    justify-content: center;
+  }
+
+  /* The tooltip opens leftwards from the button's right edge so it isn't
+     clipped at the page edge. */
+  .project.has-channels .download-unavailable[data-tooltip]::after {
+    left: auto;
+    right: -2px;
+    transform: translateY(-4px);
+  }
+  .project.has-channels .download-unavailable[data-tooltip]:hover::after,
+  .project.has-channels .download-unavailable[data-tooltip]:focus-visible::after,
+  .project.has-channels .download-unavailable[data-tooltip].tooltip-open::after {
+    transform: translateY(-10px);
+  }
 }
 
 /* ---------- Icons ---------- */
@@ -1806,49 +1924,51 @@ p { margin: 0; }
 /* Larger than icon-sm: the Download button is the most prominent. */
 .download-btn .icon-sm { width: 18px; height: 18px; }
 
-/* ---------- Deep-linking ("copy link" buttons) ---------- */
-/* Small button for copying a direct link. Always visible (not just
-   on hover), so it works for keyboard and touch too. */
+/* ---------- Deep-linking ("copy link" button) ---------- */
+/* The project title is the button (see copyLinkButton), with an always-visible
+   link icon so it works for keyboard and touch too. */
 .copy-link-btn {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 26px;
-  height: 26px;
   padding: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   background: transparent;
-  color: var(--text-soft);
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-align: left;
   cursor: pointer;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
-.copy-link-btn:focus-visible {
-  background: var(--surface-hover);
-  color: var(--text);
+
+/* Title text and link icon turn the accent colour on hover/focus. */
+.copy-link-btn > span:first-child {
+  transition: color var(--transition-fast);
+}
+
+.copy-link-btn .icon-sm {
+  width: 14px;
+  height: 14px;
+  color: var(--text-soft);
+  /* Centres the icon on the title's capital letters at any title size. */
+  vertical-align: calc(0.365em - 7px);
+  /* 8px gap; the negative margin cancels the icon's width and gap so it takes
+     no line width and can't wrap onto its own line. */
+  margin-left: 8px;
+  margin-right: -22px;
+  transition: color var(--transition-fast);
 }
 
 @media (hover: hover) {
-  .copy-link-btn:hover {
-    background: var(--surface-hover);
-    color: var(--text);
-  }
+  .copy-link-btn:hover > span:first-child { color: var(--accent); }
+  .copy-link-btn:hover .icon-sm { color: var(--accent); }
 }
-/* Invisible hit-slop making the tap target ~44x44 (26px + 9px each side). */
-.copy-link-btn::before {
-  content: '';
-  position: absolute;
-  inset: -9px;
-}
-.copy-link-btn .icon-sm { width: 14px; height: 14px; }
+.copy-link-btn:focus-visible > span:first-child { color: var(--accent); }
+.copy-link-btn:focus-visible .icon-sm { color: var(--accent); }
 
-.copy-link-btn.is-copied {
-  color: var(--accent);
-}
+.copy-link-btn.is-copied .icon-sm { color: var(--accent); }
 
-/* Brief highlight after a direct link. The ring is a ::before with -6px inset so #catalog's buffer doesn't clip it; off under reduced motion. */
+/* Brief highlight after a direct link. The -6px inset keeps #catalog's buffer from clipping the ring; off under reduced motion. */
 .is-linked-target {
   position: relative;
 }
@@ -2156,7 +2276,7 @@ p { margin: 0; }
 
   .nav-toggle { display: flex; }
 
-  /* Folding panel, full width under the brand row, capped to the screen so it scrolls. Padding leaves room for notification pills. */
+  /* Folding panel under the brand row, capped to the screen so it scrolls; padding leaves room for pills. */
   .site-menu {
     display: none;
     flex: 0 0 100%;
@@ -2279,7 +2399,7 @@ p { margin: 0; }
   }
 }
 
-/* Guards against horizontal overflow; scoped narrowly because Safari's sticky header is sensitive to parent overflow. */
+/* Guards against horizontal overflow; scoped narrowly because Safari's sticky header dislikes parent overflow. */
 /* Padding stops focus rings on edge elements being clipped; the negative margin cancels it visually. */
 #catalog, .stats-section, .site-footer {
   overflow-x: clip;
@@ -2290,7 +2410,7 @@ p { margin: 0; }
   margin-right: -6px;
 }
 
-/* More buffer than the shared 6px: the highlight ring (.is-linked-target::before) sits ~8px outside the project. */
+/* More buffer than the shared 6px: the highlight ring sits ~8px outside the project. */
 #catalog {
   max-width: calc(100% + 20px);
   padding-left: 10px;
@@ -2314,8 +2434,7 @@ p { margin: 0; }
   }
 }
 
-/* Safety net so an image can never make its container wider than the
-   screen. */
+/* Stops an image widening its container past the screen. */
 img, svg {
   max-width: 100%;
 }
