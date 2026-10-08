@@ -481,13 +481,14 @@ p { margin: 0; }
   margin-left: auto;
 }
 
-/* Opens downwards: a tooltip above the header would be cut off. */
+/* Opens to the left of the dot without touching the top of the page
+   and without covering all of the Projects label. */
 .site-header .nav-jump-dot[data-tooltip]::after {
   bottom: auto;
-  top: calc(100% + 6px);
+  top: 50%;
   left: auto;
-  right: -4px;
-  transform: translateY(-4px);
+  right: calc(100% + 6px);
+  transform: translate(4px, calc(-50% - 1px));
   background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
   border-color: color-mix(in srgb, var(--badge-color), black 25%);
   color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
@@ -495,7 +496,7 @@ p { margin: 0; }
 .site-header .nav-jump-dot[data-tooltip]:hover::after,
 .site-header .nav-jump-dot[data-tooltip]:focus-visible::after,
 .site-header .nav-jump-dot[data-tooltip].tooltip-open::after {
-  transform: translateY(0);
+  transform: translate(0, calc(-50% - 1px));
   background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
   border-color: color-mix(in srgb, var(--badge-color), black 25%);
   color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
