@@ -37,6 +37,6 @@ The website currently features:
 
 ## Credits
 
-- Icons used on the site were provided by [SVG Repo](https://svgrepo.com).
+- Icons by [SVG Repo](https://svgrepo.com)
 - Minercraftory font by [GrandChaos9000/Jayvee D. Enaguas](https://www.dafont.com/minercraftory.font)
 - [Inter font](https://github.com/rsms/inter)

@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.1.1 — 2026/10/08
+
+### Changed
+- Made separators between projects on project pages thicker and more visible
+- Swapped version separator in project buttons on the home page for better readability
+- Improvements to image loading on the home page
+
+### Fixed
+- Screen readers announcing each project's name twice on the Data Packs & Mods, Resource Packs and Other Projects pages
+
 ## v3.1.0 — 2026/10/07
 
 ### Changed
