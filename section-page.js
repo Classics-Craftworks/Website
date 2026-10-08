@@ -295,7 +295,7 @@ function renderProject(p) {
   }
 
   return el('article', { class: 'project', attrs: { id } }, [
-    el('img', { class: 'project-image', src: p.image, alt: p.title, attrs: { loading: 'lazy', width: '320', height: '320' } }),
+    el('img', { class: 'project-image', src: p.image, alt: '', attrs: { loading: 'lazy', width: '320', height: '320' } }),
     el('div', { class: 'project-body' }, [
       el('div', { class: 'project-title-row' }, [el('h2', { text: p.title }), copyLinkButton(id, p.title)]),
       el('p', { class: 'project-description', text: p.description }),
