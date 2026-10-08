@@ -591,7 +591,7 @@ function initBackToTop() {
   const btn = document.getElementById('back-to-top');
   if (!btn) return;
 
-  const update = () => btn.classList.toggle('is-visible', window.scrollY > 400);
+  const update = () => btn.classList.toggle('is-visible', window.scrollY > 180);
   update();
   window.addEventListener('scroll', update, { passive: true });
 
