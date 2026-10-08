@@ -28,7 +28,7 @@ function renderHomeProject(project, page) {
   const meta = projectMeta(project);
   return el('li', { class: 'home-project-item' }, [
     internalLink('home-project', projectUrl(page, project), [
-      el('img', { class: 'home-project-img', src: project.image, alt: '', attrs: { draggable: 'false' } }),
+      el('img', { class: 'home-project-img', src: project.image, alt: '', attrs: { draggable: 'false', width: '320', height: '320', loading: 'lazy', decoding: 'async' } }),
       el('span', { class: 'home-project-text' }, [
         el('span', { class: 'home-project-title', text: project.title }),
         meta ? el('span', { class: 'home-project-meta', text: meta }) : null
@@ -158,7 +158,7 @@ function renderFeaturedCard({ project, url }, imageSrc) {
   return [
     el('p', { class: 'splash-featured-label', text: 'Featured project' }),
     imageSrc ? el('div', { class: 'splash-featured-media' }, [
-      el('img', { class: 'splash-featured-img', src: imageSrc, alt: '', attrs: { draggable: 'false' } })
+      el('img', { class: 'splash-featured-img', src: imageSrc, alt: '', attrs: { draggable: 'false', width: '1000', height: '400' } })
     ]) : null,
     el('div', { class: 'splash-featured-head' }, [
       el('h2', { class: 'splash-featured-title', text: project.title })
