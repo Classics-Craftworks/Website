@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.2.0 — 2026/10/08
+
+### Changed
+- Redesigned project pages to be more compact on desktop/wider screens
+  - On mobile/narrower screens, the layout should remain as it was prior to this update
+- Updated Copy Link buttons on project pages to include the project name
+- Notification labels have been moved to the right side of channel boxes so the left side doesn't feel cluttered
+- The Back to Top button now appears sooner
+
+### Fixed
+- Copy Link button icon being placed too low
+
 ## v3.1.2 — 2026/10/08
 
 ### Fixed
