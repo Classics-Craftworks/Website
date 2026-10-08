@@ -10,14 +10,14 @@ function projectUrl(page, project) {
   return page.url + '#' + encodeURIComponent(slugify(project.title));
 }
 
-// "v8.0.0 - 26.3": first enabled download's version plus the stable channel's
+// "v8.0.0 · 26.3": first enabled download's version plus the stable channel's
 // Minecraft version. Empty string if there's neither.
 function projectMeta(project) {
   const ch = stableChannel(project);
   if (!ch) return '';
 
   const first = (ch.downloads || []).find(d => !d.disabled && d.version);
-  return [first && first.version, ch.mcVersion].filter(Boolean).join(' - ');
+  return [first && first.version, ch.mcVersion].filter(Boolean).join(' · ');
 }
 
 function homeArrow(className) {
