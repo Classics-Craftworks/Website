@@ -1464,25 +1464,28 @@ p { margin: 0; }
 }
 
 /* ---------- Project Links ---------- */
+/* Always a tidy two-column grid: an even count fills every row, and an odd
+   count's last button spans the full width, so there are never orphans. */
 .project-links {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  flex-wrap: wrap;
   margin-top: 14px;
 }
+.project-links a:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
 .project-links a {
+  justify-content: center;
+  min-width: 0;
   background-color: transparent;
   border: 1px solid rgba(var(--border-rgb), var(--alpha-medium));
   color: var(--text-soft);
   font-weight: 400;
-  opacity: 0.85;
-  transition: opacity var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-snap);
+  transition: color var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast), transform var(--transition-snap);
 }
 
 @media (hover: hover) {
   .project-links a:hover {
-    opacity: 1;
     color: var(--text);
     border-color: var(--border);
     background: var(--surface-hover);
@@ -1845,9 +1848,7 @@ p { margin: 0; }
 }
 
 /* ---------- Project layout (wide screens) ---------- */
-/* From 1210px of list width, a project becomes three columns:
-     [ image | title, description, links | Release + Beta boxes ]
-                                          [ Older versions note ]
+/* From 1210px of list width, a project becomes three columns.
    Each download is a compact row. Narrower lists and mobile keep the stacked
    layout; link-only projects never get the extra column. Keep 1210px in step
    with the box width the rows need (~330px of content). */
@@ -1877,30 +1878,19 @@ p { margin: 0; }
     min-width: 0;
   }
 
-  /* Links follow the description rather than sitting on the boxes' bottom edge.
-     Three or more links form two columns when the boxes have two downloads;
-     with one download, up to three stay on one row and four or more use columns. */
+  /* Links follow the description rather than sitting on the boxes' bottom edge. */
   .project.has-channels .project-description { margin-top: 2px; }
   .project.has-channels .project-links {
     margin-top: 0;
     padding-top: 8px;
-  }
-  .project.has-channels .project-links:has(> :nth-child(4)),
-  .project.has-channels:has(.download-col + .download-col) .project-links:has(> :nth-child(3)) {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  /* Buttons stretch to fill the info column. */
-  .project.has-channels .project-links a {
-    justify-content: center;
-    flex: 1 1 auto;
-    min-width: 0;
   }
 
   .project.has-channels .channel-row {
     grid-column: 3;
     grid-row: 1;
     margin-top: 0;
+    margin-left: 10px;
+    width: auto;
     flex-direction: row;
   }
 
@@ -1920,6 +1910,7 @@ p { margin: 0; }
   .project.has-channels .versions-note {
     grid-column: 3;
     grid-row: 2;
+    margin-left: 10px;
   }
 
   /* Download rows: type + version on the left, button on the right. Rows share
@@ -2454,17 +2445,6 @@ p { margin: 0; }
 @media (max-width: 900px) {
   .page {
     padding: 16px calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
-  }
-
-  /* A grid so chips align in columns. */
-  .project-links {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-  .project-links a {
-    justify-content: center;
-    min-width: 0;
   }
 
   /* Small square thumbnail instead of a wide banner. */
