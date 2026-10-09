@@ -2419,7 +2419,7 @@ p { margin: 0; }
   margin-right: -10px;
 }
 
-/* No press-shrink under reduced motion; colour feedback stays. */
+/* No press-shrink, slide or fade under reduced motion; colour feedback stays. */
 @media (prefers-reduced-motion: reduce) {
   .nav-link:active,
   .download-btn:active,
@@ -2429,8 +2429,11 @@ p { margin: 0; }
   .home-project:active {
     transform: none;
   }
+  .back-to-top,
+  .back-to-top.is-visible,
   .back-to-top.is-visible:active {
-    transform: translateY(0);
+    transform: none;
+    transition: background-color var(--transition-fast), border-color var(--transition-fast);
   }
 }
 
