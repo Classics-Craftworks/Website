@@ -139,21 +139,30 @@ function layoutChannelRow(rowEl) {
 // with a link icon after it. It sits inside the <h2>, so the heading is still
 // the title; the visually hidden text tells screen readers what it does.
 function copyLinkButton(id, label) {
+  const linkIcon = icon('link', 'icon-sm');
   const btn = el('button', {
     class: 'copy-link-btn',
     attrs: { type: 'button', 'data-tooltip': 'Copy link' }
   }, [
     el('span', { text: label }),
     el('span', { class: 'visually-hidden', text: ' (copy link)' }),
-    icon('link', 'icon-sm')
+    linkIcon
   ]);
+
+  const setIcon = name => {
+    const url = `url('images/icons/${name}.svg')`;
+    linkIcon.style.webkitMaskImage = url;
+    linkIcon.style.maskImage = url;
+  };
 
   const showCopied = () => {
     btn.classList.add('is-copied');
+    setIcon('tick');
     btn.setAttribute('data-tooltip', 'Copied!');
     window.clearTimeout(btn._copiedTimer);
     btn._copiedTimer = window.setTimeout(() => {
       btn.classList.remove('is-copied');
+      setIcon('link');
       btn.setAttribute('data-tooltip', 'Copy link');
     }, 1500);
   };
@@ -173,7 +182,7 @@ function copyLinkButton(id, label) {
     temp.style.opacity = '0';
     document.body.appendChild(temp);
     temp.select();
-    try { document.execCommand('copy'); showCopied(); } catch { /* copy unsupported */ }
+    try { if (document.execCommand('copy')) showCopied(); } catch { /* copy unsupported */ }
     document.body.removeChild(temp);
   });
 
