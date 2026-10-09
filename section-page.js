@@ -208,7 +208,7 @@ function renderChannelBadge(ch, key) {
   const text = String(ch.badge).toLowerCase() === 'updated' ? 'Updated' : 'New';
   const badge = el('button', {
     class: 'channel-badge',
-    attrs: { type: 'button', 'data-badge': text.toLowerCase(), 'aria-label': `Dismiss "${text}" label` }
+    attrs: { type: 'button', 'data-badge': text.toLowerCase(), 'data-tooltip': 'Dismiss', 'aria-label': `Dismiss "${text}" label` }
   }, [
     el('span', { class: 'channel-badge-text', text }),
     el('span', { class: 'channel-badge-dismiss' })
