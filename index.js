@@ -95,6 +95,16 @@ function renderHomeButtons(sections, pages) {
   main.appendChild(grid);
 }
 
+// A trailing "+" is drawn by CSS (.stat-plus) because the pixel font has no such glyph;
+// the real character stays in the page, visually hidden, for screen readers.
+function statValue(value) {
+  const text = String(value);
+  const hasPlus = text.endsWith('+');
+  const kids = [document.createTextNode(hasPlus ? text.slice(0, -1) : text)];
+  if (hasPlus) kids.push(el('span', { class: 'stat-plus', attrs: { 'aria-hidden': 'true' } }), el('span', { class: 'visually-hidden', text: '+' }));
+  return el('span', { class: 'stat-value' }, kids);
+}
+
 function renderStats(stats) {
   if (!stats) return;
 
@@ -102,7 +112,7 @@ function renderStats(stats) {
   if (grid) {
     (stats.stats || []).forEach(s => grid.appendChild(el('div', { class: 'stat-box' }, [
       s.icon ? icon(s.icon, 'icon-md') : null,
-      el('span', { class: 'stat-value', text: fillPlaceholders(s.value) }),
+      statValue(fillPlaceholders(s.value)),
       el('span', { class: 'stat-label', text: s.label })
     ])));
   }
