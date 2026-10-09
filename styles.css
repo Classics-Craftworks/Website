@@ -1495,6 +1495,14 @@ p { margin: 0; }
   margin-top: 12px;
   font-size: 0.7rem;
   color: var(--text-soft);
+  text-align: right;
+}
+
+.versions-note .icon {
+  width: 13px;
+  height: 13px;
+  margin-right: 5px;
+  vertical-align: -2px;
 }
 
 .versions-note-link {

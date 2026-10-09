@@ -291,6 +291,7 @@ function renderVersionsNote(p) {
   if (!modrinth && !github) return null;
 
   const note = el('p', { class: 'versions-note' });
+  note.appendChild(icon('history', 'icon-sm'));
   note.appendChild(document.createTextNode('Older versions: '));
   if (modrinth) note.appendChild(el('a', { class: 'versions-note-link', href: `${modrinth.url}/versions`, text: 'Modrinth' }));
   if (modrinth && github) note.appendChild(document.createTextNode(' | '));
