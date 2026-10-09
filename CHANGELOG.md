@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.4.0 — 2026-10-09
+
+### Changed
+- Restyled the home page splash banner with a full-height Featured Project panel
+- Evened out the spacing between home page sections
+- Increased the size of the icons in the Stats section and made them slightly darker
+- Reduced the size of the stats numbers in the Stats section
+
+### Fixed
+- Fixed the "+" in the stats numbers being too thin and too low
+
 ## v3.3.1 — 2026-10-09
 
 ### Fixed
