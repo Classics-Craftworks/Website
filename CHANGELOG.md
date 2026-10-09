@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.3.0 — 2026/10/09
+
+### Changed
+- The site now loads faster on repeat visits, and pages you've already opened still show their layout and images if you lose your connection
+- Copy Link buttons now briefly change their icon to a tick when clicked
+- Updated the mobile footer to properly centre the Classic's Craftworks logo, text and copyright information
+- Shrunk the logo & copyright info in the desktop footer
+- Centred the desktop footer and moved its sections closer to the logo
+- Updated statistics
+
+### Fixed
+- Back to Top button not respecting `prefers-reduced-motion`
+- "Copied!" tooltip appearing even if the link fails to copy
+
+### Removed
+- Established date from the footer
+- Second separator from the footer
+
 ## v3.2.0 — 2026/10/08
 
 ### Changed
