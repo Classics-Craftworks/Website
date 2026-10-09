@@ -528,6 +528,21 @@ function renderSiteHeader(pages, currentUrl) {
 
 /* ---------- Section page & footer ---------- */
 
+const NOTICE_KEY = 'notice-dismissed';
+const NOTICE_RETURN_DAYS = 45;
+
+// True while this exact notice was dismissed less than NOTICE_RETURN_DAYS ago.
+// Anything unreadable (older format, bad data, a clock set backwards) counts as not dismissed.
+function noticeDismissed(text) {
+  try {
+    const saved = JSON.parse(storageGet(NOTICE_KEY));
+    const age = Date.now() - saved.at;
+    return saved.text === text && age >= 0 && age < NOTICE_RETURN_DAYS * 24 * 60 * 60 * 1000;
+  } catch {
+    return false;
+  }
+}
+
 // Sections like "Other Projects" only link out, so they get no download notice.
 function sectionHasDownloads(section) {
   return (section.projects || []).some(p => (p.channels || []).length > 0);
@@ -543,9 +558,10 @@ function renderFlatSection(section) {
     el('span', { class: 'section-count', text: String((section.projects || []).length) })
   ]));
 
-  // Dismissable; the choice is remembered until the notice's wording changes.
+  // Dismissable. The choice is remembered, but the notice returns when its
+  // wording changes or NOTICE_RETURN_DAYS have passed since it was dismissed.
   const noticeText = SITE_DATA.downloadNotice;
-  if (noticeText && sectionHasDownloads(section) && storageGet('notice-dismissed') !== noticeText) {
+  if (noticeText && sectionHasDownloads(section) && !noticeDismissed(noticeText)) {
     const close = el('button', { class: 'notice-close', attrs: { type: 'button', 'aria-label': 'Dismiss notice', 'data-tooltip': 'Dismiss' } });
     const notice = el('div', { class: 'download-notice', attrs: { role: 'note' } }, [
       icon('info', 'icon-sm'),
@@ -553,12 +569,11 @@ function renderFlatSection(section) {
       close
     ]);
     close.addEventListener('click', () => {
-      storageSet('notice-dismissed', noticeText);
+      storageSet(NOTICE_KEY, JSON.stringify({ text: noticeText, at: Date.now() }));
       notice.remove();
     });
     main.appendChild(notice);
   }
-
 
   main.appendChild(el('div', { class: 'project-list' }, section.projects.map(renderProject)));
 }
