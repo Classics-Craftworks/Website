@@ -2000,12 +2000,13 @@ p { margin: 0; }
 /* Four columns with thin dividers on desktop. */
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.8fr 1fr 1fr;
+  grid-template-columns: repeat(3, max-content);
+  justify-content: center;
   gap: 0;
   align-items: start;
 }
 .footer-col {
-  padding: 2px 28px;
+  padding: 2px 48px;
   border-left: 1px solid var(--border);
   min-width: 0;
 }
@@ -2028,8 +2029,8 @@ p { margin: 0; }
 .footer-brand-text { min-width: 0; }
 .footer-logo {
   display: block;
-  width: clamp(68px, 8vw, 98px);
-  height: clamp(68px, 8vw, 98px);
+  width: 68px;
+  height: 68px;
   transform: translateY(-6px);
 }
 .footer-brand {
@@ -2039,16 +2040,17 @@ p { margin: 0; }
 .footer-brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .footer-brand-name {
   font-family: 'Minercraftory', sans-serif;
-  font-size: clamp(1.1rem, calc(2.5vw - 4px), 1.5rem);
+  font-size: clamp(1rem, calc(2.2vw - 4px), 1.3rem);
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.2;
   white-space: nowrap;
 }
-.footer-brand-col .footer-established,
-.footer-brand-col .footer-copyright { font-size: 0.95rem; text-wrap: balance; }
-.footer-brand-col .footer-established { margin: 6px 0 0; }
-.footer-brand-col .footer-copyright { margin: 2px 0 0; }
+.footer-brand-col .footer-copyright {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-soft);
+}
 
 .footer-heading {
   margin: 0 0 8px;
@@ -2099,7 +2101,6 @@ p { margin: 0; }
 .footer-legal {
   margin-top: 18px;
   padding-top: 4px;
-  border-top: 1px solid var(--border);
 }
 
 @media (max-width: 900px) {
@@ -2115,12 +2116,7 @@ p { margin: 0; }
   .footer-brand-col { justify-content: center; text-align: left; }
   .footer-logo { width: 72px; height: 72px; }
   .footer-brand-name { font-size: clamp(0.85rem, 4.3vw, 1.6rem); }
-  /* One line each; scales with the screen so the copyright never wraps. */
-  .footer-brand-col .footer-established,
-  .footer-brand-col .footer-copyright {
-    font-size: clamp(0.5rem, 2.75vw, 0.95rem);
-    white-space: nowrap;
-  }
+  .footer-brand-col .footer-copyright { font-size: clamp(0.6rem, 3.1vw, 0.8rem); white-space: nowrap; }
 
   .footer-list { align-items: center; }
   #social-links { grid-template-columns: max-content; justify-content: center; }
@@ -2135,7 +2131,6 @@ p { margin: 0; }
   }
   .footer-logo { width: 58px; height: 58px; margin-bottom: 8px; transform: none; }
   .footer-brand { margin-inline: auto; }
-  .footer-brand-col .footer-established,
   .footer-brand-col .footer-copyright { text-align: center; }
 }
 

@@ -575,8 +575,6 @@ function renderFooter(socials, footer, version) {
   });
 
   document.getElementById('copyright').textContent = footer.copyright;
-  const established = document.getElementById('established');
-  if (established && footer.established) established.textContent = footer.established;
   document.getElementById('disclaimer').textContent = footer.disclaimer;
 
   const credits = footer.iconCredits;
