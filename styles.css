@@ -52,8 +52,8 @@
   --border:        #233044;
   --border-rgb:    35, 48, 68;
   --white-rgb:     255, 255, 255; /* used for translucent white fills/borders (nav) */
-  --scrim-rgb:     8, 12, 22;     /* dark overlays on the splash banner */
-  --text-bright:   #d3dcee;       /* subtitle text on the splash banner */
+  --scrim-rgb:     8, 12, 22; /* dark overlays on the splash banner */
+  --text-bright:   #d3dcee; /* subtitle text on the splash banner */
 
   /* Nav Controls & Glow Accent */
   --nav-accent:           #41a0c8;
@@ -88,7 +88,7 @@
   --ch-unsupported:      #929292;
   --ch-unsupported-rgb:  146, 146, 146;
 
-  --badge-color:      #efdd65;  /* "new"/"updated" channel badge */
+  --badge-color:      #efdd65; /* "new"/"updated" channel badge */
   --badge-color-rgb:  239, 221, 101;
 
 /* Named opacity levels, used with the channel colors above
@@ -1406,7 +1406,6 @@ p { margin: 0; }
 }
 
 @media (max-width: 900px) {
-  /* Single column, capped and centred so the boxes don't stretch into wide bars. */
   .stats-grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
@@ -1552,7 +1551,6 @@ p { margin: 0; }
   padding-bottom: 9px;
   margin-bottom: 11px;
   border-bottom: 1px solid rgba(var(--channel-rgb), var(--alpha-border));
-  /* Wraps only if label + version don't fit; the "|" and version wrap together. */
   flex-wrap: wrap;
   row-gap: 4px;
 }
@@ -2273,31 +2271,60 @@ p { margin: 0; }
   color: var(--text-soft);
 }
 
-/* Warning about unofficial reuploads, shown above the project list. */
+/* Reuploads notice above the project list: a thin accent bar and a faint tint; dismissable. */
 .download-notice {
-  max-width: 123ch;
-  margin: -8px auto 20px;
-  padding: 10px 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--text-soft);
-  font-size: 0.82rem;
-  text-align: center;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 12px;
+  margin: -8px auto 24px;
+  padding: 8px 6px 8px 16px;
+  border-left: 3px solid var(--nav-accent);
+  border-radius: 4px 10px 10px 4px;
+  background: rgba(var(--nav-accent-rgb), 0.07);
+  color: color-mix(in srgb, var(--text-soft), var(--text) 35%);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  text-align: left;
 }
-.download-notice .icon { flex: none; }
+.download-notice .icon {
+  width: 17px;
+  height: 17px;
+  margin-top: 9px;
+  color: var(--nav-accent);
+}
+.download-notice p { flex: 1; margin: 0; padding-block: 6px; }
 
-/* On phones the icon sits above the wrapped text. */
-@media (max-width: 900px) {
-  .download-notice {
-    flex-direction: column;
-    gap: 6px;
-  }
+.notice-close {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-right: 6px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
 }
+.notice-close::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
+}
+@media (hover: hover) {
+  .notice-close:hover { color: var(--text); background: rgba(var(--nav-accent-rgb), 0.18); }
+}
+.notice-close:focus-visible {
+  color: var(--text);
+  background: rgba(var(--nav-accent-rgb), 0.18);
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.notice-close:active { background: rgba(var(--nav-accent-rgb), 0.3); }
 
 .footer-version {
   text-align: center;
@@ -2352,7 +2379,7 @@ p { margin: 0; }
   .brand-logo { width: 38px; height: 38px; }
   .brand-name {
     font-size: clamp(0.95rem, 4.6vw, 1.2rem);
-    white-space: normal; /* lets very narrow phones wrap the name instead of squeezing the menu button off-screen */
+    white-space: normal;
     text-wrap: balance;
   }
 

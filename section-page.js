@@ -542,12 +542,22 @@ function renderFlatSection(section) {
     el('span', { class: 'section-count', text: String((section.projects || []).length) })
   ]));
 
-  if (SITE_DATA.downloadNotice && sectionHasDownloads(section)) {
-    main.appendChild(el('p', { class: 'download-notice' }, [
+  // Dismissable; the choice is remembered until the notice's wording changes.
+  const noticeText = SITE_DATA.downloadNotice;
+  if (noticeText && sectionHasDownloads(section) && storageGet('notice-dismissed') !== noticeText) {
+    const close = el('button', { class: 'notice-close', attrs: { type: 'button', 'aria-label': 'Dismiss notice', 'data-tooltip': 'Dismiss' } });
+    const notice = el('div', { class: 'download-notice', attrs: { role: 'note' } }, [
       icon('info', 'icon-sm'),
-      el('span', { text: SITE_DATA.downloadNotice })
-    ]));
+      el('p', { text: noticeText }),
+      close
+    ]);
+    close.addEventListener('click', () => {
+      storageSet('notice-dismissed', noticeText);
+      notice.remove();
+    });
+    main.appendChild(notice);
   }
+
 
   main.appendChild(el('div', { class: 'project-list' }, section.projects.map(renderProject)));
 }
