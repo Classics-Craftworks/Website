@@ -1894,12 +1894,12 @@ p { margin: 0; }
   .project.has-channels .download-unavailable[data-tooltip]::after {
     left: auto;
     right: -2px;
-    transform: translateY(-4px);
+    transform: translateY(calc(-4px * var(--tt-flip, 1)));
   }
   .project.has-channels .download-unavailable[data-tooltip]:hover::after,
   .project.has-channels .download-unavailable[data-tooltip]:focus-visible::after,
   .project.has-channels .download-unavailable[data-tooltip].tooltip-open::after {
-    transform: translateY(-10px);
+    transform: translateY(calc(-10px * var(--tt-flip, 1)));
   }
 }
 
@@ -2139,7 +2139,7 @@ p { margin: 0; }
   position: absolute;
   bottom: 100%;
   left: 50%;
-  transform: translateX(-50%) translateY(-4px);
+  transform: translateX(-50%) translateY(calc(-4px * var(--tt-flip, 1)));
   
   padding: 5px 10px;
   font-size: 0.80rem;
@@ -2165,7 +2165,15 @@ p { margin: 0; }
   visibility: visible;
   color: var(--text);
   background: var(--surface-hover);
-  transform: translateX(-50%) translateY(-10px);
+  transform: translateX(-50%) translateY(calc(-10px * var(--tt-flip, 1)));
+}
+
+/* section-page.js adds .tooltip-below when there is no room above (the sticky
+   header would cover it), so the tooltip opens beneath the element instead. */
+[data-tooltip].tooltip-below { --tt-flip: -1; }
+[data-tooltip].tooltip-below::after {
+  bottom: auto;
+  top: 100%;
 }
 
 /* Right-aligned: the button sits at the screen edge. */

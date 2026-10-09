@@ -674,6 +674,24 @@ function renderStructuredData(data, section) {
   document.head.appendChild(script);
 }
 
+/* ---------- Tooltip placement ----------
+   Tooltips open above their element. Near the top of the page the sticky
+   header would cover them, so they open below instead (.tooltip-below). */
+
+function placeTooltip(target) {
+  const el = target instanceof Element ? target.closest('[data-tooltip]') : null;
+  if (!el || el.closest('.site-header') || el.id === 'back-to-top') return;
+
+  const header = document.querySelector('.site-header');
+  const headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+  const tipHeight = parseFloat(getComputedStyle(el, '::after').height) || 40;
+  const needed = tipHeight + 14; // the tooltip plus its 10px offset and a little air
+  el.classList.toggle('tooltip-below', el.getBoundingClientRect().top - headerBottom < needed);
+}
+
+['mouseover', 'focusin', 'pointerdown'].forEach(type =>
+  document.addEventListener(type, e => placeTooltip(e.target)));
+
 /* ---------- Entry point ----------
    Section pages set data-page to their "url" in SITE_DATA.pages. */
 
