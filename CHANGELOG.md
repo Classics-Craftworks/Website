@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.5.0 — 2026-10-09
+
+### Added
+- Made the reupload notice dismissible. Its dismissed state persists across visits and both project pages, but the notice reappears after 45 days or when its wording changes
+- Tooltips to the "New" and "Updated" badges
+
+### Changed
+- Made the "Older versions" links right-aligned and added a history icon
+- Restyled the reupload notice on project pages to make it more noticeable without being overwhelming
+- Moved the "New" and "Updated" badges slightly to the left
+- Brightened the link button text on project pages
+- Made the download boxes slightly smaller
+- Increased space between projects on the project pages
+- Made the dividers on the project pages slightly brighter
+
 ## v3.4.0 — 2026-10-09
 
 ### Changed
