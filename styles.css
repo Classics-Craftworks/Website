@@ -2497,21 +2497,42 @@ p { margin: 0; }
     padding: 16px calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   }
 
-  /* Small square thumbnail instead of a wide banner. */
+  /* Small square thumbnail beside the title only; the description, links and downloads below
+     use the full width. .project-body and .project-info drop out of the layout so their children
+     sit directly in the .project grid. */
   .project {
-    grid-template-columns: 64px 1fr;
-    gap: 14px;
+    grid-template-columns: 64px minmax(0, 1fr);
+    column-gap: 14px;
+    row-gap: 0;
+    align-items: center;
     padding: 22px 0;
+    /* The container the channel boxes' stacking rule (@container project) looks for moves up here,
+       because .project-body no longer has a box of its own. */
+    container: project / inline-size;
   }
+  .project-body,
+  .project-info { display: contents; }
+  .project-body { container-type: normal; }
   .project-image {
+    grid-column: 1;
+    grid-row: 1;
     width: 64px;
     height: 64px;
     border-radius: 12px;
   }
   .project-body h2 {
-    font-size: 1.25rem;
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 1.5rem;
+    line-height: 1.15;
     transform: none;
   }
+  .project-description,
+  .project-links,
+  .channel-row,
+  .versions-note { grid-column: 1 / -1; }
+  .project-description { margin-top: 12px; }
+  .project-links { margin-top: 18px; } /* a touch more than the 16px above the Release card, so the rhythm reads even */
 
   .download-btn,
   .download-unavailable {
