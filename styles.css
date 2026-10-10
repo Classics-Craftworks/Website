@@ -904,7 +904,7 @@ p { margin: 0; }
 /* A faint accent tint lifts the panel off the banner so it reads as the featured side.
    It lives on a pseudo-element so it can start left of the panel (--featured-fade-lead) and begin
    fading in earlier. Both layers start fully transparent and reach full strength 160px later,
-   so there is no hard edge. Hidden on mobile, where the card has its own flat tint. */
+   so there is no hard edge. On mobile the same fade runs vertically (see the 900px block). */
 .splash-featured::before {
   content: '';
   position: absolute;
@@ -961,6 +961,7 @@ p { margin: 0; }
   margin: 0 0 20px;
   color: var(--text-soft);
   font-size: 0.95rem;
+  text-wrap: balance;
 }
 .splash-chips {
   display: flex;
@@ -974,28 +975,18 @@ p { margin: 0; }
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 4px 10px;
+  box-sizing: border-box;
+  height: 28px;
+  padding: 0 12px;
   border: 0;
-  border: 1px solid var(--nav-btn-border);
   border-radius: 999px;
   background: rgba(var(--nav-accent-rgb), 0.1);
-  color: var(--text-soft);
-  font-size: 0.78rem;
+  color: color-mix(in srgb, var(--text-soft), white 30%);
+  font-size: 0.8rem;
   font-weight: 500;
   cursor: default;
 }
 
-/* Delete the desktop rule that forces chips to the button's height */
-@media (min-width: 901px) {
-  .splash-featured-foot .splash-btn {
-    height: 40px;
-    padding-block: 0;
-  }
-  .splash-featured-foot .splash-chip {
-    padding-inline: 10px;
-    font-size: 0.78rem;
-  }
-}
 .splash-chip .icon { color: var(--accent); }
 .splash-featured-foot {
   display: flex;
@@ -1006,19 +997,12 @@ p { margin: 0; }
 }
 .splash-featured-foot .splash-btn { padding: 10px 18px; font-size: 0.88rem; }
 
-/* Desktop: the type tags and the View Project button share one height, so the row lines up. */
+/* Desktop: the View Project button is a fixed 40px tall. */
 @media (min-width: 901px) {
-  .splash-featured-foot .splash-chip,
   .splash-featured-foot .splash-btn {
     box-sizing: border-box;
     height: 40px;
     padding-block: 0;
-  }
-  .splash-featured-foot .splash-chip {
-    height: 28px;
-    padding-inline: 12px;
-    font-size: 0.8rem;
-    border: 0;
   }
 }
 
@@ -1030,54 +1014,73 @@ p { margin: 0; }
     padding: 16px 14px;
   }
   .splash-copy { padding: 0; }
-  .splash-featured::before { display: none; }
+  /* Same fade as desktop, turned vertical: it starts above the panel and ramps in as it comes down. */
+  .splash-featured::before {
+    top: -64px;
+    left: 0;
+    background:
+      linear-gradient(180deg, rgba(var(--nav-accent-rgb), 0) 0, rgba(var(--nav-accent-rgb), 0.09) 120px),
+      linear-gradient(180deg, rgba(var(--scrim-rgb), 0) 0, rgba(var(--scrim-rgb), 0.78) 120px);
+  }
   .splash::before {
     background: linear-gradient(180deg, rgba(var(--scrim-rgb), 0.7) 0%, rgba(var(--scrim-rgb), 0.55) 100%);
   }
   /* Fixed-width, centred buttons rather than stretching across the banner. */
   .splash-actions { justify-content: center; gap: 10px; }
-  .splash-actions .splash-btn { flex: 0 1 200px; }
+  /* Two equal buttons spanning the full copy width, so their outer edges line up with the featured panel's content. */
+  .splash-actions .splash-btn { flex: 1 1 0; min-width: 0; }
   .splash-headline { margin-bottom: 10px; }
   .splash-subtitle { margin-bottom: 14px; }
 
-  /* Mobile featured card: centred, width-capped, tighter. */
+  /* Mobile featured panel: like desktop, a borderless tinted panel running edge to edge along the
+     bottom of the banner (no card inside the banner), with the image filling its width. */
   .splash-featured {
-    width: 100%;
-    max-width: 520px;
-    margin-inline: auto;
-    padding: 12px;
-    border: 1px solid rgba(var(--nav-accent-rgb), 0.55);
-    border-radius: 14px;
-    /* Stacked card: a flat tint rather than the desktop side-ramp. */
-    background:
-      linear-gradient(rgba(var(--nav-accent-rgb), 0.09), rgba(var(--nav-accent-rgb), 0.09)),
-      rgba(var(--scrim-rgb), 0.78);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    width: auto;
+    max-width: none;
+    margin: 10px -14px -16px;
+    padding: 16px 14px;
+    border: 0;
+    border-radius: 0;
   }
-  .splash-featured-label { margin: 2px 0 10px; font-size: 1rem; }
+  /* Divider from the hero copy: inset to the content padding and faded out toward both ends. */
+  .splash-featured::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 14px;
+    right: 14px;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(var(--nav-accent-rgb), 0), rgba(var(--nav-accent-rgb), 0.5) 25%, rgba(var(--nav-accent-rgb), 0.5) 75%, rgba(var(--nav-accent-rgb), 0));
+  }
+  .splash-featured-label { margin: 0 0 10px; font-size: 1rem; }
   .splash-featured-media {
-    /* Scaled down at the image's own 5:2 ratio and centred, never cropped. */
-    --media-h: clamp(72px, 20vw, 120px);
-    height: var(--media-h);
-    width: calc(var(--media-h) * 2.5);
-    max-width: 100%;
+    /* Full card width at the image's own 5:2 ratio, never cropped. */
+    width: 100%;
+    height: auto;
     aspect-ratio: 5 / 2;
-    margin-inline: auto;
     border-radius: 8px;
   }
   .splash-featured-head { margin: 8px 0 6px; gap: 6px; }
   .splash-featured-title { font-size: 1.15rem; }
-  .splash-chip { padding: 3px 8px; font-size: 0.74rem; }
   .splash-featured-desc { margin-bottom: 8px; font-size: 0.85rem; }
   .splash-featured-foot { gap: 8px 12px; }
   .splash-featured-foot .splash-btn { padding: 8px 14px; font-size: 0.82rem; }
 }
 
+/* Footer row: pills and button never wrap their text; the row tightens as the card narrows (phones
+   around 375px wide), and stacks with a full-width button only in the narrowest cards. */
+.splash-featured-foot .splash-chip,
+.splash-featured-foot .splash-btn { white-space: nowrap; }
+@container splash-featured (max-width: 330px) {
+  .splash-featured-foot { gap: 8px; }
+  .splash-chips { gap: 6px; }
+  .splash-chip { gap: 5px; padding-inline: 9px; font-size: 0.76rem; }
+  .splash-featured-foot .splash-btn { padding: 8px 12px; font-size: 0.8rem; }
+}
 /* Footer row: tightens first, and stacks with a full-width button only in the narrowest cards. */
 @container splash-featured (max-width: 311px) {
-  .splash-featured-foot { gap: 12px; }
-  .splash-featured-foot .splash-btn { padding: 8px 14px; font-size: 0.82rem; }
+  .splash-featured-foot { gap: 8px; }
 }
 @container splash-featured (max-width: 289px) {
   .splash-featured-foot { flex-direction: column; align-items: stretch; }
