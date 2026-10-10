@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.6.0 — 2026-10-10
+
+### Changed
+- Restyled the mobile Featured Project panel from a boxed card into a borderless panel to better match the desktop version from v3.4.0
+- Made the Explore and About buttons span the full width on mobile
+- Made the "Data Pack" and "Mod" pills smaller and borderless, and also slightly darkened their text
+- Improved text wrapping in the Featured Project description on mobile
+- Updated the mobile project page layout so the icon sits beside the title only, and the description, links and download boxes use the full width
+- Increased the size of project titles on mobile
+- Increased the spacing between the project description and link buttons on mobile to a little more
+
+### Fixed
+- Fixed the Featured Project image being narrower than its panel on mobile
+- Fixed the "Data Pack" & "Mod" pills and the View Project button wrapping onto two lines on narrow screens
+
 ## v3.5.0 — 2026-10-09
 
 ### Added
