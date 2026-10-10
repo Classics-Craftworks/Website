@@ -979,7 +979,7 @@ p { margin: 0; }
   border: 1px solid var(--nav-btn-border);
   border-radius: 999px;
   background: rgba(var(--nav-accent-rgb), 0.1);
-  color: var(--text);
+  color: var(--text-soft);
   font-size: 0.78rem;
   font-weight: 500;
   cursor: default;
@@ -1014,7 +1014,12 @@ p { margin: 0; }
     height: 40px;
     padding-block: 0;
   }
-  .splash-featured-foot .splash-chip { padding-inline: 14px; font-size: 0.85rem; }
+  .splash-featured-foot .splash-chip {
+    height: 28px;
+    padding-inline: 12px;
+    font-size: 0.8rem;
+    border: 0;
+  }
 }
 
 @media (max-width: 900px) {
