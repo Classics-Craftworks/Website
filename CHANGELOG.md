@@ -4,10 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.7.1 — 2026-10-11
+
+### Added
+- Descriptive alt text to project icons on the project pages, for screen reader users
+
+### Changed
+- Improved link previews with a new share image, and a clearer home page title
+- Updated the home page to "Classic's Craftworks - Minecraft Java Data Packs, Mods & Resource Packs"
+- Reduced repeat downloads for returning visitors - fonts and images are no longer re-fetched on every page view
+
 ## v3.7.0 — 2026-10-11
 
 ### Changed
-- Changed Download button labels to "View" on project pages
+- Changed Download button labels to "View" on project pages and swapped the download icon out for a new "new tab" one
 - Improved the site working offline after a visit - it now loads from a saved copy when your connection is slow or drops
 - Omitted Minecraft versions when one isn't specified, instead of showing "Java undefined"
 - Updated statistics
