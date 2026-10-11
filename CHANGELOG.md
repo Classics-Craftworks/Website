@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.7.2 — 2026-10-11
+
+### Changed
+- Improved link previews again with a better image, and a title and description that no longer repeat each other
+
 ## v3.7.1 — 2026-10-11
 
 ### Added
