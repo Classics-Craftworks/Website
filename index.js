@@ -6,8 +6,8 @@ const HOME_SLOTS = 4;
 
 const pluralProjects = n => `${n} project${n === 1 ? '' : 's'}`;
 
-function projectUrl(page, project) {
-  return sitePath(page.url) + '#' + encodeURIComponent(slugify(project.title));
+function projectUrl(page, section, project) {
+  return sitePath(page.url) + '#' + encodeURIComponent(projectId(section, project));
 }
 
 // "v8.0.0 · 26.3": first enabled download's version plus the stable channel's
@@ -24,10 +24,10 @@ function homeArrow(className) {
   return el('span', { class: className, attrs: { 'aria-hidden': 'true' } });
 }
 
-function renderHomeProject(project, page) {
+function renderHomeProject(project, section, page) {
   const meta = projectMeta(project);
   return el('li', { class: 'home-project-item' }, [
-    internalLink('home-project', projectUrl(page, project), [
+    internalLink('home-project', projectUrl(page, section, project), [
       el('img', { class: 'home-project-img', src: project.image, alt: '', attrs: { draggable: 'false', width: '320', height: '320', loading: 'lazy', decoding: 'async' } }),
       el('span', { class: 'home-project-text' }, [
         el('span', { class: 'home-project-title', text: project.title }),
@@ -62,7 +62,7 @@ function renderHomeButton(section, page) {
   const overflow = count > HOME_SLOTS;
   const shown = overflow ? HOME_SLOTS - 1 : HOME_SLOTS;
 
-  const rows = projects.slice(0, shown).map(p => renderHomeProject(p, page));
+  const rows = projects.slice(0, shown).map(p => renderHomeProject(p, section, page));
   if (overflow) rows.push(renderHomeMore(count - shown, page));
 
   const header = internalLink('home-card-header', page.url, [
@@ -147,7 +147,7 @@ function findProject(title, sections, pages) {
   for (const section of sections) {
     const project = (section.projects || []).find(p => p.title === title);
     const page = pages.find(pg => pg.section === section.heading);
-    if (project && page) return { project, url: projectUrl(page, project) };
+    if (project && page) return { project, url: projectUrl(page, section, project) };
   }
   return null;
 }

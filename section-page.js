@@ -44,9 +44,25 @@ function uniqueSlug(text, fallback, used) {
   return slug;
 }
 
-const usedSlugs = new Set();
-function assignSlug(text, fallback) {
-  return uniqueSlug(text, fallback, usedSlugs);
+// The one place that decides element IDs for a section: the heading claims its
+// slug first, then each project in order. Section pages, the home page links,
+// search results, badge keys and the structured data all read IDs from here, so
+// they can't drift apart. Returns { headingId, projects: [{ project, id }] }.
+const sectionIdCache = new WeakMap();
+function sectionIds(section) {
+  let ids = sectionIdCache.get(section);
+  if (!ids) {
+    const used = new Set();
+    const headingId = uniqueSlug(section.heading, 'section', used);
+    const projects = (section.projects || []).map(project => ({ project, id: uniqueSlug(project.title, 'project', used) }));
+    ids = { headingId, projects, byProject: new Map(projects.map(p => [p.project, p.id])) };
+    sectionIdCache.set(section, ids);
+  }
+  return ids;
+}
+
+function projectId(section, project) {
+  return sectionIds(section).byProject.get(project);
 }
 
 // Note: the `href` option opens a new tab; use internalLink() for same-site links.
@@ -141,6 +157,16 @@ function layoutChannelRow(rowEl) {
     return headers.length > 1 && headers.some(pillWraps);
   });
   if (pillNeedsRoom) downloadLists.forEach(dl => dl.classList.add('downloads-stacked'));
+}
+
+// Re-runs layoutChannelRow() whenever the row's size changes. Deliberately not
+// skipped when only the height changed: stacking changes the height, and those
+// follow-up passes are what settle the layout after a resize (skipping them left
+// rows stuck stacked after resizing from narrow to wide).
+function watchChannelRow(rowEl) {
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => layoutChannelRow(rowEl)).observe(rowEl);
+  }
 }
 
 /* ---------- Project cards ---------- */
@@ -317,17 +343,13 @@ function renderVersionsNote(p) {
   return note;
 }
 
-function renderProject(p) {
-  const id = assignSlug(p.title, 'project');
-
+function renderProject(p, id) {
   const linkRow = el('div', { class: 'project-links' }, (p.links || []).map(l =>
     el('a', { class: 'text-link', href: l.url }, [icon(l.icon, 'icon-sm'), el('span', { text: l.label })])
   ));
 
   const channelRow = el('div', { class: 'channel-row' }, (p.channels || []).map(ch => renderChannel(ch, id)));
-  if (window.ResizeObserver) {
-    new ResizeObserver(() => layoutChannelRow(channelRow)).observe(channelRow);
-  }
+  watchChannelRow(channelRow);
 
   // On wide screens the info block (title, description, links) and the channel
   // boxes sit side by side and share a height; narrower screens stack them
@@ -356,12 +378,10 @@ function countUndismissedBadges(page) {
   const section = (SITE_DATA.sections || []).find(s => s.heading === page.section);
   if (!section) return 0;
 
-  const slugs = new Set();
   let count = 0;
-  (section.projects || []).forEach(p => {
-    const projectId = uniqueSlug(p.title, 'project', slugs);
-    (p.channels || []).forEach(ch => {
-      if (ch.badge && storageGet(badgeKey(projectId, ch)) !== badgeFingerprint(ch)) count++;
+  sectionIds(section).projects.forEach(({ project, id }) => {
+    (project.channels || []).forEach(ch => {
+      if (ch.badge && storageGet(badgeKey(id, ch)) !== badgeFingerprint(ch)) count++;
     });
   });
   return count;
@@ -570,8 +590,8 @@ function renderFlatSection(section) {
   const main = document.getElementById('catalog');
   if (!main || !section) return;
 
-  const id = assignSlug(section.heading, 'section');
-  main.appendChild(el('h1', { class: 'flat-section-heading', attrs: { id } }, [
+  const ids = sectionIds(section);
+  main.appendChild(el('h1', { class: 'flat-section-heading', attrs: { id: ids.headingId } }, [
     el('span', { text: section.heading }),
     el('span', { class: 'section-count', text: String((section.projects || []).length) })
   ]));
@@ -593,7 +613,7 @@ function renderFlatSection(section) {
     main.appendChild(notice);
   }
 
-  main.appendChild(el('div', { class: 'project-list' }, section.projects.map(renderProject)));
+  main.appendChild(el('div', { class: 'project-list' }, ids.projects.map(({ project, id }) => renderProject(project, id))));
 }
 
 function footerLink(href, iconName, label) {
@@ -711,12 +731,7 @@ function renderStructuredData(data, section) {
   sections.forEach(sec => {
     const page = pages.find(p => p.section === sec.heading);
 
-    // As in renderFlatSection(), the heading claims its slug first.
-    const used = new Set();
-    uniqueSlug(sec.heading, 'section', used);
-
-    (sec.projects || []).forEach(project => {
-      const id = uniqueSlug(project.title, 'project', used);
+    sectionIds(sec).projects.forEach(({ project, id }) => {
       if (!(project.channels || []).length) return;
 
       const stable = stableChannel(project);

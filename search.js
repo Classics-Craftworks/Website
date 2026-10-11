@@ -12,12 +12,7 @@ function buildSearchIndex(data) {
     const page = pages.find(p => p.section === section.heading);
     if (!page) return;
 
-    // As in renderFlatSection(), the heading claims its slug first.
-    const used = new Set();
-    uniqueSlug(section.heading, 'section', used);
-
-    (section.projects || []).forEach(project => {
-      const id = uniqueSlug(project.title, 'project', used);
+    sectionIds(section).projects.forEach(({ project, id }) => {
 
       const versions = [];
       (project.channels || []).forEach(ch => {
