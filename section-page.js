@@ -100,10 +100,9 @@ function storageSet(key, value) {
   try { localStorage.setItem(key, value); } catch { /* storage unavailable */ }
 }
 
-function setHashSilently(id) {
-  const url = `${location.origin}${location.pathname}#${id}`;
-  try { history.pushState(null, '', url); } catch { /* not fatal */ }
-  return url;
+// Full URL for a project's deep link. Copying it leaves the address bar alone.
+function deepLinkUrl(id) {
+  return `${location.origin}${location.pathname}#${id}`;
 }
 
 /* ---------- Channel row layout ----------
@@ -181,20 +180,28 @@ function copyLinkButton(id, label) {
   btn.addEventListener('click', e => {
     e.preventDefault();
     e.stopPropagation();
-    const url = setHashSilently(id);
+    const url = deepLinkUrl(id);
+
+    // execCommand path, also used when the async Clipboard API is missing or rejects.
+    const fallbackCopy = () => {
+      const temp = document.createElement('textarea');
+      temp.value = url;
+      temp.setAttribute('readonly', '');
+      temp.style.position = 'fixed';
+      temp.style.opacity = '0';
+      document.body.appendChild(temp);
+      temp.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch { /* copy unsupported */ }
+      document.body.removeChild(temp);
+      if (ok) showCopied();
+    };
 
     if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(url).then(showCopied).catch(() => {});
-      return;
+      navigator.clipboard.writeText(url).then(showCopied).catch(fallbackCopy);
+    } else {
+      fallbackCopy();
     }
-    const temp = document.createElement('textarea');
-    temp.value = url;
-    temp.style.position = 'fixed';
-    temp.style.opacity = '0';
-    document.body.appendChild(temp);
-    temp.select();
-    try { if (document.execCommand('copy')) showCopied(); } catch { /* copy unsupported */ }
-    document.body.removeChild(temp);
   });
 
   return btn;
