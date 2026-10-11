@@ -285,10 +285,10 @@ function renderChannel(ch, projectId) {
   const header = el('div', { class: 'channel-header' }, [
     el('span', { class: 'status-dot' }),
     el('span', { class: 'channel-label', text: ch.label }),
-    el('span', { class: 'channel-mc-group' }, [
+    ch.mcVersion ? el('span', { class: 'channel-mc-group' }, [
       el('span', { class: 'channel-sep', text: '|' }),
       el('span', { class: 'channel-mc', text: 'Java ' + ch.mcVersion })
-    ])
+    ]) : null
   ]);
 
   const badge = ch.badge ? renderChannelBadge(ch, badgeKey(projectId, ch)) : null;
