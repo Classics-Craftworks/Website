@@ -1,6 +1,8 @@
 /* SITE DATA - all site text, links and project lists.
 
    - Icons: SVGs in /images/icons/, referenced by filename without extension.
+   - imageAlt: describes the project icon for screen readers, Leave it out for
+     an image that is purely decorative.
    - Channels: "stable" | "beta" | "alpha" | "unsupported".
    - Downloads: each needs its own "version". Add `disabled: true` (and an
      optional "tooltip") if unavailable.
@@ -50,6 +52,7 @@ const SITE_DATA = {
         // #region ──────── Better Craftables ────────
         {
           image: "images/better-craftables.webp",
+          imageAlt: "Better Craftables logo: the letters BC",
           title: "Better Craftables",
           description: "Adds some quality-of-life crafting and smelting recipes to the game.",
           links: [
@@ -85,6 +88,7 @@ const SITE_DATA = {
         // #region ──────── Better Unpackables ────────
         {
           image: "images/better-unpackables.webp",
+          imageAlt: "Better Unpackables logo: the letters BU",
           title: "Better Unpackables",
           description: "Adds some quality-of-life unpacking recipes to the game.",
           links: [
@@ -120,6 +124,7 @@ const SITE_DATA = {
         // #region ──────── Silly Eatables ────────
         {
           image: "images/silly-eatables.webp",
+          imageAlt: "Silly Eatables logo: the letters SE",
           title: "Silly Eatables",
           description: "Eat things you shouldn't with these silly food recipes!",
           links: [
@@ -154,6 +159,7 @@ const SITE_DATA = {
         // #region ──────── New Sword Blocking ────────
         {
           image: "images/new-sword-blocking.webp",
+          imageAlt: "New Sword Blocking logo: the letters NSB",
           title: "New Sword Blocking",
           description: "Restores and enhances sword blocking in Minecraft 1.21.5 – 1.21.8!",
           links: [
@@ -185,6 +191,7 @@ const SITE_DATA = {
         // #region ──────── Classic's Disc Tweaks ────────
         {
           image: "images/disc-tweaks.webp",
+          imageAlt: "Classic's Disc Tweaks logo: the letters DT",
           title: "Classic's Disc Tweaks",
           description: "Subtly widens music discs and unifies their design for a more cohesive look.",
           links: [
@@ -216,6 +223,7 @@ const SITE_DATA = {
         // #region ──────── Classic's Dye Tweaks ────────
         {
           image: "images/dye-tweaks.webp",
+          imageAlt: "Classic's Dye Tweaks logo: the letters DT",
           title: "Classic's Dye Tweaks",
           description: "Tweaks Minecraft's new dye textures and brings them to older versions of the game!",
           links: [
@@ -247,6 +255,7 @@ const SITE_DATA = {
         // #region ──────── Classic's Lantern Tweaks ────────
         {
           image: "images/lantern-tweaks.webp",
+          imageAlt: "Classic's Lantern Tweaks logo: the letters LT",
           title: "Classic's Lantern Tweaks",
           description: "Adjusts the edges of Soul & Copper Lanterns so they better match the regular Lantern. Little details matter!",
           links: [
@@ -278,6 +287,7 @@ const SITE_DATA = {
         // #region ──────── Zisteau Pigmen ────────
         {
           image: "images/zisteau-pigmen.webp",
+          imageAlt: "Zisteau Pigmen logo: the letters ZP",
           title: "Zisteau Pigmen",
           description: "Zombified Piglins named 'Zisteau' become Zombie Pigmen.",
           links: [
@@ -306,6 +316,7 @@ const SITE_DATA = {
         // #region ──────── CraftHorizon ────────
         {
           image: "images/crafthorizon.webp",
+          imageAlt: "CraftHorizon logo over a starry galaxy",
           title: "CraftHorizon",
           description: "Whitelisted Minecraft server, with a focus on vanilla+ Survival and Creative gameplay.",
           links: [
@@ -319,6 +330,7 @@ const SITE_DATA = {
         // #region ──────── Website ────────
         {
           image: "images/craftworks.webp",
+          imageAlt: "Classic's Craftworks CCW emblem",
           title: "Classic's Craftworks Website",
           description: "The hub for all of our projects. You're already here!",
           links: [

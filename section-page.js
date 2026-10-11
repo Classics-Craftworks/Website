@@ -357,7 +357,7 @@ function renderProject(p, id) {
   const hasChannels = (p.channels || []).length > 0;
 
   return el('article', { class: 'project' + (hasChannels ? ' has-channels' : ''), attrs: { id } }, [
-    el('img', { class: 'project-image', src: p.image, alt: '', attrs: { loading: 'lazy', width: '320', height: '320' } }),
+    el('img', { class: 'project-image', src: p.image, alt: p.imageAlt || '', attrs: { loading: 'lazy', width: '320', height: '320' } }),
     el('div', { class: 'project-body' }, [
       el('div', { class: 'project-info' }, [
         el('h2', {}, [copyLinkButton(id, p.title)]),
