@@ -667,54 +667,92 @@ function handleDeepLink() {
   });
 }
 
-// Adds JSON-LD (Organization + project list). Pass a section for just its
-// projects, or null for every project.
+// Adds JSON-LD: Organization, WebSite and a list of the downloadable projects.
+// Pass a section for just its projects, or null for every project. Link-only
+// entries (a server, this website) aren't software downloads, so they're left
+// out of the list. Each project's url is its card on this site, using the same
+// #id the page gives it.
 function renderStructuredData(data, section) {
   const canonical = document.querySelector('link[rel="canonical"]');
   const siteUrl = canonical ? canonical.href : location.origin + '/';
+  const root = new URL('/', siteUrl).href;
   const toAbsolute = path => path ? new URL(path, siteUrl).href : undefined;
+
+  // Same name the page's social tags use ("Classic's Craftworks"); the brand
+  // name is the all-caps display version.
+  const siteMeta = document.querySelector('meta[property="og:site_name"]');
+  const siteName = (siteMeta && siteMeta.content) || data.brand.name;
+  const splash = data.home && data.home.splash;
+  const description = (data.home && data.home.description) || (splash && splash.subtitle) || '';
 
   const organization = {
     '@type': 'Organization',
-    name: data.brand.name,
-    url: siteUrl,
+    '@id': root + '#organization',
+    name: siteName,
+    url: root,
     logo: toAbsolute(data.brand.logo),
-    description: (data.home && data.home.projectsSubtitle) || '',
     sameAs: (data.socials || []).map(l => l.url)
   };
+  if (description) organization.description = description;
 
-  const projects = section
-    ? (section.projects || [])
-    : (data.sections || []).flatMap(s => s.projects || []);
+  const website = {
+    '@type': 'WebSite',
+    '@id': root + '#website',
+    name: siteName,
+    url: root,
+    publisher: { '@id': organization['@id'] }
+  };
+  if (description) website.description = description;
 
-  const items = projects.map(project => {
-    const stable = stableChannel(project);
-    const firstDownload = stable && (stable.downloads || []).find(d => d.url && !d.disabled);
-    const firstLink = (project.links || [])[0];
+  const pages = data.pages || [];
+  const sections = section ? [section] : (data.sections || []);
+  const items = [];
 
-    const item = {
-      '@type': 'SoftwareApplication',
-      name: project.title,
-      description: project.description,
-      image: toAbsolute(project.image),
-      url: (firstLink && firstLink.url) || siteUrl,
-      applicationCategory: 'GameApplication',
-      operatingSystem: 'Minecraft: Java Edition'
-    };
-    if (firstDownload && firstDownload.version) item.softwareVersion = firstDownload.version;
-    if (firstDownload) item.downloadUrl = firstDownload.url;
-    return item;
+  sections.forEach(sec => {
+    const page = pages.find(p => p.section === sec.heading);
+
+    // As in renderFlatSection(), the heading claims its slug first.
+    const used = new Set();
+    uniqueSlug(sec.heading, 'section', used);
+
+    (sec.projects || []).forEach(project => {
+      const id = uniqueSlug(project.title, 'project', used);
+      if (!(project.channels || []).length) return;
+
+      const stable = stableChannel(project);
+      const firstDownload = stable && (stable.downloads || []).find(d => d.url && !d.disabled);
+
+      const item = {
+        '@type': 'SoftwareApplication',
+        name: project.title,
+        description: project.description,
+        image: toAbsolute(project.image),
+        url: page ? toAbsolute(`${sitePath(page.url)}#${id}`) : siteUrl,
+        applicationCategory: 'GameApplication',
+        operatingSystem: 'Minecraft: Java Edition',
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'GBP' },
+        publisher: { '@id': organization['@id'] }
+      };
+      const external = (project.links || []).map(l => l.url).filter(Boolean);
+      if (external.length) item.sameAs = external;
+      if (firstDownload && firstDownload.version) item.softwareVersion = firstDownload.version;
+      if (firstDownload) item.downloadUrl = firstDownload.url;
+      items.push(item);
+    });
   });
 
-  const itemList = {
-    '@type': 'ItemList',
-    name: `${data.brand.name} ${section ? section.heading : 'Projects'}`,
-    itemListElement: items.map((item, i) => ({ '@type': 'ListItem', position: i + 1, item }))
-  };
+  const graph = [organization, website];
+  if (items.length) {
+    graph.push({
+      '@type': 'ItemList',
+      name: `${siteName} ${section ? section.heading : 'Projects'}`,
+      itemListElement: items.map((item, i) => ({ '@type': 'ListItem', position: i + 1, item }))
+    });
+  }
 
   const script = document.createElement('script');
   script.type = 'application/ld+json';
-  script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': [organization, itemList] });
+  script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph });
   document.head.appendChild(script);
 }
 
@@ -758,7 +796,8 @@ function initSectionPage(pageUrl) {
 
 if (document.body.dataset.page) initSectionPage(document.body.dataset.page);
 
-// Cache-free service worker (sw.js) so Chrome/Edge offer to install the site.
+// Service worker (sw.js): lets Chrome/Edge offer to install the site, and keeps
+// the page shell and visited pages available offline.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => { /* not fatal */ });
