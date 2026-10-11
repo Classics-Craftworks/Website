@@ -218,7 +218,6 @@ p { margin: 0; }
 .download-btn:focus-visible,
 .top-link:focus-visible,
 .text-link:focus-visible,
-.social-link:focus-visible,
 .version-link:focus-visible,
 .credits-link:focus-visible,
 .brand:focus-visible,
@@ -1811,8 +1810,7 @@ p { margin: 0; }
 
 .download-btn:active,
 .project-links a:active,
-.top-link:active,
-.social-link:active {
+.top-link:active {
   transform: scale(0.97);
 }
 
@@ -2005,8 +2003,6 @@ p { margin: 0; }
 }
 .icon-sm { width: 15px; height: 15px; }
 .icon-md { width: 19px; height: 19px; }
-
-.social-link .icon-md { width: 17px; height: 17px; }
 
 /* Larger than icon-sm: the Download button is the most prominent. */
 .download-btn .icon-sm { width: 18px; height: 18px; }
@@ -2567,7 +2563,6 @@ p { margin: 0; }
   .download-btn:active,
   .project-links a:active,
   .top-link:active,
-  .social-link:active,
   .home-project:active {
     transform: none;
   }
