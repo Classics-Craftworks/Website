@@ -273,8 +273,8 @@ function renderDownload(d) {
     }
   } else {
     action = el('a', { class: 'download-btn', href: d.url }, [
-      icon('download', 'icon-sm'),
-      el('span', { text: 'Download' })
+      icon('newtab', 'icon-sm'),
+      el('span', { text: 'View' })
     ]);
   }
 
