@@ -662,9 +662,26 @@ function initBackToTop() {
   const btn = document.getElementById('back-to-top');
   if (!btn) return;
 
-  const update = () => btn.classList.toggle('is-visible', window.scrollY > 180);
-  update();
-  window.addEventListener('scroll', update, { passive: true });
+  const SHOW_AFTER = 180; // px scrolled before the button appears
+
+  if ('IntersectionObserver' in window) {
+    // An invisible marker over the top SHOW_AFTER px of the page: the button shows
+    // once it has scrolled out of view. No work happens per scroll event.
+    const marker = document.createElement('div');
+    marker.setAttribute('aria-hidden', 'true');
+    Object.assign(marker.style, {
+      position: 'absolute', top: '0', left: '0', width: '1px',
+      height: SHOW_AFTER + 'px', pointerEvents: 'none', visibility: 'hidden'
+    });
+    document.body.appendChild(marker);
+    new IntersectionObserver(entries => {
+      btn.classList.toggle('is-visible', !entries[entries.length - 1].isIntersecting);
+    }).observe(marker);
+  } else {
+    const update = () => btn.classList.toggle('is-visible', window.scrollY > SHOW_AFTER);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+  }
 
   btn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
