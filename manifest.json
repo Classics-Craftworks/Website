@@ -1,7 +1,9 @@
 {
+  "id": "/",
   "name": "Classic's Craftworks",
   "short_name": "CCW",
   "description": "Minecraft Java Edition data packs, mods & resource packs.",
+  "lang": "en",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
