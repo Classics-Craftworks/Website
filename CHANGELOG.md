@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.7.0 — 2026-10-11
+
+### Changed
+- Changed Download button labels to "View" on project pages
+- Improved the site working offline after a visit - it now loads from a saved copy when your connection is slow or drops
+- Omitted Minecraft versions when one isn't specified, instead of showing "Java undefined"
+- Updated statistics
+
+### Fixed
+- Fixed pages not loading when opened with a trailing slash in the address (e.g. `/about/` or `/data-packs-mods/`)
+- Fixed copying a project link not working sometimes. If your browser blocks the usual copy method, the site falls back to another one instead of silently doing nothing
+- Fixed copying a project link changing the address bar and adding it to the browser history
+
 ## v3.6.0 — 2026-10-10
 
 ### Changed
