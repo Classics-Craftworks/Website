@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.7.3 — 2026-10-11
+
+### Removed
+- The "Sometimes useful. Always Minecraft." tagline from link previews
+
+### Fixed
+- Home page link preview title & description
+- X/Twitter link preview having a different description
+
 ## v3.7.2 — 2026-10-11
 
 ### Changed
