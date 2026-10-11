@@ -4,11 +4,22 @@
 
 /* ---------- Helpers ---------- */
 
+// Site-relative paths ("about", "images/x.webp") become root-absolute so they
+// resolve the same from any URL depth (e.g. a trailing-slash "/about/").
+// Absolute URLs, "/..." paths, "#hash" and "mailto:" are left alone.
+function sitePath(path) {
+  return /^([a-z][a-z0-9+.-]*:|\/|#)/i.test(path) ? path : '/' + path;
+}
+
+function iconUrl(name) {
+  return `url('${sitePath(`images/icons/${name || 'link'}.svg`)}')`;
+}
+
 function icon(name, cls) {
   const span = document.createElement('span');
   span.className = 'icon' + (cls ? ' ' + cls : '');
   span.setAttribute('aria-hidden', 'true');
-  const url = `url('images/icons/${name || 'link'}.svg')`;
+  const url = iconUrl(name);
   span.style.webkitMaskImage = url;
   span.style.maskImage = url;
   return span;
@@ -44,7 +55,7 @@ function el(tag, opts = {}, children = []) {
   if (opts.class) node.className = opts.class;
   if (opts.text) node.textContent = opts.text;
   if (opts.href) { node.href = opts.href; node.target = '_blank'; node.rel = 'noopener noreferrer'; }
-  if (opts.src) node.src = opts.src;
+  if (opts.src) node.src = sitePath(opts.src);
   if (opts.alt !== undefined) node.alt = opts.alt;
   if (opts.attrs) for (const [k, v] of Object.entries(opts.attrs)) node.setAttribute(k, v);
   children.forEach(c => c && node.appendChild(c));
@@ -54,7 +65,7 @@ function el(tag, opts = {}, children = []) {
 function internalLink(className, href, children, label) {
   const a = document.createElement('a');
   a.className = className;
-  a.href = href;
+  a.href = sitePath(href);
   if (label) a.setAttribute('aria-label', label);
   children.forEach(c => c && a.appendChild(c));
   return a;
@@ -150,7 +161,7 @@ function copyLinkButton(id, label) {
   ]);
 
   const setIcon = name => {
-    const url = `url('images/icons/${name}.svg')`;
+    const url = iconUrl(name);
     linkIcon.style.webkitMaskImage = url;
     linkIcon.style.maskImage = url;
   };
@@ -192,7 +203,7 @@ function copyLinkButton(id, label) {
 function renderBrand(brand) {
   const logo = document.getElementById('brand-logo');
   // Re-assigning an identical src can restart the request in some browsers.
-  if (logo.getAttribute('src') !== brand.logo) logo.src = brand.logo;
+  if (logo.getAttribute('src') !== sitePath(brand.logo)) logo.src = sitePath(brand.logo);
   logo.alt = '';
   document.getElementById('brand-name').textContent = brand.name;
 }

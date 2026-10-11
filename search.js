@@ -33,7 +33,7 @@ function buildSearchIndex(data) {
         title: project.title,
         image: project.image,
         section: section.heading,
-        url: `${page.url}#${id}`,
+        url: `${sitePath(page.url)}#${id}`,
         titleLower,
         titleWords: titleLower.split(/[^a-z0-9]+/).filter(Boolean),
         sectionLower: section.heading.toLowerCase(),

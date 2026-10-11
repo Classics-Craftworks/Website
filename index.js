@@ -7,7 +7,7 @@ const HOME_SLOTS = 4;
 const pluralProjects = n => `${n} project${n === 1 ? '' : 's'}`;
 
 function projectUrl(page, project) {
-  return page.url + '#' + encodeURIComponent(slugify(project.title));
+  return sitePath(page.url) + '#' + encodeURIComponent(slugify(project.title));
 }
 
 // "v8.0.0 · 26.3": first enabled download's version plus the stable channel's
@@ -136,7 +136,7 @@ function forwardOldDeepLink(sections, pages) {
 
     const matches = slugify(section.heading) === id || (section.projects || []).some(p => slugify(p.title) === id);
     if (matches) {
-      location.replace(page.url + '#' + encodeURIComponent(id));
+      location.replace(sitePath(page.url) + '#' + encodeURIComponent(id));
       return true;
     }
   }
