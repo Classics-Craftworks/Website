@@ -100,9 +100,12 @@ function highlightMatches(text, words) {
   return frag;
 }
 
-// "resource-packs.html" and "/resource-packs" are the same page.
+// "resource-packs.html", "/resource-packs" and "/resource-packs/" are the same page.
 function normalizePath(path) {
-  return path.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, '');
+  return path
+    .replace(/(^|\/)index\.html$/, '$1')
+    .replace(/\.html$/, '')
+    .replace(/(.)\/+$/, '$1');
 }
 
 function initSearch() {
