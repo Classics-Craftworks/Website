@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.7.4 — 2026-10-14
+
+### Changed
+- Download stats on the home page now update automatically from Modrinth and SpigotMC (via Spiget)
+
 ## v3.7.3.3 — 2026-10-14
 
 ### Changed
