@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.7.3.3 — 2026-10-14
+
+### Changed
+- Updated statistics
+
 ## v3.7.3.2 — 2026-10-13
 
 ### Changed

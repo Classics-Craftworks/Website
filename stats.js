@@ -5,11 +5,11 @@ const STATS_DATA = {
 
   stats: [
     { icon: "box", label: "Downloadable Projects", value: "{projects}" },
-    { icon: "download", label: "Downloads", value: "123,000+" },
-    { icon: "clock", label: "Hours of Playtime", value: "480+" }
+    { icon: "download", label: "Downloads", value: "125,000+" },
+    { icon: "clock", label: "Hours of Playtime", value: "490+" }
   ],
 
-  lastUpdated: "October 11, 2026",
+  lastUpdated: "October 14, 2026",
 
   note: "Download stats combine totals from Modrinth and SpigotMC. Playtime stats are tracked by Modrinth via the Modrinth App only."
 };
