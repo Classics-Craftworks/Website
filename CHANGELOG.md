@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.7.5 — 2026-10-14
+
+### Changed
+
+- Hid the no-JavaScript notice from Google search snippets and reworded its text
+- Expanded the home page meta description
+
 ## v3.7.4 — 2026-10-14
 
 ### Changed
