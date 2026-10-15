@@ -41,7 +41,7 @@ const SITE_DATA = {
     { label: "Data Packs & Mods", url: "data-packs-mods", section: "Data Packs & Mods", icon: "brackets" },
     { label: "Resource Packs", url: "resource-packs", section: "Resource Packs", icon: "brush" },
     { label: "Other Projects", url: "other-projects", section: "Other Projects", icon: "wrench" },
-    { label: "About", url: "about", icon: "book" }
+    { label: "About", url: "about", icon: "about" }
   ],
 
   sections: [
