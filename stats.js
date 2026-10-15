@@ -11,5 +11,5 @@ const STATS_DATA = {
 
   lastUpdated: "October 15, 2026",
 
-  note: "Download stats combine totals from Modrinth and SpigotMC. Playtime stats are tracked by Modrinth via the Modrinth App only."
+  note: "Download stats combine totals from Modrinth and SpigotMC, fetched daily via the Modrinth API and Spiget and rounded down to the nearest thousand. Playtime stats are tracked by Modrinth through the Modrinth App only, and are updated manually."
 };
