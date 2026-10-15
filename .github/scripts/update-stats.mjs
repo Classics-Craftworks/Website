@@ -1,4 +1,7 @@
 // Updates the "Downloads" stat in stats.js from Modrinth + SpigotMC (via Spiget).
+// When the stat changes, it also bumps the hotfix number of the site version in
+// data.js (v3.7.5 -> v3.7.5.1, v3.7.5.1 -> v3.7.5.2, ...) and adds a matching
+// entry to CHANGELOG.md.
 //
 // Projects are read from data.js, so new projects are picked up automatically:
 //   - Modrinth: every modrinth.com/<type>/<slug> link, except servers,
@@ -18,6 +21,7 @@ import vm from 'node:vm';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA_FILE = resolve(ROOT, 'data.js');
 const STATS_FILE = resolve(ROOT, 'stats.js');
+const CHANGELOG_FILE = resolve(ROOT, 'CHANGELOG.md');
 
 const EXCLUDE_SLUGS = new Set(['crafthorizon']);
 const IGNORED_MODRINTH_TYPES = new Set(['server', 'organization', 'user', 'collection']);
@@ -116,6 +120,30 @@ function today() {
   return new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 }
 
+// ---------- version + changelog ----------
+
+const VERSION_RE = /(version:\s*\{\s*label:\s*")([^"]*)(")/; // the site version, not a download's "version"
+
+function bumpHotfix(label) {
+  const m = label.match(/^v(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?$/);
+  if (!m) throw new Error(`Cannot parse version label "${label}" (expected e.g. v3.7.5 or v3.7.5.1)`);
+  return `v${m[1]}.${m[2]}.${m[3]}.${Number(m[4] ?? 0) + 1}`;
+}
+
+function isoToday() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+// Adds the entry above the newest *released* version. A heading whose date still
+// contains "XX" (e.g. "## v3.7.6 — 2026-10-XX") is an upcoming release and stays on top.
+function addChangelogEntry(changelog, version) {
+  const headings = [...changelog.matchAll(/^## .*$/gm)];
+  const released = headings.find(h => !/XX/i.test(h[0]));
+  if (!released) throw new Error('Could not find a released version heading in CHANGELOG.md');
+  const entry = `## ${version} — ${isoToday()}\n\n### Changed\n- Updated download statistics [automated]\n\n`;
+  return changelog.slice(0, released.index) + entry + changelog.slice(released.index);
+}
+
 // ---------- main ----------
 
 const { modrinth, spigot } = collectProjects(loadSiteData());
@@ -143,12 +171,25 @@ if (newValue === oldValue) {
 }
 
 console.log(`Downloads: "${oldValue}" -> "${newValue}"`);
+
+// Work out every change before writing anything, so a problem with the version
+// or changelog can't leave the files half-updated.
+const dataSource = readFileSync(DATA_FILE, 'utf8');
+const versionMatch = dataSource.match(VERSION_RE);
+if (!versionMatch) throw new Error('Could not find the site version label in data.js');
+const oldVersion = versionMatch[2];
+const newVersion = bumpHotfix(oldVersion);
+const newChangelog = addChangelogEntry(readFileSync(CHANGELOG_FILE, 'utf8'), newVersion);
+console.log(`Version: ${oldVersion} -> ${newVersion}`);
+
 if (DRY_RUN) {
-  console.log('Dry run; stats.js not modified.');
+  console.log('Dry run; no files modified.');
   process.exit(0);
 }
 
 let updated = source.replace(DOWNLOADS_RE, `$1${newValue}$3`);
 updated = updated.replace(UPDATED_RE, `$1${today()}$3`);
 writeFileSync(STATS_FILE, updated);
-console.log('stats.js updated.');
+writeFileSync(DATA_FILE, dataSource.replace(VERSION_RE, `$1${newVersion}$3`));
+writeFileSync(CHANGELOG_FILE, newChangelog);
+console.log('stats.js, data.js and CHANGELOG.md updated.');
