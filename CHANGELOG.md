@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.7.6 — 2026-10-15
+
+### Changed
+- The version number and changelog are now updated when download stats are automatically updated
+- Updated the note below the stats section
+- Updated icon used by About page
+
 ## v3.7.5.1 — 2026-10-15
 
 ### Changed
