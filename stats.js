@@ -6,7 +6,7 @@ const STATS_DATA = {
   stats: [
     { icon: "box", label: "Downloadable Projects", value: "{projects}" },
     { icon: "download", label: "Downloads", value: "128,000+" },
-    { icon: "clock", label: "Hours of Playtime", value: "490+" }
+    { icon: "clock", label: "Hours of Playtime", value: "500+" }
   ],
 
   lastUpdated: "October 18, 2026",
