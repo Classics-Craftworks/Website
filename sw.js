@@ -12,7 +12,7 @@
    Bump CACHE when this file's strategy changes; old caches are deleted on
    activate. SHELL below is only a head start: anything missing from it is
    still cached the first time it is fetched. */
-const CACHE = 'ccw-cache-v8';
+const CACHE = 'ccw-cache-v6';
 const NETWORK_TIMEOUT_MS = 4000;
 const IMAGE_REFRESH_MS = 24 * 60 * 60 * 1000;
 const STAMP = 'x-sw-cached-at'; // when an image was cached; added by storeImage()
