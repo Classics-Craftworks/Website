@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.8.0 — 2026-10-19
+
+### Added
+- Announcements banner on the bottom of every page
+
+### Changed
+- Slightly reworded the note below the stats section
+
 ## v3.7.6.4 — 2026-10-19
 
 ### Changed
