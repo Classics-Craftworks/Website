@@ -379,7 +379,7 @@ const SITE_DATA = {
   // Banner fixed to the bottom of every page. Plain text only.
   announcement: {
     enabled: true,
-    text: "Better Unpackables v5.0.1 has been released with an important bug fix!"
+    text: "Better Unpackables v5.0.1 has been released with an important fix for Cut Sandstone recipes."
   },
 
   downloadNotice: "Any reuploads of these projects that are not linked on this website are unofficial, unaffiliated, and may have been modified or contain malicious content."
