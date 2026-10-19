@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.9.0 — 2026-10-19
+
+### Added
+- Updates page
+- Latest updates section to the home page, pulling the most recent 3 entries from the new Updates page
+
+### Changed
+- Changed announcements icon
+- Updated Better Unpackables v5.0.1 announcement wording
+
 ## v3.8.0 — 2026-10-19
 
 ### Added
