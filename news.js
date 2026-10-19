@@ -65,20 +65,27 @@ function newsSafeUrl(url) {
   return /^(https?:\/\/|\/|#|[^:]*$)/i.test(url);
 }
 
-// Link button for an entry's `url`. Same-site links stay in the tab; others
-// open a new one.
-function newsLink(entry) {
-  if (!entry.url || !newsSafeUrl(entry.url)) return null;
+// Anchor for `url`, or null if it isn't a safe address. Same-site links stay
+// in the tab; others open a new one.
+function newsAnchor(className, url, children) {
+  if (!url || !newsSafeUrl(url)) return null;
 
-  const a = internalLink('news-link', entry.url, [
-    el('span', { text: entry.linkText || 'Read more' }),
-    el('span', { class: 'news-link-arrow', attrs: { 'aria-hidden': 'true' } })
-  ]);
+  const a = internalLink(className, url, children);
   if (/^https?:/i.test(a.href) && new URL(a.href).origin !== location.origin) {
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
   }
   return a;
+}
+
+const newsArrow = () => el('span', { class: 'news-link-arrow', attrs: { 'aria-hidden': 'true' } });
+
+// Link button for an entry's `url`.
+function newsLink(entry) {
+  return newsAnchor('news-link', entry.url, [
+    el('span', { text: entry.linkText || 'Read more' }),
+    newsArrow()
+  ]);
 }
 
 // Calendar icon for the Updates page. If images/icons/calendar.svg is missing
@@ -99,7 +106,19 @@ function newsDate(entry) {
   ]);
 }
 
-function renderNewsItem(entry) {
+// Picture tile for an entry (Updates page): its `image`, else the icon of the
+// project its `url` points at, else a generic news glyph.
+function newsMedia(entry) {
+  const src = announceImage(entry);
+  return el('div', { class: 'news-item-media', attrs: { 'aria-hidden': 'true' } }, [
+    src ? el('img', { class: 'news-item-img', src, alt: '', attrs: { width: '120', height: '120', loading: 'lazy', decoding: 'async', draggable: 'false' } })
+        : icon('news', 'news-item-glyph')
+  ]);
+}
+
+// Home page cards are plain; the Updates page passes { detailed: true } for the
+// icon tile and version pill, and { latest: true } for the newest entry's highlight.
+function renderNewsItem(entry, opts = {}) {
   const pills = (entry.tags || []).map(key => {
     const tag = newsTag(key);
     const pill = el('span', { class: 'news-tag', text: tag.label });
@@ -108,17 +127,23 @@ function renderNewsItem(entry) {
   });
   const head = el('div', { class: 'news-meta' }, [
     ...pills,
-    newsDate(entry)
+    newsDate(entry),
+    opts.detailed && entry.version ? el('span', { class: 'news-version', text: entry.version }) : null
   ]);
 
   const body = [
     head,
     el('h3', { class: 'news-title', text: entry.title }),
-    entry.text ? el('p', { class: 'news-text', text: fillPlaceholders(entry.text) }) : null
+    entry.text ? el('p', { class: 'news-text', text: fillPlaceholders(entry.text) }) : null,
+    newsLink(entry)
   ];
 
-  body.push(newsLink(entry));
-  return el('li', { class: 'news-item' }, body);
+  if (!opts.detailed) return el('li', { class: 'news-item' }, body);
+
+  return el('li', { class: 'news-item news-item-detailed' + (opts.latest ? ' is-latest' : '') }, [
+    newsMedia(entry),
+    el('div', { class: 'news-item-body' }, body)
+  ]);
 }
 
 // Home page: fills #news-section with the latest entries; hidden if there are none.
@@ -177,10 +202,55 @@ function searchText(entry) {
   ].filter(Boolean).join(' ').toLowerCase();
 }
 
+// Sidebar "Quick links" panel.
+function renderQuickLinks(cfg) {
+  const links = ((cfg && cfg.links) || []).map(l => {
+    const a = newsAnchor('news-quick', l.url, [
+      icon(l.icon || 'link', 'icon-md news-quick-icon'),
+      el('span', { class: 'news-quick-label', text: l.label }),
+      el('span', { class: 'news-quick-arrow', attrs: { 'aria-hidden': 'true' } })
+    ]);
+    return a && el('li', {}, [a]);
+  }).filter(Boolean);
+  if (!links.length) return null;
+
+  return el('section', { class: 'news-panel' }, [
+    el('h2', { class: 'news-panel-heading', text: cfg.heading || 'Quick links' }),
+    el('ul', { class: 'news-quick-list' }, links)
+  ]);
+}
+
+// Sidebar info card: icon tile, heading, text, then an optional outlined
+// `button` and/or plain `link` ({ label, url, icon? }).
+function renderSideCard(card) {
+  if (!card || !card.heading) return null;
+
+  const button = card.button && newsAnchor('news-btn', card.button.url, [
+    card.button.icon ? icon(card.button.icon, 'icon-sm') : null,
+    el('span', { text: card.button.label }),
+    el('span', { class: 'news-btn-arrow', attrs: { 'aria-hidden': 'true' } })
+  ]);
+  const link = card.link && newsAnchor('news-link', card.link.url, [
+    el('span', { text: card.link.label }),
+    newsArrow()
+  ]);
+
+  return el('section', { class: 'news-panel news-card' }, [
+    el('div', { class: 'news-card-icon', attrs: { 'aria-hidden': 'true' } }, [icon(card.icon || 'info', 'news-card-glyph')]),
+    el('div', { class: 'news-card-body' }, [
+      el('h2', { class: 'news-card-heading', text: card.heading }),
+      card.text ? el('p', { class: 'news-card-text', text: card.text }) : null,
+      button,
+      link
+    ])
+  ]);
+}
+
 function renderUpdatesPage() {
   const main = document.getElementById('updates');
   const news = newsData();
   if (!main || !news) return;
+  const side = news.sidebar || {};
 
   main.appendChild(el('h1', { class: 'flat-section-heading', attrs: { id: 'updates-heading' } }, [
     el('span', { text: news.heading || 'Updates' })
@@ -208,7 +278,7 @@ function renderUpdatesPage() {
     class: 'nav-search-input',
     attrs: {
       type: 'search',
-      placeholder: 'Search updates…',
+      placeholder: side.searchPlaceholder || 'Search updates…',
       'aria-label': 'Search updates',
       autocomplete: 'off',
       spellcheck: 'false',
@@ -233,7 +303,8 @@ function renderUpdatesPage() {
 
   function refresh() {
     const shown = entries.filter(matches);
-    list.replaceChildren(...shown.map(e => renderNewsItem(e)));
+    // The newest entry overall keeps its highlight wherever it appears.
+    list.replaceChildren(...shown.map(e => renderNewsItem(e, { detailed: true, latest: e === entries[0] })));
 
     buttons.forEach((btn, key) => {
       const on = key === '' ? !active.size : active.has(key);
@@ -271,18 +342,25 @@ function renderUpdatesPage() {
     return btn;
   }
 
-  // Search box and tag filters share a row (they wrap onto two on narrow screens).
-  // The filters only appear when there's more than one tag to choose between.
+  // Layout: the list, plus a sidebar. The sidebar is two blocks (search/filters,
+  // then quick links and cards) so that on narrow screens the search and filters
+  // come first, then the list, then the extras.
   const tools = el('div', { class: 'news-tools' }, [searchBox]);
   if (tagKeys.length > 1) {
+    tools.appendChild(el('h2', { class: 'news-side-heading', text: side.filterHeading || 'Filter by type' }));
     tools.appendChild(el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter updates by tag' } }, [
       makeButton('', 'All', null),
       ...tagKeys.map(k => { const t = newsTag(k); return makeButton(k, t.label, t); })
     ]));
   }
-  main.appendChild(tools);
-  main.appendChild(status);
-  main.appendChild(list);
+
+  const extras = [renderQuickLinks(side.quickLinks), ...(side.cards || []).map(renderSideCard)].filter(Boolean);
+  const layout = el('div', { class: 'news-layout' + (extras.length ? '' : ' no-extras') }, [
+    tools,
+    el('div', { class: 'news-feed' }, [status, list]),
+    extras.length ? el('aside', { class: 'news-extra', attrs: { 'aria-label': 'More about updates' } }, extras) : null
+  ]);
+  main.appendChild(layout);
   refresh();
 }
 

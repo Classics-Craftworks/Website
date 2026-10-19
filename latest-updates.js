@@ -17,14 +17,25 @@
                 newest is used. Visitors can dismiss it; it comes back for them
                 when a different entry is announced. Remove the flag (or set it
                 to false) to stop announcing.
-       image    (optional) picture for the card, e.g. "images/x.webp". By
-                default it's the icon of the project the `url` points at.
+       image    (optional) picture for the entry's icon tile on the Updates page
+                and for the corner card, e.g. "images/x.webp". By default it's
+                the icon of the project the `url` points at; with neither, a
+                generic news icon is shown.
    - Tags: each key has a `label` (shown on the pill and filter button) and a
      `color` (any #rrggbb hex). Add, rename or recolour freely; the filters on
      the Updates page are built from the tags that entries actually use, in the
      order listed here. A tag used by an entry but missing from `tags` still
      works: it gets its key as a label and the default blue.
-   - homeCount: how many entries the home page shows. */
+   - homeCount: how many entries the home page shows.
+   - sidebar: the right-hand column of the Updates page (below the entries on
+     narrow screens). Search and the tag filters are always there; you set their
+     text, plus what follows. Icons are names of files in images/icons/ without
+     ".svg" (e.g. "discord"). Links work like an entry's `url`.
+       searchPlaceholder, filterHeading   text for those two controls
+       quickLinks   { heading, links: [{ label, url, icon }] }; leave out to hide
+       cards        info cards, in order; each is { heading, text, icon } plus an
+                    optional `button` and/or `link` of { label, url, icon? }.
+                    Leave the list empty to hide them. */
 
 const LATEST_UPDATES = {
   heading: "Latest Updates",
@@ -100,5 +111,35 @@ const LATEST_UPDATES = {
       url: "/resource-packs",
       linkText: "View Resource Packs"
     }
-  ]
+  ],
+
+  sidebar: {
+    searchPlaceholder: "Search updates…",
+    filterHeading: "Filter by type",
+
+    quickLinks: {
+      heading: "Quick links",
+      links: [
+        { label: "Data Packs & Mods", url: "/data-packs-mods", icon: "brackets" },
+        { label: "Resource Packs",    url: "/resource-packs",  icon: "brush" },
+        { label: "Other Projects",    url: "/other-projects",  icon: "wrench" },
+        { label: "Modrinth",          url: "https://modrinth.com/organization/classics-craftworks", icon: "modrinth" }
+      ]
+    },
+
+    cards: [
+      {
+        heading: "Stay in the loop",
+        text: "Follow along for new releases, betas and snapshots.",
+        icon: "announcements",
+        button: { label: "Join the Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" }
+      },
+      {
+        heading: "About our updates",
+        text: "This page covers stable releases, betas and snapshots for every project, plus new and retired projects.",
+        icon: "info",
+        link: { label: "Learn more", url: "/about" }
+      }
+    ]
+  }
 };
