@@ -1402,7 +1402,7 @@ p { margin: 0; }
   font-size: 0.72rem;
   color: var(--text-soft);
   text-align: left;
-  max-width: 115ch;
+  max-width: 180ch;
   font-style: italic;
 }
 
