@@ -1,5 +1,5 @@
 /* LATEST UPDATES - the news feed shown on the home page (newest few) and on
-   the Updates page (everything, with tag filters). Rendered by news.js.
+   the News page (everything, with search and tag filters). Rendered by news.js.
 
    - Adding an entry: copy a block in `entries`. Order doesn't matter; the
      newest `date` is always shown first.
@@ -13,21 +13,21 @@
                 ("/data-packs-mods#better-unpackables")
        linkText (optional) the button's text; defaults to "Read more"
        announce (optional) true shows this entry as a card in the bottom-right
-                corner of every page except Updates. If several are marked, the
+                corner of every page except News. If several are marked, the
                 newest is used. Visitors can dismiss it; it comes back for them
                 when a different entry is announced. Remove the flag (or set it
                 to false) to stop announcing.
-       image    (optional) picture for the entry's icon tile on the Updates page
+       image    (optional) picture for the entry's icon tile on the News page
                 and for the corner card, e.g. "images/x.webp". By default it's
                 the icon of the project the `url` points at; with neither, a
                 generic news icon is shown.
    - Tags: each key has a `label` (shown on the pill and filter button) and a
      `color` (any #rrggbb hex). Add, rename or recolour freely; the filters on
-     the Updates page are built from the tags that entries actually use, in the
+     the News page are built from the tags that entries actually use, in the
      order listed here. A tag used by an entry but missing from `tags` still
      works: it gets its key as a label and the default blue.
    - homeCount: how many entries the home page shows.
-   - sidebar: the right-hand column of the Updates page (below the entries on
+   - sidebar: the right-hand column of the News page (below the entries on
      narrow screens). Search and the tag filters are always there; you set their
      text, plus what follows. Icons are names of files in images/icons/ without
      ".svg" (e.g. "discord"). Links work like an entry's `url`.
@@ -38,8 +38,8 @@
                     Leave the list empty to hide them. */
 
 const LATEST_UPDATES = {
-  heading: "Latest Updates",
-  homeHeading: "Latest Updates",
+  heading: "News",
+  homeHeading: "Latest News",
   intro: "The latest news and updates from Classic's Craftworks.",
   homeCount: 3,
 
@@ -114,7 +114,7 @@ const LATEST_UPDATES = {
   ],
 
   sidebar: {
-    searchPlaceholder: "Search updates…",
+    searchPlaceholder: "Search news…",
     filterHeading: "Filter by type",
 
     quickLinks: {
@@ -135,7 +135,7 @@ const LATEST_UPDATES = {
         button: { label: "Join the Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" }
       },
       {
-        heading: "About our updates",
+        heading: "About our news",
         text: "This page covers stable releases, betas and snapshots for every project, plus new and retired projects.",
         icon: "info",
         link: { label: "Learn more", url: "/about" }

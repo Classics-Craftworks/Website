@@ -1,7 +1,7 @@
 /* News feed: renders LATEST_UPDATES (latest-updates.js; format documented
    there). Used by the home page (latest few, via renderNewsPreview) and by the
-   Updates page (everything, with tag filters; this file builds that page
-   itself). Needs latest-updates.js, data.js and section-page.js. */
+   News page (everything, with search and tag filters; this file builds that
+   page itself). Needs latest-updates.js, data.js and section-page.js. */
 
 const NEWS_DEFAULT_RGB = '65, 160, 200'; // same blue as --nav-accent-rgb
 
@@ -88,7 +88,7 @@ function newsLink(entry) {
   ]);
 }
 
-// Calendar icon for the Updates page. If images/icons/calendar.svg is missing
+// Calendar icon for dates. If images/icons/calendar.svg is missing
 // the icon is dropped rather than shown as a blank square.
 function calendarIcon() {
   const node = icon('calendar', 'icon-sm news-date-icon');
@@ -106,7 +106,7 @@ function newsDate(entry) {
   ]);
 }
 
-// Picture tile for an entry (Updates page): its `image`, else the icon of the
+// Picture tile for an entry (News page): its `image`, else the icon of the
 // project its `url` points at, else a generic news glyph.
 function newsMedia(entry) {
   const src = announceImage(entry);
@@ -116,8 +116,7 @@ function newsMedia(entry) {
   ]);
 }
 
-// Home page cards are plain; the Updates page passes { detailed: true } for the
-// icon tile and version pill, and { latest: true } for the newest entry's highlight.
+// Home page cards are plain; the News page passes { detailed: true } for the icon tile.
 function renderNewsItem(entry, opts = {}) {
   const pills = (entry.tags || []).map(key => {
     const tag = newsTag(key);
@@ -127,8 +126,7 @@ function renderNewsItem(entry, opts = {}) {
   });
   const head = el('div', { class: 'news-meta' }, [
     ...pills,
-    newsDate(entry),
-    opts.detailed && entry.version ? el('span', { class: 'news-version', text: entry.version }) : null
+    newsDate(entry)
   ]);
 
   const body = [
@@ -140,7 +138,7 @@ function renderNewsItem(entry, opts = {}) {
 
   if (!opts.detailed) return el('li', { class: 'news-item' }, body);
 
-  return el('li', { class: 'news-item news-item-detailed' + (opts.latest ? ' is-latest' : '') }, [
+  return el('li', { class: 'news-item news-item-detailed' }, [
     newsMedia(entry),
     el('div', { class: 'news-item-body' }, body)
   ]);
@@ -155,15 +153,15 @@ function renderNewsPreview() {
   const entries = newsEntries().slice(0, news.homeCount || 3);
   if (!entries.length) { wrap.hidden = true; return; }
 
-  document.getElementById('news-heading').textContent = news.homeHeading || news.heading || 'Latest updates';
+  document.getElementById('news-heading').textContent = news.homeHeading || news.heading || 'Latest news';
   const list = document.getElementById('news-list');
   entries.forEach(e => list.appendChild(renderNewsItem(e)));
 
-  const page = (SITE_DATA.pages || []).find(p => p.url === 'updates');
+  const page = (SITE_DATA.pages || []).find(p => p.url === 'news');
   const more = document.getElementById('news-more');
   if (page && more) {
     more.appendChild(internalLink('news-all', page.url, [
-      el('span', { text: 'All updates' }),
+      el('span', { text: 'All news' }),
       el('span', { class: 'news-link-arrow', attrs: { 'aria-hidden': 'true' } })
     ]));
   } else if (more) {
@@ -172,7 +170,7 @@ function renderNewsPreview() {
   wrap.hidden = false;
 }
 
-/* ---------- Updates page ---------- */
+/* ---------- News page ---------- */
 
 // Active filters and the search text live in the URL (#tags=release,new&q=snapshot)
 // so a filtered view can be linked to.
@@ -246,14 +244,14 @@ function renderSideCard(card) {
   ]);
 }
 
-function renderUpdatesPage() {
-  const main = document.getElementById('updates');
+function renderNewsPage() {
+  const main = document.getElementById('news-page');
   const news = newsData();
   if (!main || !news) return;
   const side = news.sidebar || {};
 
-  main.appendChild(el('h1', { class: 'flat-section-heading', attrs: { id: 'updates-heading' } }, [
-    el('span', { text: news.heading || 'Updates' })
+  main.appendChild(el('h1', { class: 'flat-section-heading', attrs: { id: 'news-page-heading' } }, [
+    el('span', { text: news.heading || 'News' })
   ]));
   if (news.intro) main.appendChild(el('p', { class: 'news-intro', text: news.intro }));
 
@@ -278,8 +276,8 @@ function renderUpdatesPage() {
     class: 'nav-search-input',
     attrs: {
       type: 'search',
-      placeholder: side.searchPlaceholder || 'Search updates…',
-      'aria-label': 'Search updates',
+      placeholder: side.searchPlaceholder || 'Search news…',
+      'aria-label': 'Search news',
       autocomplete: 'off',
       spellcheck: 'false',
       enterkeyhint: 'search'
@@ -303,8 +301,7 @@ function renderUpdatesPage() {
 
   function refresh() {
     const shown = entries.filter(matches);
-    // The newest entry overall keeps its highlight wherever it appears.
-    list.replaceChildren(...shown.map(e => renderNewsItem(e, { detailed: true, latest: e === entries[0] })));
+    list.replaceChildren(...shown.map(e => renderNewsItem(e, { detailed: true })));
 
     buttons.forEach((btn, key) => {
       const on = key === '' ? !active.size : active.has(key);
@@ -314,8 +311,8 @@ function renderUpdatesPage() {
 
     const filtering = active.size > 0 || query.trim() !== '';
     status.textContent = !shown.length
-      ? (query.trim() ? 'No updates match your search.' : 'No updates match those tags.')
-      : (filtering ? `Showing ${shown.length} of ${entries.length} updates` : '');
+      ? (query.trim() ? 'Nothing matches your search.' : 'Nothing matches those tags.')
+      : (filtering ? `Showing ${shown.length} of ${entries.length}` : '');
     writeHash(active, query);
   }
 
@@ -348,7 +345,7 @@ function renderUpdatesPage() {
   const tools = el('div', { class: 'news-tools' }, [searchBox]);
   if (tagKeys.length > 1) {
     tools.appendChild(el('h2', { class: 'news-side-heading', text: side.filterHeading || 'Filter by type' }));
-    tools.appendChild(el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter updates by tag' } }, [
+    tools.appendChild(el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter news by tag' } }, [
       makeButton('', 'All', null),
       ...tagKeys.map(k => { const t = newsTag(k); return makeButton(k, t.label, t); })
     ]));
@@ -358,21 +355,21 @@ function renderUpdatesPage() {
   const layout = el('div', { class: 'news-layout' + (extras.length ? '' : ' no-extras') }, [
     tools,
     el('div', { class: 'news-feed' }, [status, list]),
-    extras.length ? el('aside', { class: 'news-extra', attrs: { 'aria-label': 'More about updates' } }, extras) : null
+    extras.length ? el('aside', { class: 'news-extra', attrs: { 'aria-label': 'More about the news' } }, extras) : null
   ]);
   main.appendChild(layout);
   refresh();
 }
 
-if (document.getElementById('updates')) {
+if (document.getElementById('news-page')) {
   renderBrand(SITE_DATA.brand);
-  renderSiteHeader(SITE_DATA.pages || [], 'updates');
+  renderSiteHeader(SITE_DATA.pages || [], 'news');
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
-  renderUpdatesPage();
+  renderNewsPage();
 }
 
 /* ---------- Announcement card ---------- */
-/* A card in the bottom-right corner of every page except Updates, built from
+/* A card in the bottom-right corner of every page except News, built from
    the newest entry marked `announce: true` in latest-updates.js. Dismissing it
    is remembered per entry, so the next announced entry shows again. */
 
@@ -397,7 +394,7 @@ function announceImage(entry) {
 }
 
 function initAnnouncementCard() {
-  if (document.getElementById('updates')) return; // the list is already on screen there
+  if (document.getElementById('news-page')) return; // the list is already on screen there
 
   const entry = newsEntries().find(e => e.announce === true);
   if (!entry) return;
@@ -420,7 +417,7 @@ function initAnnouncementCard() {
 
   const close = el('button', { class: 'announce-close', attrs: { type: 'button', 'aria-label': 'Dismiss announcement', 'data-tooltip': 'Dismiss' } });
   // Tags and date run along the top; the icon sits below them beside the text.
-  const card = el('aside', { class: 'announce', attrs: { role: 'region', 'aria-label': 'Latest update' } }, [
+  const card = el('aside', { class: 'announce', attrs: { role: 'region', 'aria-label': 'Latest news' } }, [
     el('div', { class: 'news-meta announce-meta' }, [
       ...pills,
       newsDate(entry)

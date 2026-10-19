@@ -2875,7 +2875,7 @@ body.has-announcement .back-to-top {
   .site-error button:hover { background: rgba(var(--ch-alpha-rgb), 0.2); }
 }
 
-/* ---------- News feed (home page block + Updates page) ---------- */
+/* ---------- News feed (home page block + News page) ---------- */
 /* Built by news.js. The heading reuses .stats-heading / .flat-section-heading. */
 .news-section { margin-top: var(--section-gap); }
 
@@ -2960,7 +2960,7 @@ body.has-announcement .back-to-top {
   .news-item { padding: 16px; }
 }
 
-/* Home page: the latest updates sit in columns like the project cards above,
+/* Home page: the latest news sits in columns like the project cards above,
    stepping 3 -> 2 -> 1 at the same widths (in two columns the odd card is centred). */
 .news-section .news-list {
   --home-gap: 24px;
@@ -2986,7 +2986,7 @@ body.has-announcement .back-to-top {
   .news-section .news-list > .news-item:last-child:nth-child(odd) { grid-column: auto; justify-self: stretch; width: auto; }
 }
 
-/* ---------- Updates page layout ---------- */
+/* ---------- News page layout ---------- */
 /* Entries on the left, sidebar on the right. On narrow screens it's one column
    in the order: search and filters, entries, quick links and cards. */
 .news-layout {
@@ -3062,7 +3062,7 @@ body.has-announcement .back-to-top {
 .news-status { min-height: 1.4em; margin: 0 0 10px; font-size: 0.9rem; color: var(--text-soft); }
 .news-status:empty { min-height: 0; margin: 0; }
 
-/* ---------- Updates page entries ---------- */
+/* ---------- News page entries ---------- */
 .news-item-detailed {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -3098,7 +3098,7 @@ body.has-announcement .back-to-top {
   .news-item-glyph { width: 26px; height: 26px; }
 }
 
-/* ---------- Updates page sidebar panels ---------- */
+/* ---------- News page sidebar panels ---------- */
 .news-panel {
   padding: 20px;
   border-radius: 16px;

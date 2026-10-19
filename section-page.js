@@ -401,7 +401,7 @@ function navBadgeDot(count) {
 // Keep in sync with the 900px breakpoint in styles.css.
 const MOBILE_NAV_QUERY = '(max-width: 900px)';
 
-// Builds the nav: Home, a Projects dropdown (pages with a "section"), Updates, About.
+// Builds the nav: Home, a Projects dropdown (pages with a "section"), News, About.
 // search.js adds the search box to the same menu. On small screens the whole
 // menu folds behind a button and the dropdown becomes an accordion.
 function renderSiteHeader(pages, currentUrl) {
@@ -414,7 +414,7 @@ function renderSiteHeader(pages, currentUrl) {
   const mobile = window.matchMedia(MOBILE_NAV_QUERY);
   const home = pages.find(p => p.url === '/');
   const about = pages.find(p => p.url === 'about');
-  const updates = pages.find(p => p.url === 'updates');
+  const newsPage = pages.find(p => p.url === 'news');
   const projectPages = pages.filter(p => p.section);
 
   // Elements that carry a count pill, each with a function giving its count.
@@ -515,7 +515,7 @@ function renderSiteHeader(pages, currentUrl) {
     });
   }
 
-  if (updates) nav.appendChild(pageLink(updates, 'nav-link'));
+  if (newsPage) nav.appendChild(pageLink(newsPage, 'nav-link'));
   if (about) nav.appendChild(pageLink(about, 'nav-link'));
 
   // Mobile menu button; its pill totals every project page.
