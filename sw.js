@@ -23,7 +23,7 @@ const SHELL = [
   '/resource-packs',
   '/other-projects',
   '/about',
-  '/updates',
+  '/news',
   '/styles.css',
   '/site-error.js',
   '/data.js',

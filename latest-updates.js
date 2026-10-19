@@ -38,7 +38,7 @@
                     Leave the list empty to hide them. */
 
 const LATEST_UPDATES = {
-  heading: "News",
+  heading: "Latest News",
   homeHeading: "Latest News",
   intro: "The latest news and updates from Classic's Craftworks.",
   homeCount: 3,
@@ -47,8 +47,8 @@ const LATEST_UPDATES = {
     release:     { label: "Release",      color: "#22C55E" },
     beta:        { label: "Beta",         color: "#FF9D47" },
     alpha:       { label: "Alpha",        color: "#F2607E" },
-    new:         { label: "New Project",  color: "#EFDD65" },
     unsupported: { label: "Unsupported",  color: "#929292" },
+    new:         { label: "New Project",  color: "#EFDD65" },
     news:        { label: "News",         color: "#41A0C8" },
     snapshot:    { label: "Snapshot",     color: "#41A0C8" }
   },
@@ -74,6 +74,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-13",
       tags: ["beta", "snapshot"],
+      image: "images/icons/snapshot.svg",
       title: "26.4 Snapshot 4",
       text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-4.",
       url: "/data-packs-mods",
@@ -82,6 +83,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-06",
       tags: ["beta", "snapshot"],
+      image: "images/icons/snapshot.svg",
       title: "26.4 Snapshot 3",
       text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-3.",
       url: "/data-packs-mods",
@@ -90,6 +92,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-09-22",
       tags: ["beta", "snapshot"],
+      image: "images/icons/snapshot.svg",
       title: "26.4 Snapshot 1",
       text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-1.",
       url: "/data-packs-mods",
@@ -98,6 +101,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-09-15",
       tags: ["release"],
+      image: "images/icons/announcements.svg",
       title: "26.3 Data Pack & Mod Updates",
       text: "New updates for Better Craftables, Better Unpackables and Silly Eatables have been released for Java 26.3.",
       url: "/data-packs-mods",
@@ -106,6 +110,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-09-14",
       tags: ["release"],
+      image: "images/icons/announcements.svg",
       title: "26.3 Resource Pack Updates",
       text: "New updates for Classic's Disc, Dye and Lantern Tweaks have been released for Java 26.3.",
       url: "/resource-packs",
@@ -121,24 +126,20 @@ const LATEST_UPDATES = {
       heading: "Quick links",
       links: [
         { label: "Data Packs & Mods", url: "/data-packs-mods", icon: "brackets" },
-        { label: "Resource Packs",    url: "/resource-packs",  icon: "brush" },
-        { label: "Other Projects",    url: "/other-projects",  icon: "wrench" },
-        { label: "Modrinth",          url: "https://modrinth.com/organization/classics-craftworks", icon: "modrinth" }
+        { label: "Resource Packs", url: "/resource-packs",  icon: "brush" },
+        { label: "Other Projects", url: "/other-projects",  icon: "wrench" },
+        { label: "Modrinth", url: "https://modrinth.com/organization/classics-craftworks", icon: "modrinth" },
+        { label: "GitHub", url: "https://github.com/Classics-Craftworks", icon: "github" }
       ]
     },
 
     cards: [
       {
         heading: "Stay in the loop",
-        text: "Follow along for new releases, betas and snapshots.",
+        text: "Follow along for new releases, betas and other updates.",
         icon: "announcements",
-        button: { label: "Join the Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" }
-      },
-      {
-        heading: "About our news",
-        text: "This page covers stable releases, betas and snapshots for every project, plus new and retired projects.",
-        icon: "info",
-        link: { label: "Learn more", url: "/about" }
+        button: { label: "Join the Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" },
+        // button2: { label: "Follow on X/Twitter", url: "x.com/C36Craftworks", icon: "x" },
       }
     ]
   }

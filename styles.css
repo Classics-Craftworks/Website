@@ -2764,6 +2764,7 @@ h2.about-h { font-size: 1.35rem; }
 }
 .announce-img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
 .announce-icon { width: 28px; height: 28px; }
+.announce-svg { width: 40px; height: 40px; }
 .announce-body {
   min-width: 0;
   display: flex;
@@ -2839,6 +2840,7 @@ body.has-announcement .back-to-top {
   }
   .announce-media { width: 48px; height: 48px; border-radius: 12px; }
   .announce-icon { width: 24px; height: 24px; }
+  .announce-svg { width: 32px; height: 32px; }
   body.has-announcement { padding-bottom: calc(var(--announce-h, 0px) + 12px); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -3077,14 +3079,21 @@ body.has-announcement .back-to-top {
   width: 76px;
   height: 76px;
   box-sizing: border-box;
-  padding: 10px;
-  border-radius: 16px;
   color: var(--nav-accent);
+  border-radius: 16px;
+}
+/* Outlined frame for artwork on a transparent background and for the generic icon. */
+.news-item-media.is-framed {
+  padding: 10px;
   background: rgba(var(--nav-accent-rgb), 0.1);
   border: 1px solid rgba(var(--nav-accent-rgb), 0.28);
 }
 .news-item-img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
+/* Full square icons fill the whole tile, no frame. */
+.news-item-media.is-full { overflow: hidden; }
+.news-item-media.is-full .news-item-img { object-fit: cover; border-radius: 0; }
 .news-item-glyph { width: 32px; height: 32px; }
+.news-item-svg { width: 44px; height: 44px; }
 .news-item-body {
   min-width: 0;
   display: flex;
@@ -3094,8 +3103,10 @@ body.has-announcement .back-to-top {
 }
 @media (max-width: 600px) {
   .news-item-detailed { column-gap: 14px; padding: 14px; }
-  .news-item-media { width: 56px; height: 56px; padding: 7px; border-radius: 12px; }
+  .news-item-media { width: 56px; height: 56px; border-radius: 12px; }
+  .news-item-media.is-framed { padding: 7px; }
   .news-item-glyph { width: 26px; height: 26px; }
+  .news-item-svg { width: 34px; height: 34px; }
 }
 
 /* ---------- News page sidebar panels ---------- */

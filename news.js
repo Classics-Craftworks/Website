@@ -106,14 +106,63 @@ function newsDate(entry) {
   ]);
 }
 
+// True if an image's four corners are solid, i.e. it's a full square icon
+// (like the project icons) rather than artwork on a transparent background.
+function isFullSquare(img) {
+  try {
+    const size = 16;
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = size;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0, size, size);
+    return [[0, 0], [size - 1, 0], [0, size - 1], [size - 1, size - 1]]
+      .every(([x, y]) => ctx.getImageData(x, y, 1, 1).data[3] > 230);
+  } catch {
+    return false;
+  }
+}
+
+// True for an .svg image path.
+function isSvgSrc(src) {
+  return /\.svg(?:[?#].*)?$/i.test(src);
+}
+
+// SVGs loaded through <img> can't take the site's colours (these icons are
+// plain black, which vanishes on the dark background), so they are drawn as a
+// mask filled with the tile's colour instead, like the other icons.
+function svgMask(src, cls) {
+  const url = `url('${sitePath(src)}')`;
+  const node = el('span', { class: 'icon ' + cls, attrs: { 'aria-hidden': 'true' } });
+  node.style.webkitMaskImage = url;
+  node.style.maskImage = url;
+  return node;
+}
+
 // Picture tile for an entry (News page): its `image`, else the icon of the
-// project its `url` points at, else a generic news glyph.
+// project its `url` points at, else a generic news glyph. Full square icons
+// fill the tile on their own; transparent artwork and the glyph sit in an
+// outlined frame.
 function newsMedia(entry) {
   const src = announceImage(entry);
-  return el('div', { class: 'news-item-media', attrs: { 'aria-hidden': 'true' } }, [
-    src ? el('img', { class: 'news-item-img', src, alt: '', attrs: { width: '120', height: '120', loading: 'lazy', decoding: 'async', draggable: 'false' } })
-        : icon('news', 'news-item-glyph')
-  ]);
+  const media = el('div', { class: 'news-item-media', attrs: { 'aria-hidden': 'true' } });
+  if (!src) {
+    media.classList.add('is-framed');
+    media.appendChild(icon('news', 'news-item-glyph'));
+    return media;
+  }
+
+  if (isSvgSrc(src)) {
+    media.classList.add('is-framed');
+    media.appendChild(svgMask(src, 'news-item-svg'));
+    return media;
+  }
+
+  const img = el('img', { class: 'news-item-img', src, alt: '', attrs: { width: '120', height: '120', decoding: 'async', draggable: 'false' } });
+  const decide = () => media.classList.add(isFullSquare(img) ? 'is-full' : 'is-framed');
+  img.addEventListener('load', decide, { once: true });
+  img.addEventListener('error', () => media.classList.add('is-framed'), { once: true });
+  media.appendChild(img);
+  return media;
 }
 
 // Home page cards are plain; the News page passes { detailed: true } for the icon tile.
@@ -404,8 +453,9 @@ function initAnnouncementCard() {
 
   const src = announceImage(entry);
   const media = el('div', { class: 'announce-media', attrs: { 'aria-hidden': 'true' } }, [
-    src ? el('img', { class: 'announce-img', src, alt: '', attrs: { width: '120', height: '120', draggable: 'false', decoding: 'async' } })
-        : icon('announcements', 'announce-icon')
+    !src ? icon('announcements', 'announce-icon')
+      : isSvgSrc(src) ? svgMask(src, 'announce-svg')
+      : el('img', { class: 'announce-img', src, alt: '', attrs: { width: '120', height: '120', draggable: 'false', decoding: 'async' } })
   ]);
 
   const pills = (entry.tags || []).map(key => {
