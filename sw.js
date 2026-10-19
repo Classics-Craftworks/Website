@@ -12,7 +12,7 @@
    Bump CACHE when this file's strategy changes; old caches are deleted on
    activate. SHELL below is only a head start: anything missing from it is
    still cached the first time it is fetched. */
-const CACHE = 'ccw-cache-v3';
+const CACHE = 'ccw-cache-v5';
 const NETWORK_TIMEOUT_MS = 4000;
 const IMAGE_REFRESH_MS = 24 * 60 * 60 * 1000;
 const STAMP = 'x-sw-cached-at'; // when an image was cached; added by storeImage()
@@ -23,6 +23,7 @@ const SHELL = [
   '/resource-packs',
   '/other-projects',
   '/about',
+  '/updates',
   '/styles.css',
   '/site-error.js',
   '/data.js',
@@ -30,6 +31,8 @@ const SHELL = [
   '/section-page.js',
   '/index.js',
   '/about.js',
+  '/news.js',
+  '/latest-updates.js',
   '/search.js',
   '/manifest.json',
   '/fonts/Inter-Regular.woff2',

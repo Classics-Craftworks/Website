@@ -242,6 +242,7 @@ function renderProjectsIntro(home) {
   renderSplash(SITE_DATA.home, sections, pages);
   renderProjectsIntro(SITE_DATA.home);
   renderHomeButtons(sections, pages);
+  renderNewsPreview();
   renderStats(typeof STATS_DATA !== 'undefined' ? STATS_DATA : null);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderStructuredData(SITE_DATA, null);
