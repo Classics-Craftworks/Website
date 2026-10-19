@@ -221,3 +221,89 @@ if (document.getElementById('updates')) {
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderUpdatesPage();
 }
+
+/* ---------- Announcement card ---------- */
+/* A card in the bottom-right corner of every page except Updates, built from
+   the newest entry marked `announce: true` in latest-updates.js. Dismissing it
+   is remembered per entry, so the next announced entry shows again. */
+
+const ANNOUNCE_KEY = 'announcement-dismissed';
+
+// Picture for the card: the entry's own `image`, else the icon of the project
+// its same-site `url` points at (e.g. "/data-packs-mods#better-unpackables").
+function announceImage(entry) {
+  if (entry.image) return entry.image;
+  if (!entry.url) return null;
+
+  let u;
+  try { u = new URL(entry.url, location.origin); } catch { return null; }
+  if (u.origin !== location.origin) return null;
+
+  const path = u.pathname.replace(/^\/|\/$/g, '');
+  const id = decodeURIComponent(u.hash.slice(1));
+  const page = (SITE_DATA.pages || []).find(p => p.url === path && p.section);
+  const section = page && (SITE_DATA.sections || []).find(s => s.heading === page.section);
+  const match = section && sectionIds(section).projects.find(p => p.id === id);
+  return match ? match.project.image || null : null;
+}
+
+function initAnnouncementCard() {
+  if (document.getElementById('updates')) return; // the list is already on screen there
+
+  const entry = newsEntries().find(e => e.announce === true);
+  if (!entry) return;
+
+  const id = entry.date + '|' + entry.title;
+  if (storageGet(ANNOUNCE_KEY) === id) return;
+
+  const src = announceImage(entry);
+  const media = el('div', { class: 'announce-media', attrs: { 'aria-hidden': 'true' } }, [
+    src ? el('img', { class: 'announce-img', src, alt: '', attrs: { width: '120', height: '120', draggable: 'false', decoding: 'async' } })
+        : icon('announcements', 'announce-icon')
+  ]);
+
+  const pills = (entry.tags || []).map(key => {
+    const tag = newsTag(key);
+    const pill = el('span', { class: 'news-tag', text: tag.label });
+    setTagColor(pill, tag);
+    return pill;
+  });
+
+  const close = el('button', { class: 'announce-close', attrs: { type: 'button', 'aria-label': 'Dismiss announcement', 'data-tooltip': 'Dismiss' } });
+  // Tags and date run along the top; the icon sits below them beside the text.
+  const card = el('aside', { class: 'announce', attrs: { role: 'region', 'aria-label': 'Latest update' } }, [
+    el('div', { class: 'news-meta announce-meta' }, [
+      ...pills,
+      el('time', { class: 'news-date', text: formatNewsDate(entry.date), attrs: { datetime: entry.date } })
+    ]),
+    media,
+    el('div', { class: 'announce-body' }, [
+      el('p', { class: 'announce-title', text: entry.title }),
+      entry.text ? el('p', { class: 'announce-text', text: fillPlaceholders(entry.text) }) : null,
+      newsLink(entry)
+    ]),
+    close
+  ]);
+
+  const root = document.documentElement;
+  let observer = null;
+  const setHeight = () => root.style.setProperty('--announce-h', card.offsetHeight + 'px');
+
+  close.addEventListener('click', () => {
+    storageSet(ANNOUNCE_KEY, id);
+    if (observer) observer.disconnect();
+    card.remove();
+    document.body.classList.remove('has-announcement');
+    root.style.removeProperty('--announce-h');
+  });
+
+  document.body.appendChild(card);
+  document.body.classList.add('has-announcement');
+  setHeight();
+  if ('ResizeObserver' in window) {
+    observer = new ResizeObserver(setHeight);
+    observer.observe(card);
+  }
+}
+
+initAnnouncementCard();

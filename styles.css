@@ -2718,70 +2718,86 @@ h2.about-h { font-size: 1.35rem; }
   transform: translateY(2px) rotate(-45deg);
 }
 
-/* ---------- Announcement banner (initAnnouncement in section-page.js) ---------- */
-/* Fixed across the full width of the bottom of every page. --announce-h is set
-   from its real height so the page and the back-to-top button stay clear of it. */
-.announcement {
+/* ---------- Announcement card (initAnnouncementCard in news.js) ---------- */
+/* A card in the bottom-right corner, built from the newest entry in
+   latest-updates.js marked `announce: true`. --announce-h is set from its real
+   height so the back-to-top button (and, on phones, the page) stay clear of it. */
+.announce {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  right: calc(20px + env(safe-area-inset-right));
+  bottom: calc(20px + env(safe-area-inset-bottom));
   z-index: 45;
-  padding-bottom: env(safe-area-inset-bottom);
-  background:
-    linear-gradient(90deg, rgba(var(--nav-accent-rgb), 0.34), rgba(var(--nav-accent-rgb), 0.18)),
-    var(--nav-bg);
-  border-top: 2px solid var(--nav-accent);
-  animation: announcement-in 0.25s ease-out;
+  box-sizing: border-box;
+  width: min(410px, calc(100vw - 32px));
+  /* Tags/date span the top row; icon and text sit side by side below. */
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  column-gap: 16px;
+  row-gap: 14px;
+  padding: 18px 52px 18px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.45);
+  background: var(--nav-bg);
+  box-shadow: var(--nav-shadow);
+  animation: announce-in 0.3s ease-out;
 }
-@keyframes announcement-in {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+@keyframes announce-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.announcement-inner {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px calc(16px + env(safe-area-inset-right)) 14px calc(32px + env(safe-area-inset-left));
-}
-.announcement-badge {
-  flex: none;
+.announce-meta { grid-column: 1 / -1; }
+.announce-media {
+  align-self: start;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  color: #fff;
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  overflow: hidden;
+  color: var(--nav-accent);
+  background: rgba(var(--nav-accent-rgb), 0.16);
+  border: 1px solid rgba(var(--nav-accent-rgb), 0.4);
 }
-.announcement-icon { width: 20px; height: 20px; }
-.announcement-text {
-  flex: 1;
+.announce-img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+.announce-icon { width: 28px; height: 28px; }
+.announce-body {
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+.announce-title {
   margin: 0;
-  padding-block: 4px;
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1.45;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
   color: var(--text);
   overflow-wrap: anywhere;
 }
-
-/* Same close button as the download notice. */
-.announcement-close {
-  position: relative;
-  flex: none;
-  margin-left: auto;
+.announce-text {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--text-soft);
+  overflow-wrap: anywhere;
+}
+.announce-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   width: 36px;
   height: 36px;
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: var(--text);
+  color: var(--text-soft);
   cursor: pointer;
   transition: color var(--transition-fast), background-color var(--transition-fast);
 }
-.announcement-close::before {
+.announce-close::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -2790,28 +2806,44 @@ h2.about-h { font-size: 1.35rem; }
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center / 16px 16px no-repeat;
 }
 @media (hover: hover) {
-  .announcement-close:hover { color: var(--text); background: rgba(var(--nav-accent-rgb), 0.18); }
+  .announce-close:hover { color: var(--text); background: rgba(var(--nav-accent-rgb), 0.18); }
 }
-.announcement-close:focus-visible {
+.announce-close:focus-visible {
   color: var(--text);
   background: rgba(var(--nav-accent-rgb), 0.18);
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
-.announcement-close:active { background: rgba(var(--nav-accent-rgb), 0.3); }
-.announcement-close[data-tooltip]::after { left: auto; right: 0; transform: translateY(-4px); }
-.announcement-close[data-tooltip]:hover::after,
-.announcement-close[data-tooltip]:focus-visible::after { transform: translateY(-10px); }
+.announce-close:active { background: rgba(var(--nav-accent-rgb), 0.3); }
+.announce-close[data-tooltip]::after { left: auto; right: 0; transform: translateY(-4px); }
+.announce-close[data-tooltip]:hover::after,
+.announce-close[data-tooltip]:focus-visible::after { transform: translateY(-10px); }
 
-/* Room for the banner under the footer, and the back-to-top button lifts above it. */
-body.has-announcement { padding-bottom: var(--announce-h, 0px); }
-body.has-announcement .back-to-top { bottom: calc(20px + var(--announce-h, 0px)); }
+/* The back-to-top button lifts above the card. */
+body.has-announcement .back-to-top {
+  bottom: calc(32px + var(--announce-h, 0px) + env(safe-area-inset-bottom));
+}
 
+/* Phones: the card spans the bottom of the screen, and the page gets room under it. */
+@media (max-width: 600px) {
+  .announce {
+    left: calc(12px + env(safe-area-inset-left));
+    right: calc(12px + env(safe-area-inset-right));
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    width: auto;
+    column-gap: 12px;
+    row-gap: 10px;
+    padding: 14px 46px 14px 14px;
+  }
+  .announce-media { width: 48px; height: 48px; border-radius: 12px; }
+  .announce-icon { width: 24px; height: 24px; }
+  body.has-announcement { padding-bottom: calc(var(--announce-h, 0px) + 12px); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .announcement { animation: none; }
+  .announce { animation: none; }
 }
 @media print {
-  .announcement { display: none; }
+  .announce { display: none; }
 }
 
 /* ---------- Load-error notice (site-error.js) ---------- */

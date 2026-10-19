@@ -12,6 +12,13 @@
                 ("https://...", opens in a new tab) or a page on this site
                 ("/data-packs-mods#better-unpackables")
        linkText (optional) the button's text; defaults to "Read more"
+       announce (optional) true shows this entry as a card in the bottom-right
+                corner of every page except Updates. If several are marked, the
+                newest is used. Visitors can dismiss it; it comes back for them
+                when a different entry is announced. Remove the flag (or set it
+                to false) to stop announcing.
+       image    (optional) picture for the card, e.g. "images/x.webp". By
+                default it's the icon of the project the `url` points at.
    - Tags: each key has a `label` (shown on the pill and filter button) and a
      `color` (any #rrggbb hex). Add, rename or recolour freely; the filters on
      the Updates page are built from the tags that entries actually use, in the
@@ -47,6 +54,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-13",
       tags: ["release"],
+      announce: true,
       title: "Better Unpackables v5.0.1",
       text: "Better Unpackables v5.0.1 has been released with an important fix for Cut Sandstone recipes.",
       url: "/data-packs-mods#better-unpackables",
