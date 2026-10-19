@@ -2,7 +2,7 @@
 
 Classic's Craftworks is a collection of Minecraft projects focused on adding new and quality-of-life crafting recipes, as well as other enhancements, to Minecraft Java Edition.
 
-This repository contains the source code for the [Classic's Craftworks website](https://classicscraftworks.co.uk/).
+This repository contains the source code for the [Classic's Craftworks website](https://classicscraftworks.co.uk).
 
 ## Features
 
@@ -27,7 +27,7 @@ The website currently features:
 
 - [Classic's Disc Tweaks](https://modrinth.com/resourcepack/classics-disc-tweaks)
 - [Classic's Dye Tweaks](https://modrinth.com/resourcepack/classics-dye-tweaks)
-- [Classic's Lantern Tweaks](https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0)
+- [Classic's Lantern Tweaks](https://modrinth.com/resourcepack/classics-lantern-tweaks)
 - [Zisteau Pigmen](https://modrinth.com/resourcepack/zisteau-pigmen) (limited support)
 
 ### Other Projects

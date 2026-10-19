@@ -18,7 +18,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v3.9.0",
+    label: "v3.10.0",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -41,7 +41,7 @@ const SITE_DATA = {
     { label: "Data Packs & Mods", url: "data-packs-mods", section: "Data Packs & Mods", icon: "brackets" },
     { label: "Resource Packs", url: "resource-packs", section: "Resource Packs", icon: "brush" },
     { label: "Other Projects", url: "other-projects", section: "Other Projects", icon: "wrench" },
-    { label: "Updates", url: "updates", icon: "news" },
+    { label: "News", url: "news", icon: "news" },
     { label: "About", url: "about", icon: "about" }
   ],
 

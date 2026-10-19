@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.10.0 — 2026-10-20
+
+### Added
+- New announcement card, replacing the announcement banner
+
+### Changed
+- Redesigned the Latest Updates section on the Home page
+- Renamed the Updates page to "News"
+- Redesigned the News page to include a new sidebar with a search bar, filters and some additional information
+
 ## v3.9.0 — 2026-10-19
 
 ### Added
