@@ -806,6 +806,51 @@ function placeTooltip(target) {
 ['mouseover', 'focusin', 'pointerdown'].forEach(type =>
   document.addEventListener(type, e => placeTooltip(e.target)));
 
+/* ---------- Announcement banner ---------- */
+
+// Remembers the exact text a visitor dismissed, so any edit to the text in
+// SITE_DATA.announcement brings the banner back for everyone.
+const ANNOUNCEMENT_KEY = 'announcement-dismissed';
+
+function initAnnouncement() {
+  const cfg = SITE_DATA.announcement;
+  const text = cfg && typeof cfg.text === 'string' ? cfg.text.trim() : '';
+  if (!cfg || cfg.enabled !== true || !text) return;
+  if (storageGet(ANNOUNCEMENT_KEY) === text) return;
+
+  const close = el('button', { class: 'announcement-close', attrs: { type: 'button', 'aria-label': 'Dismiss announcement', 'data-tooltip': 'Dismiss' } });
+  const banner = el('div', { class: 'announcement', attrs: { role: 'region', 'aria-label': 'Announcement' } }, [
+    el('div', { class: 'announcement-inner' }, [
+      el('span', { class: 'announcement-badge', attrs: { 'aria-hidden': 'true' } }, [icon('announcements', 'announcement-icon')]),
+      el('p', { class: 'announcement-text', text }),
+      close
+    ])
+  ]);
+
+  const root = document.documentElement;
+  let observer = null;
+  const setHeight = h => root.style.setProperty('--announce-h', h + 'px');
+
+  close.addEventListener('click', () => {
+    storageSet(ANNOUNCEMENT_KEY, text);
+    if (observer) observer.disconnect();
+    banner.remove();
+    document.body.classList.remove('has-announcement');
+    root.style.removeProperty('--announce-h');
+  });
+
+  document.body.appendChild(banner);
+  document.body.classList.add('has-announcement');
+
+  // Keeps page content and the back-to-top button clear of the banner as it
+  // wraps onto more lines on narrow screens.
+  setHeight(banner.offsetHeight);
+  if ('ResizeObserver' in window) {
+    observer = new ResizeObserver(() => setHeight(banner.offsetHeight));
+    observer.observe(banner);
+  }
+}
+
 /* ---------- Entry point ----------
    Section pages set data-page to their "url" in SITE_DATA.pages. */
 
@@ -827,6 +872,9 @@ function initSectionPage(pageUrl) {
 }
 
 if (document.body.dataset.page) initSectionPage(document.body.dataset.page);
+
+// Every page loads this file, so the banner is added here rather than per page.
+initAnnouncement();
 
 // Service worker (sw.js): lets Chrome/Edge offer to install the site, and keeps
 // the page shell and visited pages available offline.

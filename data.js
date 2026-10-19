@@ -8,6 +8,9 @@
      optional "tooltip") if unavailable.
    - Badges: `badge: "new"` or `"updated"` on a channel. Visitors can dismiss
      it; it returns when that channel's download versions change.
+   - Announcement: the banner across the bottom of every page. Set `enabled`
+     to show/hide it and edit `text`. Visitors can dismiss it; it comes back
+     for them whenever the text changes.
    - New project: copy an existing project block. */
 
 const SITE_DATA = {
@@ -370,6 +373,12 @@ const SITE_DATA = {
     copyright: "\u00A9 2023\u20132026 Classic36 / Classic's Craftworks",
     disclaimer: "NOT AN OFFICIAL MINECRAFT PRODUCT OR SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",
     iconCredits: { prefix: "Icons provided by ", label: "SVG Repo", url: "https://www.svgrepo.com" }
+  },
+
+  // Banner fixed to the bottom of every page. Plain text only.
+  announcement: {
+    enabled: true,
+    text: "Better Unpackables v5.0.1 has been released with an important bug fix!"
   },
 
   downloadNotice: "Any reuploads of these projects that are not linked on this website are unofficial, unaffiliated, and may have been modified or contain malicious content."
