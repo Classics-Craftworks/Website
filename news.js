@@ -81,6 +81,24 @@ function newsLink(entry) {
   return a;
 }
 
+// Calendar icon for the Updates page. If images/icons/calendar.svg is missing
+// the icon is dropped rather than shown as a blank square.
+function calendarIcon() {
+  const node = icon('calendar', 'icon-sm news-date-icon');
+  const probe = new Image();
+  probe.onerror = () => node.remove();
+  probe.src = sitePath('images/icons/calendar.svg');
+  return node;
+}
+
+// Date with its calendar icon, used wherever an update's date is shown.
+function newsDate(entry) {
+  return el('span', { class: 'news-when' }, [
+    calendarIcon(),
+    el('time', { class: 'news-date', text: formatNewsDate(entry.date), attrs: { datetime: entry.date } })
+  ]);
+}
+
 function renderNewsItem(entry) {
   const pills = (entry.tags || []).map(key => {
     const tag = newsTag(key);
@@ -90,7 +108,7 @@ function renderNewsItem(entry) {
   });
   const head = el('div', { class: 'news-meta' }, [
     ...pills,
-    el('time', { class: 'news-date', text: formatNewsDate(entry.date), attrs: { datetime: entry.date } })
+    newsDate(entry)
   ]);
 
   const body = [
@@ -172,7 +190,7 @@ function renderUpdatesPage() {
 
   function refresh() {
     const shown = entries.filter(matches);
-    list.replaceChildren(...shown.map(renderNewsItem));
+    list.replaceChildren(...shown.map(e => renderNewsItem(e)));
 
     buttons.forEach((btn, key) => {
       const on = key === '' ? !active.size : active.has(key);
@@ -274,7 +292,7 @@ function initAnnouncementCard() {
   const card = el('aside', { class: 'announce', attrs: { role: 'region', 'aria-label': 'Latest update' } }, [
     el('div', { class: 'news-meta announce-meta' }, [
       ...pills,
-      el('time', { class: 'news-date', text: formatNewsDate(entry.date), attrs: { datetime: entry.date } })
+      newsDate(entry)
     ]),
     media,
     el('div', { class: 'announce-body' }, [
