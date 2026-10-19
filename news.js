@@ -149,16 +149,32 @@ function renderNewsPreview() {
 
 /* ---------- Updates page ---------- */
 
-// Active filters live in the URL (#tags=release,new) so a filtered view can be linked to.
-function readHashTags(valid) {
-  const m = /^#tags=([^&]*)/.exec(location.hash);
-  if (!m) return new Set();
-  return new Set(decodeURIComponent(m[1]).split(',').filter(k => valid.includes(k)));
+// Active filters and the search text live in the URL (#tags=release,new&q=snapshot)
+// so a filtered view can be linked to.
+function readHash(validTags) {
+  const params = new URLSearchParams(location.hash.slice(1));
+  const tags = (params.get('tags') || '').split(',').filter(k => validTags.includes(k));
+  return { tags: new Set(tags), query: params.get('q') || '' };
 }
 
-function writeHashTags(active) {
-  const hash = active.size ? '#tags=' + [...active].map(encodeURIComponent).join(',') : '';
-  history.replaceState(null, '', location.pathname + location.search + hash);
+function writeHash(active, query) {
+  const params = new URLSearchParams();
+  if (active.size) params.set('tags', [...active].join(','));
+  if (query.trim()) params.set('q', query.trim());
+  const text = params.toString();
+  history.replaceState(null, '', location.pathname + location.search + (text ? '#' + text : ''));
+}
+
+// Everything a visitor could reasonably search for in an entry, lower-cased.
+function searchText(entry) {
+  return [
+    entry.title,
+    entry.text,
+    entry.linkText,
+    formatNewsDate(entry.date),
+    entry.date,
+    ...(entry.tags || []).map(k => newsTag(k).label)
+  ].filter(Boolean).join(' ').toLowerCase();
 }
 
 function renderUpdatesPage() {
@@ -177,15 +193,42 @@ function renderUpdatesPage() {
     return;
   }
 
+  const haystacks = new Map(entries.map(e => [e, searchText(e)]));
   const tagKeys = usedTagKeys(entries);
-  const active = readHashTags(tagKeys); // empty set = show everything
+  const initial = readHash(tagKeys);
+  const active = initial.tags; // empty set = every tag
+  let query = initial.query;
 
   const list = el('ul', { class: 'news-list' });
   const status = el('p', { class: 'news-status', attrs: { 'aria-live': 'polite' } });
   const buttons = new Map(); // tag key (or '') -> button
 
+  // Search box: same look as the header search.
+  const input = el('input', {
+    class: 'nav-search-input',
+    attrs: {
+      type: 'search',
+      placeholder: 'Search updates…',
+      'aria-label': 'Search updates',
+      autocomplete: 'off',
+      spellcheck: 'false',
+      enterkeyhint: 'search'
+    }
+  });
+  input.value = query;
+  const clearBtn = el('button', { class: 'nav-search-clear', attrs: { type: 'button', 'aria-label': 'Clear search', hidden: '' } });
+  const searchBox = el('div', { class: 'news-search', attrs: { role: 'search' } }, [
+    icon('search', 'icon-sm nav-search-icon'),
+    input,
+    clearBtn
+  ]);
+
+  // Every word typed has to appear somewhere in the entry, in any order.
   function matches(entry) {
-    return !active.size || (entry.tags || []).some(t => active.has(t));
+    if (active.size && !(entry.tags || []).some(t => active.has(t))) return false;
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const hay = haystacks.get(entry);
+    return terms.every(t => hay.includes(t));
   }
 
   function refresh() {
@@ -196,12 +239,20 @@ function renderUpdatesPage() {
       const on = key === '' ? !active.size : active.has(key);
       btn.setAttribute('aria-pressed', String(on));
     });
+    clearBtn.hidden = !query;
 
-    status.textContent = shown.length
-      ? (active.size ? `Showing ${shown.length} of ${entries.length} updates` : '')
-      : 'No updates match those tags.';
-    writeHashTags(active);
+    const filtering = active.size > 0 || query.trim() !== '';
+    status.textContent = !shown.length
+      ? (query.trim() ? 'No updates match your search.' : 'No updates match those tags.')
+      : (filtering ? `Showing ${shown.length} of ${entries.length} updates` : '');
+    writeHash(active, query);
   }
+
+  input.addEventListener('input', () => { query = input.value; refresh(); });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && input.value) { e.preventDefault(); input.value = ''; query = ''; refresh(); }
+  });
+  clearBtn.addEventListener('click', () => { input.value = ''; query = ''; refresh(); input.focus(); });
 
   function makeButton(key, label, tag) {
     const count = key === '' ? entries.length : entries.filter(e => (e.tags || []).includes(key)).length;
@@ -220,14 +271,16 @@ function renderUpdatesPage() {
     return btn;
   }
 
-  // One filter row, only when there's more than one tag to choose between.
+  // Search box and tag filters share a row (they wrap onto two on narrow screens).
+  // The filters only appear when there's more than one tag to choose between.
+  const tools = el('div', { class: 'news-tools' }, [searchBox]);
   if (tagKeys.length > 1) {
-    const row = el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter updates by tag' } }, [
+    tools.appendChild(el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter updates by tag' } }, [
       makeButton('', 'All', null),
       ...tagKeys.map(k => { const t = newsTag(k); return makeButton(k, t.label, t); })
-    ]);
-    main.appendChild(row);
+    ]));
   }
+  main.appendChild(tools);
   main.appendChild(status);
   main.appendChild(list);
   refresh();
