@@ -56,6 +56,15 @@ const LATEST_UPDATES = {
   entries: [
     {
       date: "2026-10-20",
+      tags: ["snapshot", "beta"],
+      image: "images/icons/snapshot.svg",
+      title: "26.4 Snapshot 5",
+      text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-5.",
+      url: "/data-packs-mods",
+      linkText: "View Data Packs"
+    },
+    {
+      date: "2026-10-20",
       tags: ["new"],
       image: "images/note-block-tweaks.webp",
       announce: true,
