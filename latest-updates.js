@@ -1,11 +1,15 @@
 /* LATEST UPDATES - the news feed shown on the home page (newest few) and on
-   the News page (everything, with search and tag filters). Rendered by news.js.
+   the News page (everything, with search, project and tag filters). Rendered by news.js.
 
    - Adding an entry: copy a block in `entries`. Order doesn't matter; the
      newest `date` is always shown first.
        date   "YYYY-MM-DD"
        title  headline
        text   one or two sentences (optional)
+       projects (optional) project ids this entry is about, e.g.
+              ["better-craftables", "better-unpackables"] (an id is the project's
+              title in data.js, lower-cased with hyphens). A project the `url`
+              points at is picked up automatically.
        tags   one or more keys from `tags` below, e.g. ["release"] or
               ["release", "beta"]
        url      (optional) adds a link button. Use a full address
@@ -22,13 +26,13 @@
                 the icon of the project the `url` points at; with neither, a
                 generic news icon is shown.
    - Tags: each key has a `label` (shown on the pill and filter button) and a
-     `color` (any #rrggbb hex). Add, rename or recolour freely; the filters on
+     `color` (any #rrggbb hex). Add, rename or recolour freely; the tag filters on
      the News page are built from the tags that entries actually use, in the
      order listed here. A tag used by an entry but missing from `tags` still
      works: it gets its key as a label and the default blue.
    - homeCount: how many entries the home page shows.
    - sidebar: the right-hand column of the News page (below the entries on
-     narrow screens). Search and the tag filters are always there; you set their
+     narrow screens). Search and the project/tag filters are always there; you set their
      text, plus what follows. Icons are names of files in images/icons/ without
      ".svg" (e.g. "discord"). Links work like an entry's `url`.
        searchPlaceholder, filterHeading   text for those two controls
@@ -75,6 +79,7 @@ const LATEST_UPDATES = {
       date: "2026-10-20",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
+      projects: ["better-craftables", "better-unpackables"],
       title: "26.4 Snapshot 5",
       text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-5.",
       url: "/data-packs-mods",
@@ -110,6 +115,7 @@ const LATEST_UPDATES = {
       date: "2026-10-13",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
+      projects: ["better-craftables", "better-unpackables"],
       title: "26.4 Snapshot 4",
       text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-4.",
       url: "/data-packs-mods",
@@ -119,6 +125,7 @@ const LATEST_UPDATES = {
       date: "2026-10-06",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
+      projects: ["better-craftables", "better-unpackables"],
       title: "26.4 Snapshot 3",
       text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-3.",
       url: "/data-packs-mods",
@@ -128,6 +135,7 @@ const LATEST_UPDATES = {
       date: "2026-09-22",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
+      projects: ["better-craftables", "better-unpackables"],
       title: "26.4 Snapshot 1",
       text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-1.",
       url: "/data-packs-mods",
@@ -137,6 +145,7 @@ const LATEST_UPDATES = {
       date: "2026-09-15",
       tags: ["release"],
       image: "images/icons/announcements.svg",
+      projects: ["better-craftables", "better-unpackables", "silly-eatables"],
       title: "26.3 Data Pack & Mod Updates",
       text: "New updates for Better Craftables, Better Unpackables and Silly Eatables have been released for Java 26.3.",
       url: "/data-packs-mods",
@@ -146,6 +155,7 @@ const LATEST_UPDATES = {
       date: "2026-09-14",
       tags: ["release"],
       image: "images/icons/announcements.svg",
+      projects: ["classics-disc-tweaks", "classics-dye-tweaks", "classics-lantern-tweaks"],
       title: "26.3 Resource Pack Updates",
       text: "New updates for Classic's Disc, Dye and Lantern Tweaks have been released for Java 26.3.",
       url: "/resource-packs",
@@ -155,7 +165,7 @@ const LATEST_UPDATES = {
 
   sidebar: {
     searchPlaceholder: "Search news…",
-    filterHeading: "Filter by tags",
+    filterHeading: "Filters",
 
     quickLinks: {
       heading: "Quick links",

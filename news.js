@@ -60,6 +60,30 @@ function usedTagKeys(entries) {
   return listed.concat([...used].filter(k => !listed.includes(k)));
 }
 
+// Every project on the site, in site order: [{ id, title }]. The News page's
+// project filter lists all of them, even ones with no entries yet.
+function allProjects() {
+  const out = [];
+  (SITE_DATA.sections || []).forEach(section => {
+    sectionIds(section).projects.forEach(p => out.push({ id: p.id, title: p.project.title, image: p.project.image || null }));
+  });
+  return out;
+}
+
+// Project ids an entry belongs to: any listed in its `projects`, plus the one
+// its same-site `url` points at (e.g. "/data-packs-mods#better-unpackables").
+function entryProjectIds(entry, validIds) {
+  const ids = new Set((entry.projects || []).filter(id => validIds.includes(id)));
+  if (entry.url) {
+    try {
+      const u = new URL(entry.url, location.origin);
+      const id = decodeURIComponent(u.hash.slice(1));
+      if (u.origin === location.origin && validIds.includes(id)) ids.add(id);
+    } catch { /* not a usable address */ }
+  }
+  return [...ids];
+}
+
 // Only http(s) and site-relative links become clickable (no javascript: etc.).
 function newsSafeUrl(url) {
   return /^(https?:\/\/|\/|#|[^:]*$)/i.test(url);
@@ -233,16 +257,18 @@ function renderNewsPreview() {
 
 /* ---------- News page ---------- */
 
-// Active filters and the search text live in the URL (#tags=release,new&q=snapshot)
-// so a filtered view can be linked to.
-function readHash(validTags) {
+// Active filters and the search text live in the URL
+// (#projects=better-unpackables&tags=release,new&q=snapshot) so a filtered view can be linked to.
+function readHash(validTags, validProjects) {
   const params = new URLSearchParams(location.hash.slice(1));
   const tags = (params.get('tags') || '').split(',').filter(k => validTags.includes(k));
-  return { tags: new Set(tags), query: params.get('q') || '' };
+  const projects = (params.get('projects') || '').split(',').filter(k => validProjects.includes(k));
+  return { tags: new Set(tags), projects: new Set(projects), query: params.get('q') || '' };
 }
 
-function writeHash(active, query) {
+function writeHash(active, activeProjects, query) {
   const params = new URLSearchParams();
+  if (activeProjects.size) params.set('projects', [...activeProjects].join(','));
   if (active.size) params.set('tags', [...active].join(','));
   if (query.trim()) params.set('q', query.trim());
   const text = params.toString();
@@ -250,14 +276,15 @@ function writeHash(active, query) {
 }
 
 // Everything a visitor could reasonably search for in an entry, lower-cased.
-function searchText(entry) {
+function searchText(entry, projectTitles) {
   return [
     entry.title,
     entry.text,
     entry.linkText,
     formatNewsDate(entry.date),
     entry.date,
-    ...(entry.tags || []).map(k => newsTag(k).label)
+    ...(entry.tags || []).map(k => newsTag(k).label),
+    ...projectTitles
   ].filter(Boolean).join(' ').toLowerCase();
 }
 
@@ -325,15 +352,23 @@ function renderNewsPage() {
     return;
   }
 
-  const haystacks = new Map(entries.map(e => [e, searchText(e)]));
+  const everyProject = allProjects();
+  const entryProjects = new Map(entries.map(e => [e, entryProjectIds(e, everyProject.map(p => p.id))]));
+  // Only projects with at least one entry get a filter.
+  const projects = everyProject.filter(p => entries.some(e => entryProjects.get(e).includes(p.id)));
+  const projectIds = projects.map(p => p.id);
+  const projectTitle = new Map(projects.map(p => [p.id, p.title]));
+  const haystacks = new Map(entries.map(e => [e, searchText(e, entryProjects.get(e).map(id => projectTitle.get(id)))]));
   const tagKeys = usedTagKeys(entries);
-  const initial = readHash(tagKeys);
+  const initial = readHash(tagKeys, projectIds);
   const active = initial.tags; // empty set = every tag
+  const activeProjects = initial.projects; // empty set = every project
   let query = initial.query;
 
   const list = el('ul', { class: 'news-list' });
   const status = el('p', { class: 'news-status', attrs: { 'aria-live': 'polite' } });
   const buttons = new Map(); // tag key (or '') -> button
+  const projectButtons = new Map(); // project id (or '') -> button
 
   // Search box: same look as the header search.
   const input = el('input', {
@@ -358,6 +393,7 @@ function renderNewsPage() {
   // Every word typed has to appear somewhere in the entry, in any order.
   function matches(entry) {
     if (active.size && !(entry.tags || []).some(t => active.has(t))) return false;
+    if (activeProjects.size && !entryProjects.get(entry).some(id => activeProjects.has(id))) return false;
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     const hay = haystacks.get(entry);
     return terms.every(t => hay.includes(t));
@@ -374,13 +410,17 @@ function renderNewsPage() {
       const on = key === '' ? !active.size : active.has(key);
       btn.setAttribute('aria-pressed', String(on));
     });
+    projectButtons.forEach((btn, id) => {
+      const on = id === '' ? !activeProjects.size : activeProjects.has(id);
+      btn.setAttribute('aria-pressed', String(on));
+    });
     clearBtn.hidden = !query;
 
-    const filtering = active.size > 0 || query.trim() !== '';
+    const filtering = active.size > 0 || activeProjects.size > 0 || query.trim() !== '';
     status.textContent = !shown.length
-      ? (query.trim() ? 'Nothing matches your search.' : 'Nothing matches those tags.')
+      ? (query.trim() ? 'Nothing matches your search.' : 'Nothing matches those filters.')
       : (filtering ? `Showing ${shown.length} of ${entries.length}` : '');
-    writeHash(active, query);
+    writeHash(active, activeProjects, query);
   }
 
   input.addEventListener('input', () => { query = input.value; refresh(); });
@@ -389,60 +429,94 @@ function renderNewsPage() {
   });
   clearBtn.addEventListener('click', () => { input.value = ''; query = ''; refresh(); input.focus(); });
 
-  function makeButton(key, label, tag) {
-    const count = key === '' ? entries.length : entries.filter(e => (e.tags || []).includes(key)).length;
-    const btn = el('button', { class: 'news-filter', attrs: { type: 'button', 'aria-pressed': 'false' } }, [
+  // One filter button. `set` is the active set it toggles, `registry` the map
+  // refresh() uses to show which buttons are on, and `count` the entries it matches.
+  function makeButton(key, label, tag, set, registry, count, image) {
+    const pic = image ? el('img', { class: 'news-filter-icon', src: image, alt: '', attrs: { width: '20', height: '20', decoding: 'async', draggable: 'false' } }) : null;
+    const btn = el('button', { class: 'news-filter' + (tag ? '' : ' is-plain'), attrs: { type: 'button', 'aria-pressed': 'false' } }, [
+      pic,
       el('span', { text: label }),
       el('span', { class: 'news-filter-count', text: String(count), attrs: { 'aria-hidden': 'true' } })
     ]);
     if (tag) setTagColor(btn, tag);
+    if (key !== '' && count === 0) btn.classList.add('is-empty');
     btn.addEventListener('click', () => {
-      if (key === '') active.clear();
-      else if (active.has(key)) active.delete(key);
-      else active.add(key);
+      if (key === '') set.clear();
+      else if (set.has(key)) set.delete(key);
+      else set.add(key);
       refresh();
     });
-    buttons.set(key, btn);
+    registry.set(key, btn);
     return btn;
   }
 
-  // Tag filter dropdown: a toggle button that opens/collapses the list of
-  // tags. "All" is always shown; only the first FILTER_VISIBLE tags show until
-  // "Show more" is pressed (the button only exists when there are more).
-  const FILTER_VISIBLE = 4;
-  function buildFilterDropdown() {
-    const panelId = 'news-filter-panel';
-    const toggle = el('button', { class: 'news-filter-toggle', attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': panelId } }, [
-      el('span', { class: 'news-filter-toggle-label', text: side.filterHeading || 'Filter by tags' }),
-      el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
-    ]);
+  // How many options each group shows before "Show more".
+  const PROJECTS_VISIBLE = 5;
+  const TAGS_VISIBLE = 3;
 
-    const tagButtons = tagKeys.map(k => { const t = newsTag(k); return makeButton(k, t.label, t); });
-    const options = el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter news by tag' } }, [
-      makeButton('', 'All', null),
-      ...tagButtons
+  // A titled group of filter buttons: an "All" button, then the options. Only
+  // the first `visible` options show until "Show more" is pressed (the
+  // button only exists when there are more). `noun` is "projects" or "tags".
+  function buildFilterGroup(title, noun, visible, allButton, optionButtons, keys, set, panelId) {
+    const options = el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter news by ' + title.toLowerCase() } }, [
+      allButton,
+      ...optionButtons
     ]);
-    const panel = el('div', { class: 'news-filter-panel', attrs: { id: panelId, hidden: '' } }, [options]);
+    const group = el('div', { class: 'news-filter-group' }, [
+      el('h3', { class: 'news-filter-group-title', text: title }),
+      options
+    ]);
 
     let expanded = false;
     let more = null;
     function applyMore() {
-      tagButtons.forEach((b, i) => { b.hidden = !expanded && i >= FILTER_VISIBLE; });
+      optionButtons.forEach((b, i) => { b.hidden = !expanded && i >= visible; });
       if (!more) return;
       more.setAttribute('aria-expanded', String(expanded));
-      more.firstChild.textContent = expanded ? 'Show less' : 'Show more';
+      more.firstChild.textContent = (expanded ? 'Show fewer ' : 'Show more ') + noun;
     }
-    if (tagButtons.length > FILTER_VISIBLE) {
+    if (optionButtons.length > visible) {
       more = el('button', { class: 'news-filter-more', attrs: { type: 'button', 'aria-controls': panelId } }, [
         el('span'),
         el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
       ]);
       more.addEventListener('click', () => { expanded = !expanded; applyMore(); });
-      panel.appendChild(more);
+      group.appendChild(more);
     }
-    // A tag picked from a shared link might be hidden behind "Show more".
-    expanded = tagKeys.slice(FILTER_VISIBLE).some(k => active.has(k));
+    // An option picked from a shared link might be hidden behind "Show more".
+    expanded = keys.slice(visible).some(k => set.has(k));
     applyMore();
+    return group;
+  }
+
+  // Filter dropdown: a toggle button that opens/collapses the panel, which holds
+  // the project group, then the tag group.
+  function buildFilterDropdown() {
+    const panelId = 'news-filter-panel';
+    const toggle = el('button', { class: 'news-filter-toggle', attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': panelId } }, [
+      el('span', { class: 'news-filter-toggle-label', text: side.filterHeading || 'Filters' }),
+      el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+    ]);
+
+    const groups = [];
+    if (projects.length) {
+      const projectCount = id => entries.filter(e => entryProjects.get(e).includes(id)).length;
+      groups.push(buildFilterGroup(
+        'Project', 'projects', PROJECTS_VISIBLE,
+        makeButton('', 'All projects', null, activeProjects, projectButtons, entries.length),
+        projects.map(p => makeButton(p.id, p.title, null, activeProjects, projectButtons, projectCount(p.id), p.image)),
+        projectIds, activeProjects, panelId
+      ));
+    }
+    if (tagKeys.length > 1) {
+      groups.push(buildFilterGroup(
+        'Tags', 'tags', TAGS_VISIBLE,
+        makeButton('', 'All tags', null, active, buttons, entries.length),
+        tagKeys.map(k => { const t = newsTag(k); return makeButton(k, t.label, t, active, buttons, entries.filter(e => (e.tags || []).includes(k)).length); }),
+        tagKeys, active, panelId
+      ));
+    }
+    const panel = el('div', { class: 'news-filter-panel', attrs: { id: panelId, hidden: '' } }, groups);
 
     const box = el('div', { class: 'news-filter-box' }, [toggle, panel]);
     function setOpen(open) {
@@ -459,7 +533,7 @@ function renderNewsPage() {
   // then quick links and cards) so that on narrow screens the search and filters
   // come first, then the list, then the extras.
   const tools = el('div', { class: 'news-tools' }, [searchBox]);
-  if (tagKeys.length > 1) {
+  if (projects.length || tagKeys.length > 1) {
     tools.appendChild(buildFilterDropdown());
   }
 
