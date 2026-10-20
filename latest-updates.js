@@ -127,8 +127,8 @@ const LATEST_UPDATES = {
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       projects: [
-        { id: "better-craftables", version: "v8.1.0-beta.4" },
-        { id: "better-unpackables", version: "v5.1.0-beta.5" }
+        { id: "better-craftables", version: "v8.1.0-beta.4", text: "Reduced the Ice crafting cost from 4 Ice Crystals to 2 Ice Crystals per Ice, and made the recipe shapeless." },
+        { id: "better-unpackables", version: "v5.1.0-beta.5", text: "Reduced the amount of Ice Crystals from 4 to 2 per Ice when converting Ice into Ice Crystals." }
       ]
     },
     {
@@ -159,7 +159,7 @@ const LATEST_UPDATES = {
       tags: ["release"],
       projects: [
         { id: "better-unpackables", version: "v5.0.1" },
-        { id: "better-unpackables", version: "v5.0.1+mod" }
+        { id: "better-unpackables", version: "v5.0.1+mod", text: "Fixed Cut Sandstone unpacking recipes returning 4 Sandstone instead of 1." }
       ]
     },
     {
@@ -169,8 +169,8 @@ const LATEST_UPDATES = {
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       projects: [
-        { id: "better-craftables", version: "v8.1.0-beta.3" },
-        { id: "better-unpackables", version: "v5.1.0-beta.3" }
+        { id: "better-craftables", version: "v8.1.0-beta.3", text: "Adjusted Icicle and Ice Crystal crafting recipes." },
+        { id: "better-unpackables", version: "v5.1.0-beta.3", text: "Adjusted Icicle and Ice Crystal crafting requirements and made the Packed Ice to Ice Balls recipe shapeless." }
       ]
     },
     {
@@ -180,8 +180,8 @@ const LATEST_UPDATES = {
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       projects: [
-        { id: "better-craftables", version: "v8.1.0-beta.2" },
-        { id: "better-unpackables", version: "v5.1.0-beta.2" }
+        { id: "better-craftables", version: "v8.1.0-beta.2", text: "Added new 26.4 to craft Ice Balls, Ice Crystals, and Icicles into Packed Ice and Ice." },
+        { id: "better-unpackables", version: "v5.1.0-beta.2", text: "Added new 26.4 recipes to craft Ice Balls, Ice Crystals, and Icicles from Packed Ice and Ice." }
       ]
     },
     {
@@ -196,15 +196,35 @@ const LATEST_UPDATES = {
       ]
     },
     {
+      date: "2026-09-16",
+      title: "Zisteau Pigmen v2.4.1",
+      text: "Zisteau Pigmen v2.4.1 has been released to fix the old pack icon being used.",
+      tags: ["release"],
+      image: "images/zisteau-pigmen.webp",
+      projects: ["zisteau-pigmen"],
+      url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1",
+      linkText: "View update on Modrinth"
+    },
+    {
+      date: "2026-09-15",
+      title: "Zisteau Pigmen v2.4.0",
+      text: "Zisteau Pigmen v2.4.0 has been released for Java 26.3.",
+      tags: ["release"],
+      image: "images/zisteau-pigmen.webp",
+      projects: ["zisteau-pigmen"],
+      url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.0",
+      linkText: "View update on Modrinth"
+    },
+    {
       date: "2026-09-15",
       title: "26.3 Mod Updates",
       text: "New mod updates have been released for Java 26.3.",
       tags: ["release"],
       image: "images/icons/announcements.svg",
       projects: [
-        { id: "better-craftables", version: "v8.0.0+mod" },
-        { id: "better-unpackables", version: "v5.0.0+mod" },
-        { id: "silly-eatables", version: "v5.0.0+mod" }
+        { id: "better-craftables", version: "v8.0.0+mod", text: "Added redyeing recipes for Concrete Stairs and Slabs, plus a Shelf Mushroom to Brown Dye recipe." },
+        { id: "better-unpackables", version: "v5.0.0+mod", text: "Added Straw Bed -> Hay Bale and Cushion -> Wool Slab recipes, plus 'back to block' recipes for Concrete Stairs and Slabs." },
+        { id: "silly-eatables", version: "v5.0.0+mod", text: "Updated for 26.3 compatibility." }
       ]
     },
     {
@@ -214,9 +234,9 @@ const LATEST_UPDATES = {
       tags: ["release"],
       image: "images/icons/announcements.svg",
       projects: [
-        { id: "better-craftables", version: "v8.0.0" },
-        { id: "better-unpackables", version: "v5.0.0" },
-        { id: "silly-eatables", version: "v5.0.0" }
+        { id: "better-craftables", version: "v8.0.0", text: "Added redyeing recipes for Concrete Stairs and Slabs, plus a Shelf Mushroom to Brown Dye recipe." },
+        { id: "better-unpackables", version: "v5.0.0", text: "Added Straw Bed -> Hay Bale and Cushion -> Wool Slab recipes, plus 'back to block' recipes for Concrete Stairs and Slabs." },
+        { id: "silly-eatables", version: "v5.0.0", text: "Updated for 26.3 compatibility." }
       ]
     },
     {
@@ -226,9 +246,9 @@ const LATEST_UPDATES = {
       tags: ["release"],
       image: "images/icons/announcements.svg",
       projects: [
-        { id: "classics-disc-tweaks", version: "v3.4.0" },
-        { id: "classics-dye-tweaks", version: "v1.4.0" },
-        { id: "classics-lantern-tweaks", version: "v2.4.0" }
+        { id: "classics-disc-tweaks", version: "v3.4.0", text: "Updated for 26.3 compatibility." },
+        { id: "classics-dye-tweaks", version: "v1.4.0", text: "Updated for 26.3 compatibility." },
+        { id: "classics-lantern-tweaks", version: "v2.4.0", text: "Updated for 26.3 compatibility." }
       ]
     }
   ]
