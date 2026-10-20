@@ -280,15 +280,17 @@ function renderQuickLinks(cfg) {
 }
 
 // Sidebar info card: icon tile, heading, text, then an optional outlined
-// `button` and/or plain `link` ({ label, url, icon? }).
+// `button` (plus an optional second, `button2`) and/or plain `link` ({ label, url, icon? }).
 function renderSideCard(card) {
   if (!card || !card.heading) return null;
 
-  const button = card.button && newsAnchor('news-btn', card.button.url, [
-    card.button.icon ? icon(card.button.icon, 'icon-sm') : null,
-    el('span', { text: card.button.label }),
+  const makeButton = b => b && newsAnchor('news-btn', b.url, [
+    b.icon ? icon(b.icon, 'icon-sm') : null,
+    el('span', { text: b.label }),
     el('span', { class: 'news-btn-arrow', attrs: { 'aria-hidden': 'true' } })
   ]);
+  const button = makeButton(card.button);
+  const button2 = makeButton(card.button2);
   const link = card.link && newsAnchor('news-link', card.link.url, [
     el('span', { text: card.link.label }),
     newsArrow()
@@ -300,6 +302,7 @@ function renderSideCard(card) {
       el('h2', { class: 'news-card-heading', text: card.heading }),
       card.text ? el('p', { class: 'news-card-text', text: card.text }) : null,
       button,
+      button2,
       link
     ])
   ]);

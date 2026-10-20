@@ -3310,6 +3310,7 @@ body.has-announcement .back-to-top {
   transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 .news-btn > span:nth-child(2) { flex: 1; }
+.news-btn + .news-btn { margin-top: 4px; }
 @media (hover: hover) {
   .news-btn:hover { background: rgba(var(--nav-accent-rgb), 0.18); border-color: rgba(var(--nav-accent-rgb), 0.6); }
 }

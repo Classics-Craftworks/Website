@@ -148,7 +148,7 @@ const LATEST_UPDATES = {
         text: "Follow along for new releases, betas and other updates.",
         icon: "announcements",
         button: { label: "Join the Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" },
-        // button2: { label: "Follow on X/Twitter", url: "x.com/C36Craftworks", icon: "x" },
+        button2: { label: "Follow on X/Twitter", url: "https://x.com/C36Craftworks", icon: "x" },
       }
     ]
   }
