@@ -724,9 +724,17 @@ function initAnnouncementCard() {
     return pill;
   });
 
+  // Like the home page cards: "View full update" goes to the entry on the News
+  // page and stretches over the whole card (the close button stays above it).
+  const page = (SITE_DATA.pages || []).find(p => p.url === 'news');
+  const link = page && internalLink('news-link', `${page.url}#entry=${newsEntryId(entry)}`, [
+    el('span', { text: 'View full update' }),
+    newsArrow()
+  ]);
+
   const close = el('button', { class: 'announce-close', attrs: { type: 'button', 'aria-label': 'Dismiss announcement', 'data-tooltip': 'Dismiss' } });
   // Tags and date run along the top; the icon sits below them beside the text.
-  const card = el('aside', { class: 'announce', attrs: { role: 'region', 'aria-label': 'Latest news' } }, [
+  const card = el('aside', { class: 'announce' + (link ? ' is-linked' : ''), attrs: { role: 'region', 'aria-label': 'Latest news' } }, [
     el('div', { class: 'news-meta announce-meta' }, [
       ...pills,
       newsDate(entry)
@@ -735,7 +743,7 @@ function initAnnouncementCard() {
     el('div', { class: 'announce-body' }, [
       el('p', { class: 'announce-title', text: entry.title }),
       entry.text ? el('p', { class: 'announce-text', text: fillPlaceholders(entry.text) }) : null,
-      newsLink(entry)
+      link
     ]),
     close
   ]);
