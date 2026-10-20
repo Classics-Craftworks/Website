@@ -244,16 +244,15 @@ function renderEntryProjects(entry) {
     const icon = project.image ? el('img', { class: 'news-project-icon', src: project.image, alt: '', attrs: { width: '28', height: '28', decoding: 'async', draggable: 'false' } }) : null;
     const name = el('span', { class: 'news-project-name', text: project.title });
     const pill = ref.version ? versionPill(ref.version, refChannel(ref, entry)) : null;
-    // Icon, name and pill are one link: the version's Modrinth page, else the
-    // project's (or the ref's own `url`).
+    const text = ref.text ? el('p', { class: 'news-project-text', text: fillPlaceholders(ref.text) }) : null;
+    // Icon, name, pill and description are one link: the version's Modrinth page,
+    // else the project's (or the ref's own `url`).
+    const content = [el('div', { class: 'news-project-head' }, [icon, name, pill]), text];
     const target = ref.url || versionUrl(ref, project) || project.modrinth;
-    const link = newsAnchor('news-project-link', target, [icon, name, pill]);
+    const link = newsAnchor('news-project-link', target, content);
     if (link) link.setAttribute('aria-label', `${project.title}${ref.version ? ' ' + ref.version : ''} on Modrinth`);
     return el('li', { class: 'news-project' }, [
-      el('div', { class: 'news-project-body' }, [
-        link || el('div', { class: 'news-project-who' }, [icon, name, pill]),
-        ref.text ? el('p', { class: 'news-project-text', text: fillPlaceholders(ref.text) }) : null
-      ])
+      link || el('div', { class: 'news-project-who' }, content)
     ]);
   }).filter(Boolean);
   return rows.length ? el('ul', { class: 'news-projects' }, rows) : null;

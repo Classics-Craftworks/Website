@@ -145,7 +145,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-13",
       title: "Better Unpackables v5.1.0-beta.4",
-      text: "Better Unpackables v5.1.0-beta.4 has been released with an important fix for Cut Sandstone recipes.",
+      text: "Better Unpackables v5.1.0-beta.4 has been released to fix Cut Sandstone unpacking recipes returning 4 Sandstone instead of 1.",
       tags: ["beta"],
       image: "images/better-unpackables.webp",
       projects: ["better-unpackables"],
@@ -155,11 +155,11 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-13",
       title: "Better Unpackables v5.0.1",
-      text: "Better Unpackables v5.0.1 has been released with an important fix for Cut Sandstone recipes.",
+      text: "Better Unpackables v5.0.1 has been released to fix Cut Sandstone unpacking recipes returning 4 Sandstone instead of 1.",
       tags: ["release"],
       projects: [
         { id: "better-unpackables", version: "v5.0.1" },
-        { id: "better-unpackables", version: "v5.0.1+mod", text: "Fixed Cut Sandstone unpacking recipes returning 4 Sandstone instead of 1." }
+        { id: "better-unpackables", version: "v5.0.1+mod" }
       ]
     },
     {
