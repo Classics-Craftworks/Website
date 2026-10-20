@@ -36,7 +36,11 @@
      text, plus what follows. Icons are names of files in images/icons/ without
      ".svg" (e.g. "discord"). Links work like an entry's `url`.
        searchPlaceholder, filterHeading   text for those two controls
-       quickLinks   { heading, links: [{ label, url, icon }] }; leave out to hide
+       latestReleases  { heading, releases: [{ project, version, channel, date, url }] };
+                    shown in order, so list the newest first. channel is "stable",
+                    "beta", "alpha" or "unsupported" (colours come from the matching
+                    tags above); date is "YYYY-MM-DD"; url (optional) makes the row a link, like an
+                    entry's `url`. Leave out to hide
        cards        info cards, in order; each is { heading, text, icon } plus an
                     optional `button` and/or `link` of { label, url, icon? }.
                     Leave the list empty to hide them. */
@@ -61,10 +65,11 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-20",
       tags: ["beta"],
+      image: "images/better-unpackables.webp",
       title: "Better Unpackables v5.1.0-beta.6",
       text: "Better Unpackables v5.1.0-beta.6 has been released, adding new 'back to block' recipes for Packed Ice Brick blocks.",
-      url: "/data-packs-mods#better-unpackables",
-      linkText: "View Better Unpackables"
+      url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6",
+      linkText: "View update on Modrinth"
     },
     {
       date: "2026-10-20",
@@ -72,8 +77,8 @@ const LATEST_UPDATES = {
       image: "images/note-block-tweaks.webp",
       title: "Classic's Note Block Tweaks v0.5.0",
       text: "New alpha for Classic's Note Block Tweaks, including a new pack icon and support for Java 26.4-snapshot-5.",
-      url: "/resource-packs#classics-note-block-tweaks",
-      linkText: "View Classic's Note Block Tweaks"
+      url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0",
+      linkText: "View update on Modrinth"
     },
     {
       date: "2026-10-20",
@@ -98,10 +103,11 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-13",
       tags: ["beta"],
+      image: "images/better-unpackables.webp",
       title: "Better Unpackables v5.1.0-beta.4",
       text: "Better Unpackables v5.1.0-beta.4 has been released with an important fix for Cut Sandstone recipes.",
-      url: "/data-packs-mods#better-unpackables",
-      linkText: "View Better Unpackables"
+      url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.4",
+      linkText: "View update on Modrinth"
     },
     {
       date: "2026-10-13",
@@ -167,14 +173,13 @@ const LATEST_UPDATES = {
     searchPlaceholder: "Search news…",
     filterHeading: "Filters",
 
-    quickLinks: {
-      heading: "Quick links",
-      links: [
-        { label: "Data Packs & Mods", url: "/data-packs-mods", icon: "brackets" },
-        { label: "Resource Packs", url: "/resource-packs",  icon: "brush" },
-        { label: "Other Projects", url: "/other-projects",  icon: "wrench" },
-        { label: "Modrinth", url: "https://modrinth.com/organization/classics-craftworks", icon: "modrinth" },
-        { label: "GitHub", url: "https://github.com/Classics-Craftworks", icon: "github" }
+    latestReleases: {
+      heading: "Latest releases",
+      releases: [
+        { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6", version: "v5.1.0-beta.6", channel: "beta", date: "2026-10-20" },
+        { project: "Classic's Note Block Tweaks", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0", version: "v0.5.0", channel: "alpha", date: "2026-10-20" },
+        { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.5", version: "v5.1.0-beta.5", channel: "beta", date: "2026-10-20" },
+        { project: "Better Craftables", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.4", version: "v8.1.0-beta.4", channel: "beta", date: "2026-10-20" },
       ]
     },
 

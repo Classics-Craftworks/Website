@@ -288,21 +288,54 @@ function searchText(entry, projectTitles) {
   ].filter(Boolean).join(' ').toLowerCase();
 }
 
-// Sidebar "Quick links" panel.
-function renderQuickLinks(cfg) {
-  const links = ((cfg && cfg.links) || []).map(l => {
-    const a = newsAnchor('news-quick', l.url, [
-      icon(l.icon || 'link', 'icon-md news-quick-icon'),
-      el('span', { class: 'news-quick-label', text: l.label }),
-      el('span', { class: 'news-quick-arrow', attrs: { 'aria-hidden': 'true' } })
+// Channel -> label shown on the pill, and the tag (in latest-updates.js) whose colour it uses.
+const RELEASE_CHANNELS = {
+  stable:      { label: 'Stable',      tag: 'release' },
+  beta:        { label: 'Beta',        tag: 'beta' },
+  alpha:       { label: 'Alpha',       tag: 'alpha' },
+  unsupported: { label: 'Unsupported', tag: 'unsupported' }
+};
+
+// "2026-10-13" -> "13 Oct"
+function formatShortDate(iso) {
+  const d = new Date(iso + 'T00:00:00Z');
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+}
+
+// Sidebar "Latest releases" panel: one row per release with the project name,
+// (with its icon) then its version (a pill coloured by channel) and date. Rows with a `url` are links.
+function renderLatestReleases(cfg) {
+  const rows = ((cfg && cfg.releases) || []).filter(r => r && r.project).map(r => {
+    const channel = RELEASE_CHANNELS[String(r.channel || '').toLowerCase()];
+    // One pill: the version, coloured by its channel.
+    const meta = [];
+    if (r.version) {
+      const pill = el('code', { class: 'release-version', text: r.version });
+      if (channel) {
+        setTagColor(pill, newsTag(channel.tag));
+        pill.title = channel.label;
+      }
+      meta.push(pill);
+    }
+    if (r.date) meta.push(el('time', { class: 'release-date', text: formatShortDate(r.date), attrs: { datetime: r.date } }));
+    // With a url, the project name is a link that stretches over the whole row.
+    const name = newsAnchor('release-project', r.url, [el('span', { text: r.project })])
+      || el('span', { class: 'release-project', text: r.project });
+    const image = (allProjects().find(p => p.title === r.project) || {}).image;
+    const pic = image
+      ? el('img', { class: 'release-icon', src: image, alt: '', attrs: { width: '36', height: '36', decoding: 'async', draggable: 'false' } })
+      : null;
+    return el('li', { class: 'release-item' + (name.tagName === 'A' ? ' is-clickable' : '') + (pic ? ' has-icon' : '') }, [
+      pic,
+      el('div', { class: 'release-body' }, [name, el('div', { class: 'release-meta' }, meta)])
     ]);
-    return a && el('li', {}, [a]);
-  }).filter(Boolean);
-  if (!links.length) return null;
+  });
+  if (!rows.length) return null;
 
   return el('section', { class: 'news-panel' }, [
-    el('h2', { class: 'news-panel-heading', text: cfg.heading || 'Quick links' }),
-    el('ul', { class: 'news-quick-list' }, links)
+    el('h2', { class: 'news-panel-heading', text: cfg.heading || 'Latest releases' }),
+    el('ul', { class: 'release-list' }, rows)
   ]);
 }
 
@@ -530,14 +563,14 @@ function renderNewsPage() {
   }
 
   // Layout: the list, plus a sidebar. The sidebar is two blocks (search/filters,
-  // then quick links and cards) so that on narrow screens the search and filters
+  // then latest releases and cards) so that on narrow screens the search and filters
   // come first, then the list, then the extras.
   const tools = el('div', { class: 'news-tools' }, [searchBox]);
   if (projects.length || tagKeys.length > 1) {
     tools.appendChild(buildFilterDropdown());
   }
 
-  const extras = [renderQuickLinks(side.quickLinks), ...(side.cards || []).map(renderSideCard)].filter(Boolean);
+  const extras = [renderLatestReleases(side.latestReleases), ...(side.cards || []).map(renderSideCard)].filter(Boolean);
   const layout = el('div', { class: 'news-layout' + (extras.length ? '' : ' no-extras') }, [
     tools,
     el('div', { class: 'news-feed' }, [status, list]),
