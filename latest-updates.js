@@ -57,6 +57,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-20",
       tags: ["new"],
+      image: "images/note-block-tweaks.webp",
       announce: true,
       title: "Introducing Classic's Note Block Tweaks",
       text: "New resource pack that updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
