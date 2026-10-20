@@ -18,7 +18,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v3.11.0.3",
+    label: "v3.11.0.4",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -103,7 +103,6 @@ const SITE_DATA = {
               channel: "stable",
               label: "Release",
               mcVersion: "26.3",
-              badge: "updated",
               downloads: [
                 { label: "Data Pack", icon: "brackets", version: "v5.0.1", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.1" },
                 { label: "Mod", icon: "box", version: "v5.0.1+mod", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.1+mod" }
@@ -115,7 +114,7 @@ const SITE_DATA = {
               mcVersion: "26.3 – 26.4-snap-5",
               badge: "updated",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.5", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.5" },
+                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.6", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6" },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }

@@ -56,7 +56,15 @@ const LATEST_UPDATES = {
   entries: [
     {
       date: "2026-10-20",
-      tags: ["snapshot", "alpha"],
+      tags: ["beta"],
+      title: "Better Unpackables v5.1.0-beta.6",
+      text: "Better Unpackables v5.1.0-beta.6 has been released, adding new 'back to block' recipes for Packed Ice Brick blocks.",
+      url: "/data-packs-mods#better-unpackables",
+      linkText: "View Better Unpackables"
+    },
+    {
+      date: "2026-10-20",
+      tags: ["alpha"],
       image: "images/note-block-tweaks.webp",
       title: "Classic's Note Block Tweaks v0.5.0",
       text: "New alpha for Classic's Note Block Tweaks, including a new pack icon and support for Java 26.4-snapshot-5.",

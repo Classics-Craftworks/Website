@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.11.0.4 — 2026-10-20
+
+### Changed
+- Updated for Better Unpackables v5.1.0-beta.6
+
 ## v3.11.0.3 — 2026-10-20
 
 ### Changed
