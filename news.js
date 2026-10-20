@@ -430,7 +430,7 @@ function renderNewsPage() {
       tagButtons.forEach((b, i) => { b.hidden = !expanded && i >= FILTER_VISIBLE; });
       if (!more) return;
       more.setAttribute('aria-expanded', String(expanded));
-      more.firstChild.textContent = expanded ? 'Show less' : 'Show ' + (tagButtons.length - FILTER_VISIBLE) + ' more';
+      more.firstChild.textContent = expanded ? 'Show less' : 'Show more';
     }
     if (tagButtons.length > FILTER_VISIBLE) {
       more = el('button', { class: 'news-filter-more', attrs: { type: 'button', 'aria-controls': panelId } }, [

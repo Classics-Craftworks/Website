@@ -82,7 +82,7 @@ const LATEST_UPDATES = {
     },
     {
       date: "2026-10-13",
-      tags: ["beta", "snapshot"],
+      tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       title: "26.4 Snapshot 4",
       text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-4.",
@@ -91,7 +91,7 @@ const LATEST_UPDATES = {
     },
     {
       date: "2026-10-06",
-      tags: ["beta", "snapshot"],
+      tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       title: "26.4 Snapshot 3",
       text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-3.",
@@ -100,7 +100,7 @@ const LATEST_UPDATES = {
     },
     {
       date: "2026-09-22",
-      tags: ["beta", "snapshot"],
+      tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       title: "26.4 Snapshot 1",
       text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-1.",
