@@ -3432,3 +3432,20 @@ body::before {
   }
 }
 .news-project-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* Home page news cards: the "View full update" link goes to the entry on the News page and stretches over the card. */
+.news-item.is-linked { position: relative; cursor: pointer; }
+.news-item.is-linked .news-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+}
+.news-item.is-linked .news-link:focus-visible { outline: none; }
+.news-item.is-linked .news-link:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (hover: hover) {
+  .news-item.is-linked:hover { background: var(--surface-hover); border-color: rgba(var(--nav-accent-rgb), 0.5); }
+  .news-item.is-linked:hover .news-title { color: var(--accent); }
+}
+/* The entry just jumped to from a link. */
+.news-item.is-targeted { border-color: rgba(var(--nav-accent-rgb), 0.8); box-shadow: 0 0 0 3px rgba(var(--nav-accent-rgb), 0.25); }

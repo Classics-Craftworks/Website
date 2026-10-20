@@ -17,6 +17,11 @@ function newsEntries() {
   return entries.slice().sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 }
 
+// Stable anchor for an entry, used to link to it on the News page.
+function newsEntryId(entry) {
+  return slugify(entry.date + ' ' + entry.title);
+}
+
 function formatNewsDate(iso) {
   const d = new Date(iso + 'T00:00:00Z');
   if (isNaN(d)) return iso;
@@ -271,7 +276,15 @@ function renderNewsItem(entry, opts = {}) {
   // The News page puts the tags on the right of the entry; the home page
   // keeps them beside the date.
   const head = el('div', { class: 'news-meta' }, opts.detailed ? [newsDate(entry)] : [...pills, newsDate(entry)]);
-  const link = newsLink(entry);
+  // Home page: no per-entry url; a "View full update" link goes to the entry on
+  // the News page and stretches over the whole card. The News page uses the entry's own url.
+  const page = !opts.detailed && (SITE_DATA.pages || []).find(p => p.url === 'news');
+  const link = opts.detailed
+    ? newsLink(entry)
+    : page && internalLink('news-link', `${page.url}#entry=${newsEntryId(entry)}`, [
+        el('span', { text: 'View full update' }),
+        newsArrow()
+      ]);
 
   const body = [
     head,
@@ -281,13 +294,15 @@ function renderNewsItem(entry, opts = {}) {
     link
   ];
 
-  if (!opts.detailed) return el('li', { class: 'news-item' }, body);
+  if (!opts.detailed) {
+    return el('li', { class: 'news-item' + (link ? ' is-linked' : '') }, body);
+  }
 
   // With a link, the whole entry is clickable (the link stretches over it).
   const pin = opts.pinned
     ? el('span', { class: 'news-pin', attrs: { role: 'img', 'aria-label': 'Pinned', 'data-tooltip': 'Pinned' } }, [icon('pin', 'icon-sm')])
     : null;
-  return el('li', { class: 'news-item news-item-detailed' + (link ? ' is-clickable' : '') + (pin ? ' is-pinned' : '') }, [
+  return el('li', { attrs: { id: 'entry-' + newsEntryId(entry) }, class: 'news-item news-item-detailed' + (link ? ' is-clickable' : '') + (pin ? ' is-pinned' : '') }, [
     pin,
     newsMedia(entry),
     el('div', { class: 'news-item-body' }, body),
@@ -329,11 +344,12 @@ function readHash(validTags, validProjects) {
   const params = new URLSearchParams(location.hash.slice(1));
   const tags = (params.get('tags') || '').split(',').filter(k => validTags.includes(k));
   const projects = (params.get('projects') || '').split(',').filter(k => validProjects.includes(k));
-  return { tags: new Set(tags), projects: new Set(projects), query: params.get('q') || '' };
+  return { tags: new Set(tags), projects: new Set(projects), query: params.get('q') || '', entry: params.get('entry') || '' };
 }
 
-function writeHash(active, activeProjects, query) {
+function writeHash(active, activeProjects, query, entry) {
   const params = new URLSearchParams();
+  if (entry) params.set('entry', entry);
   if (activeProjects.size) params.set('projects', [...activeProjects].join(','));
   if (active.size) params.set('tags', [...active].join(','));
   if (query.trim()) params.set('q', query.trim());
@@ -456,6 +472,8 @@ function renderNewsPage() {
   const active = initial.tags; // empty set = every tag
   const activeProjects = initial.projects; // empty set = every project
   let query = initial.query;
+  let focused = initial.entry; // an entry linked to from elsewhere (#entry=...); cleared on the first filter or search change
+  let rendered = false;
 
   const list = el('ul', { class: 'news-list' });
   const status = el('p', { class: 'news-status', attrs: { 'aria-live': 'polite' } });
@@ -492,6 +510,8 @@ function renderNewsPage() {
   }
 
   function refresh() {
+    if (rendered) focused = '';
+    rendered = true;
     const shown = entries.filter(matches);
     // The pinned entry goes first (if it matches the current filters).
     const pinned = pinnedEntry(entries);
@@ -512,7 +532,7 @@ function renderNewsPage() {
     status.textContent = !shown.length
       ? (query.trim() ? 'Nothing matches your search.' : 'Nothing matches those filters.')
       : (filtering ? `Showing ${shown.length} of ${entries.length}` : '');
-    writeHash(active, activeProjects, query);
+    writeHash(active, activeProjects, query, focused);
   }
 
   input.addEventListener('input', () => { query = input.value; refresh(); });
@@ -637,6 +657,16 @@ function renderNewsPage() {
   ]);
   main.appendChild(layout);
   refresh();
+  focusLinkedEntry(list, focused);
+}
+
+// Scrolls to the entry named in the URL (#entry=...) and flashes its outline.
+function focusLinkedEntry(list, id) {
+  const target = id && list.querySelector('#' + CSS.escape('entry-' + id));
+  if (!target) return;
+  target.classList.add('is-targeted');
+  target.scrollIntoView({ block: 'center' });
+  setTimeout(() => target.classList.remove('is-targeted'), 2500);
 }
 
 if (document.getElementById('news-page')) {
