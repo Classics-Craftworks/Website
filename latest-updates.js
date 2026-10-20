@@ -64,146 +64,6 @@ const LATEST_UPDATES = {
   intro: "The latest news and updates from Classic's Craftworks.",
   homeCount: 3,
 
-  tags: {
-    news:        { label: "News",         color: "#41A0C8" },
-    release:     { label: "Release",      color: "#22C55E" },
-    beta:        { label: "Beta",         color: "#FF9D47" },
-    alpha:       { label: "Alpha",        color: "#F2607E" },
-    unsupported: { label: "Unsupported",  color: "#929292" },
-    new:         { label: "New Project",  color: "#EFDD65" },
-    snapshot:    { label: "Snapshot",     color: "#41A0C8" }
-  },
-
-  entries: [
-    {
-      date: "2026-10-20",
-      tags: ["beta"],
-      image: "images/better-unpackables.webp",
-      title: "Better Unpackables v5.1.0-beta.6",
-      text: "Better Unpackables v5.1.0-beta.6 has been released, adding new 'back to block' recipes for Packed Ice Brick blocks.",
-      url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6",
-      linkText: "View update on Modrinth"
-    },
-    {
-      date: "2026-10-20",
-      tags: ["alpha"],
-      image: "images/note-block-tweaks.webp",
-      title: "Classic's Note Block Tweaks v0.5.0",
-      text: "Classic's Note Block Tweaks v0.5.0 includes a new pack icon and support for Java 26.4-snapshot-5.",
-      url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0",
-      linkText: "View update on Modrinth"
-    },
-    {
-      date: "2026-10-20",
-      tags: ["snapshot", "beta"],
-      image: "images/icons/snapshot.svg",
-      projects: [
-        { id: "better-craftables", version: "v8.1.0-beta.4" },
-        { id: "better-unpackables", version: "v5.1.0-beta.5" }
-      ],
-      title: "26.4 Snapshot 5",
-      text: "New betas have been released for Java 26.4-snapshot-5."
-    },
-    {
-      date: "2026-10-20",
-      tags: ["new"],
-      image: "images/note-block-tweaks.webp",
-      announce: true,
-      title: "Introducing Classic's Note Block Tweaks",
-      text: "New resource pack that updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
-      url: "/resource-packs#classics-note-block-tweaks",
-      linkText: "View Classic's Note Block Tweaks"
-    },
-    {
-      date: "2026-10-13",
-      tags: ["beta"],
-      image: "images/better-unpackables.webp",
-      title: "Better Unpackables v5.1.0-beta.4",
-      text: "Better Unpackables v5.1.0-beta.4 has been released with an important fix for Cut Sandstone recipes.",
-      url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.4",
-      linkText: "View update on Modrinth"
-    },
-    {
-      date: "2026-10-13",
-      tags: ["release"],
-      projects: [
-        { id: "better-unpackables", version: "v5.0.1" },
-        { id: "better-unpackables", version: "v5.0.1+mod" }
-      ],
-      title: "Better Unpackables v5.0.1",
-      text: "Better Unpackables v5.0.1 has been released with an important fix for Cut Sandstone recipes.",
-    },
-    {
-      date: "2026-10-13",
-      tags: ["snapshot", "beta"],
-      image: "images/icons/snapshot.svg",
-      projects: [
-        { id: "better-craftables", version: "v8.1.0-beta.3" },
-        { id: "better-unpackables", version: "v5.1.0-beta.3" }
-      ],
-      title: "26.4 Snapshot 4",
-      text: "New betas have been released for Java 26.4-snapshot-4.",
-    },
-    {
-      date: "2026-10-06",
-      tags: ["snapshot", "beta"],
-      image: "images/icons/snapshot.svg",
-      projects: [
-        { id: "better-craftables", version: "v8.1.0-beta.2" },
-        { id: "better-unpackables", version: "v5.1.0-beta.2" }
-      ],
-      title: "26.4 Snapshot 3",
-      text: "New betas have been released for Java 26.4-snapshot-3.",
-    },
-    {
-      date: "2026-09-22",
-      tags: ["snapshot", "beta"],
-      image: "images/icons/snapshot.svg",
-      projects: [
-        { id: "better-craftables", version: "v8.1.0-beta.1" },
-        { id: "better-unpackables", version: "v5.1.0-beta.1" }
-      ],
-      title: "26.4 Snapshot 1",
-      text: "New betas have been released for Java 26.4-snapshot-1.",
-    },
-    {
-      date: "2026-09-15",
-      tags: ["release"],
-      image: "images/icons/announcements.svg",
-      projects: [
-        { id: "better-craftables", version: "v8.0.0+mod" },
-        { id: "better-unpackables", version: "v5.0.0+mod" },
-        { id: "silly-eatables", version: "v5.0.0+mod" }
-      ],
-      title: "26.3 Mod Updates",
-      text: "New mod updates have been released for Java 26.3."
-    },
-    {
-      date: "2026-09-15",
-      tags: ["release"],
-      image: "images/icons/announcements.svg",
-      projects: [
-        { id: "better-craftables", version: "v8.0.0" },
-        { id: "better-unpackables", version: "v5.0.0" },
-        { id: "silly-eatables", version: "v5.0.0" }
-      ],
-      title: "26.3 Data Pack Updates",
-      text: "New data pack updates have been released for Java 26.3.",
-    },
-    {
-      date: "2026-09-14",
-      tags: ["release"],
-      image: "images/icons/announcements.svg",
-      projects: [
-        { id: "classics-disc-tweaks", version: "v3.4.0" },
-        { id: "classics-dye-tweaks", version: "v1.4.0" },
-        { id: "classics-lantern-tweaks", version: "v2.4.0" }
-      ],
-      title: "26.3 Resource Pack Updates",
-      text: "New resource pack updates have been released for Java 26.3.",
-    }
-  ],
-
   sidebar: {
     searchPlaceholder: "Search news…",
     filterHeading: "Filters",
@@ -227,5 +87,145 @@ const LATEST_UPDATES = {
         button2: { label: "Follow on X/Twitter", url: "https://x.com/C36Craftworks", icon: "x" },
       }
     ]
-  }
+  },
+
+  tags: {
+    news:        { label: "News",         color: "#41A0C8" },
+    release:     { label: "Release",      color: "#22C55E" },
+    beta:        { label: "Beta",         color: "#FF9D47" },
+    alpha:       { label: "Alpha",        color: "#F2607E" },
+    unsupported: { label: "Unsupported",  color: "#929292" },
+    new:         { label: "New Project",  color: "#EFDD65" },
+    snapshot:    { label: "Snapshot",     color: "#41A0C8" }
+  },
+
+  entries: [
+    {
+      date: "2026-10-20",
+      title: "Better Unpackables v5.1.0-beta.6",
+      text: "Better Unpackables v5.1.0-beta.6 has been released, adding new 'back to block' recipes for Packed Ice Brick blocks.",
+      tags: ["beta"],
+      image: "images/better-unpackables.webp",
+      url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6",
+      linkText: "View update on Modrinth"
+    },
+    {
+      date: "2026-10-20",
+      title: "Classic's Note Block Tweaks v0.5.0",
+      text: "Classic's Note Block Tweaks v0.5.0 has been released, adding a new pack icon and support for Java 26.4-snapshot-5.",
+      tags: ["alpha"],
+      image: "images/note-block-tweaks.webp",
+      url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0",
+      linkText: "View update on Modrinth"
+    },
+    {
+      date: "2026-10-20",
+      title: "26.4 Snapshot 5",
+      text: "New betas have been released for Java 26.4-snapshot-5.",
+      tags: ["snapshot", "beta"],
+      image: "images/icons/snapshot.svg",
+      projects: [
+        { id: "better-craftables", version: "v8.1.0-beta.4" },
+        { id: "better-unpackables", version: "v5.1.0-beta.5" }
+      ]
+    },
+    {
+      announce: true,
+      date: "2026-10-20",
+      title: "Introducing Classic's Note Block Tweaks",
+      text: "New resource pack that updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
+      tags: ["new"],
+      image: "images/note-block-tweaks.webp",
+      url: "/resource-packs#classics-note-block-tweaks",
+      linkText: "View Classic's Note Block Tweaks"
+    },
+    {
+      date: "2026-10-13",
+      title: "Better Unpackables v5.1.0-beta.4",
+      text: "Better Unpackables v5.1.0-beta.4 has been released with an important fix for Cut Sandstone recipes.",
+      tags: ["beta"],
+      image: "images/better-unpackables.webp",
+      url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.4",
+      linkText: "View update on Modrinth"
+    },
+    {
+      date: "2026-10-13",
+      title: "Better Unpackables v5.0.1",
+      text: "Better Unpackables v5.0.1 has been released with an important fix for Cut Sandstone recipes.",
+      tags: ["release"],
+      projects: [
+        { id: "better-unpackables", version: "v5.0.1" },
+        { id: "better-unpackables", version: "v5.0.1+mod" }
+      ]
+    },
+    {
+      date: "2026-10-13",
+      title: "26.4 Snapshot 4",
+      text: "New betas have been released for Java 26.4-snapshot-4.",
+      tags: ["snapshot", "beta"],
+      image: "images/icons/snapshot.svg",
+      projects: [
+        { id: "better-craftables", version: "v8.1.0-beta.3" },
+        { id: "better-unpackables", version: "v5.1.0-beta.3" }
+      ]
+    },
+    {
+      date: "2026-10-06",
+      title: "26.4 Snapshot 3",
+      text: "New betas have been released for Java 26.4-snapshot-3.",
+      tags: ["snapshot", "beta"],
+      image: "images/icons/snapshot.svg",
+      projects: [
+        { id: "better-craftables", version: "v8.1.0-beta.2" },
+        { id: "better-unpackables", version: "v5.1.0-beta.2" }
+      ]
+    },
+    {
+      date: "2026-09-22",
+      title: "26.4 Snapshot 1",
+      text: "New betas have been released for Java 26.4-snapshot-1.",
+      tags: ["snapshot", "beta"],
+      image: "images/icons/snapshot.svg",
+      projects: [
+        { id: "better-craftables", version: "v8.1.0-beta.1" },
+        { id: "better-unpackables", version: "v5.1.0-beta.1" }
+      ]
+    },
+    {
+      date: "2026-09-15",
+      title: "26.3 Mod Updates",
+      text: "New mod updates have been released for Java 26.3.",
+      tags: ["release"],
+      image: "images/icons/announcements.svg",
+      projects: [
+        { id: "better-craftables", version: "v8.0.0+mod" },
+        { id: "better-unpackables", version: "v5.0.0+mod" },
+        { id: "silly-eatables", version: "v5.0.0+mod" }
+      ]
+    },
+    {
+      date: "2026-09-15",
+      title: "26.3 Data Pack Updates",
+      text: "New data pack updates have been released for Java 26.3.",
+      tags: ["release"],
+      image: "images/icons/announcements.svg",
+      projects: [
+        { id: "better-craftables", version: "v8.0.0" },
+        { id: "better-unpackables", version: "v5.0.0" },
+        { id: "silly-eatables", version: "v5.0.0" }
+      ]
+    },
+    {
+      date: "2026-09-14",
+      title: "26.3 Resource Pack Updates",
+      text: "New resource pack updates have been released for Java 26.3.",
+      tags: ["release"],
+      image: "images/icons/announcements.svg",
+      projects: [
+        { id: "classics-disc-tweaks", version: "v3.4.0" },
+        { id: "classics-dye-tweaks", version: "v1.4.0" },
+        { id: "classics-lantern-tweaks", version: "v2.4.0" }
+      ]
+    }
+  ]
 };
