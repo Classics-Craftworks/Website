@@ -135,11 +135,41 @@ function calendarIcon() {
   return node;
 }
 
+// "Today", "Yesterday", "3 days ago", "2 weeks ago" for an entry's date while
+// it's under a calendar month old; null once it's a month or more old (or is
+// dated in the future), when the full date is shown instead.
+function relativeNewsDate(iso) {
+  const d = new Date(iso + 'T00:00:00Z');
+  if (isNaN(d)) return null;
+
+  const now = new Date();
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()); // the visitor's own "today"
+  const days = Math.round((today - d.getTime()) / 86400000);
+  if (days < 0) return null;
+
+  // One month back from today; a short month clamps (31 Mar -> 28 Feb, not 3 Mar).
+  const limit = new Date(today);
+  const day = limit.getUTCDate();
+  limit.setUTCDate(1);
+  limit.setUTCMonth(limit.getUTCMonth() - 1);
+  limit.setUTCDate(Math.min(day, new Date(Date.UTC(limit.getUTCFullYear(), limit.getUTCMonth() + 1, 0)).getUTCDate()));
+  if (d.getTime() <= limit.getTime()) return null;
+
+  // "Today"/"Yesterday" for the first two days, then "N days ago" / "N weeks ago" ("1 week ago", not "last week").
+  const words = new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' });
+  const counts = new Intl.RelativeTimeFormat('en-GB', { numeric: 'always' });
+  return capitalise(days < 7 ? words.format(-days, 'day') : counts.format(-Math.floor(days / 7), 'week'));
+}
+
 // Date with its calendar icon, used wherever an update's date is shown.
+// Recent entries show a relative date with the full date as a tooltip; older
+// ones show the full date outright, with no tooltip.
 function newsDate(entry) {
-  return el('span', { class: 'news-when' }, [
+  const full = formatNewsDate(entry.date);
+  const relative = relativeNewsDate(entry.date);
+  return el('span', { class: 'news-when' + (relative ? ' has-tooltip' : ''), attrs: relative ? { 'data-tooltip': full } : {} }, [
     calendarIcon(),
-    el('time', { class: 'news-date', text: formatNewsDate(entry.date), attrs: { datetime: entry.date } })
+    el('time', { class: 'news-date', text: relative || full, attrs: { datetime: entry.date } })
   ]);
 }
 

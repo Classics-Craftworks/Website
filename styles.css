@@ -2925,6 +2925,10 @@ body.has-announcement .back-to-top {
   gap: 6px;
   color: var(--text-soft);
 }
+/* Relative dates carry the full date as a tooltip (the generic [data-tooltip] rules). */
+/* z-index lifts it above a clickable entry's stretched "Read more" link, which would otherwise
+   swallow the hover (so a click on the date itself doesn't follow the entry's link). */
+.news-when[data-tooltip] { position: relative; z-index: 1; cursor: default; }
 .news-title { font-size: 1.15rem; line-height: 1.3; color: var(--text); }
 .news-text { color: var(--text-soft); }
 
