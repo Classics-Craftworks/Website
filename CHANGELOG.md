@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.10.0.2 — 2026-10-20
+
+### Changed
+- Swapped announcement message
+
+### Fixed
+- Outdated version number in the footer
+
 ## v3.10.0.1 — 2026-10-20
 
 ### Added

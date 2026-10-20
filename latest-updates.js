@@ -57,6 +57,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-20",
       tags: ["new"],
+      announce: true,
       title: "Introducing Classic's Note Block Tweaks",
       text: "New resource pack that updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
       url: "/resource-packs#classics-note-block-unpackables",
@@ -73,7 +74,6 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-13",
       tags: ["release"],
-      announce: true,
       title: "Better Unpackables v5.0.1",
       text: "Better Unpackables v5.0.1 has been released with an important fix for Cut Sandstone recipes.",
       url: "/data-packs-mods#better-unpackables",
