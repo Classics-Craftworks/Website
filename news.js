@@ -376,21 +376,22 @@ function formatMonth(key) {
 }
 
 // Active filters and the search text live in the URL
-// (#projects=better-unpackables&tags=release,new&months=2026-10&q=snapshot) so a filtered view can be linked to.
+// (#projects=better-unpackables&tags=release,new&months=2026-10&sort=oldest&q=snapshot) so a filtered view can be linked to.
 function readHash(validTags, validProjects, validMonths) {
   const params = new URLSearchParams(location.hash.slice(1));
   const tags = (params.get('tags') || '').split(',').filter(k => validTags.includes(k));
   const projects = (params.get('projects') || '').split(',').filter(k => validProjects.includes(k));
   const months = (params.get('months') || '').split(',').filter(k => validMonths.includes(k));
-  return { tags: new Set(tags), projects: new Set(projects), months: new Set(months), query: params.get('q') || '', entry: params.get('entry') || '' };
+  return { tags: new Set(tags), projects: new Set(projects), months: new Set(months), sort: params.get('sort') === 'oldest' ? 'oldest' : 'newest', query: params.get('q') || '', entry: params.get('entry') || '' };
 }
 
-function writeHash(active, activeProjects, activeMonths, query, entry) {
+function writeHash(active, activeProjects, activeMonths, sort, query, entry) {
   const params = new URLSearchParams();
   if (entry) params.set('entry', entry);
   if (activeProjects.size) params.set('projects', [...activeProjects].join(','));
   if (active.size) params.set('tags', [...active].join(','));
   if (activeMonths.size) params.set('months', [...activeMonths].join(','));
+  if (sort === 'oldest') params.set('sort', 'oldest');
   if (query.trim()) params.set('q', query.trim());
   const text = params.toString();
   history.replaceState(null, '', location.pathname + location.search + (text ? '#' + text : ''));
@@ -527,6 +528,7 @@ function renderNewsPage() {
   const active = initial.tags; // empty set = every tag
   const activeProjects = initial.projects; // empty set = every project
   const activeMonths = initial.months; // empty set = every month
+  let sort = initial.sort; // 'newest' or 'oldest'; the pinned entry stays on top either way
   let query = initial.query;
   let focused = initial.entry; // an entry linked to from elsewhere (#entry=...); cleared on the first filter or search change
   let rendered = false;
@@ -536,6 +538,7 @@ function renderNewsPage() {
   const buttons = new Map(); // tag key (or '') -> button
   const projectButtons = new Map(); // project id (or '') -> button
   const monthButtons = new Map(); // month key (or '') -> button
+  const sortButtons = new Map(); // 'newest' / 'oldest' -> button
 
   // Search box: same look as the header search.
   const input = el('input', {
@@ -577,8 +580,10 @@ function renderNewsPage() {
     const pinnedShown = pinned && shown.includes(pinned) ? pinned : null;
     const groups = [];
     if (pinnedShown) groups.push(newsGroup('Pinned', [pinnedShown], { icon: 'pin', pinned: pinnedShown, count: false }));
-    monthKeys.forEach(key => {
+    const oldestFirst = sort === 'oldest';
+    (oldestFirst ? monthKeys.slice().reverse() : monthKeys).forEach(key => {
       const inMonth = shown.filter(e => e !== pinnedShown && newsMonthKey(e) === key);
+      if (oldestFirst) inMonth.reverse();
       if (inMonth.length) groups.push(newsGroup(formatMonth(key), inMonth, { pinned: pinnedShown }));
     });
     list.replaceChildren(...groups);
@@ -595,13 +600,14 @@ function renderNewsPage() {
       const on = key === '' ? !activeMonths.size : activeMonths.has(key);
       btn.setAttribute('aria-pressed', String(on));
     });
+    sortButtons.forEach((btn, key) => btn.setAttribute('aria-pressed', String(key === sort)));
     clearBtn.hidden = !query;
 
     const filtering = active.size > 0 || activeProjects.size > 0 || activeMonths.size > 0 || query.trim() !== '';
     status.textContent = !shown.length
       ? (query.trim() ? 'Nothing matches your search.' : 'Nothing matches those filters.')
       : (filtering ? `Showing ${shown.length} of ${entries.length}` : '');
-    writeHash(active, activeProjects, activeMonths, query, focused);
+    writeHash(active, activeProjects, activeMonths, sort, query, focused);
   }
 
   input.addEventListener('input', () => { query = input.value; refresh(); });
@@ -720,10 +726,19 @@ function renderNewsPage() {
     return box;
   }
 
+  // Sort order: two buttons side by side under the search box.
+  const sortBox = el('div', { class: 'news-sort', attrs: { role: 'group', 'aria-label': 'Sort news' } },
+    [['newest', 'Newest first'], ['oldest', 'Oldest first']].map(([key, label]) => {
+      const btn = el('button', { class: 'news-sort-btn', text: label, attrs: { type: 'button', 'aria-pressed': 'false' } });
+      btn.addEventListener('click', () => { sort = key; refresh(); });
+      sortButtons.set(key, btn);
+      return btn;
+    }));
+
   // Layout: the list, plus a sidebar. The sidebar is two blocks (search/filters,
   // then latest releases and cards) so that on narrow screens the search and filters
   // come first, then the list, then the extras.
-  const tools = el('div', { class: 'news-tools' }, [searchBox]);
+  const tools = el('div', { class: 'news-tools' }, [searchBox, sortBox]);
   if (projects.length || tagKeys.length > 1 || monthKeys.length > 1) {
     tools.appendChild(buildFilterDropdown());
   }

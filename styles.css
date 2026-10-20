@@ -3147,6 +3147,37 @@ body.has-announcement .back-to-top {
 @media (hover: hover) {
   .news-filter[aria-pressed="false"]:hover { background: rgba(var(--news-rgb), var(--alpha-faint)); }
 }
+/* Sort order: a two-button toggle under the search box. */
+.news-sort {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.news-sort-btn {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-soft);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+.news-sort-btn[aria-pressed="true"] {
+  background: rgba(var(--nav-accent-rgb), var(--alpha-hover));
+  border-color: rgba(var(--nav-accent-rgb), 0.5);
+  color: var(--accent);
+}
+@media (hover: hover) {
+  .news-sort-btn[aria-pressed="false"]:hover { color: var(--text); background: var(--surface-hover); }
+}
+.news-sort-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .news-status { min-height: 1.4em; margin: 0 0 10px; font-size: 0.9rem; color: var(--text-soft); }
 .news-status:empty { min-height: 0; margin: 0; }
 
