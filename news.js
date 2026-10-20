@@ -388,16 +388,61 @@ function renderNewsPage() {
     return btn;
   }
 
+  // Tag filter dropdown: a toggle button that opens/collapses the list of
+  // tags. "All" is always shown; only the first FILTER_VISIBLE tags show until
+  // "Show more" is pressed (the button only exists when there are more).
+  const FILTER_VISIBLE = 4;
+  function buildFilterDropdown() {
+    const panelId = 'news-filter-panel';
+    const toggle = el('button', { class: 'news-filter-toggle', attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': panelId } }, [
+      el('span', { class: 'news-filter-toggle-label', text: side.filterHeading || 'Filter by tags' }),
+      el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+    ]);
+
+    const tagButtons = tagKeys.map(k => { const t = newsTag(k); return makeButton(k, t.label, t); });
+    const options = el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter news by tag' } }, [
+      makeButton('', 'All', null),
+      ...tagButtons
+    ]);
+    const panel = el('div', { class: 'news-filter-panel', attrs: { id: panelId, hidden: '' } }, [options]);
+
+    let expanded = false;
+    let more = null;
+    function applyMore() {
+      tagButtons.forEach((b, i) => { b.hidden = !expanded && i >= FILTER_VISIBLE; });
+      if (!more) return;
+      more.setAttribute('aria-expanded', String(expanded));
+      more.firstChild.textContent = expanded ? 'Show less' : 'Show ' + (tagButtons.length - FILTER_VISIBLE) + ' more';
+    }
+    if (tagButtons.length > FILTER_VISIBLE) {
+      more = el('button', { class: 'news-filter-more', attrs: { type: 'button', 'aria-controls': panelId } }, [
+        el('span'),
+        el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+      ]);
+      more.addEventListener('click', () => { expanded = !expanded; applyMore(); });
+      panel.appendChild(more);
+    }
+    // A tag picked from a shared link might be hidden behind "Show more".
+    expanded = tagKeys.slice(FILTER_VISIBLE).some(k => active.has(k));
+    applyMore();
+
+    const box = el('div', { class: 'news-filter-box' }, [toggle, panel]);
+    function setOpen(open) {
+      toggle.setAttribute('aria-expanded', String(open));
+      panel.hidden = !open;
+      box.classList.toggle('is-open', open);
+    }
+    toggle.addEventListener('click', () => setOpen(panel.hidden));
+    setOpen(true);
+    return box;
+  }
+
   // Layout: the list, plus a sidebar. The sidebar is two blocks (search/filters,
   // then quick links and cards) so that on narrow screens the search and filters
   // come first, then the list, then the extras.
   const tools = el('div', { class: 'news-tools' }, [searchBox]);
   if (tagKeys.length > 1) {
-    tools.appendChild(el('h2', { class: 'news-side-heading', text: side.filterHeading || 'Filter by type' }));
-    tools.appendChild(el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter news by tag' } }, [
-      makeButton('', 'All', null),
-      ...tagKeys.map(k => { const t = newsTag(k); return makeButton(k, t.label, t); })
-    ]));
+    tools.appendChild(buildFilterDropdown());
   }
 
   const extras = [renderQuickLinks(side.quickLinks), ...(side.cards || []).map(renderSideCard)].filter(Boolean);

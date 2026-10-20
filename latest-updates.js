@@ -128,7 +128,7 @@ const LATEST_UPDATES = {
 
   sidebar: {
     searchPlaceholder: "Search news…",
-    filterHeading: "Filter by type",
+    filterHeading: "Filter by tags",
 
     quickLinks: {
       heading: "Quick links",
