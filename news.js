@@ -65,15 +65,23 @@ function usedTagKeys(entries) {
 function allProjects() {
   const out = [];
   (SITE_DATA.sections || []).forEach(section => {
-    sectionIds(section).projects.forEach(p => out.push({ id: p.id, title: p.project.title, image: p.project.image || null }));
+    sectionIds(section).projects.forEach(p => out.push({ id: p.id, title: p.project.title, image: p.project.image || null, modrinth: ((p.project.links || []).find(l => l.label === 'Modrinth') || {}).url || null }));
   });
   return out;
+}
+
+// An entry's `projects` as [{ id, version?, channel?, text? }]; a plain id
+// string is the same as { id }.
+function projectRefs(entry) {
+  return (entry.projects || [])
+    .map(p => (typeof p === 'string' ? { id: p } : p))
+    .filter(p => p && p.id);
 }
 
 // Project ids an entry belongs to: any listed in its `projects`, plus the one
 // its same-site `url` points at (e.g. "/data-packs-mods#better-unpackables").
 function entryProjectIds(entry, validIds) {
-  const ids = new Set((entry.projects || []).filter(id => validIds.includes(id)));
+  const ids = new Set(projectRefs(entry).map(r => r.id).filter(id => validIds.includes(id)));
   if (entry.url) {
     try {
       const u = new URL(entry.url, location.origin);
@@ -189,6 +197,63 @@ function newsMedia(entry) {
   return media;
 }
 
+// The channel a project's version pill is coloured by: its own `channel`, else
+// the first channel-like tag on the entry (release shows as stable).
+function refChannel(ref, entry) {
+  const own = String(ref.channel || '').toLowerCase();
+  if (RELEASE_CHANNELS[own]) return RELEASE_CHANNELS[own];
+  const tags = entry.tags || [];
+  const key = ['release', 'beta', 'alpha', 'unsupported'].find(k => tags.includes(k));
+  return key ? Object.values(RELEASE_CHANNELS).find(c => c.tag === key) : null;
+}
+
+// Version pill, coloured by channel.
+function versionPill(version, channel) {
+  const pill = el('code', { class: 'version-pill', text: version });
+  if (channel) {
+    setTagColor(pill, newsTag(channel.tag));
+    pill.title = channel.label;
+  }
+  return pill;
+}
+
+// Modrinth page for a project's version: the ref's own `versionUrl`, else
+// <project page>/version/<version> when the version looks like a release
+// ("v8.0.0", not a Minecraft snapshot name, which has no page of its own).
+function versionUrl(ref, project) {
+  if (ref.versionUrl) return ref.versionUrl;
+  if (!project.modrinth || !/^v\d/i.test(ref.version || '')) return null;
+  return `${project.modrinth}/version/${encodeURIComponent(ref.version)}`;
+}
+
+// Per-project rows inside an entry: icon, name, version pill and an optional
+// description. Only entries whose `projects` use the object form get one.
+function renderEntryProjects(entry) {
+  const refs = projectRefs(entry).filter(r => r.version || r.text);
+  if (!refs.length) return null;
+
+  const all = allProjects();
+  const rows = refs.map(ref => {
+    const project = all.find(p => p.id === ref.id);
+    if (!project) return null;
+    const icon = project.image ? el('img', { class: 'news-project-icon', src: project.image, alt: '', attrs: { width: '28', height: '28', decoding: 'async', draggable: 'false' } }) : null;
+    const name = el('span', { class: 'news-project-name', text: project.title });
+    const pill = ref.version ? versionPill(ref.version, refChannel(ref, entry)) : null;
+    // Icon, name and pill are one link: the version's Modrinth page, else the
+    // project's (or the ref's own `url`).
+    const target = ref.url || versionUrl(ref, project) || project.modrinth;
+    const link = newsAnchor('news-project-link', target, [icon, name, pill]);
+    if (link) link.setAttribute('aria-label', `${project.title}${ref.version ? ' ' + ref.version : ''} on Modrinth`);
+    return el('li', { class: 'news-project' }, [
+      el('div', { class: 'news-project-body' }, [
+        link || el('div', { class: 'news-project-who' }, [icon, name, pill]),
+        ref.text ? el('p', { class: 'news-project-text', text: fillPlaceholders(ref.text) }) : null
+      ])
+    ]);
+  }).filter(Boolean);
+  return rows.length ? el('ul', { class: 'news-projects' }, rows) : null;
+}
+
 // Home page cards are plain; the News page passes { detailed: true } for the icon tile.
 // The entry the announcement card is built from: the newest with announce: true.
 // The News page pins it to the top of the list.
@@ -212,6 +277,7 @@ function renderNewsItem(entry, opts = {}) {
     head,
     el('h3', { class: 'news-title', text: entry.title }),
     entry.text ? el('p', { class: 'news-text', text: fillPlaceholders(entry.text) }) : null,
+    opts.detailed ? renderEntryProjects(entry) : null,
     link
   ];
 
@@ -310,14 +376,7 @@ function renderLatestReleases(cfg) {
     const channel = RELEASE_CHANNELS[String(r.channel || '').toLowerCase()];
     // One pill: the version, coloured by its channel.
     const meta = [];
-    if (r.version) {
-      const pill = el('code', { class: 'release-version', text: r.version });
-      if (channel) {
-        setTagColor(pill, newsTag(channel.tag));
-        pill.title = channel.label;
-      }
-      meta.push(pill);
-    }
+    if (r.version) meta.push(versionPill(r.version, channel));
     if (r.date) meta.push(el('time', { class: 'release-date', text: formatShortDate(r.date), attrs: { datetime: r.date } }));
     // With a url, the project name is a link that stretches over the whole row.
     const name = newsAnchor('release-project', r.url, [el('span', { text: r.project })])

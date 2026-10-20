@@ -6,10 +6,23 @@
        date   "YYYY-MM-DD"
        title  headline
        text   one or two sentences (optional)
-       projects (optional) project ids this entry is about, e.g.
-              ["better-craftables", "better-unpackables"] (an id is the project's
-              title in data.js, lower-cased with hyphens). A project the `url`
-              points at is picked up automatically.
+       projects (optional) the projects this entry is about. Each is a project id
+              (its title in data.js, lower-cased with hyphens) or, to give the
+              entry its own row for that project on the News page, an object:
+                { id: "better-craftables",
+                  version: "v8.0.0",     pill next to the name (optional)
+                  channel: "beta",       colours the pill: stable, beta, alpha or
+                                         unsupported (optional; defaults to the
+                                         entry's release/beta/alpha tag)
+                  text: "...",           that project's own description (optional)
+                  url: "https://...",    where the row (icon, name and pill) links;
+                                         overrides the default below (optional)
+                  versionUrl: "https://..." }  the version's page; the row links to
+                                         it, defaulting to <Modrinth page>/
+                                         version/<version> for versions like
+                                         "v8.0.0", else the project's page
+              The entry's own `text` stays as the overall description. A project
+              the `url` points at is picked up automatically for the filter.
        tags   one or more keys from `tags` below, e.g. ["release"] or
               ["release", "beta"]
        url      (optional) adds a link button. Use a full address
@@ -76,7 +89,7 @@ const LATEST_UPDATES = {
       tags: ["alpha"],
       image: "images/note-block-tweaks.webp",
       title: "Classic's Note Block Tweaks v0.5.0",
-      text: "New alpha for Classic's Note Block Tweaks, including a new pack icon and support for Java 26.4-snapshot-5.",
+      text: "Classic's Note Block Tweaks v0.5.0 includes a new pack icon and support for Java 26.4-snapshot-5.",
       url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0",
       linkText: "View update on Modrinth"
     },
@@ -84,11 +97,12 @@ const LATEST_UPDATES = {
       date: "2026-10-20",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
-      projects: ["better-craftables", "better-unpackables"],
+      projects: [
+        { id: "better-craftables", version: "v8.1.0-beta.4" },
+        { id: "better-unpackables", version: "v5.1.0-beta.5" }
+      ],
       title: "26.4 Snapshot 5",
-      text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-5.",
-      url: "/data-packs-mods",
-      linkText: "View Data Packs"
+      text: "New betas have been released for Java 26.4-snapshot-5."
     },
     {
       date: "2026-10-20",
@@ -112,60 +126,81 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-13",
       tags: ["release"],
+      projects: [
+        { id: "better-unpackables", version: "v5.0.1" },
+        { id: "better-unpackables", version: "v5.0.1+mod" }
+      ],
       title: "Better Unpackables v5.0.1",
       text: "Better Unpackables v5.0.1 has been released with an important fix for Cut Sandstone recipes.",
-      url: "/data-packs-mods#better-unpackables",
-      linkText: "View Better Unpackables"
     },
     {
       date: "2026-10-13",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
-      projects: ["better-craftables", "better-unpackables"],
+      projects: [
+        { id: "better-craftables", version: "v8.1.0-beta.3" },
+        { id: "better-unpackables", version: "v5.1.0-beta.3" }
+      ],
       title: "26.4 Snapshot 4",
-      text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-4.",
-      url: "/data-packs-mods",
-      linkText: "View Data Packs"
+      text: "New betas have been released for Java 26.4-snapshot-4.",
     },
     {
       date: "2026-10-06",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
-      projects: ["better-craftables", "better-unpackables"],
+      projects: [
+        { id: "better-craftables", version: "v8.1.0-beta.2" },
+        { id: "better-unpackables", version: "v5.1.0-beta.2" }
+      ],
       title: "26.4 Snapshot 3",
-      text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-3.",
-      url: "/data-packs-mods",
-      linkText: "View Data Packs"
+      text: "New betas have been released for Java 26.4-snapshot-3.",
     },
     {
       date: "2026-09-22",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
-      projects: ["better-craftables", "better-unpackables"],
+      projects: [
+        { id: "better-craftables", version: "v8.1.0-beta.1" },
+        { id: "better-unpackables", version: "v5.1.0-beta.1" }
+      ],
       title: "26.4 Snapshot 1",
-      text: "New betas for Better Craftables & Better Unpackables have been released for Java 26.4-snapshot-1.",
-      url: "/data-packs-mods",
-      linkText: "View Data Packs"
+      text: "New betas have been released for Java 26.4-snapshot-1.",
     },
     {
       date: "2026-09-15",
       tags: ["release"],
       image: "images/icons/announcements.svg",
-      projects: ["better-craftables", "better-unpackables", "silly-eatables"],
-      title: "26.3 Data Pack & Mod Updates",
-      text: "New updates for Better Craftables, Better Unpackables and Silly Eatables have been released for Java 26.3.",
-      url: "/data-packs-mods",
-      linkText: "View Data Packs & Mods"
+      projects: [
+        { id: "better-craftables", version: "v8.0.0+mod" },
+        { id: "better-unpackables", version: "v5.0.0+mod" },
+        { id: "silly-eatables", version: "v5.0.0+mod" }
+      ],
+      title: "26.3 Mod Updates",
+      text: "New mod updates have been released for Java 26.3."
+    },
+    {
+      date: "2026-09-15",
+      tags: ["release"],
+      image: "images/icons/announcements.svg",
+      projects: [
+        { id: "better-craftables", version: "v8.0.0" },
+        { id: "better-unpackables", version: "v5.0.0" },
+        { id: "silly-eatables", version: "v5.0.0" }
+      ],
+      title: "26.3 Data Pack Updates",
+      text: "New data pack updates have been released for Java 26.3.",
     },
     {
       date: "2026-09-14",
       tags: ["release"],
       image: "images/icons/announcements.svg",
-      projects: ["classics-disc-tweaks", "classics-dye-tweaks", "classics-lantern-tweaks"],
+      projects: [
+        { id: "classics-disc-tweaks", version: "v3.4.0" },
+        { id: "classics-dye-tweaks", version: "v1.4.0" },
+        { id: "classics-lantern-tweaks", version: "v2.4.0" }
+      ],
       title: "26.3 Resource Pack Updates",
-      text: "New updates for Classic's Disc, Dye and Lantern Tweaks have been released for Java 26.3.",
-      url: "/resource-packs",
-      linkText: "View Resource Packs"
+      text: "New resource pack updates have been released for Java 26.3.",
     }
   ],
 
