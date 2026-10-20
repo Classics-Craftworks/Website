@@ -60,7 +60,7 @@ const LATEST_UPDATES = {
       image: "images/note-block-tweaks.webp",
       title: "Classic's Note Block Tweaks v0.5.0",
       text: "New alpha for Classic's Note Block Tweaks, including a new pack icon and support for Java 26.4-snapshot-5.",
-      url: "/resource-packs#classics-note-block-unpackables",
+      url: "/resource-packs#classics-note-block-tweaks",
       linkText: "View Classic's Note Block Tweaks"
     },
     {
@@ -79,7 +79,7 @@ const LATEST_UPDATES = {
       announce: true,
       title: "Introducing Classic's Note Block Tweaks",
       text: "New resource pack that updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
-      url: "/resource-packs#classics-note-block-unpackables",
+      url: "/resource-packs#classics-note-block-tweaks",
       linkText: "View Classic's Note Block Tweaks"
     },
     {

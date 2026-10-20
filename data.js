@@ -18,7 +18,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v3.11.0.2",
+    label: "v3.11.0.3",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -301,10 +301,10 @@ const SITE_DATA = {
             {
               channel: "alpha",
               label: "Alpha",
-              mcVersion: "1.21.9 – 26.4-snap-4",
+              mcVersion: "1.21.9 – 26.4-snap-5",
               badge: "new",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v0.4.0", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.4.0" }
+                { label: "Resource Pack", icon: "brush", version: "v0.5.0", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0" }
               ]
             }
           ]
