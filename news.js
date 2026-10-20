@@ -166,6 +166,12 @@ function newsMedia(entry) {
 }
 
 // Home page cards are plain; the News page passes { detailed: true } for the icon tile.
+// The entry the announcement card is built from: the newest with announce: true.
+// The News page pins it to the top of the list.
+function pinnedEntry(entries) {
+  return entries.find(e => e.announce === true) || null;
+}
+
 function renderNewsItem(entry, opts = {}) {
   const pills = (entry.tags || []).map(key => {
     const tag = newsTag(key);
@@ -173,23 +179,29 @@ function renderNewsItem(entry, opts = {}) {
     setTagColor(pill, tag);
     return pill;
   });
-  const head = el('div', { class: 'news-meta' }, [
-    ...pills,
-    newsDate(entry)
-  ]);
+  // The News page puts the tags on the right of the entry; the home page
+  // keeps them beside the date.
+  const head = el('div', { class: 'news-meta' }, opts.detailed ? [newsDate(entry)] : [...pills, newsDate(entry)]);
+  const link = newsLink(entry);
 
   const body = [
     head,
     el('h3', { class: 'news-title', text: entry.title }),
     entry.text ? el('p', { class: 'news-text', text: fillPlaceholders(entry.text) }) : null,
-    newsLink(entry)
+    link
   ];
 
   if (!opts.detailed) return el('li', { class: 'news-item' }, body);
 
-  return el('li', { class: 'news-item news-item-detailed' }, [
+  // With a link, the whole entry is clickable (the link stretches over it).
+  const pin = opts.pinned
+    ? el('span', { class: 'news-pin', attrs: { role: 'img', 'aria-label': 'Pinned', 'data-tooltip': 'Pinned' } }, [icon('pin', 'icon-sm')])
+    : null;
+  return el('li', { class: 'news-item news-item-detailed' + (link ? ' is-clickable' : '') + (pin ? ' is-pinned' : '') }, [
+    pin,
     newsMedia(entry),
-    el('div', { class: 'news-item-body' }, body)
+    el('div', { class: 'news-item-body' }, body),
+    pills.length ? el('div', { class: 'news-item-tags' }, pills) : null
   ]);
 }
 
@@ -350,7 +362,10 @@ function renderNewsPage() {
 
   function refresh() {
     const shown = entries.filter(matches);
-    list.replaceChildren(...shown.map(e => renderNewsItem(e, { detailed: true })));
+    // The pinned entry goes first (if it matches the current filters).
+    const pinned = pinnedEntry(entries);
+    if (pinned && shown.includes(pinned)) shown.splice(0, 0, ...shown.splice(shown.indexOf(pinned), 1));
+    list.replaceChildren(...shown.map(e => renderNewsItem(e, { detailed: true, pinned: e === pinned })));
 
     buttons.forEach((btn, key) => {
       const on = key === '' ? !active.size : active.has(key);

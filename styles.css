@@ -3119,26 +3119,30 @@ body.has-announcement .back-to-top {
 .news-status:empty { min-height: 0; margin: 0; }
 
 /* ---------- News page entries ---------- */
+.news-feed .news-list { gap: 12px; }
 .news-item-detailed {
+  position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: start;
-  column-gap: 20px;
-  padding: 18px 22px 18px 18px;
+  column-gap: 18px;
+  padding: 15px 18px 15px 15px;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 .news-item-media {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 76px;
-  height: 76px;
+  width: 70px;
+  height: 70px;
   box-sizing: border-box;
   color: var(--nav-accent);
-  border-radius: 16px;
+  border-radius: 15px;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 /* Outlined frame for artwork on a transparent background and for the generic icon. */
 .news-item-media.is-framed {
-  padding: 10px;
+  padding: 9px;
   background: rgba(var(--nav-accent-rgb), 0.1);
   border: 1px solid rgba(var(--nav-accent-rgb), 0.28);
 }
@@ -3146,21 +3150,86 @@ body.has-announcement .back-to-top {
 /* Full square icons fill the whole tile, no frame. */
 .news-item-media.is-full { overflow: hidden; }
 .news-item-media.is-full .news-item-img { object-fit: cover; border-radius: 0; }
-.news-item-glyph { width: 32px; height: 32px; }
-.news-item-svg { width: 44px; height: 44px; }
+.news-item-glyph { width: 28px; height: 28px; }
+.news-item-svg { width: 38px; height: 38px; }
 .news-item-body {
   min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
+  gap: 5px;
+}
+.news-item-body .news-link { margin-top: 0; }
+.news-item-body .news-title { margin: 0; }
+.news-item-body .news-text { margin: 0; }
+/* Tags: right-hand column, right-aligned. */
+.news-item-tags {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* Pinned entry: a pin badge on the top-left corner. */
+.news-pin {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--bg);
+  background: var(--nav-accent);
+  border: 2px solid var(--bg);
+  pointer-events: none;
+}
+.news-pin .icon {
+  width: 22px;
+  height: 22px;
+  transform: rotate(-30deg);
+}
+.news-item-detailed.is-pinned { border-color: rgba(var(--nav-accent-rgb), 0.4); }
+
+/* Clickable entry: the "Read more" link stretches over the whole card. */
+.news-item-detailed.is-clickable { cursor: pointer; }
+.news-item-detailed.is-clickable .news-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+}
+.news-item-detailed.is-clickable .news-link:focus-visible { outline: none; }
+.news-item-detailed.is-clickable .news-link:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .news-item-detailed.is-clickable:hover {
+    background: var(--surface-hover);
+    border-color: rgba(var(--nav-accent-rgb), 0.5);
+  }
+  .news-item-detailed.is-clickable:hover .news-title { color: var(--accent); }
+  .news-item-detailed.is-clickable:hover .news-item-media.is-framed {
+    background: rgba(var(--nav-accent-rgb), 0.18);
+    border-color: rgba(var(--nav-accent-rgb), 0.5);
+  }
 }
 @media (max-width: 600px) {
-  .news-item-detailed { column-gap: 14px; padding: 14px; }
-  .news-item-media { width: 56px; height: 56px; border-radius: 12px; }
+  .news-item-detailed {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 8px;
+    padding: 12px;
+  }
+  .news-item-tags { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; }
+  .news-item-media { width: 52px; height: 52px; border-radius: 12px; }
   .news-item-media.is-framed { padding: 7px; }
-  .news-item-glyph { width: 26px; height: 26px; }
-  .news-item-svg { width: 34px; height: 34px; }
+  .news-item-glyph { width: 24px; height: 24px; }
+  .news-item-svg { width: 32px; height: 32px; }
 }
 
 /* ---------- News page sidebar panels ---------- */
