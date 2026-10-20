@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.12.0 — 2026-10-21
+
+### Added
+- Project filters on the news page
+- Month filters & headings on the news page
+- Option to sort news page by newest first or oldest first
+- Latest releases card on the news page, replacing Quick links
+- "Show more" button on the news page - the News page now loads the 10 newest entries, with the button revealing 10 more at a time
+
+### Changed
+- Home page news entries & the announcement card now link to their respective entries on the news page
+- News page entries can now have links to multiple projects/versions
+- Dates on the news page are now relative (e.g. "2 days ago", "3 weeks ago") up to 1 month, then they turn back into full dates. The full date can still be seen when hovering over these new relative dates
+- Tightened filters card on the news page
+- Standalone updates in news entries now link directly to their Modrinth page
+- Changed calendar icon
+
 ## v3.11.0.4 — 2026-10-20
 
 ### Changed
