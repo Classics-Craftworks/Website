@@ -286,6 +286,31 @@ const SITE_DATA = {
         },
         // #endregion Classic's Lantern Tweaks
 
+        // #region ──────── Classic's Note Block Tweaks ────────
+        {
+          image: "images/note-block-tweaks.webp",
+          imageAlt: "Classic's Note Block Tweaks logo: the letters NT",
+          title: "Classic's Note Block Tweaks",
+          description: "Updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
+          links: [
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks" },
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Note-Block-Tweaks" },
+            { label: "Wiki", icon: "book", url: "https://github.com/Classics-Craftworks/Classics-Note-Block-Tweaks/wiki" }
+          ],
+          channels: [
+            {
+              channel: "alpha",
+              label: "Alpha",
+              mcVersion: "1.21.9 – 26.4-snap-4",
+              badge: "new",
+              downloads: [
+                { label: "Resource Pack", icon: "brush", version: "v0.4.0", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.4.0" }
+              ]
+            }
+          ]
+        },
+        // #endregion Classic's Note Block Tweaks
+
         // #region ──────── Zisteau Pigmen ────────
         {
           image: "images/zisteau-pigmen.webp",

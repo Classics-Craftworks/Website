@@ -55,6 +55,14 @@ const LATEST_UPDATES = {
 
   entries: [
     {
+      date: "2026-10-20",
+      tags: ["new"],
+      title: "Introducing Classic's Note Block Tweaks",
+      text: "New resource pack that updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
+      url: "/resource-packs#classics-note-block-unpackables",
+      linkText: "View Classic's Note Block Tweaks"
+    },
+    {
       date: "2026-10-13",
       tags: ["beta"],
       title: "Better Unpackables v5.1.0-beta.4",

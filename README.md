@@ -28,6 +28,7 @@ The website currently features:
 - [Classic's Disc Tweaks](https://modrinth.com/resourcepack/classics-disc-tweaks)
 - [Classic's Dye Tweaks](https://modrinth.com/resourcepack/classics-dye-tweaks)
 - [Classic's Lantern Tweaks](https://modrinth.com/resourcepack/classics-lantern-tweaks)
+- [Classic's Note Block Tweaks](https://modrinth.com/resourcepack/classics-note-block-tweaks)
 - [Zisteau Pigmen](https://modrinth.com/resourcepack/zisteau-pigmen) (limited support)
 
 ### Other Projects
