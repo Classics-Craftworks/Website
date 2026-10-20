@@ -106,6 +106,7 @@ const LATEST_UPDATES = {
       text: "Better Unpackables v5.1.0-beta.6 has been released, adding new 'back to block' recipes for Packed Ice Brick blocks.",
       tags: ["beta"],
       image: "images/better-unpackables.webp",
+      projects: ["better-unpackables"],
       url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6",
       linkText: "View update on Modrinth"
     },
@@ -115,6 +116,7 @@ const LATEST_UPDATES = {
       text: "Classic's Note Block Tweaks v0.5.0 has been released, adding a new pack icon and support for Java 26.4-snapshot-5.",
       tags: ["alpha"],
       image: "images/note-block-tweaks.webp",
+      projects: ["classics-note-block-tweaks"],
       url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0",
       linkText: "View update on Modrinth"
     },
@@ -136,6 +138,7 @@ const LATEST_UPDATES = {
       text: "New resource pack that updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
       tags: ["new"],
       image: "images/note-block-tweaks.webp",
+      projects: ["classics-note-block-tweaks"],
       url: "/resource-packs#classics-note-block-tweaks",
       linkText: "View Classic's Note Block Tweaks"
     },
@@ -145,6 +148,7 @@ const LATEST_UPDATES = {
       text: "Better Unpackables v5.1.0-beta.4 has been released with an important fix for Cut Sandstone recipes.",
       tags: ["beta"],
       image: "images/better-unpackables.webp",
+      projects: ["better-unpackables"],
       url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.4",
       linkText: "View update on Modrinth"
     },
