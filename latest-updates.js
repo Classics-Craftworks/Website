@@ -56,6 +56,15 @@ const LATEST_UPDATES = {
   entries: [
     {
       date: "2026-10-20",
+      tags: ["snapshot", "alpha"],
+      image: "images/note-block-tweaks.webp",
+      title: "Classic's Note Block Tweaks v0.5.0",
+      text: "New alpha for Classic's Note Block Tweaks, including a new pack icon and support for Java 26.4-snapshot-5.",
+      url: "/resource-packs#classics-note-block-unpackables",
+      linkText: "View Classic's Note Block Tweaks"
+    },
+    {
+      date: "2026-10-20",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       title: "26.4 Snapshot 5",

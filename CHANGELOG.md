@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.11.0.2 — 2026-10-20
+
+### Changed
+- Updated for Classic's Note Block Tweaks v0.5.0
+
 ## v3.11.0.1 — 2026-10-20
 
 ### Changed
