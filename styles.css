@@ -3152,6 +3152,30 @@ body.has-announcement .back-to-top {
 
 /* ---------- News page entries ---------- */
 .news-feed .news-list { gap: 12px; }
+
+/* Group headings on the News page: "Pinned" and one per month. */
+.news-groups { display: flex; flex-direction: column; gap: 26px; }
+.news-group-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 12px;
+  color: var(--text-soft);
+}
+.news-group-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: inherit;
+}
+.news-group-icon { width: 15px; height: 15px; }
+.news-group-line { flex: 1; height: 1px; background: var(--border); }
+.news-group-count { font-size: 0.82rem; font-weight: 600; white-space: nowrap; }
 .news-item-detailed {
   position: relative;
   display: grid;
@@ -3202,28 +3226,7 @@ body.has-announcement .back-to-top {
   gap: 6px;
 }
 
-/* Pinned entry: a pin badge on the top-left corner. */
-.news-pin {
-  position: absolute;
-  top: -12px;
-  left: -12px;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  color: var(--bg);
-  background: var(--nav-accent);
-  border: 2px solid var(--bg);
-  pointer-events: none;
-}
-.news-pin .icon {
-  width: 22px;
-  height: 22px;
-  transform: rotate(-30deg);
-}
+/* Pinned entry: outlined in the accent colour (its "Pinned" heading is a news-group-head). */
 .news-item-detailed.is-pinned { border-color: rgba(var(--nav-accent-rgb), 0.4); }
 
 /* Clickable entry: the "Read more" link stretches over the whole card. */

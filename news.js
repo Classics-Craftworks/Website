@@ -328,11 +328,7 @@ function renderNewsItem(entry, opts = {}) {
   }
 
   // With a link, the whole entry is clickable (the link stretches over it).
-  const pin = opts.pinned
-    ? el('span', { class: 'news-pin', attrs: { role: 'img', 'aria-label': 'Pinned', 'data-tooltip': 'Pinned' } }, [icon('pin', 'icon-sm')])
-    : null;
-  return el('li', { attrs: { id: 'entry-' + newsEntryId(entry) }, class: 'news-item news-item-detailed' + (link ? ' is-clickable' : '') + (pin ? ' is-pinned' : '') }, [
-    pin,
+  return el('li', { attrs: { id: 'entry-' + newsEntryId(entry) }, class: 'news-item news-item-detailed' + (link ? ' is-clickable' : '') + (opts.pinned ? ' is-pinned' : '') }, [
     newsMedia(entry),
     el('div', { class: 'news-item-body' }, body),
     pills.length ? el('div', { class: 'news-item-tags' }, pills) : null
@@ -367,20 +363,34 @@ function renderNewsPreview() {
 
 /* ---------- News page ---------- */
 
+// "2026-10-13" -> "2026-10": the key entries are grouped and filtered by.
+function newsMonthKey(entry) {
+  return entry.date.slice(0, 7);
+}
+
+// "2026-10" -> "October 2026"
+function formatMonth(key) {
+  const d = new Date(key + '-01T00:00:00Z');
+  if (isNaN(d)) return key;
+  return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+}
+
 // Active filters and the search text live in the URL
-// (#projects=better-unpackables&tags=release,new&q=snapshot) so a filtered view can be linked to.
-function readHash(validTags, validProjects) {
+// (#projects=better-unpackables&tags=release,new&months=2026-10&q=snapshot) so a filtered view can be linked to.
+function readHash(validTags, validProjects, validMonths) {
   const params = new URLSearchParams(location.hash.slice(1));
   const tags = (params.get('tags') || '').split(',').filter(k => validTags.includes(k));
   const projects = (params.get('projects') || '').split(',').filter(k => validProjects.includes(k));
-  return { tags: new Set(tags), projects: new Set(projects), query: params.get('q') || '', entry: params.get('entry') || '' };
+  const months = (params.get('months') || '').split(',').filter(k => validMonths.includes(k));
+  return { tags: new Set(tags), projects: new Set(projects), months: new Set(months), query: params.get('q') || '', entry: params.get('entry') || '' };
 }
 
-function writeHash(active, activeProjects, query, entry) {
+function writeHash(active, activeProjects, activeMonths, query, entry) {
   const params = new URLSearchParams();
   if (entry) params.set('entry', entry);
   if (activeProjects.size) params.set('projects', [...activeProjects].join(','));
   if (active.size) params.set('tags', [...active].join(','));
+  if (activeMonths.size) params.set('months', [...activeMonths].join(','));
   if (query.trim()) params.set('q', query.trim());
   const text = params.toString();
   history.replaceState(null, '', location.pathname + location.search + (text ? '#' + text : ''));
@@ -472,6 +482,21 @@ function renderSideCard(card) {
   ]);
 }
 
+// One group on the News page: a small heading (icon or label, a rule, and a post
+// count) above a list of entries. Used for the pinned entry and for each month.
+function newsGroup(title, groupEntries, opts = {}) {
+  const head = el('div', { class: 'news-group-head' }, [
+    el('h2', { class: 'news-group-title' }, [
+      opts.icon ? icon(opts.icon, 'icon-sm news-group-icon') : null,
+      el('span', { text: title })
+    ]),
+    el('span', { class: 'news-group-line', attrs: { 'aria-hidden': 'true' } }),
+    opts.count === false ? null : el('span', { class: 'news-group-count', text: `${groupEntries.length} ${groupEntries.length === 1 ? 'post' : 'posts'}` })
+  ]);
+  const items = el('ul', { class: 'news-list' }, groupEntries.map(e => renderNewsItem(e, { detailed: true, pinned: e === opts.pinned })));
+  return el('section', { class: 'news-group' }, [head, items]);
+}
+
 function renderNewsPage() {
   const main = document.getElementById('news-page');
   const news = newsData();
@@ -497,17 +522,20 @@ function renderNewsPage() {
   const projectTitle = new Map(projects.map(p => [p.id, p.title]));
   const haystacks = new Map(entries.map(e => [e, searchText(e, entryProjects.get(e).map(id => projectTitle.get(id)))]));
   const tagKeys = usedTagKeys(entries);
-  const initial = readHash(tagKeys, projectIds);
+  const monthKeys = [...new Set(entries.map(newsMonthKey))]; // newest first
+  const initial = readHash(tagKeys, projectIds, monthKeys);
   const active = initial.tags; // empty set = every tag
   const activeProjects = initial.projects; // empty set = every project
+  const activeMonths = initial.months; // empty set = every month
   let query = initial.query;
   let focused = initial.entry; // an entry linked to from elsewhere (#entry=...); cleared on the first filter or search change
   let rendered = false;
 
-  const list = el('ul', { class: 'news-list' });
+  const list = el('div', { class: 'news-groups' }); // a heading and a list of entries per group (pinned, then each month)
   const status = el('p', { class: 'news-status', attrs: { 'aria-live': 'polite' } });
   const buttons = new Map(); // tag key (or '') -> button
   const projectButtons = new Map(); // project id (or '') -> button
+  const monthButtons = new Map(); // month key (or '') -> button
 
   // Search box: same look as the header search.
   const input = el('input', {
@@ -533,6 +561,7 @@ function renderNewsPage() {
   function matches(entry) {
     if (active.size && !(entry.tags || []).some(t => active.has(t))) return false;
     if (activeProjects.size && !entryProjects.get(entry).some(id => activeProjects.has(id))) return false;
+    if (activeMonths.size && !activeMonths.has(newsMonthKey(entry))) return false;
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     const hay = haystacks.get(entry);
     return terms.every(t => hay.includes(t));
@@ -542,10 +571,17 @@ function renderNewsPage() {
     if (rendered) focused = '';
     rendered = true;
     const shown = entries.filter(matches);
-    // The pinned entry goes first (if it matches the current filters).
+    // The pinned entry goes first, under its own heading (if it matches the current
+    // filters); the rest are grouped by month, newest first.
     const pinned = pinnedEntry(entries);
-    if (pinned && shown.includes(pinned)) shown.splice(0, 0, ...shown.splice(shown.indexOf(pinned), 1));
-    list.replaceChildren(...shown.map(e => renderNewsItem(e, { detailed: true, pinned: e === pinned })));
+    const pinnedShown = pinned && shown.includes(pinned) ? pinned : null;
+    const groups = [];
+    if (pinnedShown) groups.push(newsGroup('Pinned', [pinnedShown], { icon: 'pin', pinned: pinnedShown, count: false }));
+    monthKeys.forEach(key => {
+      const inMonth = shown.filter(e => e !== pinnedShown && newsMonthKey(e) === key);
+      if (inMonth.length) groups.push(newsGroup(formatMonth(key), inMonth, { pinned: pinnedShown }));
+    });
+    list.replaceChildren(...groups);
 
     buttons.forEach((btn, key) => {
       const on = key === '' ? !active.size : active.has(key);
@@ -555,13 +591,17 @@ function renderNewsPage() {
       const on = id === '' ? !activeProjects.size : activeProjects.has(id);
       btn.setAttribute('aria-pressed', String(on));
     });
+    monthButtons.forEach((btn, key) => {
+      const on = key === '' ? !activeMonths.size : activeMonths.has(key);
+      btn.setAttribute('aria-pressed', String(on));
+    });
     clearBtn.hidden = !query;
 
-    const filtering = active.size > 0 || activeProjects.size > 0 || query.trim() !== '';
+    const filtering = active.size > 0 || activeProjects.size > 0 || activeMonths.size > 0 || query.trim() !== '';
     status.textContent = !shown.length
       ? (query.trim() ? 'Nothing matches your search.' : 'Nothing matches those filters.')
       : (filtering ? `Showing ${shown.length} of ${entries.length}` : '');
-    writeHash(active, activeProjects, query, focused);
+    writeHash(active, activeProjects, activeMonths, query, focused);
   }
 
   input.addEventListener('input', () => { query = input.value; refresh(); });
@@ -594,6 +634,7 @@ function renderNewsPage() {
   // How many options each group shows before "Show more".
   const PROJECTS_VISIBLE = 5;
   const TAGS_VISIBLE = 3;
+  const MONTHS_VISIBLE = 3;
 
   // A titled group of filter buttons: an "All" button, then the options. Only
   // the first `visible` options show until "Show more" is pressed (the
@@ -657,6 +698,15 @@ function renderNewsPage() {
         tagKeys, active, panelId
       ));
     }
+    if (monthKeys.length > 1) {
+      const monthCount = key => entries.filter(e => newsMonthKey(e) === key).length;
+      groups.push(buildFilterGroup(
+        'Month', 'months', MONTHS_VISIBLE,
+        makeButton('', 'All months', null, activeMonths, monthButtons, entries.length),
+        monthKeys.map(k => makeButton(k, formatMonth(k), null, activeMonths, monthButtons, monthCount(k))),
+        monthKeys, activeMonths, panelId
+      ));
+    }
     const panel = el('div', { class: 'news-filter-panel', attrs: { id: panelId, hidden: '' } }, groups);
 
     const box = el('div', { class: 'news-filter-box' }, [toggle, panel]);
@@ -674,7 +724,7 @@ function renderNewsPage() {
   // then latest releases and cards) so that on narrow screens the search and filters
   // come first, then the list, then the extras.
   const tools = el('div', { class: 'news-tools' }, [searchBox]);
-  if (projects.length || tagKeys.length > 1) {
+  if (projects.length || tagKeys.length > 1 || monthKeys.length > 1) {
     tools.appendChild(buildFilterDropdown());
   }
 
