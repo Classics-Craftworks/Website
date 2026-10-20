@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.11.0 — 2026-10-20
+
+### Added
+- Pinned news entry - moves to the top of the page, has a pin icon and a lighter border. The same entry is used for the announcement card.
+- X/Twitter link to news page's "Stay in the loop" panel
+
+### Changed
+- Redesigned the News page tag filter on the sidebar
+- Tightened padding on the News page
+- Moved tags to the right side of news entries
+- Updated Classic's Note Block Tweaks news entry with the pack icon
+- Swapped news page entry "beta" & "snapshot" tags around
+
+### Fixed
+- Fixed the announcement card appearing on the 404 page
+
 ## v3.10.0.2 — 2026-10-20
 
 ### Changed
