@@ -492,11 +492,13 @@ function newsGroup(title, groupEntries, opts = {}) {
       el('span', { text: title })
     ]),
     el('span', { class: 'news-group-line', attrs: { 'aria-hidden': 'true' } }),
-    opts.count === false ? null : el('span', { class: 'news-group-count', text: `${groupEntries.length} ${groupEntries.length === 1 ? 'post' : 'posts'}` })
+    opts.count === false ? null : el('span', { class: 'news-group-count', text: `${opts.total || groupEntries.length} ${(opts.total || groupEntries.length) === 1 ? 'post' : 'posts'}` })
   ]);
   const items = el('ul', { class: 'news-list' }, groupEntries.map(e => renderNewsItem(e, { detailed: true, pinned: e === opts.pinned })));
   return el('section', { class: 'news-group' }, [head, items]);
 }
+
+const NEWS_PAGE_SIZE = 10; // entries shown at first, and added by each "Show more" click
 
 function renderNewsPage() {
   const main = document.getElementById('news-page');
@@ -531,10 +533,13 @@ function renderNewsPage() {
   let sort = initial.sort; // 'newest' or 'oldest'; the pinned entry stays on top either way
   let query = initial.query;
   let focused = initial.entry; // an entry linked to from elsewhere (#entry=...); cleared on the first filter or search change
+  let limit = NEWS_PAGE_SIZE; // how many (non-pinned) entries are shown
   let rendered = false;
 
   const list = el('div', { class: 'news-groups' }); // a heading and a list of entries per group (pinned, then each month)
   const status = el('p', { class: 'news-status', attrs: { 'aria-live': 'polite' } });
+  const moreBtn = el('button', { class: 'news-show-more', attrs: { type: 'button', hidden: '' } });
+  moreBtn.addEventListener('click', () => { limit += NEWS_PAGE_SIZE; refresh(true); });
   const buttons = new Map(); // tag key (or '') -> button
   const projectButtons = new Map(); // project id (or '') -> button
   const monthButtons = new Map(); // month key (or '') -> button
@@ -570,7 +575,10 @@ function renderNewsPage() {
     return terms.every(t => hay.includes(t));
   }
 
-  function refresh() {
+  // Only the first NEWS_PAGE_SIZE entries show at first; "Show more" adds that many again.
+  // Any other change (filters, search, sort) starts over from the first page.
+  function refresh(keepLimit) {
+    if (!keepLimit) limit = NEWS_PAGE_SIZE;
     if (rendered) focused = '';
     rendered = true;
     const shown = entries.filter(matches);
@@ -578,15 +586,30 @@ function renderNewsPage() {
     // filters); the rest are grouped by month, newest first.
     const pinned = pinnedEntry(entries);
     const pinnedShown = pinned && shown.includes(pinned) ? pinned : null;
-    const groups = [];
-    if (pinnedShown) groups.push(newsGroup('Pinned', [pinnedShown], { icon: 'pin', pinned: pinnedShown, count: false }));
     const oldestFirst = sort === 'oldest';
-    (oldestFirst ? monthKeys.slice().reverse() : monthKeys).forEach(key => {
+    const byMonth = (oldestFirst ? monthKeys.slice().reverse() : monthKeys).map(key => {
       const inMonth = shown.filter(e => e !== pinnedShown && newsMonthKey(e) === key);
       if (oldestFirst) inMonth.reverse();
-      if (inMonth.length) groups.push(newsGroup(formatMonth(key), inMonth, { pinned: pinnedShown }));
+      return { key, inMonth };
+    }).filter(g => g.inMonth.length);
+    const ordered = byMonth.flatMap(g => g.inMonth); // display order, pinned entry not included
+
+    // An entry linked to from elsewhere (#entry=...) must be on screen, so open enough pages to include it.
+    const linkedAt = focused ? ordered.findIndex(e => newsEntryId(e) === focused) : -1;
+    if (linkedAt >= limit) limit = Math.ceil((linkedAt + 1) / NEWS_PAGE_SIZE) * NEWS_PAGE_SIZE;
+
+    const visible = new Set(ordered.slice(0, limit));
+    const groups = [];
+    if (pinnedShown) groups.push(newsGroup('Pinned', [pinnedShown], { icon: 'pin', pinned: pinnedShown, count: false }));
+    byMonth.forEach(({ key, inMonth }) => {
+      const part = inMonth.filter(e => visible.has(e));
+      if (part.length) groups.push(newsGroup(formatMonth(key), part, { pinned: pinnedShown, total: inMonth.length }));
     });
     list.replaceChildren(...groups);
+
+    const remaining = Math.max(0, ordered.length - limit);
+    moreBtn.hidden = remaining === 0;
+    moreBtn.textContent = `Show ${Math.min(remaining, NEWS_PAGE_SIZE)} more`; // what this click adds
 
     buttons.forEach((btn, key) => {
       const on = key === '' ? !active.size : active.has(key);
@@ -606,7 +629,7 @@ function renderNewsPage() {
     const filtering = active.size > 0 || activeProjects.size > 0 || activeMonths.size > 0 || query.trim() !== '';
     status.textContent = !shown.length
       ? (query.trim() ? 'Nothing matches your search.' : 'Nothing matches those filters.')
-      : (filtering ? `Showing ${shown.length} of ${entries.length}` : '');
+      : (filtering ? `${shown.length} of ${entries.length} entries match` : '');
     writeHash(active, activeProjects, activeMonths, sort, query, focused);
   }
 
@@ -746,7 +769,7 @@ function renderNewsPage() {
   const extras = [renderLatestReleases(side.latestReleases), ...(side.cards || []).map(renderSideCard)].filter(Boolean);
   const layout = el('div', { class: 'news-layout' + (extras.length ? '' : ' no-extras') }, [
     tools,
-    el('div', { class: 'news-feed' }, [status, list]),
+    el('div', { class: 'news-feed' }, [status, list, moreBtn]),
     extras.length ? el('aside', { class: 'news-extra', attrs: { 'aria-label': 'More about the news' } }, extras) : null
   ]);
   main.appendChild(layout);
