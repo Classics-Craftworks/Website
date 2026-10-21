@@ -641,6 +641,7 @@ function renderNewsPage() {
       const on = key === '' ? !activeMonths.size : activeMonths.has(key);
       btn.setAttribute('aria-pressed', String(on));
     });
+    groupUpdaters.forEach(update => update());
     sortButtons.forEach((item, key) => {
       item.setAttribute('aria-selected', String(key === sort));
       item.classList.toggle('is-current', key === sort);
@@ -685,22 +686,46 @@ function renderNewsPage() {
   }
 
   // How many options each group shows before "Show more".
-  const PROJECTS_VISIBLE = 5;
-  const TAGS_VISIBLE = 3;
-  const MONTHS_VISIBLE = 3;
+  const PROJECTS_VISIBLE = 4;
+  const TAGS_VISIBLE = 4;
+  const MONTHS_VISIBLE = 4;
 
-  // A titled group of filter buttons: an "All" button, then the options. Only
-  // the first `visible` options show until "Show more" is pressed (the
-  // button only exists when there are more). `noun` is "projects" or "tags".
-  function buildFilterGroup(title, noun, visible, allButton, optionButtons, keys, set, panelId) {
+  // A titled group of filter buttons: an "All" button, then the options. The title is a
+  // button that collapses the group (`startOpen` sets its default; a group with something
+  // already selected, e.g. from a shared link, always starts open). Only the first
+  // `visible` options show until "Show more" is pressed (the button only exists when
+  // there are more). `noun` is "projects" or "tags".
+  const groupUpdaters = []; // refresh() calls these so each title shows how many options are selected
+  function buildFilterGroup(title, noun, visible, startOpen, allButton, optionButtons, keys, set, panelId) {
+    const bodyId = 'news-filter-group-' + noun;
     const options = el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter news by ' + title.toLowerCase() } }, [
       allButton,
       ...optionButtons
     ]);
-    const group = el('div', { class: 'news-filter-group' }, [
-      el('h3', { class: 'news-filter-group-title', text: title }),
-      options
+    const body = el('div', { class: 'news-filter-group-body', attrs: { id: bodyId } }, [options]);
+    const selected = el('span', { class: 'news-filter-group-selected', attrs: { hidden: '' } });
+    const heading = el('button', { class: 'news-filter-group-toggle', attrs: { type: 'button', 'aria-controls': bodyId } }, [
+      el('span', { class: 'news-filter-group-label', text: title }),
+      selected,
+      el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
     ]);
+    const group = el('div', { class: 'news-filter-group' }, [
+      el('h3', { class: 'news-filter-group-title' }, [heading]),
+      body
+    ]);
+
+    let open = startOpen || set.size > 0;
+    function applyOpen() {
+      heading.setAttribute('aria-expanded', String(open));
+      body.hidden = !open;
+      group.classList.toggle('is-open', open);
+    }
+    heading.addEventListener('click', () => { open = !open; applyOpen(); });
+    applyOpen();
+    groupUpdaters.push(() => {
+      selected.textContent = String(set.size);
+      selected.hidden = set.size === 0;
+    });
 
     let expanded = false;
     let more = null;
@@ -716,7 +741,7 @@ function renderNewsPage() {
         el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
       ]);
       more.addEventListener('click', () => { expanded = !expanded; applyMore(); });
-      group.appendChild(more);
+      body.appendChild(more);
     }
     // An option picked from a shared link might be hidden behind "Show more".
     expanded = keys.slice(visible).some(k => set.has(k));
@@ -737,7 +762,7 @@ function renderNewsPage() {
     if (projects.length) {
       const projectCount = id => entries.filter(e => entryProjects.get(e).includes(id)).length;
       groups.push(buildFilterGroup(
-        'Project', 'projects', PROJECTS_VISIBLE,
+        'Project', 'projects', PROJECTS_VISIBLE, true,
         makeButton('', 'All projects', null, activeProjects, projectButtons, entries.length),
         projects.map(p => makeButton(p.id, p.title, null, activeProjects, projectButtons, projectCount(p.id), p.image)),
         projectIds, activeProjects, panelId
@@ -745,7 +770,7 @@ function renderNewsPage() {
     }
     if (tagKeys.length > 1) {
       groups.push(buildFilterGroup(
-        'Tags', 'tags', TAGS_VISIBLE,
+        'Tags', 'tags', TAGS_VISIBLE, false,
         makeButton('', 'All tags', null, active, buttons, entries.length),
         tagKeys.map(k => { const t = newsTag(k); return makeButton(k, t.label, t, active, buttons, entries.filter(e => (e.tags || []).includes(k)).length); }),
         tagKeys, active, panelId
@@ -754,7 +779,7 @@ function renderNewsPage() {
     if (monthKeys.length > 1) {
       const monthCount = key => entries.filter(e => newsMonthKey(e) === key).length;
       groups.push(buildFilterGroup(
-        'Month', 'months', MONTHS_VISIBLE,
+        'Month', 'months', MONTHS_VISIBLE, false,
         makeButton('', 'All months', null, activeMonths, monthButtons, entries.length),
         monthKeys.map(k => makeButton(k, formatMonth(k), null, activeMonths, monthButtons, monthCount(k))),
         monthKeys, activeMonths, panelId
