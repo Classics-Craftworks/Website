@@ -448,10 +448,34 @@ function renderLatestReleases(cfg) {
   });
   if (!rows.length) return null;
 
-  return el('section', { class: 'news-panel' }, [
-    el('h2', { class: 'news-panel-heading', text: cfg.heading || 'Latest releases' }),
-    el('ul', { class: 'release-list' }, rows)
+  // The heading is a toggle that collapses the list. The choice is remembered
+  // per browser; storage can be unavailable, so every access is guarded.
+  const KEY = 'news-releases-collapsed';
+  let open = true;
+  try { open = localStorage.getItem(KEY) !== '1'; } catch (e) {}
+
+  const listId = 'latest-releases-list';
+  const list = el('ul', { class: 'release-list', attrs: { id: listId } }, rows);
+  const toggle = el('button', { class: 'news-panel-toggle', attrs: { type: 'button', 'aria-controls': listId } }, [
+    el('span', { text: cfg.heading || 'Latest releases' }),
+    el('span', { class: 'news-panel-chevron', attrs: { 'aria-hidden': 'true' } })
   ]);
+  const panel = el('section', { class: 'news-panel is-collapsible' }, [
+    el('h2', { class: 'news-panel-heading' }, [toggle]),
+    list
+  ]);
+  const apply = () => {
+    toggle.setAttribute('aria-expanded', String(open));
+    list.hidden = !open;
+    panel.classList.toggle('is-collapsed', !open);
+  };
+  toggle.addEventListener('click', () => {
+    open = !open;
+    apply();
+    try { localStorage.setItem(KEY, open ? '0' : '1'); } catch (e) {}
+  });
+  apply();
+  return panel;
 }
 
 // Sidebar info card: icon tile, heading, text, then an optional outlined
