@@ -38,7 +38,7 @@
                      without ".svg". Leave the list empty to hide cards. */
 
 const LATEST_UPDATES = {
-  heading: "Latest News",
+  heading: "News",
   homeHeading: "Latest News",
   intro: "The latest news and updates from Classic's Craftworks.",
   homeCount: 3,
@@ -60,7 +60,7 @@ const LATEST_UPDATES = {
     cards: [
       {
         heading: "Stay in the loop",
-        text: "Follow along for new releases, betas and other updates.",
+        text: "Join the community or follow along for new releases, betas and behind-the-scenes updates.",
         button: { label: "Join the Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" },
         button2: { label: "Follow on X/Twitter", url: "https://x.com/C36Craftworks", icon: "x" },
         secondary: [
@@ -85,7 +85,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-20",
       title: "Better Unpackables v5.1.0-beta.6",
-      text: "Better Unpackables v5.1.0-beta.6 has been released, adding new 'back to block' recipes for Packed Ice Brick blocks.",
+      text: "Packed Ice Bricks can now be turned back into blocks. This beta adds new \"back to block\" recipes for Packed Ice Brick blocks.",
       tags: ["beta"],
       image: "images/better-unpackables.webp",
       projects: ["better-unpackables"],
@@ -95,7 +95,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-20",
       title: "Classic's Note Block Tweaks v0.5.0",
-      text: "Classic's Note Block Tweaks v0.5.0 has been released, adding a new pack icon and support for Java 26.4-snapshot-5.",
+      text: "Classic's Note Block Tweaks gets a fresh pack icon and support for Java 26.4-snapshot-5 in this alpha release.",
       tags: ["alpha"],
       image: "images/note-block-tweaks.webp",
       projects: ["classics-note-block-tweaks"],
@@ -109,15 +109,15 @@ const LATEST_UPDATES = {
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       projects: [
-        { id: "better-craftables", version: "v8.1.0-beta.4", text: "Reduced the Ice crafting cost from 4 Ice Crystals to 2 Ice Crystals per Ice, and made the recipe shapeless." },
-        { id: "better-unpackables", version: "v5.1.0-beta.5", text: "Reduced the amount of Ice Crystals from 4 to 2 per Ice when converting Ice into Ice Crystals." }
+        { id: "better-craftables", version: "v8.1.0-beta.4", text: "Crafting Ice now costs 2 Ice Crystals instead of 4, and the recipe is shapeless." },
+        { id: "better-unpackables", version: "v5.1.0-beta.5", text: "Converting Ice into Ice Crystals now gives 2 per Ice instead of 4." }
       ]
     },
     {
       announce: true,
       date: "2026-10-20",
       title: "Introducing Classic's Note Block Tweaks",
-      text: "New resource pack that updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
+      text: "Our newest resource pack updates Note Blocks to match the new Jukebox textures, and backports them to Java 1.21.9 – 26.3.",
       tags: ["new"],
       image: "images/note-block-tweaks.webp",
       projects: ["classics-note-block-tweaks"],
@@ -127,7 +127,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-13",
       title: "Better Unpackables v5.1.0-beta.4",
-      text: "Better Unpackables v5.1.0-beta.4 has been released to fix Cut Sandstone unpacking recipes returning 4 Sandstone instead of 1.",
+      text: "This beta fixes Cut Sandstone unpacking recipes, which returned 4 Sandstone instead of 1.",
       tags: ["beta"],
       image: "images/better-unpackables.webp",
       projects: ["better-unpackables"],
@@ -137,8 +137,9 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-13",
       title: "Better Unpackables v5.0.1",
-      text: "Better Unpackables v5.0.1 has been released to fix Cut Sandstone unpacking recipes returning 4 Sandstone instead of 1.",
+      text: "This patch fixes Cut Sandstone unpacking recipes, which returned 4 Sandstone instead of 1.",
       tags: ["release"],
+      image: "images/better-unpackables.webp",
       projects: [
         { id: "better-unpackables", version: "v5.0.1" },
         { id: "better-unpackables", version: "v5.0.1+mod" }
@@ -147,29 +148,29 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-13",
       title: "26.4 Snapshot 4",
-      text: "New betas have been released for Java 26.4-snapshot-4.",
+      text: "Ice-related recipes get another pass. New betas are out for Java 26.4-snapshot-4.",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       projects: [
-        { id: "better-craftables", version: "v8.1.0-beta.3", text: "Adjusted Icicle and Ice Crystal crafting recipes." },
-        { id: "better-unpackables", version: "v5.1.0-beta.3", text: "Adjusted Icicle and Ice Crystal crafting requirements and made the Packed Ice to Ice Balls recipe shapeless." }
+        { id: "better-craftables", version: "v8.1.0-beta.3", text: "Adjusted the Icicle and Ice Crystal crafting recipes." },
+        { id: "better-unpackables", version: "v5.1.0-beta.3", text: "Adjusted the Icicle and Ice Crystal crafting requirements, and made the Packed Ice to Ice Balls recipe shapeless." }
       ]
     },
     {
       date: "2026-10-06",
       title: "26.4 Snapshot 3",
-      text: "New betas have been released for Java 26.4-snapshot-3.",
+      text: "Ice Balls, Ice Crystals and Icicles arrive in our packs. New betas are out for Java 26.4-snapshot-3.",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       projects: [
-        { id: "better-craftables", version: "v8.1.0-beta.2", text: "Added new 26.4 to craft Ice Balls, Ice Crystals, and Icicles into Packed Ice and Ice." },
-        { id: "better-unpackables", version: "v5.1.0-beta.2", text: "Added new 26.4 recipes to craft Ice Balls, Ice Crystals, and Icicles from Packed Ice and Ice." }
+        { id: "better-craftables", version: "v8.1.0-beta.2", text: "Added new 26.4 recipes to craft Ice Balls, Ice Crystals and Icicles into Packed Ice and Ice." },
+        { id: "better-unpackables", version: "v5.1.0-beta.2", text: "Added new 26.4 recipes to unpack Packed Ice and Ice into Ice Balls, Ice Crystals and Icicles." }
       ]
     },
     {
       date: "2026-09-22",
       title: "26.4 Snapshot 1",
-      text: "New betas have been released for Java 26.4-snapshot-1.",
+      text: "Our first betas for the 26.4 cycle are out, supporting Java 26.4-snapshot-1.",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
       projects: [
@@ -180,7 +181,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-09-16",
       title: "Zisteau Pigmen v2.4.1",
-      text: "Zisteau Pigmen v2.4.1 has been released to fix the old pack icon being used.",
+      text: "A quick fix for v2.4.0, which accidentally shipped with the old pack icon.",
       tags: ["release"],
       image: "images/zisteau-pigmen.webp",
       projects: ["zisteau-pigmen"],
@@ -190,7 +191,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-09-15",
       title: "Zisteau Pigmen v2.4.0",
-      text: "Zisteau Pigmen v2.4.0 has been released for Java 26.3.",
+      text: "Zisteau Pigmen is now updated for Java 26.3.",
       tags: ["release"],
       image: "images/zisteau-pigmen.webp",
       projects: ["zisteau-pigmen"],
@@ -200,37 +201,37 @@ const LATEST_UPDATES = {
     {
       date: "2026-09-15",
       title: "26.3 Mod Updates",
-      text: "New mod updates have been released for Java 26.3.",
+      text: "Our mods are now updated for Java 26.3, with new recipes in Better Craftables and Better Unpackables.",
       tags: ["release"],
       image: "images/icons/announcements.svg",
       projects: [
-        { id: "better-craftables", version: "v8.0.0+mod", text: "Added redyeing recipes for Concrete Stairs and Slabs, plus a Shelf Mushroom to Brown Dye recipe." },
-        { id: "better-unpackables", version: "v5.0.0+mod", text: "Added Straw Bed -> Hay Bale and Cushion -> Wool Slab recipes, plus 'back to block' recipes for Concrete Stairs and Slabs." },
-        { id: "silly-eatables", version: "v5.0.0+mod", text: "Updated for 26.3 compatibility." }
+        { id: "better-craftables", version: "v8.0.0+mod", text: "Added redyeing recipes for Concrete Stairs and Slabs, plus a Shelf Mushroom → Brown Dye recipe." },
+        { id: "better-unpackables", version: "v5.0.0+mod", text: "Added Straw Bed → Hay Bale and Cushion → Wool Slab recipes, plus \"back to block\" recipes for Concrete Stairs and Slabs." },
+        { id: "silly-eatables", version: "v5.0.0+mod", text: "Updated for Java 26.3." }
       ]
     },
     {
       date: "2026-09-15",
       title: "26.3 Data Pack Updates",
-      text: "New data pack updates have been released for Java 26.3.",
+      text: "Our data packs are now updated for Java 26.3, with new recipes in Better Craftables and Better Unpackables.",
       tags: ["release"],
       image: "images/icons/announcements.svg",
       projects: [
-        { id: "better-craftables", version: "v8.0.0", text: "Added redyeing recipes for Concrete Stairs and Slabs, plus a Shelf Mushroom to Brown Dye recipe." },
-        { id: "better-unpackables", version: "v5.0.0", text: "Added Straw Bed -> Hay Bale and Cushion -> Wool Slab recipes, plus 'back to block' recipes for Concrete Stairs and Slabs." },
-        { id: "silly-eatables", version: "v5.0.0", text: "Updated for 26.3 compatibility." }
+        { id: "better-craftables", version: "v8.0.0", text: "Added redyeing recipes for Concrete Stairs and Slabs, plus a Shelf Mushroom → Brown Dye recipe." },
+        { id: "better-unpackables", version: "v5.0.0", text: "Added Straw Bed → Hay Bale and Cushion → Wool Slab recipes, plus \"back to block\" recipes for Concrete Stairs and Slabs." },
+        { id: "silly-eatables", version: "v5.0.0", text: "Updated for Java 26.3." }
       ]
     },
     {
       date: "2026-09-14",
       title: "26.3 Resource Pack Updates",
-      text: "New resource pack updates have been released for Java 26.3.",
+      text: "Our resource packs are now updated for Java 26.3.",
       tags: ["release"],
       image: "images/icons/announcements.svg",
       projects: [
-        { id: "classics-disc-tweaks", version: "v3.4.0", text: "Updated for 26.3 compatibility." },
-        { id: "classics-dye-tweaks", version: "v1.4.0", text: "Updated for 26.3 compatibility." },
-        { id: "classics-lantern-tweaks", version: "v2.4.0", text: "Updated for 26.3 compatibility." }
+        { id: "classics-disc-tweaks", version: "v3.4.0", text: "Updated for Java 26.3." },
+        { id: "classics-dye-tweaks", version: "v1.4.0", text: "Updated for Java 26.3." },
+        { id: "classics-lantern-tweaks", version: "v2.4.0", text: "Updated for Java 26.3." }
       ]
     }
   ]
