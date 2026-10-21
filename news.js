@@ -454,20 +454,19 @@ function renderLatestReleases(cfg) {
   let open = true;
   try { open = localStorage.getItem(KEY) !== '1'; } catch (e) {}
 
+  // Same box, toggle and chevron as the Filters dropdown above it.
   const listId = 'latest-releases-list';
-  const list = el('ul', { class: 'release-list', attrs: { id: listId } }, rows);
-  const toggle = el('button', { class: 'news-panel-toggle', attrs: { type: 'button', 'aria-controls': listId } }, [
-    el('span', { text: cfg.heading || 'Latest releases' }),
-    el('span', { class: 'news-panel-chevron', attrs: { 'aria-hidden': 'true' } })
+  const list = el('ul', { class: 'release-list' }, rows);
+  const body = el('div', { class: 'news-filter-panel news-release-body', attrs: { id: listId } }, [list]);
+  const toggle = el('button', { class: 'news-filter-toggle', attrs: { type: 'button', 'aria-controls': listId } }, [
+    el('span', { class: 'news-filter-toggle-label', text: cfg.heading || 'Latest releases' }),
+    el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
   ]);
-  const panel = el('section', { class: 'news-panel is-collapsible' }, [
-    el('h2', { class: 'news-panel-heading' }, [toggle]),
-    list
-  ]);
+  const panel = el('section', { class: 'news-filter-box' }, [toggle, body]);
   const apply = () => {
     toggle.setAttribute('aria-expanded', String(open));
-    list.hidden = !open;
-    panel.classList.toggle('is-collapsed', !open);
+    body.hidden = !open;
+    panel.classList.toggle('is-open', open);
   };
   toggle.addEventListener('click', () => {
     open = !open;

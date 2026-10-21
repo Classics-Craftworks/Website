@@ -3058,7 +3058,7 @@ body.has-announcement .back-to-top {
   border-radius: 12px;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
-.news-filter-toggle { padding: 9px 16px 9px 14px; font-size: 1rem; font-weight: 700; }
+.news-filter-toggle { padding: 12px 16px 12px 14px; font-size: 1.2rem; font-weight: 700; line-height: 1.3; }
 .news-filter-toggle-label { flex: 1; text-align: left; }
 .news-filter-box.is-open .news-filter-toggle .nav-chevron,
 .news-filter-more[aria-expanded="true"] .nav-chevron {
@@ -3326,49 +3326,23 @@ body.has-announcement .back-to-top {
 
 /* ---------- News page sidebar panels ---------- */
 .news-panel {
-  padding: 20px;
-  border-radius: 16px;
+  padding: 16px 14px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--surface);
 }
 .news-panel-heading,
 .news-card-heading {
   margin: 0 0 12px;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   line-height: 1.3;
   color: var(--text);
 }
 
-/* Collapsible panel heading (Latest releases) */
-.news-panel.is-collapsible .news-panel-heading { margin: 0; }
-.news-panel.is-collapsible:not(.is-collapsed) .news-panel-heading { margin-bottom: 12px; }
-.news-panel-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.news-panel-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
-.news-panel-chevron {
-  flex-shrink: 0;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: translateY(-2px) rotate(45deg);
-  transition: transform var(--transition-fast);
-}
-.is-collapsed .news-panel-chevron { transform: translateY(1px) rotate(-45deg); }
-.release-list[hidden] { display: none; }
+/* Latest releases reuses the Filters box/toggle; only its body needs tuning. */
+.news-release-body { padding: 0 14px 2px; }
+.news-release-body .release-item:first-child::before { display: none; }
 
 .release-list { list-style: none; margin: 0; padding: 0; }
 .release-item {
