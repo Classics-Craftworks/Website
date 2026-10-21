@@ -53,6 +53,7 @@ const LATEST_UPDATES = {
     latestReleases: {
       heading: "Latest releases",
       releases: [
+        { project: "Classic's Tweaks", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.1", version: "v3.0.0-beta.1", channel: "beta", date: "2026-10-21" },
         { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6", version: "v5.1.0-beta.6", channel: "beta", date: "2026-10-20" },
         { project: "Classic's Note Block Tweaks", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0", version: "v0.5.0", channel: "alpha", date: "2026-10-20" },
         { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.5", version: "v5.1.0-beta.5", channel: "beta", date: "2026-10-20" },
@@ -86,9 +87,28 @@ const LATEST_UPDATES = {
 
   entries: [
     {
+      announce: true,
+      date: "2026-10-21",
+      title: "Introducing Classic's Tweaks",
+      text: "An all-in-one resource pack combining existing tweaks packs and Zisteau Pigmen, with individually toggleable tweaks thanks to Respackopts.",
+      tags: ["new"],
+      image: "images/classics-tweaks.webp",
+      projects: ["classics-tweaks"],
+      url: "/resource-packs#classics-tweaks",
+      linkText: "View Classic's Tweaks"
+    },
+    {
+      pinned: true,
+      date: "2026-10-21",
+      title: "Standalone Tweaks Packs archived",
+      text: "Classic's Disc, Dye & Lantern Tweaks and Zisteau Pigmen have merged into Classic's Tweaks and will no longer receive updates. Classic's Note Block Tweaks will be archived after v1.0.0.",
+      tags: ["news", "unsupported"],
+      projects: ["classics-disc-tweaks", "classics-dye-tweaks", "classics-lantern-tweaks", "zisteau-pigmen"],
+    },
+    {
       date: "2026-10-20",
       title: "Better Unpackables v5.1.0-beta.6",
-      text: "Packed Ice Bricks can now be turned back into blocks. This beta adds new \"back to block\" recipes for Packed Ice Brick blocks.",
+      text: "In this beta, Packed Ice Bricks can now be turned back into blocks with \"back to block\" recipes.",
       tags: ["beta"],
       image: "images/better-unpackables.webp",
       projects: ["better-unpackables"],
@@ -117,7 +137,7 @@ const LATEST_UPDATES = {
       ]
     },
     {
-      announce: true,
+      pinned: true,
       date: "2026-10-20",
       title: "Introducing Classic's Note Block Tweaks",
       text: "Our newest resource pack updates Note Blocks to match the new Jukebox textures, and backports them to Java 1.21.9 – 26.3.",

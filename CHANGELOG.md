@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.14.0.1 — 2026-10-21
+
+### Added
+- New Resource Pack: Classic's Tweaks
+
+### Changed
+- Marked Classic's Disc/Dye/Lantern Tweaks & Zisteau's Pigmen as archived
+
 ## v3.14.0 — 2026-10-21
 
 ### Added

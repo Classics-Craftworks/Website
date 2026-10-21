@@ -18,7 +18,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v3.14.0",
+    label: "v3.14.0.1",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -189,6 +189,39 @@ const SITE_DATA = {
     {
       heading: "Resource Packs",
       projects: [
+        // #region ──────── Classic's Tweaks ────────
+        {
+          image: "images/classics-tweaks.webp",
+          imageAlt: "Classic's Tweaks logo: the letters CT",
+          title: "Classic's Tweaks",
+          description: "Little details matter: subtle texture tweaks for Minecraft, each one toggleable in-game with Respackopts.",
+          links: [
+            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-tweaks" },
+            { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Tweaks" },
+            { label: "Wiki", icon: "book", url: "https://github.com/Classics-Craftworks/Classics-Tweaks/wiki" }
+          ],
+          channels: [
+            {
+              channel: "beta",
+              label: "Beta",
+              badge: "new",
+              mcVersion: "1.21.9 – 26.3",
+              downloads: [
+                { label: "Resource Pack", icon: "brush", version: "v3.0.0-b.1", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.1" }
+              ]
+            },
+            {
+              channel: "beta",
+              label: "26.4 Beta",
+              mcVersion: "1.21.9 – 26.4-snap-5",
+              downloads: [
+                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for 26.4 are coming soon!" },
+              ]
+            }
+          ]
+        },
+        // #endregion Classic's Disc Tweaks
+
         // #region ──────── Classic's Disc Tweaks ────────
         {
           image: "images/disc-tweaks.webp",
@@ -202,19 +235,11 @@ const SITE_DATA = {
           ],
           channels: [
             {
-              channel: "stable",
-              label: "Release",
+              channel: "unsupported",
+              label: "Archived",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", version: "v3.4.0", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
-              ]
-            },
-            {
-              channel: "beta",
-              label: "Beta",
-              mcVersion: "1.21.9 – 26.4-snap-5",
-              downloads: [
-                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
               ]
             }
           ]
@@ -234,19 +259,11 @@ const SITE_DATA = {
           ],
           channels: [
             {
-              channel: "stable",
-              label: "Release",
+              channel: "unsupported",
+              label: "Archived",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", version: "v1.4.0", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
-              ]
-            },
-            {
-              channel: "beta",
-              label: "Beta",
-              mcVersion: "1.21.9 – 26.4-snap-5",
-              downloads: [
-                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
               ]
             }
           ]
@@ -266,19 +283,11 @@ const SITE_DATA = {
           ],
           channels: [
             {
-              channel: "stable",
-              label: "Release",
+              channel: "unsupported",
+              label: "Archived",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", version: "v2.4.0", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
-              ]
-            },
-            {
-              channel: "beta",
-              label: "Beta",
-              mcVersion: "1.21.9 – 26.4-snap-5",
-              downloads: [
-                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
               ]
             }
           ]
@@ -322,7 +331,7 @@ const SITE_DATA = {
           channels: [
             {
               channel: "unsupported",
-              label: "Limited Support",
+              label: "Archived",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
                 { label: "Resource Pack", icon: "brush", version: "v2.4.1", url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1" }
