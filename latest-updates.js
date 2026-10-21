@@ -1,62 +1,41 @@
-/* LATEST UPDATES - the news feed shown on the home page (newest few) and on
-   the News page (everything, with search, project and tag filters). Rendered by news.js.
+/* LATEST UPDATES - the news feed on the home page (newest few) and the News page
+   (everything, with search and filters). Rendered by news.js.
 
-   - Adding an entry: copy a block in `entries`. Order doesn't matter; the
-     newest `date` is always shown first.
-       date   "YYYY-MM-DD"
-       title  headline
-       text   one or two sentences (optional)
-       projects (optional) the projects this entry is about. Each is a project id
-              (its title in data.js, lower-cased with hyphens) or, to give the
-              entry its own row for that project on the News page, an object:
-                { id: "better-craftables",
-                  version: "v8.0.0",     pill next to the name (optional)
-                  channel: "beta",       colours the pill: stable, beta, alpha or
-                                         unsupported (optional; defaults to the
-                                         entry's release/beta/alpha tag)
-                  text: "...",           that project's own description (optional)
-                  url: "https://...",    where the row (icon, name and pill) links;
-                                         overrides the default below (optional)
-                  versionUrl: "https://..." }  the version's page; the row links to
-                                         it, defaulting to <Modrinth page>/
-                                         version/<version> for versions like
-                                         "v8.0.0", else the project's page
-              The entry's own `text` stays as the overall description. A project
-              the `url` points at is picked up automatically for the filter.
-       tags   one or more keys from `tags` below, e.g. ["release"] or
-              ["release", "beta"]
-       url      (optional) adds a link button. Use a full address
-                ("https://...", opens in a new tab) or a page on this site
-                ("/data-packs-mods#better-unpackables")
-       linkText (optional) the button's text; defaults to "Read more"
-       announce (optional) true shows this entry as a card in the bottom-right
-                corner of every page except News. If several are marked, the
-                newest is used. Visitors can dismiss it; it comes back for them
-                when a different entry is announced. Remove the flag (or set it
-                to false) to stop announcing.
-       image    (optional) picture for the entry's icon tile on the News page
-                and for the corner card, e.g. "images/x.webp". By default it's
-                the icon of the project the `url` points at; with neither, a
-                generic news icon is shown.
-   - Tags: each key has a `label` (shown on the pill and filter button) and a
-     `color` (any #rrggbb hex). Add, rename or recolour freely; the tag filters on
-     the News page are built from the tags that entries actually use, in the
-     order listed here. A tag used by an entry but missing from `tags` still
-     works: it gets its key as a label and the default blue.
-   - homeCount: how many entries the home page shows.
-   - sidebar: the right-hand column of the News page (below the entries on
-     narrow screens). Search and the project/tag filters are always there; you set their
-     text, plus what follows. Icons are names of files in images/icons/ without
-     ".svg" (e.g. "discord"). Links work like an entry's `url`.
-       searchPlaceholder, filterHeading   text for those two controls
-       latestReleases  { heading, releases: [{ project, version, channel, date, url }] };
-                    shown in order, so list the newest first. channel is "stable",
-                    "beta", "alpha" or "unsupported" (colours come from the matching
-                    tags above); date is "YYYY-MM-DD"; url (optional) makes the row a link, like an
-                    entry's `url`. Leave out to hide
-       cards        info cards, in order; each is { heading, text, icon } plus an
-                    optional `button` and/or `link` of { label, url, icon? }.
-                    Leave the list empty to hide them. */
+   Entries (`entries`, any order; newest `date` shows first):
+     date      "YYYY-MM-DD"
+     title     headline
+     text      one or two sentences (optional)
+     tags      keys from `tags`, e.g. ["release", "beta"]
+     projects  (optional) project ids (title in data.js, lower-cased with hyphens),
+               or objects for a per-project row on the News page:
+                 { id, version, channel, text, url, versionUrl }  (all but id optional)
+                 channel     stable, beta, alpha or unsupported; colours the version
+                             pill (defaults to the entry's release/beta/alpha tag)
+                 text        that project's own description
+                 url         where the row links
+                 versionUrl  version page; defaults to <Modrinth page>/version/<version>
+               A project the entry's `url` points at is picked up automatically.
+     url       (optional) adds a link button: "https://..." (new tab) or a site page
+               like "/data-packs-mods#better-unpackables"
+     linkText  (optional) button text; defaults to "Read more"
+     announce  (optional) true shows the entry as a dismissible corner card on every
+               page except News. The newest announced entry is used.
+     image     (optional) icon tile for the entry and corner card, e.g. "images/x.webp".
+               Defaults to the icon of the project `url` points at, else a news icon.
+
+   tags: each key has a `label` and a `color` (#rrggbb). Filters use the tags entries
+   actually use, in the order listed here; unlisted tags fall back to their key and blue.
+
+   homeCount: how many entries the home page shows.
+
+   sidebar: the News page's right-hand column, besides the always-present search and filters.
+     searchPlaceholder, filterHeading  control text
+     latestReleases  { heading, releases: [{ project, version, channel, date, url }] }
+                     newest first; `url` (optional) makes the row a link; omit to hide
+     cards           info cards: { heading, text, icon?, button?, button2?, secondary?, link? }
+                     button/button2/link are { label, url, icon? }; `secondary` is a list of
+                     them, shown as smaller buttons. Icons are file names in images/icons/
+                     without ".svg". Leave the list empty to hide cards. */
 
 const LATEST_UPDATES = {
   heading: "Latest News",

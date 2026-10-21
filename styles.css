@@ -140,13 +140,13 @@
 
 * { box-sizing: border-box; }
 
-/* Reserves scrollbar space on desktop so the page doesn't shift; off at the mobile breakpoint, where scrollbars float. */
+/* Reserves scrollbar space on desktop so the page doesn't shift. */
 html { -webkit-text-size-adjust: 100%; scrollbar-gutter: stable; overflow-x: clip; }
 @media (max-width: 900px) {
   html { scrollbar-gutter: auto; }
 }
 
-/* overflow-x: clip (not "hidden") guards against horizontal scroll while keeping the sticky nav working in Safari. */
+/* overflow-x: clip, not hidden, so the sticky nav still works in Safari. */
 body {
   position: relative;
   min-height: 100vh;
@@ -581,7 +581,7 @@ p { margin: 0; }
   color: var(--text);
   font: inherit;
   font-size: 0.85rem;
-  padding: 8px 30px 8px 32px; /* room for the icon, and for the clear button so text doesn't shift when it appears */
+  padding: 8px 30px 8px 32px; /* room for the icon and clear button */
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 .nav-search-input::-webkit-search-decoration,
@@ -739,7 +739,7 @@ p { margin: 0; }
   font-weight: 700;
   color: var(--text);
   margin: 0 0 20px;
-  /* Keeps it clear of the sticky header; --sticky-nav-offset is measured in renderSiteHeader(), 68px until then. */
+  /* Clear of the sticky header; --sticky-nav-offset is set in renderSiteHeader(). */
   scroll-margin-top: var(--sticky-nav-offset, 68px);
 }
 
@@ -808,7 +808,7 @@ p { margin: 0; }
   /* Sits above the featured panel's fade, which starts a little to the left of the panel. */
   position: relative;
   z-index: 1;
-  /* Extra bottom padding lifts the text block a little above true centre, to balance the right panel's content. */
+  /* Extra bottom padding lifts the text slightly above centre. */
   padding: clamp(24px, 4vw, 56px);
   padding-bottom: calc(clamp(24px, 4vw, 56px) + 4px);
 }
@@ -1030,7 +1030,7 @@ p { margin: 0; }
   }
   /* Fixed-width, centred buttons rather than stretching across the banner. */
   .splash-actions { justify-content: center; gap: 10px; }
-  /* Two equal buttons spanning the full copy width, so their outer edges line up with the featured panel's content. */
+  /* Two equal buttons spanning the copy width. */
   .splash-actions .splash-btn { flex: 1 1 0; min-width: 0; }
   .splash-headline { margin-bottom: 10px; }
   .splash-subtitle { margin-bottom: 14px; }
@@ -1304,7 +1304,7 @@ p { margin: 0; }
 }
 .home-project:active { transform: scale(0.99); }
 
-/* Cards need ~380px each, so the grid steps 3 -> 2 -> 1 columns by available width; in two columns the odd card is centred. */
+/* ~380px per card: 3 -> 2 -> 1 columns; the odd card is centred in two columns. */
 @media (max-width: 1239px) {
   .home-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-grid > .home-card:last-child:nth-child(odd) {
@@ -1366,7 +1366,7 @@ p { margin: 0; }
   margin-bottom: 4px;
 }
 
-/* The pixel font has no "+", so it is drawn here: two square bars in the same colour and a similar weight to the numerals. */
+/* The pixel font has no "+", so it is drawn from two bars. */
 .stat-plus {
   display: inline-block;
   width: 0.56em;
@@ -1612,7 +1612,7 @@ p { margin: 0; }
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--badge-color);
-  background: var(--bg); /* solid, not tinted yellow - cuts a clean "tag" shape out of the border below it */
+  background: var(--bg); /* solid, to cut a clean tag shape out of the border */
   border: 1.5px solid var(--badge-color);
   transition: opacity var(--transition-fast), transform var(--transition-fast);
   cursor: pointer;
@@ -2055,7 +2055,7 @@ p { margin: 0; }
 
 .copy-link-btn.is-copied .icon-sm { color: var(--accent); }
 
-/* Brief highlight after a direct link. The -6px inset keeps #catalog's buffer from clipping the ring; off under reduced motion. */
+/* Brief highlight after a direct link; off under reduced motion. */
 .is-linked-target {
   position: relative;
 }
@@ -2532,12 +2532,12 @@ p { margin: 0; }
   .channel-row,
   .versions-note { grid-column: 1 / -1; }
   .project-description { margin-top: 12px; }
-  .project-links { margin-top: 18px; } /* a touch more than the 16px above the Release card, so the rhythm reads even */
+  .project-links { margin-top: 18px; }
 
   .download-btn,
   .download-unavailable {
     min-width: 0;
-    padding: 12px 10px; /* taller tap target on touch screens; keeps the disabled state's box the same size so columns still line up */
+    padding: 12px 10px; /* taller tap target; keeps disabled boxes the same size */
   }
 }
 

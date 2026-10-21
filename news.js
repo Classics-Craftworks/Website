@@ -125,8 +125,7 @@ function newsLink(entry) {
   ]);
 }
 
-// Calendar icon for dates. If images/icons/calendar.svg is missing
-// the icon is dropped rather than shown as a blank square.
+// Calendar icon for dates; dropped if images/icons/calendar.svg is missing.
 function calendarIcon() {
   const node = icon('calendar', 'icon-sm news-date-icon');
   const probe = new Image();
@@ -135,15 +134,13 @@ function calendarIcon() {
   return node;
 }
 
-// "Today", "Yesterday", "3 days ago", "2 weeks ago" for an entry's date while
-// it's under a calendar month old; null once it's a month or more old (or is
-// dated in the future), when the full date is shown instead.
+// "Today", "3 days ago", "2 weeks ago" while an entry is under a month old; null otherwise.
 function relativeNewsDate(iso) {
   const d = new Date(iso + 'T00:00:00Z');
   if (isNaN(d)) return null;
 
   const now = new Date();
-  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()); // the visitor's own "today"
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   const days = Math.round((today - d.getTime()) / 86400000);
   if (days < 0) return null;
 
@@ -155,15 +152,12 @@ function relativeNewsDate(iso) {
   limit.setUTCDate(Math.min(day, new Date(Date.UTC(limit.getUTCFullYear(), limit.getUTCMonth() + 1, 0)).getUTCDate()));
   if (d.getTime() <= limit.getTime()) return null;
 
-  // "Today"/"Yesterday" for the first two days, then "N days ago" / "N weeks ago" ("1 week ago", not "last week").
   const words = new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' });
   const counts = new Intl.RelativeTimeFormat('en-GB', { numeric: 'always' });
   return capitalise(days < 7 ? words.format(-days, 'day') : counts.format(-Math.floor(days / 7), 'week'));
 }
 
-// Date with its calendar icon, used wherever an update's date is shown.
-// Recent entries show a relative date with the full date as a tooltip; older
-// ones show the full date outright, with no tooltip.
+// Date with calendar icon. Recent entries show a relative date with the full date as a tooltip.
 function newsDate(entry) {
   const full = formatNewsDate(entry.date);
   const relative = relativeNewsDate(entry.date);
@@ -194,9 +188,7 @@ function isSvgSrc(src) {
   return /\.svg(?:[?#].*)?$/i.test(src);
 }
 
-// SVGs loaded through <img> can't take the site's colours (these icons are
-// plain black, which vanishes on the dark background), so they are drawn as a
-// mask filled with the tile's colour instead, like the other icons.
+// SVGs in <img> are plain black and vanish on the dark background, so draw them as a coloured mask.
 function svgMask(src, cls) {
   const url = `url('${sitePath(src)}')`;
   const node = el('span', { class: 'icon ' + cls, attrs: { 'aria-hidden': 'true' } });
@@ -205,10 +197,8 @@ function svgMask(src, cls) {
   return node;
 }
 
-// Picture tile for an entry (News page): its `image`, else the icon of the
-// project its `url` points at, else a generic news glyph. Full square icons
-// fill the tile on their own; transparent artwork and the glyph sit in an
-// outlined frame.
+// Picture tile for an entry: its `image`, else its project's icon, else a news glyph.
+// Square icons fill the tile; transparent artwork and the glyph get an outlined frame.
 function newsMedia(entry) {
   const src = announceImage(entry);
   const media = el('div', { class: 'news-item-media', attrs: { 'aria-hidden': 'true' } });
@@ -288,7 +278,6 @@ function renderEntryProjects(entry) {
   return rows.length ? el('ul', { class: 'news-projects' }, rows) : null;
 }
 
-// Home page cards are plain; the News page passes { detailed: true } for the icon tile.
 // The entry the announcement card is built from: the newest with announce: true.
 // The News page pins it to the top of the list.
 function pinnedEntry(entries) {
@@ -302,11 +291,9 @@ function renderNewsItem(entry, opts = {}) {
     setTagColor(pill, tag);
     return pill;
   });
-  // The News page puts the tags on the right of the entry; the home page
-  // keeps them beside the date.
+  // News page: tags sit beside the entry; home page: beside the date.
   const head = el('div', { class: 'news-meta' }, opts.detailed ? [newsDate(entry)] : [...pills, newsDate(entry)]);
-  // Home page: no per-entry url; a "View full update" link goes to the entry on
-  // the News page and stretches over the whole card. The News page uses the entry's own url.
+  // Home page: "View full update" links to the entry on the News page. News page: the entry's own url.
   const page = !opts.detailed && (SITE_DATA.pages || []).find(p => p.url === 'news');
   const link = opts.detailed
     ? newsLink(entry)
@@ -375,8 +362,8 @@ function formatMonth(key) {
   return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 }
 
-// Active filters and the search text live in the URL
-// (#projects=better-unpackables&tags=release,new&months=2026-10&sort=oldest&q=snapshot) so a filtered view can be linked to.
+// Filters and search live in the URL hash so a filtered view can be linked to,
+// e.g. #projects=better-unpackables&tags=release&months=2026-10&sort=oldest&q=snapshot
 function readHash(validTags, validProjects, validMonths) {
   const params = new URLSearchParams(location.hash.slice(1));
   const tags = (params.get('tags') || '').split(',').filter(k => validTags.includes(k));
@@ -425,13 +412,11 @@ function formatShortDate(iso) {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 }
 
-// Sidebar "Latest releases" panel: one row per release with the project name,
-// (with its icon) then its version (a pill coloured by channel) and date. Rows with a `url` are links.
+// Sidebar "Latest releases" panel: one row per release (icon, project, version pill, date).
 function renderLatestReleases(cfg) {
   const rows = ((cfg && cfg.releases) || []).filter(r => r && r.project).map(r => {
     const channel = RELEASE_CHANNELS[String(r.channel || '').toLowerCase()];
-    // One pill: the version, coloured by its channel.
-    const meta = [];
+      const meta = [];
     if (r.version) meta.push(versionPill(r.version, channel));
     if (r.date) meta.push(el('time', { class: 'release-date', text: formatShortDate(r.date), attrs: { datetime: r.date } }));
     // With a url, the project name is a link that stretches over the whole row.
@@ -448,8 +433,7 @@ function renderLatestReleases(cfg) {
   });
   if (!rows.length) return null;
 
-  // The heading is a toggle that collapses the list. The choice is remembered
-  // per browser; storage can be unavailable, so every access is guarded.
+  // Collapse state is remembered per browser; storage access is guarded.
   const KEY = 'news-releases-collapsed';
   let open = true;
   try { open = localStorage.getItem(KEY) !== '1'; } catch (e) {}
@@ -477,8 +461,7 @@ function renderLatestReleases(cfg) {
   return panel;
 }
 
-// Sidebar info card: icon tile, heading, text, then an optional outlined
-// `button` (plus an optional second, `button2`) and/or plain `link` ({ label, url, icon? }).
+// Sidebar info card: optional icon tile, heading, text, then `button`, `button2`, `secondary` buttons and/or a plain `link`.
 function renderSideCard(card) {
   if (!card || !card.heading) return null;
 
@@ -489,7 +472,6 @@ function renderSideCard(card) {
   ]);
   const button = makeButton(card.button);
   const button2 = makeButton(card.button2);
-  // Secondary buttons sit side by side in a quieter row under the main ones.
   const secondary = (card.secondary || []).map(b => makeButton(b, 'news-btn-secondary')).filter(Boolean);
   const secondaryRow = secondary.length ? el('div', { class: 'news-btn-row' }, secondary) : null;
   const link = card.link && newsAnchor('news-link', card.link.url, [
@@ -510,8 +492,7 @@ function renderSideCard(card) {
   ]);
 }
 
-// One group on the News page: a small heading (icon or label, a rule, and a post
-// count) above a list of entries. Used for the pinned entry and for each month.
+// A heading (icon or label, rule, count) above a list of entries; used for the pinned entry and each month.
 function newsGroup(title, groupEntries, opts = {}) {
   const head = el('div', { class: 'news-group-head' }, [
     el('h2', { class: 'news-group-title' }, [
@@ -785,9 +766,7 @@ function renderNewsPage() {
       return btn;
     }));
 
-  // Layout: the list, plus a sidebar. The sidebar is two blocks (search/filters,
-  // then latest releases and cards) so that on narrow screens the search and filters
-  // come first, then the list, then the extras.
+  // Sidebar is two blocks so narrow screens show search/filters, then the list, then the extras.
   const tools = el('div', { class: 'news-tools' }, [searchBox, sortBox]);
   if (projects.length || tagKeys.length > 1 || monthKeys.length > 1) {
     tools.appendChild(buildFilterDropdown());
@@ -869,8 +848,7 @@ function initAnnouncementCard() {
     return pill;
   });
 
-  // Like the home page cards: "View full update" goes to the entry on the News
-  // page and stretches over the whole card (the close button stays above it).
+  // "View full update" links to the entry and stretches over the card; the close button stays above.
   const page = (SITE_DATA.pages || []).find(p => p.url === 'news');
   const link = page && internalLink('news-link', `${page.url}#entry=${newsEntryId(entry)}`, [
     el('span', { text: 'View full update' }),
@@ -878,7 +856,6 @@ function initAnnouncementCard() {
   ]);
 
   const close = el('button', { class: 'announce-close', attrs: { type: 'button', 'aria-label': 'Dismiss announcement', 'data-tooltip': 'Dismiss' } });
-  // Tags and date run along the top; the icon sits below them beside the text.
   const card = el('aside', { class: 'announce' + (link ? ' is-linked' : ''), attrs: { role: 'region', 'aria-label': 'Latest news' } }, [
     el('div', { class: 'news-meta announce-meta' }, [
       ...pills,
