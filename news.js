@@ -818,6 +818,7 @@ if (document.getElementById('news-page')) {
   renderSiteHeader(SITE_DATA.pages || [], 'news');
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderNewsPage();
+  initBackToTop();
 }
 
 /* ---------- Announcement card ---------- */
