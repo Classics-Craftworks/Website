@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.13.0 — 2026-10-21
+
+### Changed
+- Redesigned the "stay in the loop" card on the news page, removing the icon & adding the GitHub and Modrinth links that were part of the Quick links
+- The "latest releases" card on the news page can now be collapsed
+- Moved news tags from the bottom to the top of each entry on mobile
+
+### Fixed
+- Fixed inconsistent news page sidebar card sizing
+- Fixed back to top button not appearing on the news page
+
 ## v3.12.0 — 2026-10-21
 
 ### Added
