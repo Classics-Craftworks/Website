@@ -279,9 +279,19 @@ function renderEntryProjects(entry) {
 }
 
 // The entry the announcement card is built from: the newest with announce: true.
-// The News page pins it to the top of the list.
-function pinnedEntry(entries) {
+// The News page pins it to the very top of the list.
+function announcedEntry(entries) {
   return entries.find(e => e.announce === true) || null;
+}
+
+// Entries pinned on the News page, in display order: the announced entry
+// first, then every entry with pinned: true (newest first, or oldest first
+// when `oldestFirst`). `entries` is newest first.
+function pinnedEntries(entries, oldestFirst) {
+  const announced = announcedEntry(entries);
+  const others = entries.filter(e => e !== announced && e.pinned === true);
+  if (oldestFirst) others.reverse();
+  return announced ? [announced, ...others] : others;
 }
 
 function renderNewsItem(entry, opts = {}) {
@@ -502,7 +512,7 @@ function newsGroup(title, groupEntries, opts = {}) {
     el('span', { class: 'news-group-line', attrs: { 'aria-hidden': 'true' } }),
     opts.count === false ? null : el('span', { class: 'news-group-count', text: `${opts.total || groupEntries.length} ${(opts.total || groupEntries.length) === 1 ? 'post' : 'posts'}` })
   ]);
-  const items = el('ul', { class: 'news-list' }, groupEntries.map(e => renderNewsItem(e, { detailed: true, pinned: e === opts.pinned })));
+  const items = el('ul', { class: 'news-list' }, groupEntries.map(e => renderNewsItem(e, { detailed: true, pinned: !!opts.pinned && opts.pinned.has(e) })));
   return el('section', { class: 'news-group' }, [head, items]);
 }
 
@@ -538,7 +548,7 @@ function renderNewsPage() {
   const active = initial.tags; // empty set = every tag
   const activeProjects = initial.projects; // empty set = every project
   const activeMonths = initial.months; // empty set = every month
-  let sort = initial.sort; // 'newest' or 'oldest'; the pinned entry stays on top either way
+  let sort = initial.sort; // 'newest' or 'oldest'; pinned entries stay on top either way
   let query = initial.query;
   let focused = initial.entry; // an entry linked to from elsewhere (#entry=...); cleared on the first filter or search change
   let limit = NEWS_PAGE_SIZE; // how many (non-pinned) entries are shown
@@ -590,13 +600,13 @@ function renderNewsPage() {
     if (rendered) focused = '';
     rendered = true;
     const shown = entries.filter(matches);
-    // The pinned entry goes first, under its own heading (if it matches the current
+    // Pinned entries (announced first) go under their own heading (those matching the current
     // filters); the rest are grouped by month, newest first.
-    const pinned = pinnedEntry(entries);
-    const pinnedShown = pinned && shown.includes(pinned) ? pinned : null;
     const oldestFirst = sort === 'oldest';
+    const pinnedShown = pinnedEntries(entries, oldestFirst).filter(e => shown.includes(e));
+    const pinnedSet = new Set(pinnedShown);
     const byMonth = (oldestFirst ? monthKeys.slice().reverse() : monthKeys).map(key => {
-      const inMonth = shown.filter(e => e !== pinnedShown && newsMonthKey(e) === key);
+      const inMonth = shown.filter(e => !pinnedSet.has(e) && newsMonthKey(e) === key);
       if (oldestFirst) inMonth.reverse();
       return { key, inMonth };
     }).filter(g => g.inMonth.length);
@@ -608,10 +618,10 @@ function renderNewsPage() {
 
     const visible = new Set(ordered.slice(0, limit));
     const groups = [];
-    if (pinnedShown) groups.push(newsGroup('Pinned', [pinnedShown], { icon: 'pin', pinned: pinnedShown, count: false }));
+    if (pinnedShown.length) groups.push(newsGroup('Pinned', pinnedShown, { icon: 'pin', pinned: pinnedSet }));
     byMonth.forEach(({ key, inMonth }) => {
       const part = inMonth.filter(e => visible.has(e));
-      if (part.length) groups.push(newsGroup(formatMonth(key), part, { pinned: pinnedShown, total: inMonth.length }));
+      if (part.length) groups.push(newsGroup(formatMonth(key), part, { total: inMonth.length }));
     });
     list.replaceChildren(...groups);
 

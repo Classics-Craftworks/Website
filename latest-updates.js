@@ -19,7 +19,10 @@
                like "/data-packs-mods#better-unpackables"
      linkText  (optional) button text; defaults to "Read more"
      announce  (optional) true shows the entry as a dismissible corner card on every
-               page except News. The newest announced entry is used.
+               page except News. The newest announced entry is used, and it is pinned
+               to the very top of the News page.
+     pinned    (optional) true pins the entry under "Pinned" at the top of the News page.
+               Any number of entries can be pinned; they follow the announced entry.
      image     (optional) icon tile for the entry and corner card, e.g. "images/x.webp".
                Defaults to the icon of the project `url` points at, else a news icon.
 
