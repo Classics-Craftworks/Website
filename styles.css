@@ -3003,29 +3003,42 @@ body.has-announcement .back-to-top {
 }
 
 /* ---------- News page layout ---------- */
-/* Entries on the left, sidebar on the right. On narrow screens it's one column
-   in the order: search and filters, entries, latest releases and cards. */
+/* Entries on the left, sidebar on the right. The top row holds the "Showing X of Y"
+   text and sort dropdown (left) level with the search box (right). On narrow screens
+   it's one column: search, count and sort, filters, entries, latest releases and cards. */
 .news-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 360px;
   grid-template-areas:
-    "feed tools"
-    "feed extra";
-  grid-template-rows: auto 1fr;
+    "toolbar search"
+    "feed    filters"
+    "feed    extra";
+  grid-template-rows: auto auto 1fr;
   column-gap: 28px;
   row-gap: 20px;
   align-items: start;
 }
-.news-layout.no-extras { grid-template-areas: "feed tools"; grid-template-rows: auto; }
-.news-tools { grid-area: tools; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.news-layout.no-extras { grid-template-rows: auto auto; }
+.news-layout.no-filters {
+  grid-template-areas:
+    "toolbar search"
+    "feed    extra";
+  grid-template-rows: auto 1fr;
+}
+.news-layout.no-filters.no-extras { grid-template-rows: auto auto; }
+.news-toolbar     { grid-area: toolbar; }
+.news-search-area { grid-area: search; min-width: 0; }
+.news-filter-area { grid-area: filters; min-width: 0; }
 .news-feed  { grid-area: feed;  min-width: 0; }
 .news-extra { grid-area: extra; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 .news-feed .news-list { margin-top: 0; }
 @media (max-width: 960px) {
   .news-layout,
-  .news-layout.no-extras {
+  .news-layout.no-extras,
+  .news-layout.no-filters,
+  .news-layout.no-filters.no-extras {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "tools" "feed" "extra";
+    grid-template-areas: "search" "toolbar" "filters" "feed" "extra";
     grid-template-rows: auto;
   }
 }
@@ -3172,37 +3185,70 @@ body.has-announcement .back-to-top {
 }
 .news-show-more:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* Sort order: a two-button toggle under the search box. */
-.news-sort {
+/* "Showing X of Y entries" on the left, "Sort" dropdown on the right; sits level with the search box. */
+.news-toolbar {
   display: flex;
-  gap: 3px;
-  padding: 3px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  min-height: 46px; /* matches the search box so the two line up */
+}
+.news-count { margin: 0; font-size: 0.9rem; color: var(--text-soft); }
+.news-count strong { color: var(--text); font-weight: 700; }
+.news-sort { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.news-sort-label { font-size: 0.9rem; font-weight: 600; color: var(--text-soft); }
+/* Trigger looks like the search box; the menu reuses .nav-dropdown-menu / .nav-dropdown-item. */
+.news-sort-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
   border-radius: 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--nav-btn-border);
   background: var(--surface);
-}
-.news-sort-btn {
-  flex: 1;
-  padding: 6px 10px;
-  border-radius: 9px;
+  color: var(--text);
   font: inherit;
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
-  color: var(--text-soft);
-  background: transparent;
-  border: 1px solid transparent;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
 }
-.news-sort-btn[aria-pressed="true"] {
-  background: rgba(var(--nav-accent-rgb), var(--alpha-hover));
-  border-color: rgba(var(--nav-accent-rgb), 0.5);
-  color: var(--accent);
+.news-sort-trigger .nav-chevron { margin-left: 4px; }
+.news-sort-value { display: grid; text-align: left; }
+.news-sort-value > span { grid-area: 1 / 1; }
+.news-sort-value > .is-hidden { visibility: hidden; }
+.news-sort-dropdown.is-open .nav-chevron { margin-top: 3px; transform: rotate(225deg); }
+.news-sort-dropdown.is-open .news-sort-trigger { border-color: var(--nav-btn-hover-border); }
+.news-sort-trigger:focus-visible {
+  outline: none;
+  border-color: var(--nav-btn-hover-border);
+  box-shadow: 0 0 0 3px rgba(var(--nav-accent-rgb), 0.2);
 }
 @media (hover: hover) {
-  .news-sort-btn[aria-pressed="false"]:hover { color: var(--text); background: var(--surface-hover); }
+  .news-sort-trigger:hover { border-color: var(--nav-btn-hover-border); background: var(--nav-btn-bg); }
 }
-.news-sort-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.news-sort-trigger:active { transform: scale(0.98); }
+.news-sort-menu {
+  top: calc(100% + 8px);
+  left: auto;
+  right: 0;
+  transform: none;
+  min-width: 100%;
+  z-index: 20;
+}
+.news-sort-item {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.news-sort-item.is-current { background: var(--nav-btn-bg); }
+@media (max-width: 960px) {
+  /* 16px stops iOS Safari zooming in on focus. */
+  .news-sort-trigger { font-size: 16px; }
+}
 .news-status { min-height: 1.4em; margin: 0 0 10px; font-size: 0.9rem; color: var(--text-soft); }
 .news-status:empty { min-height: 0; margin: 0; }
 

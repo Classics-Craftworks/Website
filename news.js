@@ -561,7 +561,7 @@ function renderNewsPage() {
   const buttons = new Map(); // tag key (or '') -> button
   const projectButtons = new Map(); // project id (or '') -> button
   const monthButtons = new Map(); // month key (or '') -> button
-  const sortButtons = new Map(); // 'newest' / 'oldest' -> button
+  const sortButtons = new Map(); // 'newest' / 'oldest' -> menu item
 
   // Search box: same look as the header search.
   const input = el('input', {
@@ -641,13 +641,19 @@ function renderNewsPage() {
       const on = key === '' ? !activeMonths.size : activeMonths.has(key);
       btn.setAttribute('aria-pressed', String(on));
     });
-    sortButtons.forEach((btn, key) => btn.setAttribute('aria-pressed', String(key === sort)));
+    sortButtons.forEach((item, key) => {
+      item.setAttribute('aria-selected', String(key === sort));
+      item.classList.toggle('is-current', key === sort);
+    });
+    sortValues.forEach((node, key) => node.classList.toggle('is-hidden', key !== sort));
     clearBtn.hidden = !query;
 
-    const filtering = active.size > 0 || activeProjects.size > 0 || activeMonths.size > 0 || query.trim() !== '';
+    // Entries on screen (pinned plus the loaded pages) out of every entry.
+    const onScreen = pinnedShown.length + visible.size;
+    countText.replaceChildren('Showing ', el('strong', { text: `${onScreen} of ${entries.length}` }), ` ${entries.length === 1 ? 'entry' : 'entries'}`);
     status.textContent = !shown.length
       ? (query.trim() ? 'Nothing matches your search.' : 'Nothing matches those filters.')
-      : (filtering ? `${shown.length} of ${entries.length} entries match` : '');
+      : '';
     writeHash(active, activeProjects, activeMonths, sort, query, focused);
   }
 
@@ -767,24 +773,76 @@ function renderNewsPage() {
     return box;
   }
 
-  // Sort order: two buttons side by side under the search box.
-  const sortBox = el('div', { class: 'news-sort', attrs: { role: 'group', 'aria-label': 'Sort news' } },
-    [['newest', 'Newest first'], ['oldest', 'Oldest first']].map(([key, label]) => {
-      const btn = el('button', { class: 'news-sort-btn', text: label, attrs: { type: 'button', 'aria-pressed': 'false' } });
-      btn.addEventListener('click', () => { sort = key; refresh(); });
-      sortButtons.set(key, btn);
-      return btn;
-    }));
+  // Toolbar above the entries, level with the search box: "Showing X of Y entries" on the left, sort dropdown on the right.
+  const countText = el('p', { class: 'news-count', attrs: { 'aria-live': 'polite' } });
+  // Custom dropdown, built like the nav's Projects dropdown (same menu panel and items).
+  const SORT_OPTIONS = [['newest', 'Newest first'], ['oldest', 'Oldest first']];
+  const sortMenuId = 'news-sort-menu';
+  // Both labels sit in the same grid cell and only the current one is visible, so the button
+  // is always as wide as the longer label and doesn't resize when the sort changes.
+  const sortValues = new Map(SORT_OPTIONS.map(([key, label]) => [key, el('span', { text: label })]));
+  const sortLabel = el('span', { class: 'news-sort-value' }, [...sortValues.values()]);
+  const sortTrigger = el('button', { class: 'news-sort-trigger', attrs: { type: 'button', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-controls': sortMenuId, 'aria-label': 'Sort news' } }, [
+    sortLabel,
+    el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+  ]);
+  const sortItems = SORT_OPTIONS.map(([key, label]) => {
+    const item = el('button', { class: 'nav-dropdown-item news-sort-item', text: label, attrs: { type: 'button', role: 'option', 'data-sort': key, 'aria-selected': 'false' } });
+    item.addEventListener('click', () => { sort = key; setSortOpen(false, true); refresh(); });
+    sortButtons.set(key, item);
+    return item;
+  });
+  const sortMenu = el('div', { class: 'nav-dropdown-menu news-sort-menu', attrs: { id: sortMenuId, role: 'listbox', 'aria-label': 'Sort news', hidden: '' } }, sortItems);
+  const sortDropdown = el('div', { class: 'nav-dropdown news-sort-dropdown' }, [sortTrigger, sortMenu]);
 
-  // Sidebar is two blocks so narrow screens show search/filters, then the list, then the extras.
-  const tools = el('div', { class: 'news-tools' }, [searchBox, sortBox]);
-  if (projects.length || tagKeys.length > 1 || monthKeys.length > 1) {
-    tools.appendChild(buildFilterDropdown());
+  function setSortOpen(open, refocus) {
+    sortMenu.hidden = !open;
+    sortTrigger.setAttribute('aria-expanded', String(open));
+    sortDropdown.classList.toggle('is-open', open);
+    if (!open && refocus) sortTrigger.focus();
   }
+  sortTrigger.addEventListener('click', () => setSortOpen(sortMenu.hidden));
+  sortTrigger.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowDown') return;
+    e.preventDefault();
+    setSortOpen(true);
+    (sortButtons.get(sort) || sortItems[0]).focus();
+  });
+  sortMenu.addEventListener('keydown', e => {
+    const i = sortItems.indexOf(document.activeElement);
+    let next = -1;
+    if (e.key === 'ArrowDown') next = (i + 1) % sortItems.length;
+    else if (e.key === 'ArrowUp') next = (i - 1 + sortItems.length) % sortItems.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = sortItems.length - 1;
+    else if (e.key === 'Escape') { e.preventDefault(); setSortOpen(false, true); return; }
+    if (next < 0) return;
+    e.preventDefault();
+    sortItems[next].focus();
+  });
+  sortDropdown.addEventListener('focusout', e => {
+    if (!sortDropdown.contains(e.relatedTarget)) setSortOpen(false);
+  });
+  document.addEventListener('pointerdown', e => {
+    if (!sortDropdown.contains(e.target)) setSortOpen(false);
+  });
+
+  const sortBox = el('div', { class: 'news-sort' }, [
+    el('span', { class: 'news-sort-label', text: 'Sort', attrs: { 'aria-hidden': 'true' } }),
+    sortDropdown
+  ]);
+  const toolbar = el('div', { class: 'news-toolbar' }, [countText, sortBox]);
+
+  // Grid items: search and toolbar share the top row, then filters and the entries, then the extras.
+  const filterBox = (projects.length || tagKeys.length > 1 || monthKeys.length > 1) ? buildFilterDropdown() : null;
+  const filters = filterBox ? el('div', { class: 'news-filter-area' }, [filterBox]) : null;
+  const search = el('div', { class: 'news-search-area' }, [searchBox]);
 
   const extras = [renderLatestReleases(side.latestReleases), ...(side.cards || []).map(renderSideCard)].filter(Boolean);
-  const layout = el('div', { class: 'news-layout' + (extras.length ? '' : ' no-extras') }, [
-    tools,
+  const layout = el('div', { class: 'news-layout' + (extras.length ? '' : ' no-extras') + (filters ? '' : ' no-filters') }, [
+    toolbar,
+    search,
+    filters,
     el('div', { class: 'news-feed' }, [status, list, moreBtn]),
     extras.length ? el('aside', { class: 'news-extra', attrs: { 'aria-label': 'More about the news' } }, extras) : null
   ]);
