@@ -459,25 +459,29 @@ function renderLatestReleases(cfg) {
 function renderSideCard(card) {
   if (!card || !card.heading) return null;
 
-  const makeButton = b => b && newsAnchor('news-btn', b.url, [
+  const makeButton = (b, extra) => b && newsAnchor('news-btn' + (extra ? ' ' + extra : ''), b.url, [
     b.icon ? icon(b.icon, 'icon-sm') : null,
     el('span', { text: b.label }),
     el('span', { class: 'news-btn-arrow', attrs: { 'aria-hidden': 'true' } })
   ]);
   const button = makeButton(card.button);
   const button2 = makeButton(card.button2);
+  // Secondary buttons sit side by side in a quieter row under the main ones.
+  const secondary = (card.secondary || []).map(b => makeButton(b, 'news-btn-secondary')).filter(Boolean);
+  const secondaryRow = secondary.length ? el('div', { class: 'news-btn-row' }, secondary) : null;
   const link = card.link && newsAnchor('news-link', card.link.url, [
     el('span', { text: card.link.label }),
     newsArrow()
   ]);
 
   return el('section', { class: 'news-panel news-card' }, [
-    el('div', { class: 'news-card-icon', attrs: { 'aria-hidden': 'true' } }, [icon(card.icon || 'info', 'news-card-glyph')]),
+    card.icon ? el('div', { class: 'news-card-icon', attrs: { 'aria-hidden': 'true' } }, [icon(card.icon, 'news-card-glyph')]) : null,
     el('div', { class: 'news-card-body' }, [
       el('h2', { class: 'news-card-heading', text: card.heading }),
       card.text ? el('p', { class: 'news-card-text', text: card.text }) : null,
       button,
       button2,
+      secondaryRow,
       link
     ])
   ]);

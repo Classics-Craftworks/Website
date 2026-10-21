@@ -82,9 +82,12 @@ const LATEST_UPDATES = {
       {
         heading: "Stay in the loop",
         text: "Follow along for new releases, betas and other updates.",
-        icon: "announcements",
         button: { label: "Join the Discord", url: "https://discord.gg/vZJSDjPcmu", icon: "discord" },
         button2: { label: "Follow on X/Twitter", url: "https://x.com/C36Craftworks", icon: "x" },
+        secondary: [
+          { label: "Modrinth", url: "https://modrinth.com/organization/classics-craftworks", icon: "modrinth" },
+          { label: "GitHub", url: "https://github.com/Classics-Craftworks", icon: "github" },
+        ],
       }
     ]
   },

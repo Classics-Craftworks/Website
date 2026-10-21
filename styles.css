@@ -3442,6 +3442,14 @@ body.has-announcement .back-to-top {
 }
 .news-btn > span:nth-child(2) { flex: 1; }
 .news-btn + .news-btn { margin-top: 4px; }
+.news-btn-row { align-self: stretch; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.news-btn-row .news-btn-secondary { flex: 1 1 0; min-width: max-content; margin-top: 0; }
+.news-btn-secondary {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  background: transparent;
+  border-color: rgba(var(--nav-accent-rgb), 0.2);
+}
 @media (hover: hover) {
   .news-btn:hover { background: rgba(var(--nav-accent-rgb), 0.18); border-color: rgba(var(--nav-accent-rgb), 0.6); }
 }
