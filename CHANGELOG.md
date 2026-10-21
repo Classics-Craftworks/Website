@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.14.0 — 2026-10-21
+
+### Added
+- Multiple news entries can now be pinned at the same time
+
+### Changed
+- Moved the "sort by oldest/newest" button to the left of the search bar and turned it into a dropdown
+- Made filter categories collapsible - tags & months are now collapsed by default
+- Reduced the amount of project filters visible by default from 5 to 4
+- Increased the amount of tag and month filters visibile by default from 3 to 4
+- Rewrote some news page entries
+- Brightened the Snapshot news tag colour
+
 ## v3.13.0.1 — 2026-10-21
 
 ### Changed
