@@ -15,6 +15,8 @@
                  url         where the row links
                  versionUrl  version page; defaults to <Modrinth page>/version/<version>
                A project the entry's `url` points at is picked up automatically.
+     mc        (optional) Minecraft version(s) the entry is for, e.g. "26.4" or
+               ["1.21.11", "26.1"]; adds them to the News page's "Minecraft version" filter
      url       (optional) adds a link button: "https://..." (new tab) or a site page
                like "/data-packs-mods#better-unpackables"
      linkText  (optional) button text; defaults to "Read more"
@@ -92,6 +94,7 @@ const LATEST_UPDATES = {
       title: "Introducing Classic's Tweaks",
       text: "An all-in-one resource pack combining existing tweaks packs and Zisteau Pigmen, with individually toggleable tweaks thanks to Respackopts.",
       tags: ["new"],
+      mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3"],
       image: "images/classics-tweaks.webp",
       projects: ["classics-tweaks"],
       url: "/resource-packs#classics-tweaks",
@@ -110,6 +113,7 @@ const LATEST_UPDATES = {
       title: "Better Unpackables v5.1.0-beta.6",
       text: "In this beta, Packed Ice Bricks can now be turned back into blocks with \"back to block\" recipes.",
       tags: ["beta"],
+      mc: ["26.3", "26.4"],
       image: "images/better-unpackables.webp",
       projects: ["better-unpackables"],
       url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6",
@@ -120,6 +124,7 @@ const LATEST_UPDATES = {
       title: "Classic's Note Block Tweaks v0.5.0",
       text: "Classic's Note Block Tweaks gets a fresh pack icon and support for Java 26.4-snapshot-5 in this alpha release.",
       tags: ["alpha"],
+      mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3"],
       image: "images/note-block-tweaks.webp",
       projects: ["classics-note-block-tweaks"],
       url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0",
@@ -131,6 +136,7 @@ const LATEST_UPDATES = {
       text: "New betas have been released for Java 26.4-snapshot-5.",
       tags: ["snapshot", "beta"],
       image: "images/icons/snapshot.svg",
+      mc: "26.4",
       projects: [
         { id: "better-craftables", version: "v8.1.0-beta.4", text: "Crafting Ice now costs 2 Ice Crystals instead of 4, and the recipe is shapeless." },
         { id: "better-unpackables", version: "v5.1.0-beta.5", text: "Converting Ice into Ice Crystals now gives 2 per Ice instead of 4." }
@@ -142,6 +148,7 @@ const LATEST_UPDATES = {
       title: "Introducing Classic's Note Block Tweaks",
       text: "Our newest resource pack updates Note Blocks to match the new Jukebox textures, and backports them to Java 1.21.9 – 26.3.",
       tags: ["new"],
+      mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3"],
       image: "images/note-block-tweaks.webp",
       projects: ["classics-note-block-tweaks"],
       url: "/resource-packs#classics-note-block-tweaks",
@@ -152,6 +159,7 @@ const LATEST_UPDATES = {
       title: "Better Unpackables v5.1.0-beta.4",
       text: "This beta fixes Cut Sandstone unpacking recipes, which returned 4 Sandstone instead of 1.",
       tags: ["beta"],
+      mc: ["26.3", "26.4"],
       image: "images/better-unpackables.webp",
       projects: ["better-unpackables"],
       url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.4",
@@ -162,6 +170,7 @@ const LATEST_UPDATES = {
       title: "Better Unpackables v5.0.1",
       text: "This patch fixes Cut Sandstone unpacking recipes, which returned 4 Sandstone instead of 1.",
       tags: ["release"],
+      mc: "26.3",
       image: "images/better-unpackables.webp",
       projects: [
         { id: "better-unpackables", version: "v5.0.1" },
@@ -173,6 +182,7 @@ const LATEST_UPDATES = {
       title: "26.4 Snapshot 4",
       text: "Ice-related recipes get another pass. New betas are out for Java 26.4-snapshot-4.",
       tags: ["snapshot", "beta"],
+      mc: "26.4",
       image: "images/icons/snapshot.svg",
       projects: [
         { id: "better-craftables", version: "v8.1.0-beta.3", text: "Adjusted the Icicle and Ice Crystal crafting recipes." },
@@ -184,6 +194,7 @@ const LATEST_UPDATES = {
       title: "26.4 Snapshot 3",
       text: "Ice Balls, Ice Crystals and Icicles arrive in our packs. New betas are out for Java 26.4-snapshot-3.",
       tags: ["snapshot", "beta"],
+      mc: "26.4",
       image: "images/icons/snapshot.svg",
       projects: [
         { id: "better-craftables", version: "v8.1.0-beta.2", text: "Added new 26.4 recipes to craft Ice Balls, Ice Crystals and Icicles into Packed Ice and Ice." },
@@ -195,6 +206,7 @@ const LATEST_UPDATES = {
       title: "26.4 Snapshot 1",
       text: "Our first betas for the 26.4 cycle are out, supporting Java 26.4-snapshot-1.",
       tags: ["snapshot", "beta"],
+      mc: "26.4",
       image: "images/icons/snapshot.svg",
       projects: [
         { id: "better-craftables", version: "v8.1.0-beta.1" },
@@ -206,6 +218,7 @@ const LATEST_UPDATES = {
       title: "Zisteau Pigmen v2.4.1",
       text: "A quick fix for v2.4.0, which accidentally shipped with the old pack icon.",
       tags: ["release"],
+      mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3"],
       image: "images/zisteau-pigmen.webp",
       projects: ["zisteau-pigmen"],
       url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1",
@@ -216,6 +229,7 @@ const LATEST_UPDATES = {
       title: "Zisteau Pigmen v2.4.0",
       text: "Zisteau Pigmen is now updated for Java 26.3.",
       tags: ["release"],
+      mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3"],
       image: "images/zisteau-pigmen.webp",
       projects: ["zisteau-pigmen"],
       url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.0",
@@ -226,6 +240,7 @@ const LATEST_UPDATES = {
       title: "26.3 Mod Updates",
       text: "Our mods are now updated for Java 26.3, with new recipes in Better Craftables and Better Unpackables.",
       tags: ["release"],
+      mc: "26.3",
       image: "images/icons/announcements.svg",
       projects: [
         { id: "better-craftables", version: "v8.0.0+mod", text: "Added redyeing recipes for Concrete Stairs and Slabs, plus a Shelf Mushroom → Brown Dye recipe." },
@@ -238,6 +253,7 @@ const LATEST_UPDATES = {
       title: "26.3 Data Pack Updates",
       text: "Our data packs are now updated for Java 26.3, with new recipes in Better Craftables and Better Unpackables.",
       tags: ["release"],
+      mc: "26.3",
       image: "images/icons/announcements.svg",
       projects: [
         { id: "better-craftables", version: "v8.0.0", text: "Added redyeing recipes for Concrete Stairs and Slabs, plus a Shelf Mushroom → Brown Dye recipe." },
@@ -250,6 +266,7 @@ const LATEST_UPDATES = {
       title: "26.3 Resource Pack Updates",
       text: "Our resource packs are now updated for Java 26.3.",
       tags: ["release"],
+      mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3"],
       image: "images/icons/announcements.svg",
       projects: [
         { id: "classics-disc-tweaks", version: "v3.4.0", text: "Updated for Java 26.3." },

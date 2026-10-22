@@ -65,6 +65,31 @@ function usedTagKeys(entries) {
   return listed.concat([...used].filter(k => !listed.includes(k)));
 }
 
+// An entry's Minecraft versions (`mc`: a string or a list of strings) as trimmed strings.
+function entryMcVersions(entry) {
+  const raw = Array.isArray(entry.mc) ? entry.mc : (entry.mc ? [entry.mc] : []);
+  return raw.map(v => String(v).trim()).filter(Boolean);
+}
+
+// Compares version strings part by part ("26.10" > "26.4" > "1.21.11"); numbers by value.
+function compareMcVersions(a, b) {
+  const pa = a.split('.'), pb = b.split('.');
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const x = pa[i] === undefined ? -1 : pa[i], y = pb[i] === undefined ? -1 : pb[i];
+    const nx = /^\d+$/.test(x), ny = /^\d+$/.test(y);
+    if (nx && ny && +x !== +y) return +x - +y;
+    if (!(nx && ny) && String(x) !== String(y)) return String(x) < String(y) ? -1 : 1;
+  }
+  return 0;
+}
+
+// Minecraft versions used by at least one entry, newest first.
+function usedMcVersions(entries) {
+  const used = new Set();
+  entries.forEach(e => entryMcVersions(e).forEach(v => used.add(v)));
+  return [...used].sort((a, b) => compareMcVersions(b, a));
+}
+
 // Every project on the site, in site order: [{ id, title }]. The News page's
 // project filter lists all of them, even ones with no entries yet.
 function allProjects() {
@@ -373,20 +398,22 @@ function formatMonth(key) {
 }
 
 // Filters and search live in the URL hash so a filtered view can be linked to,
-// e.g. #projects=better-unpackables&tags=release&months=2026-10&sort=oldest&q=snapshot
-function readHash(validTags, validProjects, validMonths) {
+// e.g. #projects=better-unpackables&tags=release&mc=26.4&months=2026-10&sort=oldest&q=snapshot
+function readHash(validTags, validProjects, validMonths, validMc) {
   const params = new URLSearchParams(location.hash.slice(1));
   const tags = (params.get('tags') || '').split(',').filter(k => validTags.includes(k));
   const projects = (params.get('projects') || '').split(',').filter(k => validProjects.includes(k));
   const months = (params.get('months') || '').split(',').filter(k => validMonths.includes(k));
-  return { tags: new Set(tags), projects: new Set(projects), months: new Set(months), sort: params.get('sort') === 'oldest' ? 'oldest' : 'newest', query: params.get('q') || '', entry: params.get('entry') || '' };
+  const mc = (params.get('mc') || '').split(',').filter(k => validMc.includes(k));
+  return { tags: new Set(tags), projects: new Set(projects), months: new Set(months), mc: new Set(mc), sort: params.get('sort') === 'oldest' ? 'oldest' : 'newest', query: params.get('q') || '', entry: params.get('entry') || '' };
 }
 
-function writeHash(active, activeProjects, activeMonths, sort, query, entry) {
+function writeHash(active, activeProjects, activeMonths, activeMc, sort, query, entry) {
   const params = new URLSearchParams();
   if (entry) params.set('entry', entry);
   if (activeProjects.size) params.set('projects', [...activeProjects].join(','));
   if (active.size) params.set('tags', [...active].join(','));
+  if (activeMc.size) params.set('mc', [...activeMc].join(','));
   if (activeMonths.size) params.set('months', [...activeMonths].join(','));
   if (sort === 'oldest') params.set('sort', 'oldest');
   if (query.trim()) params.set('q', query.trim());
@@ -403,6 +430,7 @@ function searchText(entry, projectTitles) {
     formatNewsDate(entry.date),
     entry.date,
     ...(entry.tags || []).map(k => newsTag(k).label),
+    ...entryMcVersions(entry),
     ...projectTitles
   ].filter(Boolean).join(' ').toLowerCase();
 }
@@ -544,10 +572,12 @@ function renderNewsPage() {
   const haystacks = new Map(entries.map(e => [e, searchText(e, entryProjects.get(e).map(id => projectTitle.get(id)))]));
   const tagKeys = usedTagKeys(entries);
   const monthKeys = [...new Set(entries.map(newsMonthKey))]; // newest first
-  const initial = readHash(tagKeys, projectIds, monthKeys);
+  const mcKeys = usedMcVersions(entries); // newest first
+  const initial = readHash(tagKeys, projectIds, monthKeys, mcKeys);
   const active = initial.tags; // empty set = every tag
   const activeProjects = initial.projects; // empty set = every project
   const activeMonths = initial.months; // empty set = every month
+  const activeMc = initial.mc; // empty set = every Minecraft version
   let sort = initial.sort; // 'newest' or 'oldest'; pinned entries stay on top either way
   let query = initial.query;
   let focused = initial.entry; // an entry linked to from elsewhere (#entry=...); cleared on the first filter or search change
@@ -561,6 +591,7 @@ function renderNewsPage() {
   const buttons = new Map(); // tag key (or '') -> button
   const projectButtons = new Map(); // project id (or '') -> button
   const monthButtons = new Map(); // month key (or '') -> button
+  const mcButtons = new Map(); // Minecraft version (or '') -> button
   const sortButtons = new Map(); // 'newest' / 'oldest' -> menu item
 
   // Search box: same look as the header search.
@@ -587,6 +618,7 @@ function renderNewsPage() {
   function matches(entry) {
     if (active.size && !(entry.tags || []).some(t => active.has(t))) return false;
     if (activeProjects.size && !entryProjects.get(entry).some(id => activeProjects.has(id))) return false;
+    if (activeMc.size && !entryMcVersions(entry).some(v => activeMc.has(v))) return false;
     if (activeMonths.size && !activeMonths.has(newsMonthKey(entry))) return false;
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     const hay = haystacks.get(entry);
@@ -637,6 +669,10 @@ function renderNewsPage() {
       const on = id === '' ? !activeProjects.size : activeProjects.has(id);
       btn.setAttribute('aria-pressed', String(on));
     });
+    mcButtons.forEach((btn, key) => {
+      const on = key === '' ? !activeMc.size : activeMc.has(key);
+      btn.setAttribute('aria-pressed', String(on));
+    });
     monthButtons.forEach((btn, key) => {
       const on = key === '' ? !activeMonths.size : activeMonths.has(key);
       btn.setAttribute('aria-pressed', String(on));
@@ -655,7 +691,7 @@ function renderNewsPage() {
     status.textContent = !shown.length
       ? (query.trim() ? 'Nothing matches your search.' : 'Nothing matches those filters.')
       : '';
-    writeHash(active, activeProjects, activeMonths, sort, query, focused);
+    writeHash(active, activeProjects, activeMonths, activeMc, sort, query, focused);
   }
 
   input.addEventListener('input', () => { query = input.value; refresh(); });
@@ -689,6 +725,7 @@ function renderNewsPage() {
   const PROJECTS_VISIBLE = 4;
   const TAGS_VISIBLE = 4;
   const MONTHS_VISIBLE = 4;
+  const MC_VISIBLE = 4;
 
   // A titled group of filter buttons: an "All" button, then the options. The title is a
   // button that collapses the group (`startOpen` sets its default; a group with something
@@ -766,6 +803,15 @@ function renderNewsPage() {
         makeButton('', 'All projects', null, activeProjects, projectButtons, entries.length),
         projects.map(p => makeButton(p.id, p.title, null, activeProjects, projectButtons, projectCount(p.id), p.image)),
         projectIds, activeProjects, panelId
+      ));
+    }
+    if (mcKeys.length) {
+      const mcCount = v => entries.filter(e => entryMcVersions(e).includes(v)).length;
+      groups.push(buildFilterGroup(
+        'Minecraft version', 'versions', MC_VISIBLE, false,
+        makeButton('', 'All versions', null, activeMc, mcButtons, entries.length),
+        mcKeys.map(v => makeButton(v, v, null, activeMc, mcButtons, mcCount(v))),
+        mcKeys, activeMc, panelId
       ));
     }
     if (tagKeys.length > 1) {
@@ -859,7 +905,7 @@ function renderNewsPage() {
   const toolbar = el('div', { class: 'news-toolbar' }, [countText, sortBox]);
 
   // Grid items: search and toolbar share the top row, then filters and the entries, then the extras.
-  const filterBox = (projects.length || tagKeys.length > 1 || monthKeys.length > 1) ? buildFilterDropdown() : null;
+  const filterBox = (projects.length || tagKeys.length > 1 || mcKeys.length || monthKeys.length > 1) ? buildFilterDropdown() : null;
   const filters = filterBox ? el('div', { class: 'news-filter-area' }, [filterBox]) : null;
   const search = el('div', { class: 'news-search-area' }, [searchBox]);
 
