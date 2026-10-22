@@ -206,27 +206,31 @@ function calendarIcon() {
   return node;
 }
 
-// "Today", "3 days ago", "2 weeks ago" while an entry is under a month old; null otherwise.
+// "Today", "Yesterday", "3 days ago", "2 weeks ago" while an entry is under a month old; future
+// dates likewise ("Tomorrow", "In 3 days", "In 2 weeks") up to a month ahead; null otherwise.
 function relativeNewsDate(iso) {
   const d = new Date(iso + 'T00:00:00Z');
   if (isNaN(d)) return null;
 
   const now = new Date();
   const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  const days = Math.round((today - d.getTime()) / 86400000);
-  if (days < 0) return null;
+  const days = Math.round((today - d.getTime()) / 86400000); // negative = in the future
 
-  // One month back from today; a short month clamps (31 Mar -> 28 Feb, not 3 Mar).
+  // The date one month from today in the entry's direction; a short month clamps
+  // (31 Mar - 1 month = 28 Feb, not 3 Mar).
+  const shift = days < 0 ? 1 : -1;
   const limit = new Date(today);
   const day = limit.getUTCDate();
   limit.setUTCDate(1);
-  limit.setUTCMonth(limit.getUTCMonth() - 1);
+  limit.setUTCMonth(limit.getUTCMonth() + shift);
   limit.setUTCDate(Math.min(day, new Date(Date.UTC(limit.getUTCFullYear(), limit.getUTCMonth() + 1, 0)).getUTCDate()));
-  if (d.getTime() <= limit.getTime()) return null;
+  if (days < 0 ? d.getTime() >= limit.getTime() : d.getTime() <= limit.getTime()) return null;
 
   const words = new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' });
   const counts = new Intl.RelativeTimeFormat('en-GB', { numeric: 'always' });
-  return capitalise(days < 7 ? words.format(-days, 'day') : counts.format(-Math.floor(days / 7), 'week'));
+  const n = Math.abs(days);
+  const sign = days < 0 ? 1 : -1;
+  return capitalise(n < 7 ? words.format(sign * n, 'day') : counts.format(sign * Math.floor(n / 7), 'week'));
 }
 
 // Date with calendar icon. Recent entries show a relative date with the full date as a tooltip.
@@ -773,7 +777,7 @@ function renderNewsPage() {
   const PROJECTS_VISIBLE = 4;
   const TAGS_VISIBLE = 4;
   const MONTHS_VISIBLE = 4;
-  const MC_VISIBLE = 4;
+  const MC_VISIBLE = 6;
 
   // A titled group of filter buttons: an "All" button, then the options. The title is a
   // button that collapses the group (`startOpen` sets its default; a group with something
