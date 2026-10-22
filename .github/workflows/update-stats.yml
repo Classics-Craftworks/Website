@@ -18,18 +18,18 @@ jobs:
         with:
           node-version: 24
 
-      - name: Fetch download counts, bump version and update changelog
+      - name: Fetch download counts, bump version, update changelog and sitemap
         run: node .github/scripts/update-stats.mjs
 
       - name: Commit changes
         run: |
-          if git diff --quiet -- stats.js data.js CHANGELOG.md; then
+          if git diff --quiet -- stats.js data.js CHANGELOG.md sitemap.xml; then
             echo "No changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           VERSION=$(grep -oP 'label:\s*"\Kv[^"]+' data.js | head -1)
-          git add stats.js data.js CHANGELOG.md
+          git add stats.js data.js CHANGELOG.md sitemap.xml
           git commit -m "$VERSION: Update download stats"
           git push

@@ -1,7 +1,7 @@
 // Updates the "Downloads" stat in stats.js from Modrinth + SpigotMC (via Spiget).
 // When the stat changes, it also bumps the hotfix number of the site version in
 // data.js (v3.7.5 -> v3.7.5.1, v3.7.5.1 -> v3.7.5.2, ...) and adds a matching
-// entry to CHANGELOG.md.
+// entry to CHANGELOG.md, and sets the home page's <lastmod> in sitemap.xml to today.
 //
 // Projects are read from data.js, so new projects are picked up automatically:
 //   - Modrinth: every modrinth.com/<type>/<slug> link, except servers,
@@ -22,6 +22,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const DATA_FILE = resolve(ROOT, 'data.js');
 const STATS_FILE = resolve(ROOT, 'stats.js');
 const CHANGELOG_FILE = resolve(ROOT, 'CHANGELOG.md');
+const SITEMAP_FILE = resolve(ROOT, 'sitemap.xml');
 
 const EXCLUDE_SLUGS = new Set(['crafthorizon']);
 const IGNORED_MODRINTH_TYPES = new Set(['server', 'organization', 'user', 'collection']);
@@ -144,6 +145,16 @@ function addChangelogEntry(changelog, version) {
   return changelog.slice(0, released.index) + entry + changelog.slice(released.index);
 }
 
+// ---------- sitemap.xml ----------
+
+// Sets <lastmod> of the home page entry (the <loc> ending in "/" right after the host).
+const SITEMAP_HOME_RE = /(<loc>https?:\/\/[^/<]+\/<\/loc>\s*<lastmod>)([^<]*)(<\/lastmod>)/;
+
+function updateSitemap(sitemap) {
+  if (!SITEMAP_HOME_RE.test(sitemap)) throw new Error('Could not find the home page <lastmod> in sitemap.xml');
+  return sitemap.replace(SITEMAP_HOME_RE, `$1${isoToday()}$3`);
+}
+
 // ---------- main ----------
 
 const { modrinth, spigot } = collectProjects(loadSiteData());
@@ -181,6 +192,8 @@ const oldVersion = versionMatch[2];
 const newVersion = bumpHotfix(oldVersion);
 const newChangelog = addChangelogEntry(readFileSync(CHANGELOG_FILE, 'utf8'), newVersion);
 console.log(`Version: ${oldVersion} -> ${newVersion}`);
+const newSitemap = updateSitemap(readFileSync(SITEMAP_FILE, 'utf8'));
+console.log(`Sitemap: home page lastmod -> ${isoToday()}`);
 
 if (DRY_RUN) {
   console.log('Dry run; no files modified.');
@@ -192,4 +205,5 @@ updated = updated.replace(UPDATED_RE, `$1${today()}$3`);
 writeFileSync(STATS_FILE, updated);
 writeFileSync(DATA_FILE, dataSource.replace(VERSION_RE, `$1${newVersion}$3`));
 writeFileSync(CHANGELOG_FILE, newChangelog);
-console.log('stats.js, data.js and CHANGELOG.md updated.');
+writeFileSync(SITEMAP_FILE, newSitemap);
+console.log('stats.js, data.js, CHANGELOG.md and sitemap.xml updated.');
