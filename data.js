@@ -207,7 +207,7 @@ const SITE_DATA = {
               badge: "new",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v3.0.0-b.1", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.1" }
+                { label: "Resource Pack", icon: "brush", version: "v3.0.0-beta.1", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.1" }
               ]
             },
             {

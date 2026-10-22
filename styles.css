@@ -1977,6 +1977,11 @@ p { margin: 0; }
     padding: 8px;
     justify-content: center;
   }
+  /* "View" gives up width, down to 84px, only when a long version pill needs the room. */
+  .project.has-channels .download-btn {
+    flex: 0 1 124px;
+    min-width: 84px;
+  }
 
   /* The tooltip opens leftwards from the button's right edge so it isn't
      clipped at the page edge. */
