@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.15.0 — 2026-10-22
+
+### Added
+- Minecraft version filters on the news page
+- Notification dots to entries added since the user's last visit
+
+### Changed
+- Moved news entry tags back to the top row, and expanded the width for text
+- Dates on news entries that are in the future now show as "Tomorrow" or "In 3 days" instead of the full date
+
+### Fixed
+- Fixed "View" button overflowing its box when a version string is too long - it now narrows slightly to make room
+
 ## v3.14.0.1 — 2026-10-21
 
 ### Added

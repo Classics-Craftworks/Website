@@ -25,11 +25,12 @@ The website currently features:
 
 ### Resource Packs
 
-- [Classic's Disc Tweaks](https://modrinth.com/resourcepack/classics-disc-tweaks)
-- [Classic's Dye Tweaks](https://modrinth.com/resourcepack/classics-dye-tweaks)
-- [Classic's Lantern Tweaks](https://modrinth.com/resourcepack/classics-lantern-tweaks)
+- [Classic's Tweaks](https://modrinth.com/resourcepack/classics-tweaks)
+- [Classic's Disc Tweaks](https://modrinth.com/resourcepack/classics-disc-tweaks) (archived)
+- [Classic's Dye Tweaks](https://modrinth.com/resourcepack/classics-dye-tweaks) (archived)
+- [Classic's Lantern Tweaks](https://modrinth.com/resourcepack/classics-lantern-tweaks) (archived)
 - [Classic's Note Block Tweaks](https://modrinth.com/resourcepack/classics-note-block-tweaks)
-- [Zisteau Pigmen](https://modrinth.com/resourcepack/zisteau-pigmen) (limited support)
+- [Zisteau Pigmen](https://modrinth.com/resourcepack/zisteau-pigmen) (archived)
 
 ### Other Projects
 
