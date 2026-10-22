@@ -3358,12 +3358,28 @@ body.has-announcement .back-to-top {
 .news-item-body .news-link { margin-top: 0; }
 .news-item-body .news-title { margin: 0; }
 .news-item-body .news-text { margin: 0; }
-/* Tags: right-hand column, right-aligned. */
+/* Tags: right-hand column, side by side and right-aligned. */
 .news-item-tags {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: flex-start;
   gap: 6px;
+}
+
+/* Desktop: the entry's text rows are laid out directly on the entry's grid, so the tags only
+   take up space beside the date and title, and the description/projects/link use the full width below them. */
+@media (min-width: 601px) {
+  .news-item-detailed { row-gap: 5px; }
+  .news-item-detailed .news-item-body { display: contents; }
+  .news-item-detailed .news-item-media { grid-column: 1; grid-row: 1 / span 3; }
+  .news-item-detailed .news-meta { grid-column: 2; grid-row: 1; justify-self: start; }
+  .news-item-detailed .news-item-tags { grid-column: 3; grid-row: 1 / span 2; }
+  .news-item-detailed .news-title { grid-column: 2; grid-row: 2; }
+  .news-item-detailed .news-text,
+  .news-item-detailed .news-projects { grid-column: 2 / -1; }
+  .news-item-detailed .news-item-body .news-link { grid-column: 2 / -1; justify-self: start; }
 }
 
 /* Pinned entry: outlined in the accent colour (its "Pinned" heading is a news-group-head). */
