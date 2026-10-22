@@ -2934,6 +2934,35 @@ body.has-announcement .back-to-top {
 /* z-index lifts it above a clickable entry's stretched "Read more" link, which would otherwise
    swallow the hover (so a click on the date itself doesn't follow the entry's link). */
 .news-when[data-tooltip] { position: relative; z-index: 1; cursor: default; }
+/* "New since your last visit" dot in front of the title; same yellow as the other notification dots.
+   z-index as for .news-when[data-tooltip]. */
+.news-new-dot {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 8px;
+  vertical-align: 0.1em;
+  border-radius: 50%;
+  background: var(--badge-color);
+  cursor: default;
+}
+/* Tooltip in the same yellow tint as the nav's notification dots. */
+.news-new-dot[data-tooltip]::after,
+.news-new-dot[data-tooltip]:hover::after {
+  background: color-mix(in srgb, var(--bg), rgb(var(--badge-color-rgb)) 15%);
+  border-color: color-mix(in srgb, var(--badge-color), black 25%);
+  color: color-mix(in srgb, var(--text), rgb(var(--badge-color-rgb)) 5%);
+}
+/* Opens rightwards from the dot, so it can't run off the left edge of the page. */
+.news-new-dot[data-tooltip]::after {
+  left: -4px;
+  transform: translateY(calc(-4px * var(--tt-flip, 1)));
+}
+.news-new-dot[data-tooltip]:hover::after {
+  transform: translateY(calc(-10px * var(--tt-flip, 1)));
+}
 .news-title { font-size: 1.15rem; line-height: 1.3; color: var(--text); }
 .news-text { color: var(--text-soft); }
 

@@ -22,6 +22,53 @@ function newsEntryId(entry) {
   return slugify(entry.date + ' ' + entry.title);
 }
 
+/* ---------- "New since your last visit" ---------- */
+/* The News page remembers which entries the visitor has seen (in localStorage). Entries
+   added since then get a dot. The list from the previous visit is kept for the rest of the
+   browser session, so reloading the page or going back to it doesn't clear the dots; they
+   go on the next visit. A first-ever visit marks nothing as new. */
+
+const NEWS_SEEN_KEY = 'news-seen';
+const NEWS_BASELINE_KEY = 'news-seen-baseline';
+
+function parseIdList(text) {
+  try {
+    const list = JSON.parse(text);
+    return Array.isArray(list) ? list : null;
+  } catch { return null; }
+}
+
+let newsBaselineCache; // Set of entry ids that were already seen, or null if unknown
+
+// Entry ids the visitor had seen before this visit; null when there's no way to tell.
+function newsBaseline() {
+  if (newsBaselineCache !== undefined) return newsBaselineCache;
+  let list = null;
+  try { list = parseIdList(sessionStorage.getItem(NEWS_BASELINE_KEY)); } catch { /* session storage unavailable */ }
+  if (!list) {
+    list = parseIdList(storageGet(NEWS_SEEN_KEY));
+    if (list) { try { sessionStorage.setItem(NEWS_BASELINE_KEY, JSON.stringify(list)); } catch { /* ignore */ } }
+  }
+  newsBaselineCache = list ? new Set(list) : null;
+  return newsBaselineCache;
+}
+
+function isNewEntry(entry) {
+  const seen = newsBaseline();
+  return !!seen && !seen.has(newsEntryId(entry));
+}
+
+// Called on the News page: everything listed now counts as seen from the next visit on.
+function markNewsSeen(entries) {
+  newsBaseline(); // fix this visit's baseline before the saved list changes
+  storageSet(NEWS_SEEN_KEY, JSON.stringify(entries.map(newsEntryId)));
+}
+
+// Small dot with a tooltip, shown in front of the title of a new entry.
+function newDot() {
+  return el('span', { class: 'news-new-dot', attrs: { 'data-tooltip': 'New since your last visit', role: 'img', 'aria-label': 'New since your last visit' } });
+}
+
 function formatNewsDate(iso) {
   const d = new Date(iso + 'T00:00:00Z');
   if (isNaN(d)) return iso;
@@ -327,6 +374,7 @@ function renderNewsItem(entry, opts = {}) {
     return pill;
   });
   // News page: tags sit beside the entry; home page: beside the date.
+  const dot = isNewEntry(entry) ? newDot() : null;
   const head = el('div', { class: 'news-meta' }, opts.detailed ? [newsDate(entry)] : [...pills, newsDate(entry)]);
   // Home page: "View full update" links to the entry on the News page. News page: the entry's own url.
   const page = !opts.detailed && (SITE_DATA.pages || []).find(p => p.url === 'news');
@@ -339,7 +387,7 @@ function renderNewsItem(entry, opts = {}) {
 
   const body = [
     head,
-    el('h3', { class: 'news-title', text: entry.title }),
+    el('h3', { class: 'news-title' }, [dot, el('span', { text: entry.title })]),
     entry.text ? el('p', { class: 'news-text', text: fillPlaceholders(entry.text) }) : null,
     opts.detailed ? renderEntryProjects(entry) : null,
     link
@@ -936,6 +984,7 @@ if (document.getElementById('news-page')) {
   renderSiteHeader(SITE_DATA.pages || [], 'news');
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderNewsPage();
+  markNewsSeen(newsEntries());
   initBackToTop();
 }
 
