@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.16.0.1 — 2026-10-23
+
+### Changed
+- Updated playtime stats
+
 ## v3.16.0 — 2026-10-23
 
 ### Added
