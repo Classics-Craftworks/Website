@@ -152,9 +152,9 @@ function findProject(title, sections, pages) {
   return null;
 }
 
-// Right-hand card of the splash. `imageSrc` is its own banner picture, not
-// the project's icon.
-function renderFeaturedCard({ project, url }, imageSrc) {
+// One slide of the featured carousel. `imageSrc` is its own banner picture,
+// not the project's icon.
+function renderFeaturedSlide({ project, url }, imageSrc) {
   const stable = stableChannel(project);
   const downloads = ((stable && stable.downloads) || []).filter(d => !d.disabled);
 
@@ -165,8 +165,7 @@ function renderFeaturedCard({ project, url }, imageSrc) {
     el('li', { class: 'splash-chip' }, [icon(d.icon, 'icon-sm'), el('span', { text: d.label })])
   );
 
-  return [
-    el('p', { class: 'splash-featured-label', text: 'Featured project' }),
+  return el('div', { class: 'splash-featured-slide' }, [
     imageSrc ? el('div', { class: 'splash-featured-media' }, [
       el('img', { class: 'splash-featured-img', src: imageSrc, alt: '', attrs: { draggable: 'false', width: '1000', height: '400' } })
     ]) : null,
@@ -181,7 +180,109 @@ function renderFeaturedCard({ project, url }, imageSrc) {
         el('span', { class: 'splash-btn-arrow', attrs: { 'aria-hidden': 'true' } })
       ])
     ])
-  ];
+  ]);
+}
+
+// Normalises `featured` / `featuredImage` into [{ title, image }]. Accepts a
+// single title (old format), or an array of titles or { title, image } objects.
+function featuredEntries(splash) {
+  const list = Array.isArray(splash.featured) ? splash.featured : (splash.featured ? [splash.featured] : []);
+  return list
+    .map((f, i) => typeof f === 'string'
+      ? { title: f, image: i === 0 && !Array.isArray(splash.featured) ? splash.featuredImage : null }
+      : { title: f.title, image: f.image })
+    .filter(f => f.title);
+}
+
+const FEATURED_INTERVAL_MS = 6000;
+
+// Cycles the slides: auto-advances, pauses on hover/focus/hidden tab (and never
+// auto-advances with reduced motion), with dots, arrows and swipe.
+function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn) {
+  const dots = [...dotsWrap.children];
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let index = 0;
+  let timer = null;
+  let paused = false;
+
+  function show(i) {
+    index = (i + slides.length) % slides.length;
+    slides.forEach((slide, n) => {
+      const on = n === index;
+      slide.classList.toggle('is-active', on);
+      slide.inert = !on;
+      slide.setAttribute('aria-hidden', on ? 'false' : 'true');
+      dots[n].setAttribute('aria-current', on ? 'true' : 'false');
+    });
+  }
+
+  function stop() { clearInterval(timer); timer = null; }
+  function start() {
+    stop();
+    if (paused || reduced.matches || document.hidden) return;
+    timer = setInterval(() => show(index + 1), FEATURED_INTERVAL_MS);
+  }
+  function go(i) { show(i); start(); }
+
+  dots.forEach((d, n) => d.addEventListener('click', () => go(n)));
+  prevBtn.addEventListener('click', () => go(index - 1));
+  nextBtn.addEventListener('click', () => go(index + 1));
+
+  card.addEventListener('mouseenter', () => { paused = true; stop(); });
+  card.addEventListener('mouseleave', () => { paused = false; start(); });
+  card.addEventListener('focusin', () => { paused = true; stop(); });
+  card.addEventListener('focusout', () => { paused = false; start(); });
+  document.addEventListener('visibilitychange', start);
+  reduced.addEventListener('change', start);
+
+  card.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') { go(index - 1); e.preventDefault(); }
+    else if (e.key === 'ArrowRight') { go(index + 1); e.preventDefault(); }
+  });
+
+  // Horizontal swipe on touch screens; vertical scrolling is left alone.
+  let startX = null, startY = null;
+  card.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }, { passive: true });
+  card.addEventListener('touchend', e => {
+    if (startX === null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    startX = startY = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) go(index + (dx < 0 ? 1 : -1));
+  }, { passive: true });
+
+  show(0);
+  start();
+}
+
+function renderFeatured(card, entries) {
+  const multiple = entries.length > 1;
+  const slidesWrap = el('div', { class: 'splash-featured-slides' }, entries.map(e => renderFeaturedSlide(e.found, e.image)));
+  const slides = [...slidesWrap.children];
+
+  const label = el('p', { class: 'splash-featured-label', text: multiple ? 'Featured projects' : 'Featured project' });
+  if (!multiple) {
+    card.append(label, slidesWrap);
+    return;
+  }
+
+  const arrow = (dir, text) => el('button', {
+    class: 'splash-featured-arrow splash-featured-arrow-' + dir,
+    attrs: { type: 'button', 'aria-label': text }
+  });
+  const prev = arrow('prev', 'Previous featured project');
+  const next = arrow('next', 'Next featured project');
+  const dotsWrap = el('div', { class: 'splash-featured-dots' }, entries.map((e, n) => el('button', {
+    class: 'splash-featured-dot',
+    attrs: { type: 'button', 'aria-label': 'Show featured project ' + (n + 1) + ': ' + e.found.project.title }
+  })));
+
+  card.setAttribute('aria-roledescription', 'carousel');
+  card.append(
+    el('div', { class: 'splash-featured-top' }, [label, el('div', { class: 'splash-featured-nav' }, [prev, dotsWrap, next])]),
+    slidesWrap
+  );
+  initFeaturedCarousel(card, slides, dotsWrap, prev, next);
 }
 
 // Fills the splash from SITE_DATA.home.splash; stays hidden without one.
@@ -211,10 +312,12 @@ function renderSplash(home, sections, pages) {
   }
 
   // Without a featured project the text takes the full width.
-  const found = splash.featured && findProject(splash.featured, sections, pages);
+  const entries = featuredEntries(splash)
+    .map(f => ({ found: findProject(f.title, sections, pages), image: f.image }))
+    .filter(f => f.found);
   const card = document.getElementById('splash-featured');
-  if (found) {
-    renderFeaturedCard(found, splash.featuredImage).forEach(n => n && card.appendChild(n));
+  if (entries.length) {
+    renderFeatured(card, entries);
   } else {
     card.remove();
     wrap.classList.add('splash-no-card');

@@ -26,8 +26,10 @@ const SITE_DATA = {
     splash: {
       headline: ["SOMETIMES USEFUL.", "ALWAYS MINECRAFT."],
       subtitle: "Minecraft Java Edition data packs, mods & resource packs by Classic's Craftworks",
-      featured: "Better Craftables",
-      featuredImage: "images/featured-banner.webp"
+      featured: [
+        { title: "Classic's Tweaks", image: "images/featured-CT.webp" },
+        { title: "Better Craftables", image: "images/featured-BC.webp" },
+      ]
     },
 
     projectsHeading: "Projects",

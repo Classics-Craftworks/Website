@@ -1071,6 +1071,77 @@ p { margin: 0; }
   .splash-featured-foot .splash-btn { padding: 8px 14px; font-size: 0.82rem; }
 }
 
+/* Featured carousel. Slides share one grid cell so the panel is as tall as the tallest slide and
+   nothing jumps when it cycles. */
+.splash-featured-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 20px;
+}
+.splash-featured-top .splash-featured-label { margin: 0; }
+.splash-featured-nav { display: flex; align-items: center; gap: 6px; }
+.splash-featured-dots { display: flex; align-items: center; }
+.splash-featured-dot,
+.splash-featured-arrow {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+.splash-featured-dot::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(var(--nav-accent-rgb), 0.35);
+  transition: width 0.25s ease, background-color 0.25s ease;
+}
+.splash-featured-dot[aria-current="true"]::before { width: 20px; background: var(--accent); }
+.splash-featured-dot:hover::before { background: var(--accent); }
+.splash-featured-arrow::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border: solid currentColor;
+  border-width: 2px 2px 0 0;
+}
+.splash-featured-arrow-prev::before { transform: translateX(2px) rotate(-135deg); }
+.splash-featured-arrow-next::before { transform: translateX(-2px) rotate(45deg); }
+.splash-featured-arrow:hover { color: var(--accent); }
+.splash-featured-dot:focus-visible,
+.splash-featured-arrow:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-radius: 6px; }
+.splash-featured-slides { display: grid; }
+.splash-featured-slide {
+  grid-area: 1 / 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* Top-aligned so the image sits in the same place whatever the description's length;
+     the description takes the spare height, which keeps the footer row level too. */
+  justify-content: flex-start;
+  opacity: 0;
+  visibility: hidden;
+}
+.splash-featured-slide .splash-featured-desc { flex: 1 0 auto; }
+.splash-featured-slide.is-active { opacity: 1; visibility: visible; }
+@media (prefers-reduced-motion: no-preference) {
+  /* Outgoing slide fades out first, then the incoming one fades in, so the text never overlaps. */
+  .splash-featured-slide { transition: opacity 0.2s ease, visibility 0s linear 0.2s; }
+  .splash-featured-slide.is-active { transition: opacity 0.3s ease 0.2s, visibility 0s linear 0.2s; }
+}
+/* Single project: no wrapper changes needed. */
+.splash-featured-slides > .splash-featured-slide:only-child { opacity: 1; visibility: visible; }
+@media (max-width: 900px) {
+  .splash-featured-top { margin: 0 0 10px; }
+}
+
 /* Footer row: pills and button never wrap their text; the row tightens as the card narrows (phones
    around 375px wide), and stacks with a full-width button only in the narrowest cards. */
 .splash-featured-foot .splash-chip,
