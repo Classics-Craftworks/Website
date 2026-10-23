@@ -18,7 +18,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v3.15.0",
+    label: "v3.15.0.1",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -204,10 +204,10 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              badge: "new",
+              badge: "updated",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v3.0.0-beta.1", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.1" }
+                { label: "Resource Pack", icon: "brush", version: "v3.0.0-beta.2", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.2" }
               ]
             },
             {

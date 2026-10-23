@@ -55,11 +55,11 @@ const LATEST_UPDATES = {
     latestReleases: {
       heading: "Latest releases",
       releases: [
+        { project: "Classic's Tweaks", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.2", version: "v3.0.0-beta.2", channel: "beta", date: "2026-10-23" },
         { project: "Classic's Tweaks", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.1", version: "v3.0.0-beta.1", channel: "beta", date: "2026-10-21" },
         { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6", version: "v5.1.0-beta.6", channel: "beta", date: "2026-10-20" },
         { project: "Classic's Note Block Tweaks", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0", version: "v0.5.0", channel: "alpha", date: "2026-10-20" },
         { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.5", version: "v5.1.0-beta.5", channel: "beta", date: "2026-10-20" },
-        { project: "Better Craftables", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.4", version: "v8.1.0-beta.4", channel: "beta", date: "2026-10-20" },
       ]
     },
 
@@ -88,6 +88,17 @@ const LATEST_UPDATES = {
   },
 
   entries: [
+    {
+      date: "2026-10-23",
+      title: "Classic's Tweaks v3.0.0-beta.2",
+      text: "Improvements for Zisteau Pigmen, Lantern Tweaks & a new tweak: Zombified Piglin Fix.",
+      tags: ["beta"],
+      mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3"],
+      image: "images/classics-tweaks.webp",
+      projects: ["classics-tweaks"],
+      url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.2",
+      linkText: "View update on Modrinth"
+    },
     {
       announce: true,
       date: "2026-10-21",
