@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.16.0 — 2026-10-23
+
+### Added
+- Support for multiple featured projects on the home page, cycles through them on a 6-second interval
+
 ## v3.15.1 — 2026-10-23
 
 ### Changed
