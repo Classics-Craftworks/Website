@@ -777,7 +777,7 @@ function renderNewsPage() {
   const PROJECTS_VISIBLE = 4;
   const TAGS_VISIBLE = 4;
   const MONTHS_VISIBLE = 4;
-  const MC_VISIBLE = 6;
+  const MC_VISIBLE = 4;
 
   // A titled group of filter buttons: an "All" button, then the options. The title is a
   // button that collapses the group (`startOpen` sets its default; a group with something
