@@ -91,7 +91,7 @@ const LATEST_UPDATES = {
     {
       date: "2026-10-23",
       title: "Classic's Tweaks v3.0.0-beta.2",
-      text: "Improvements for Zisteau Pigmen, Lantern Tweaks & a new tweak: Zombified Piglin Fix.",
+      text: "This update adds a new Zombified Piglin Fix tweak and improves upon Zisteau Pigmen and Lantern Tweaks, while also fixing Respackopts config screen issues.",
       tags: ["beta"],
       mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3"],
       image: "images/classics-tweaks.webp",
@@ -154,7 +154,6 @@ const LATEST_UPDATES = {
       ]
     },
     {
-      pinned: true,
       date: "2026-10-20",
       title: "Introducing Classic's Note Block Tweaks",
       text: "Our newest resource pack updates Note Blocks to match the new Jukebox textures, and backports them to Java 1.21.9 – 26.3.",
