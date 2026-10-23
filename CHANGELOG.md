@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.15.1 — 2026-10-23
+
+### Changed
+- Reduced Minecraft versions visible in the filters card by default from 6 to 4
+- Updated news entry text for Classic's Tweaks v3.0.0-beta.2
+- Unpinned "Introducing Classic's Note Block Tweaks" announcement
+
+### Fixed
+- Fixed the history icon showing through tooltips
+- Fixed the "Older versions" links sitting far to the right of projects with a single download box. They now sit directly under the box.
+
 ## v3.15.0.1 — 2026-10-23
 
 ### Changed
