@@ -1937,6 +1937,13 @@ p { margin: 0; }
     margin-left: 10px;
   }
 
+  /* A lone channel box is only half the row wide, so the note is limited to the
+     box's width and sits under its right edge instead of at the far page edge. */
+  .project.has-channels:not(:has(.channel-group + .channel-group)) .versions-note {
+    max-width: calc(50% - 6px);
+    margin-top: 8px;
+  }
+
   /* Download rows: type + version on the left, button on the right. Rows share
      the box height so the gap is equal above, between and below the buttons
      (the box's bottom padding and the header's bottom margin are dropped). */
