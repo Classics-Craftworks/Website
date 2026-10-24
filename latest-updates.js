@@ -81,7 +81,7 @@ const LATEST_UPDATES = {
     release: { label: "Release", color: "#22C55E" },
     beta: { label: "Beta", color: "#FF9D47" },
     alpha: { label: "Alpha", color: "#F2607E" },
-    unsupported: { label: "Unsupported", color: "#929292" },
+    archived: { label: "Archived", color: "#929292" },
     new: { label: "New Project", color: "#EFDD65" },
     snapshot: { label: "Snapshot", color: "#85C8E4" }
   },
@@ -115,7 +115,7 @@ const LATEST_UPDATES = {
       date: "2026-10-21",
       title: "Standalone Tweaks Packs archived",
       text: "Classic's Disc, Dye & Lantern Tweaks and Zisteau Pigmen have merged into Classic's Tweaks and will no longer receive updates. Classic's Note Block Tweaks will be archived after v1.0.0.",
-      tags: ["news", "unsupported"],
+      tags: ["news", "archived"],
       projects: ["classics-disc-tweaks", "classics-dye-tweaks", "classics-lantern-tweaks", "zisteau-pigmen"],
     },
     {
