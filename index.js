@@ -186,7 +186,7 @@ function featuredEntries(splash) {
     .filter(f => f.title);
 }
 
-const FEATURED_INTERVAL_MS = 6000;
+const FEATURED_INTERVAL_MS = 8000;
 
 // Auto-advancing slides (paused on hover/focus/hidden tab, never with reduced motion), plus dots, arrows and swipe.
 function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn) {
