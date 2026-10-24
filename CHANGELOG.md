@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.16.1 — 2026-10-25
+
+### Added
+- Icons to news entries on the home page
+
+### Changed
+- Increased time between featured project rotations from 6 seconds to 8 seconds
+- Changed "Unsupported" tag to "Archived"
+
 ## v3.16.0.2 — 2026-10-24
 
 ### Changed
