@@ -1,7 +1,6 @@
-/* LATEST UPDATES - the news feed on the home page (newest few) and the News page
-   (everything, with search and filters). Rendered by news.js.
+/* LATEST UPDATES - the news feed (home page preview and News page), rendered by news.js.
 
-   Entries (`entries`, any order; newest `date` shows first):
+   Entries (`entries`, any order; newest `date` first):
      date      "YYYY-MM-DD"
      title     headline
      text      one or two sentences (optional)

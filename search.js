@@ -1,9 +1,7 @@
-/* Header search: matches projects by title, description, section and version,
-   and links to each project's own card. Must load after the page's own script
-   so #site-menu exists. */
+/* Header search over project title, description, section and version. Must load after
+   the page's own script so #site-menu exists. */
 
-// Flat list of searchable projects. Each url uses the same #id the project
-// gets on its own page, so links land on the right card.
+// Flat list of searchable projects; each url ends in the project's own #id.
 function buildSearchIndex(data) {
   const pages = data.pages || [];
   const entries = [];
@@ -13,12 +11,10 @@ function buildSearchIndex(data) {
     if (!page) return;
 
     sectionIds(section).projects.forEach(({ project, id }) => {
-
       const versions = [];
       (project.channels || []).forEach(ch => {
         if (ch.mcVersion) versions.push({ text: ch.mcVersion, label: 'Java ' + ch.mcVersion });
         (ch.downloads || []).forEach(d => {
-          // Unavailable downloads show "N/A" on the page.
           if (d.version && d.url && !d.disabled) versions.push({ text: d.version, label: d.version });
         });
       });
@@ -52,8 +48,7 @@ function scoreSearchWord(entry, word) {
   return 0;
 }
 
-// Every word must match something ("disc 3.4" only finds Disc Tweaks).
-// Best first; ties keep data.js order.
+// Every word must match something; best first, ties keep data.js order.
 function searchProjects(entries, query) {
   const words = [...new Set(query.toLowerCase().split(/\s+/).filter(Boolean))];
   const results = [];
@@ -85,7 +80,7 @@ function highlightMatches(text, words) {
     return frag;
   }
 
-  // Splitting on a capture group puts matches at the odd indexes.
+  // Splitting on a capture group puts matches at odd indexes.
   text.split(new RegExp(`(${pattern})`, 'gi')).forEach((part, i) => {
     if (!part) return;
     frag.appendChild(i % 2
@@ -136,7 +131,6 @@ function initSearch() {
   const list = el('div', { class: 'search-results', attrs: { id: listboxId, role: 'listbox', 'aria-label': 'Search results' } });
   const empty = el('p', { class: 'search-empty', attrs: { hidden: '' } });
   const panel = el('div', { class: 'search-panel', attrs: { hidden: '' } }, [list, empty]);
-  // Announces the result count to screen readers.
   const status = el('p', { class: 'visually-hidden', attrs: { role: 'status', 'aria-live': 'polite' } });
 
   const wrap = el('div', { class: 'nav-search', attrs: { role: 'search' } }, [
@@ -177,8 +171,7 @@ function initSearch() {
     input.setAttribute('aria-expanded', 'true');
   }
 
-  // On the current page, scroll directly (the hash may not change); otherwise
-  // let the link navigate.
+  // On the current page, scroll directly (the hash may not change); otherwise let the link navigate.
   function onResultClick(e) {
     const url = new URL(e.currentTarget.href);
     const samePage = normalizePath(url.pathname) === normalizePath(location.pathname);
@@ -297,8 +290,7 @@ function initSearch() {
     input.select();
   });
 
-  // Keeps focus in the input; otherwise Safari closes the panel on mousedown,
-  // before the click lands.
+  // Keeps focus in the input, else Safari closes the panel on mousedown before the click lands.
   panel.addEventListener('mousedown', e => e.preventDefault());
 
   wrap.addEventListener('focusout', e => {

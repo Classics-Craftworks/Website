@@ -1,12 +1,10 @@
 /* Shared by every page: helpers plus the header, footer and project-card
-   builders, all driven by SITE_DATA (data.js). A section page opts in via
-   <body data-page="..."> (see initSectionPage at the bottom). */
+   builders, driven by SITE_DATA (data.js). Section pages opt in via <body data-page="...">. */
 
 /* ---------- Helpers ---------- */
 
-// Site-relative paths ("about", "images/x.webp") become root-absolute so they
-// resolve the same from any URL depth (e.g. a trailing-slash "/about/").
-// Absolute URLs, "/..." paths, "#hash" and "mailto:" are left alone.
+// Site-relative paths ("about", "images/x.webp") become root-absolute so they resolve
+// from any URL depth. Absolute URLs, "/..." paths, "#hash" and "mailto:" are left alone.
 function sitePath(path) {
   return /^([a-z][a-z0-9+.-]*:|\/|#)/i.test(path) ? path : '/' + path;
 }
@@ -15,13 +13,16 @@ function iconUrl(name) {
   return `url('${sitePath(`images/icons/${name || 'link'}.svg`)}')`;
 }
 
+function setMask(node, url) {
+  node.style.webkitMaskImage = url;
+  node.style.maskImage = url;
+}
+
 function icon(name, cls) {
   const span = document.createElement('span');
   span.className = 'icon' + (cls ? ' ' + cls : '');
   span.setAttribute('aria-hidden', 'true');
-  const url = iconUrl(name);
-  span.style.webkitMaskImage = url;
-  span.style.maskImage = url;
+  setMask(span, iconUrl(name));
   return span;
 }
 
@@ -44,10 +45,9 @@ function uniqueSlug(text, fallback, used) {
   return slug;
 }
 
-// The one place that decides element IDs for a section: the heading claims its
-// slug first, then each project in order. Section pages, the home page links,
-// search results, badge keys and the structured data all read IDs from here, so
-// they can't drift apart. Returns { headingId, projects: [{ project, id }] }.
+// The one place that decides element IDs for a section (heading first, then each
+// project), so links, search, badge keys and structured data can't drift apart.
+// Returns { headingId, projects: [{ project, id }], byProject }.
 const sectionIdCache = new WeakMap();
 function sectionIds(section) {
   let ids = sectionIdCache.get(section);
@@ -65,7 +65,7 @@ function projectId(section, project) {
   return sectionIds(section).byProject.get(project);
 }
 
-// Note: the `href` option opens a new tab; use internalLink() for same-site links.
+// Note: `href` opens a new tab; use internalLink() for same-site links.
 function el(tag, opts = {}, children = []) {
   const node = document.createElement(tag);
   if (opts.class) node.className = opts.class;
@@ -92,8 +92,7 @@ function stableChannel(project) {
   return channels.find(c => (c.channel || '').toLowerCase() === 'stable') || channels[0];
 }
 
-// Projects with downloads (data packs, mods, resource packs); link-only
-// projects like "Other Projects" aren't counted.
+// Projects with downloads; link-only projects like "Other Projects" aren't counted.
 function countDownloadableProjects() {
   return (SITE_DATA.sections || []).reduce(
     (n, s) => n + (s.projects || []).filter(p => (p.channels || []).length > 0).length, 0);
@@ -105,9 +104,7 @@ function fillPlaceholders(text) {
 }
 
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-function prefersReducedMotion() {
-  return reducedMotionQuery.matches;
-}
+const prefersReducedMotion = () => reducedMotionQuery.matches;
 
 function storageGet(key) {
   try { return localStorage.getItem(key); } catch { return null; }
@@ -122,8 +119,7 @@ function deepLinkUrl(id) {
 }
 
 /* ---------- Channel row layout ----------
-   Channel boxes and download columns stack rather than wrap mid-line;
-   layoutChannelRow() picks the arrangement that fits on every resize. */
+   Channel boxes and download columns stack rather than wrap mid-line. */
 
 function headerWraps(header) {
   const label = header && header.querySelector('.channel-label');
@@ -159,21 +155,16 @@ function layoutChannelRow(rowEl) {
   if (pillNeedsRoom) downloadLists.forEach(dl => dl.classList.add('downloads-stacked'));
 }
 
-// Re-runs layoutChannelRow() whenever the row's size changes. Deliberately not
-// skipped when only the height changed: stacking changes the height, and those
-// follow-up passes are what settle the layout after a resize (skipping them left
-// rows stuck stacked after resizing from narrow to wide).
+// Re-runs layoutChannelRow() on every size change, height included: stacking changes
+// the height, and those follow-up passes settle the layout after a resize.
 function watchChannelRow(rowEl) {
-  if (window.ResizeObserver) {
-    new ResizeObserver(() => layoutChannelRow(rowEl)).observe(rowEl);
-  }
+  if (window.ResizeObserver) new ResizeObserver(() => layoutChannelRow(rowEl)).observe(rowEl);
 }
 
 /* ---------- Project cards ---------- */
 
-// The project title itself is the button (clicking it copies a direct link),
-// with a link icon after it. It sits inside the <h2>, so the heading is still
-// the title; the visually hidden text tells screen readers what it does.
+// The project title is itself the button (click copies a direct link). It sits inside
+// the <h2>; the hidden text tells screen readers what it does.
 function copyLinkButton(id, label) {
   const linkIcon = icon('link', 'icon-sm');
   const btn = el('button', {
@@ -185,11 +176,7 @@ function copyLinkButton(id, label) {
     linkIcon
   ]);
 
-  const setIcon = name => {
-    const url = iconUrl(name);
-    linkIcon.style.webkitMaskImage = url;
-    linkIcon.style.maskImage = url;
-  };
+  const setIcon = name => setMask(linkIcon, iconUrl(name));
 
   const showCopied = () => {
     btn.classList.add('is-copied');
@@ -208,7 +195,7 @@ function copyLinkButton(id, label) {
     e.stopPropagation();
     const url = deepLinkUrl(id);
 
-    // execCommand path, also used when the async Clipboard API is missing or rejects.
+    // Used when the async Clipboard API is missing or rejects.
     const fallbackCopy = () => {
       const temp = document.createElement('textarea');
       temp.value = url;
@@ -235,8 +222,8 @@ function copyLinkButton(id, label) {
 
 function renderBrand(brand) {
   const logo = document.getElementById('brand-logo');
-  // Re-assigning an identical src can restart the request in some browsers.
-  if (logo.getAttribute('src') !== sitePath(brand.logo)) logo.src = sitePath(brand.logo);
+  const src = sitePath(brand.logo);
+  if (logo.getAttribute('src') !== src) logo.src = src; // an identical src can restart the request
   logo.alt = '';
   document.getElementById('brand-name').textContent = brand.name;
 }
@@ -289,7 +276,7 @@ function renderDownload(d) {
       el('span', { text: 'Not available' })
     ]);
 
-    // Touch devices have no hover, so a tap shows the tooltip briefly.
+    // Touch has no hover, so a tap shows the tooltip briefly.
     if (d.tooltip) {
       action.addEventListener('click', () => {
         action.classList.add('tooltip-open');
@@ -351,9 +338,6 @@ function renderProject(p, id) {
   const channelRow = el('div', { class: 'channel-row' }, (p.channels || []).map(ch => renderChannel(ch, id)));
   watchChannelRow(channelRow);
 
-  // On wide screens the info block (title, description, links) and the channel
-  // boxes sit side by side and share a height; narrower screens stack them
-  // (see "Project layout" in styles.css). Link-only projects have no channels.
   const hasChannels = (p.channels || []).length > 0;
 
   return el('article', { class: 'project' + (hasChannels ? ' has-channels' : ''), attrs: { id } }, [
@@ -372,8 +356,7 @@ function renderProject(p, id) {
 
 /* ---------- Header ---------- */
 
-// Undismissed "New"/"Updated" badges on a page's projects. Slugs use a fresh
-// Set so they match that page's own ids, whichever page is showing.
+// Undismissed "New"/"Updated" badges on a page's projects.
 function countUndismissedBadges(page) {
   const section = (SITE_DATA.sections || []).find(s => s.heading === page.section);
   if (!section) return 0;
@@ -402,8 +385,8 @@ function navBadgeDot(count) {
 const MOBILE_NAV_QUERY = '(max-width: 900px)';
 
 // Builds the nav: Home, a Projects dropdown (pages with a "section"), News, About.
-// search.js adds the search box to the same menu. On small screens the whole
-// menu folds behind a button and the dropdown becomes an accordion.
+// search.js adds the search box. On small screens the menu folds behind a button
+// and the dropdown becomes an accordion.
 function renderSiteHeader(pages, currentUrl) {
   const header = document.getElementById('site-header');
   const inner = document.getElementById('site-header-inner');
@@ -417,8 +400,7 @@ function renderSiteHeader(pages, currentUrl) {
   const newsPage = pages.find(p => p.url === 'news');
   const projectPages = pages.filter(p => p.section);
 
-  // Elements that carry a count pill, each with a function giving its count.
-  // syncDots() redraws them all, at load and after a back/forward restore.
+  // Elements carrying a count pill; syncDots() redraws them at load and on back/forward restore.
   const dotTargets = [];
   const trackDots = (target, getCount) => dotTargets.push({ target, getCount });
   const totalProjectBadges = () => projectPages.reduce((sum, p) => sum + countUndismissedBadges(p), 0);
@@ -505,8 +487,7 @@ function renderSiteHeader(pages, currentUrl) {
       items[next].focus();
     });
 
-    // A popover on desktop (closes on outside focus/click); an accordion on
-    // mobile (stays open until its button is pressed again).
+    // Popover on desktop (closes on outside focus/click); accordion on mobile.
     dropdown.addEventListener('focusout', e => {
       if (!mobile.matches && !dropdown.contains(e.relatedTarget)) setDropdown(false);
     });
@@ -554,8 +535,7 @@ function renderSiteHeader(pages, currentUrl) {
     if (event.persisted) syncDots();
   });
 
-  // Keeps linked headings clear of the sticky header. Skipped while the
-  // mobile menu is open, since it overlays the page rather than pushing it.
+  // Keeps linked headings clear of the sticky header (skipped while the mobile menu overlays the page).
   const syncScrollOffset = () => {
     if (header.classList.contains('is-menu-open')) return;
     const offset = header.getBoundingClientRect().height + 16;
@@ -571,8 +551,8 @@ function renderSiteHeader(pages, currentUrl) {
 const NOTICE_KEY = 'notice-dismissed';
 const NOTICE_RETURN_DAYS = 45;
 
-// True while this exact notice was dismissed less than NOTICE_RETURN_DAYS ago.
-// Anything unreadable (older format, bad data, a clock set backwards) counts as not dismissed.
+// True while this exact notice was dismissed less than NOTICE_RETURN_DAYS ago;
+// anything unreadable counts as not dismissed.
 function noticeDismissed(text) {
   try {
     const saved = JSON.parse(storageGet(NOTICE_KEY));
@@ -598,8 +578,6 @@ function renderFlatSection(section) {
     el('span', { class: 'section-count', text: String((section.projects || []).length) })
   ]));
 
-  // Dismissable. The choice is remembered, but the notice returns when its
-  // wording changes or NOTICE_RETURN_DAYS have passed since it was dismissed.
   const noticeText = SITE_DATA.downloadNotice;
   if (noticeText && sectionHasDownloads(section) && !noticeDismissed(noticeText)) {
     const close = el('button', { class: 'notice-close', attrs: { type: 'button', 'aria-label': 'Dismiss notice', 'data-tooltip': 'Dismiss' } });
@@ -667,8 +645,7 @@ function initBackToTop() {
   const SHOW_AFTER = 180; // px scrolled before the button appears
 
   if ('IntersectionObserver' in window) {
-    // An invisible marker over the top SHOW_AFTER px of the page: the button shows
-    // once it has scrolled out of view. No work happens per scroll event.
+    // Invisible marker over the top SHOW_AFTER px: the button shows once it scrolls out of view.
     const marker = document.createElement('div');
     marker.setAttribute('aria-hidden', 'true');
     Object.assign(marker.style, {
@@ -706,19 +683,15 @@ function handleDeepLink() {
   });
 }
 
-// Adds JSON-LD: Organization, WebSite and a list of the downloadable projects.
-// Pass a section for just its projects, or null for every project. Link-only
-// entries (a server, this website) aren't software downloads, so they're left
-// out of the list. Each project's url is its card on this site, using the same
-// #id the page gives it.
+// Adds JSON-LD: Organization, WebSite and the downloadable projects (link-only
+// entries are skipped). Pass a section for just its projects, or null for all.
 function renderStructuredData(data, section) {
   const canonical = document.querySelector('link[rel="canonical"]');
   const siteUrl = canonical ? canonical.href : location.origin + '/';
   const root = new URL('/', siteUrl).href;
   const toAbsolute = path => path ? new URL(path, siteUrl).href : undefined;
 
-  // Same name the page's social tags use ("Classic's Craftworks"); the brand
-  // name is the all-caps display version.
+  // Matches the page's social tags; brand.name is the all-caps display version.
   const siteMeta = document.querySelector('meta[property="og:site_name"]');
   const siteName = (siteMeta && siteMeta.content) || data.brand.name;
   const splash = data.home && data.home.splash;
@@ -791,8 +764,7 @@ function renderStructuredData(data, section) {
 }
 
 /* ---------- Tooltip placement ----------
-   Tooltips open above their element. Near the top of the page the sticky
-   header would cover them, so they open below instead (.tooltip-below). */
+   Tooltips open above; near the sticky header they open below (.tooltip-below). */
 
 function placeTooltip(target) {
   const el = target instanceof Element ? target.closest('[data-tooltip]') : null;
@@ -801,15 +773,14 @@ function placeTooltip(target) {
   const header = document.querySelector('.site-header');
   const headerBottom = header ? header.getBoundingClientRect().bottom : 0;
   const tipHeight = parseFloat(getComputedStyle(el, '::after').height) || 40;
-  const needed = tipHeight + 14; // the tooltip plus its 10px offset and a little air
+  const needed = tipHeight + 14; // tooltip, its 10px offset and a little air
   el.classList.toggle('tooltip-below', el.getBoundingClientRect().top - headerBottom < needed);
 }
 
 ['mouseover', 'focusin', 'pointerdown'].forEach(type =>
   document.addEventListener(type, e => placeTooltip(e.target)));
 
-/* ---------- Entry point ----------
-   Section pages set data-page to their "url" in SITE_DATA.pages. */
+/* ---------- Entry point ---------- */
 
 function initSectionPage(pageUrl) {
   renderBrand(SITE_DATA.brand);
@@ -830,11 +801,9 @@ function initSectionPage(pageUrl) {
 
 if (document.body.dataset.page) initSectionPage(document.body.dataset.page);
 
-
-// Service worker (sw.js): lets Chrome/Edge offer to install the site, and keeps
-// the page shell and visited pages available offline.
+// Service worker (sw.js): installable site, offline page shell.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => { /* not fatal */ });
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }

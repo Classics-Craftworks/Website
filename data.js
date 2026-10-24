@@ -1,13 +1,10 @@
 /* SITE DATA - all site text, links and project lists.
 
    - Icons: SVGs in /images/icons/, referenced by filename without extension.
-   - imageAlt: describes the project icon for screen readers, Leave it out for
-     an image that is purely decorative.
+   - imageAlt: screen-reader text for the project icon; omit for decorative images.
    - Channels: "stable" | "beta" | "alpha" | "unsupported".
-   - Downloads: each needs its own "version". Add `disabled: true` (and an
-     optional "tooltip") if unavailable.
-   - Badges: `badge: "new"` or `"updated"` on a channel. Visitors can dismiss
-     it; it returns when that channel's download versions change.
+   - Downloads: each needs a "version"; add `disabled: true` (and optional "tooltip") if unavailable.
+   - Badges: `badge: "new" | "updated"` on a channel; dismissible, returns when its versions change.
    - New project: copy an existing project block. */
 
 const SITE_DATA = {

@@ -1,5 +1,4 @@
-/* Home page: splash banner with a featured project, one card per section,
-   and the stats block. Needs data.js, section-page.js and stats.js. */
+/* Home page: splash banner, one card per section, news preview and stats. */
 
 // Project rows per card; beyond this the last row becomes a "+X more" link.
 const HOME_SLOTS = 4;
@@ -10,8 +9,7 @@ function projectUrl(page, section, project) {
   return sitePath(page.url) + '#' + encodeURIComponent(projectId(section, project));
 }
 
-// "v8.0.0 · 26.3": first enabled download's version plus the stable channel's
-// Minecraft version. Empty string if there's neither.
+// "v8.0.0 · 26.3": first enabled download's version plus the stable channel's Minecraft version.
 function projectMeta(project) {
   const ch = stableChannel(project);
   if (!ch) return '';
@@ -42,7 +40,7 @@ function renderHomeMore(count, page) {
   return el('li', { class: 'home-project-item' }, [
     internalLink('home-project home-project-more', page.url, [
       el('span', { class: 'home-project-img home-project-more-tile', attrs: { 'aria-hidden': 'true' } }, [
-        // The pixel font has no plus glyph, so CSS draws it.
+        // The pixel font has no plus glyph; CSS draws it.
         el('span', { class: 'home-slot-more-plus' }),
         document.createTextNode(String(count))
       ]),
@@ -54,8 +52,6 @@ function renderHomeMore(count, page) {
   ]);
 }
 
-// The card isn't itself a link: its header goes to the section page and each
-// row goes to that project.
 function renderHomeButton(section, page) {
   const projects = section.projects || [];
   const count = projects.length;
@@ -95,8 +91,7 @@ function renderHomeButtons(sections, pages) {
   main.appendChild(grid);
 }
 
-// A trailing "+" is drawn by CSS (.stat-plus) because the pixel font has no such glyph;
-// the real character stays in the page, visually hidden, for screen readers.
+// A trailing "+" is drawn by CSS (.stat-plus) since the pixel font lacks it; the real one stays for screen readers.
 function statValue(value) {
   const text = String(value);
   const hasPlus = text.endsWith('+');
@@ -124,8 +119,7 @@ function renderStats(stats) {
   if (updated && stats.lastUpdated) updated.textContent = 'As of ' + stats.lastUpdated;
 }
 
-// Old copy-link URLs (index.html#better-craftables) now live on the section
-// pages; forward them there. Returns true if it redirected.
+// Forwards old home-page deep links (#better-craftables) to the section pages. Returns true if it redirected.
 function forwardOldDeepLink(sections, pages) {
   const id = decodeURIComponent(location.hash.slice(1));
   if (!id) return false;
@@ -152,13 +146,11 @@ function findProject(title, sections, pages) {
   return null;
 }
 
-// One slide of the featured carousel. `imageSrc` is its own banner picture,
-// not the project's icon.
 function renderFeaturedSlide({ project, url }, imageSrc) {
   const stable = stableChannel(project);
   const downloads = ((stable && stable.downloads) || []).filter(d => !d.disabled);
 
-  // One pill per kind of download ("Data Pack", "Mod").
+  // One pill per kind of download.
   const kinds = new Map();
   downloads.forEach(d => { if (!kinds.has(d.label)) kinds.set(d.label, d); });
   const pills = [...kinds.values()].map(d =>
@@ -183,8 +175,8 @@ function renderFeaturedSlide({ project, url }, imageSrc) {
   ]);
 }
 
-// Normalises `featured` / `featuredImage` into [{ title, image }]. Accepts a
-// single title (old format), or an array of titles or { title, image } objects.
+// Normalises `featured` / `featuredImage` into [{ title, image }]: a single title (old format),
+// or an array of titles or { title, image } objects.
 function featuredEntries(splash) {
   const list = Array.isArray(splash.featured) ? splash.featured : (splash.featured ? [splash.featured] : []);
   return list
@@ -196,8 +188,7 @@ function featuredEntries(splash) {
 
 const FEATURED_INTERVAL_MS = 6000;
 
-// Cycles the slides: auto-advances, pauses on hover/focus/hidden tab (and never
-// auto-advances with reduced motion), with dots, arrows and swipe.
+// Auto-advancing slides (paused on hover/focus/hidden tab, never with reduced motion), plus dots, arrows and swipe.
 function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn) {
   const dots = [...dotsWrap.children];
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -240,7 +231,7 @@ function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn) {
     else if (e.key === 'ArrowRight') { go(index + 1); e.preventDefault(); }
   });
 
-  // Horizontal swipe on touch screens; vertical scrolling is left alone.
+  // Horizontal swipe; vertical scrolling is left alone.
   let startX = null, startY = null;
   card.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }, { passive: true });
   card.addEventListener('touchend', e => {
@@ -285,7 +276,7 @@ function renderFeatured(card, entries) {
   initFeaturedCarousel(card, slides, dotsWrap, prev, next);
 }
 
-// Fills the splash from SITE_DATA.home.splash; stays hidden without one.
+// Fills the splash from SITE_DATA.home.splash (hidden without one).
 function renderSplash(home, sections, pages) {
   const wrap = document.getElementById('splash');
   const splash = home && home.splash;
@@ -311,7 +302,6 @@ function renderSplash(home, sections, pages) {
     ]));
   }
 
-  // Without a featured project the text takes the full width.
   const entries = featuredEntries(splash)
     .map(f => ({ found: findProject(f.title, sections, pages), image: f.image }))
     .filter(f => f.found);
