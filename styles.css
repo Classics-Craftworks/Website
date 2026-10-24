@@ -3099,6 +3099,17 @@ body.has-announcement .back-to-top {
 }
 .news-section .news-item { height: 100%; box-sizing: border-box; }
 .news-section .news-link { margin-top: auto; padding-top: 4px; }
+.news-item-top { display: flex; align-items: center; gap: 14px; width: 100%; }
+.news-item-top .news-item-media { flex: none; }
+.news-item-top { height: 52px; }
+.news-item-top .news-meta { flex: 1; min-width: 0; }
+.news-meta-stacked { flex-direction: column; align-items: flex-start; gap: 6px; }
+.news-tags { display: flex; flex-wrap: wrap; gap: 6px; max-width: 100%; }
+.news-tag[hidden] { display: none; }
+.news-section .news-item-media { width: 52px; height: 52px; border-radius: 12px; }
+.news-section .news-item-media.is-framed { padding: 7px; }
+.news-section .news-item-glyph { width: 24px; height: 24px; }
+.news-section .news-item-svg { width: 32px; height: 32px; }
 @media (max-width: 1239px) {
   .news-section .news-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .news-section .news-list > .news-item:last-child:nth-child(odd) {

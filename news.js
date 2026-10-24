@@ -373,16 +373,38 @@ function viewUpdateLink(entry) {
   ]);
 }
 
+const HOME_MAX_TAGS = 3;
+
+// Home card meta: up to HOME_MAX_TAGS tags on one line (the last is dropped if they don't
+// fit), with the date on its own line below.
+function homeMeta(pills, entry) {
+  const shown = pills.slice(0, HOME_MAX_TAGS);
+  const row = shown.length ? el('div', { class: 'news-tags' }, shown) : null;
+  const meta = el('div', { class: 'news-meta news-meta-stacked' }, [row, newsDate(entry)]);
+
+  if (row && shown.length > 2 && window.ResizeObserver) {
+    const fit = () => {
+      shown[2].hidden = false;
+      if (shown[2].offsetTop > shown[0].offsetTop) shown[2].hidden = true;
+    };
+    // The meta's width depends on the card, not on the tags, so this can't loop.
+    new ResizeObserver(fit).observe(meta);
+  }
+  return meta;
+}
+
 function renderNewsItem(entry, opts = {}) {
   const pills = newsTagPills(entry);
   const dot = isNewEntry(entry) ? newDot() : null;
   // News page: tags sit beside the entry; home page: beside the date.
-  const head = el('div', { class: 'news-meta' }, opts.detailed ? [newsDate(entry)] : [...pills, newsDate(entry)]);
+  const head = opts.detailed
+    ? el('div', { class: 'news-meta' }, [newsDate(entry)])
+    : homeMeta(pills, entry);
   // News page: the entry's own url; home page: its card on the News page.
   const link = opts.detailed ? newsLink(entry) : viewUpdateLink(entry);
 
   const body = [
-    head,
+    opts.detailed ? head : el('div', { class: 'news-item-top' }, [newsMedia(entry), head]),
     el('h3', { class: 'news-title' }, [dot, el('span', { text: entry.title })]),
     entry.text ? el('p', { class: 'news-text', text: fillPlaceholders(entry.text) }) : null,
     opts.detailed ? renderEntryProjects(entry) : null,
