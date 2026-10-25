@@ -77,13 +77,13 @@ const LATEST_UPDATES = {
   },
 
   tags: {
-    news: { label: "News", color: "#41A0C8" },
+    news: { label: "News", color: "#9BA7BF" },
     release: { label: "Release", color: "#22C55E" },
     beta: { label: "Beta", color: "#FF9D47" },
     alpha: { label: "Alpha", color: "#F2607E" },
-    archived: { label: "Archived", color: "#929292" },
-    new: { label: "New Project", color: "#EFDD65" },
-    snapshot: { label: "Snapshot", color: "#85C8E4" }
+    archived: { label: "Archived", color: "#9BA7BF" },
+    new: { label: "New Project", color: "#74C4E7" },
+    snapshot: { label: "Snapshot", color: "#9BA7BF" }
   },
 
   entries: [

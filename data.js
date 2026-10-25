@@ -24,7 +24,7 @@ const SITE_DATA = {
   home: {
     splash: {
       headline: ["SOMETIMES USEFUL.", "ALWAYS MINECRAFT."],
-      subtitle: "Minecraft Java Edition data packs, mods & resource packs by Classic's Craftworks",
+      subtitle: "Quality-of-life recipes, texture tweaks and more for Minecraft Java Edition.",
       featured: [
         { title: "Classic's Tweaks", image: "images/featured-CT.webp" },
         { title: "Better Craftables", image: "images/featured-BC.webp" },

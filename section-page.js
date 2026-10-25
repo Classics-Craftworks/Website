@@ -651,6 +651,11 @@ function renderFooter(socials, footer, version) {
 
 /* ---------- Page behaviour ---------- */
 
+// Removes the loading placeholders that each page's HTML ships with ([data-skeleton]).
+function clearSkeletons() {
+  document.querySelectorAll('[data-skeleton]').forEach(node => node.remove());
+}
+
 function initBackToTop() {
   const btn = document.getElementById('back-to-top');
   if (!btn) return;
@@ -807,6 +812,7 @@ function initSectionPage(pageUrl) {
   renderFlatSection(section);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderStructuredData(SITE_DATA, section);
+  clearSkeletons();
   initBackToTop();
   handleDeepLink();
   window.addEventListener('hashchange', handleDeepLink);

@@ -4,12 +4,13 @@
 const STATS_DATA = {
 
   stats: [
-    { icon: "box", label: "Downloadable Projects", value: "{projects}" },
-    { icon: "download", label: "Downloads", value: "131,000+" },
-    { icon: "clock", label: "Hours of Playtime", value: "520+" }
+    { icon: "box", label: "Projects", value: "{projects}",
+      tooltip: "Downloadable projects only, so excludes CraftHorizon and the website." },
+    { icon: "download", label: "Downloads", value: "131,000+",
+      tooltip: "Download stats combine totals from Modrinth and SpigotMC, fetched daily from the Modrinth API and Spiget before being rounded down to the nearest 1000." },
+    { icon: "clock", label: "Hours Played", value: "520+",
+      tooltip: "Playtime stats are tracked by Modrinth via the Modrinth App only, and are updated manually." }
   ],
 
-  lastUpdated: "October 24, 2026",
-
-  note: "Download stats combine totals from Modrinth and SpigotMC, fetched daily from Modrinth and Spiget and rounded down to the nearest 1000. Playtime stats are tracked by Modrinth via the Modrinth App, and are updated manually."
+  lastUpdated: "October 24, 2026"
 };

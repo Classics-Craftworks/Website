@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <script src="/js-flag.js"></script>
   <link rel="canonical" href="https://classicscraftworks.co.uk/">
   <link rel="icon" href="/images/favicon.png" type="image/png">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
@@ -12,13 +13,13 @@
   <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/minercraftory.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
-  <title>Classic's Craftworks - Minecraft Java Data Packs, Mods &amp; Resource Packs</title>
-  <meta name="description" content="Classic's Craftworks makes Minecraft Java Edition data packs, mods & resource packs. Browse every project with downloads, versions and details. Sometimes useful. Always Minecraft." />
+  <title>Classic's Craftworks | Minecraft Java Data Packs, Mods &amp; Resource Packs</title>
+  <meta name="description" content="Data packs, mods and resource packs for Minecraft Java Edition. Every project lists its current release, beta and archive versions, with downloads on Modrinth and SpigotMC." />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Classic's Craftworks" />
-  <meta property="og:title" content="Classic's Craftworks" />
-  <meta property="og:description" content="Minecraft Java Edition Data Packs, Mods &amp; Resource Packs" />
+  <meta property="og:title" content="Classic's Craftworks | Minecraft Java Data Packs, Mods &amp; Resource Packs" />
+  <meta property="og:description" content="Data packs, mods and resource packs for Minecraft Java Edition, with versioned releases and downloads on Modrinth and SpigotMC." />
   <meta property="og:image" content="https://classicscraftworks.co.uk/images/share.jpg" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
@@ -27,8 +28,8 @@
   <meta property="og:url" content="https://classicscraftworks.co.uk/" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Classic's Craftworks" />
-  <meta name="twitter:description" content="Minecraft Java Edition Data Packs, Mods &amp; Resource Packs" />
+  <meta name="twitter:title" content="Classic's Craftworks | Minecraft Java Data Packs, Mods &amp; Resource Packs" />
+  <meta name="twitter:description" content="Data packs, mods and resource packs for Minecraft Java Edition, with versioned releases and downloads on Modrinth and SpigotMC." />
   <meta name="twitter:image" content="https://classicscraftworks.co.uk/images/share.jpg" />
   <meta name="twitter:image:alt" content="Classic's Craftworks logo" />
 </head>
@@ -65,13 +66,27 @@
 
 <div class="page">
 
+  <div class="skel-hero" data-skeleton aria-hidden="true">
+    <div>
+      <span class="skel skel-h1"></span>
+      <span class="skel skel-line w-80"></span>
+      <span class="skel skel-line w-60"></span>
+    </div>
+    <span class="skel skel-panel"></span>
+  </div>
+
   <section id="splash" class="splash" aria-labelledby="splash-headline" hidden>
-    <img class="splash-bg" src="/images/splash-bg.webp" alt="" aria-hidden="true">
     <div class="splash-inner">
       <div class="splash-copy">
         <h1 id="splash-headline" class="splash-headline"></h1>
         <p id="splash-subtitle" class="splash-subtitle"></p>
         <div id="splash-actions" class="splash-actions"></div>
+
+        <section id="stats-section" class="stats-section" aria-labelledby="stats-heading">
+          <h2 id="stats-heading" class="stats-heading visually-hidden">Statistics</h2>
+          <div id="stats-grid" class="stats-grid"></div>
+          <p id="stats-updated" class="stats-updated"></p>
+        </section>
       </div>
       <aside id="splash-featured" class="splash-featured" aria-label="Featured project"></aside>
     </div>
@@ -82,19 +97,14 @@
     <p id="projects-subtitle" class="projects-subtitle"></p>
   </section>
 
-  <main id="catalog" tabindex="-1"></main>
+  <main id="catalog" tabindex="-1">
+    <div class="skel-grid" data-skeleton aria-hidden="true"><span class="skel skel-card"></span><span class="skel skel-card"></span><span class="skel skel-card"></span></div>
+  </main>
 
   <section id="news-section" class="news-section" aria-labelledby="news-heading" hidden>
     <h2 id="news-heading" class="stats-heading"></h2>
     <ul id="news-list" class="news-list"></ul>
     <p id="news-more" class="news-more"></p>
-  </section>
-
-  <section id="stats-section" class="stats-section" aria-labelledby="stats-heading">
-    <h2 id="stats-heading" class="stats-heading">Statistics</h2>
-    <p id="stats-updated" class="stats-updated"></p>
-    <div id="stats-grid" class="stats-grid"></div>
-    <p id="stats-note" class="stats-note"></p>
   </section>
 
   <footer class="site-footer">

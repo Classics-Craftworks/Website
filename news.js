@@ -1,7 +1,7 @@
 /* News feed: renders LATEST_UPDATES (format documented in latest-updates.js) as the
    home page preview and the full News page. Needs latest-updates.js, data.js and section-page.js. */
 
-const NEWS_DEFAULT_RGB = '65, 160, 200'; // same blue as --nav-accent-rgb
+const NEWS_DEFAULT_RGB = '116, 196, 231'; // same blue as --accent-rgb
 
 function newsData() {
   return typeof LATEST_UPDATES !== 'undefined' ? LATEST_UPDATES : null;
@@ -507,9 +507,9 @@ const RELEASE_CHANNELS = {
 // "2026-10-13" -> "13 Oct"
 const formatShortDate = iso => formatDate(iso, { day: 'numeric', month: 'short' });
 
-// Sidebar "Latest releases" panel: one row per release (icon, project, version pill, date).
-function renderLatestReleases(cfg) {
-  const rows = ((cfg && cfg.releases) || []).filter(r => r && r.project).map(r => {
+// One <li> per release (icon, project, version pill, date); shared by the News sidebar and the home page.
+function releaseRows(cfg) {
+  return ((cfg && cfg.releases) || []).filter(r => r && r.project).map(r => {
     const channel = RELEASE_CHANNELS[String(r.channel || '').toLowerCase()];
     const meta = [];
     if (r.version) meta.push(versionPill(r.version, channel));
@@ -526,6 +526,11 @@ function renderLatestReleases(cfg) {
       el('div', { class: 'release-body' }, [name, el('div', { class: 'release-meta' }, meta)])
     ]);
   });
+}
+
+// Sidebar "Latest releases" panel.
+function renderLatestReleases(cfg) {
+  const rows = releaseRows(cfg);
   if (!rows.length) return null;
 
   const KEY = 'news-releases-collapsed';
@@ -970,6 +975,7 @@ if (document.getElementById('news-page')) {
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderNewsPage();
   markNewsSeen(newsEntries());
+  clearSkeletons();
   initBackToTop();
 }
 

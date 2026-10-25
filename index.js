@@ -100,20 +100,36 @@ function statValue(value) {
   return el('span', { class: 'stat-value' }, kids);
 }
 
+// One figure with its label. A `tooltip` explains how the figure is measured: it opens on hover or
+// keyboard focus, toggles on tap, and is also in the page text for screen readers.
+function renderStat(s) {
+  const hasTip = !!s.tooltip;
+  const box = el('div', {
+    class: 'stat-box' + (hasTip ? ' has-tooltip' : ''),
+    attrs: hasTip ? { 'data-tooltip': s.tooltip, tabindex: '0' } : {}
+  }, [
+    statValue(fillPlaceholders(s.value)),
+    el('span', { class: 'stat-label', text: s.label }),
+    hasTip ? el('span', { class: 'visually-hidden', text: '. ' + s.tooltip }) : null
+  ]);
+
+  if (hasTip) {
+    box.addEventListener('click', () => {
+      box.classList.toggle('tooltip-open');
+      window.clearTimeout(box._tooltipTimer);
+      box._tooltipTimer = window.setTimeout(() => box.classList.remove('tooltip-open'), 5000);
+    });
+  }
+  return box;
+}
+
 function renderStats(stats) {
   if (!stats) return;
 
   const grid = document.getElementById('stats-grid');
   if (grid) {
-    (stats.stats || []).forEach(s => grid.appendChild(el('div', { class: 'stat-box' }, [
-      s.icon ? icon(s.icon, 'icon-md') : null,
-      statValue(fillPlaceholders(s.value)),
-      el('span', { class: 'stat-label', text: s.label })
-    ])));
+    (stats.stats || []).forEach(s => grid.appendChild(renderStat(s)));
   }
-
-  const note = document.getElementById('stats-note');
-  if (note && stats.note) note.textContent = stats.note;
 
   const updated = document.getElementById('stats-updated');
   if (updated && stats.lastUpdated) updated.textContent = 'As of ' + stats.lastUpdated;
@@ -189,7 +205,7 @@ function featuredEntries(splash) {
 const FEATURED_INTERVAL_MS = 8000;
 
 // Auto-advancing slides (paused on hover/focus/hidden tab, never with reduced motion), plus dots, arrows and swipe.
-function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn) {
+function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn, counter) {
   const dots = [...dotsWrap.children];
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   let index = 0;
@@ -226,6 +242,11 @@ function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn) {
       slide.setAttribute('aria-hidden', on ? 'false' : 'true');
       dots[n].setAttribute('aria-current', on ? 'true' : 'false');
     });
+
+    if (counter) {
+      counter.textContent = `${index + 1}/${slides.length}`;
+      counter.setAttribute('aria-label', `Project ${index + 1} of ${slides.length}`);
+    }
   }
 
   function stop() { clearInterval(timer); timer = null; }
@@ -323,12 +344,17 @@ function renderFeatured(card, entries) {
     attrs: { type: 'button', 'aria-label': 'Show featured project ' + (n + 1) + ': ' + e.found.project.title }
   })));
 
+  const counter = el('span', { class: 'splash-featured-count', attrs: { role: 'status' } });
+
   card.setAttribute('aria-roledescription', 'carousel');
   card.append(
-    el('div', { class: 'splash-featured-top' }, [label, el('div', { class: 'splash-featured-nav' }, [prev, dotsWrap, next])]),
+    el('div', { class: 'splash-featured-top' }, [
+      el('div', { class: 'splash-featured-heading' }, [label, counter]),
+      el('div', { class: 'splash-featured-nav' }, [prev, dotsWrap, next])
+    ]),
     slidesWrap
   );
-  initFeaturedCarousel(card, slides, dotsWrap, prev, next);
+  initFeaturedCarousel(card, slides, dotsWrap, prev, next, counter);
 }
 
 // Fills the splash from SITE_DATA.home.splash (hidden without one).
@@ -346,15 +372,18 @@ function renderSplash(home, sections, pages) {
   const actions = document.getElementById('splash-actions');
   actions.appendChild(internalLink('splash-btn splash-btn-primary', '#projects', [
     icon('compass', 'icon-sm'),
-    el('span', { text: 'Explore' }),
+    el('span', { text: 'Browse projects' }),
     el('span', { class: 'splash-btn-arrow', attrs: { 'aria-hidden': 'true' } })
   ]));
-  const about = pages.find(p => p.url === 'about');
-  if (about) {
-    actions.appendChild(internalLink('splash-btn splash-btn-ghost', about.url, [
-      icon(about.icon, 'icon-sm'),
-      el('span', { text: 'About' })
-    ]));
+  // About is already in the nav; the second button jumps to the latest news further down.
+  // It is removed again after the news section renders if there is no news to show.
+  if (document.getElementById('news-section')) {
+    const newsBtn = internalLink('splash-btn splash-btn-ghost', '#news-section', [
+      icon('news', 'icon-sm'),
+      el('span', { text: 'Latest news' })
+    ]);
+    newsBtn.id = 'splash-news-btn';
+    actions.appendChild(newsBtn);
   }
 
   const entries = featuredEntries(splash)
@@ -391,8 +420,10 @@ function renderProjectsIntro(home) {
   renderProjectsIntro(SITE_DATA.home);
   renderHomeButtons(sections, pages);
   renderNewsPreview();
+  { const nb = document.getElementById('splash-news-btn'), ns = document.getElementById('news-section'); if (nb && ns && ns.hidden) nb.remove(); }
   renderStats(typeof STATS_DATA !== 'undefined' ? STATS_DATA : null);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderStructuredData(SITE_DATA, null);
+  clearSkeletons();
   initBackToTop();
 })();

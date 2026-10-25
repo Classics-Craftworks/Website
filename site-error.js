@@ -13,7 +13,11 @@
     const reload = document.createElement('button');
     reload.type = 'button';
     reload.textContent = 'Reload';
-    reload.addEventListener('click', () => location.reload());
+    reload.addEventListener('click', () => {
+      reload.classList.add('is-loading');
+      reload.setAttribute('aria-busy', 'true');
+      location.reload();
+    });
 
     const dismiss = document.createElement('button');
     dismiss.type = 'button';
