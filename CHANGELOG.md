@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.17.0 — 2026-10-25
+
+### Added
+- Notes to archived/unsupported projects, explaining what happened to them
+- Swipe animation for Featured Project carousel on the home age
+
 ## v3.16.1 — 2026-10-25
 
 ### Added
