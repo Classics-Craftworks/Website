@@ -778,6 +778,10 @@ main:focus, #catalog:focus { outline: none; }
   .splash-inner { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
   .splash-subtitle { font-size: var(--text-md); line-height: var(--lh-md); margin-bottom: var(--s-5); }
   .splash-actions .splash-btn { flex: 1 1 0; }
+  .splash-copy { text-align: center; }
+  .splash-subtitle { margin-left: auto; margin-right: auto; }
+  .splash-actions { justify-content: center; }
+  .stats-section { margin-top: var(--s-7); }
   .splash-featured { padding: var(--s-4); }
 }
 
@@ -898,8 +902,8 @@ main:focus, #catalog:focus { outline: none; }
 
 /* ---------- Home: stats ---------- */
 
-.stats-section { margin-top: var(--s-7); }
-.stats-updated { margin-top: var(--s-3); font-size: var(--text-xs); line-height: var(--lh-xs); font-weight: 600; }
+.stats-section { margin-top: var(--s-8); }
+.stats-updated { margin-top: var(--s-4); font-size: var(--text-xs); line-height: var(--lh-xs); font-weight: 600; }
 
 .stats-grid { display: flex; flex-wrap: wrap; gap: var(--s-4) 0; }
 
@@ -946,9 +950,9 @@ main:focus, #catalog:focus { outline: none; }
 
 @media (max-width: 720px) {
   .stats-grid { flex-direction: column; gap: 0; }
-  .stat-box, .stat-box:first-child { flex-direction: row; align-items: baseline; justify-content: space-between; gap: var(--s-4); padding: var(--s-3) 0; border-left: 0; border-top: 1px solid var(--border); }
+  .stat-box, .stat-box:first-child { align-items: center; text-align: center; padding: var(--s-4) 0; border-left: 0; border-top: 1px solid var(--border); }
   .stat-box:first-child { border-top: 0; padding-top: 0; }
-  .stat-box[data-tooltip]::after, .stat-box:first-child[data-tooltip]::after { left: 0; max-width: min(288px, calc(100vw - var(--s-6))); }
+  .stat-box[data-tooltip]::after, .stat-box:first-child[data-tooltip]::after { left: 50%; margin-left: calc(min(288px, calc(100vw - var(--s-6))) / -2); text-align: center; max-width: min(288px, calc(100vw - var(--s-6))); }
 }
 
 /* ---------- Project pages ---------- */
@@ -1944,7 +1948,8 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
   .site-header.is-menu-open .site-menu { display: flex; }
   .site-nav { flex-direction: column; align-items: stretch; gap: var(--s-1); }
   .nav-link { min-height: 48px; padding: 0 var(--s-4); font-size: var(--text-md); line-height: var(--lh-md); }
-  .nav-chevron { margin-left: auto; }
+  .nav-chevron { order: 2; margin-left: auto; }
+  .nav-link > .nav-jump-dot { position: relative; top: auto; right: auto; order: 1; margin-left: var(--s-2); }
   .nav-dropdown-toggle { width: 100%; }
   .nav-dropdown-menu { position: static; min-width: 0; margin-top: var(--s-1); padding: var(--s-1); border: 0; background: var(--surface); box-shadow: none; }
   .nav-dropdown-item { min-height: 48px; padding: 0 var(--s-4); font-size: var(--text-md); }
