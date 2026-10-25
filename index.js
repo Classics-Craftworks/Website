@@ -377,8 +377,8 @@ function renderSplash(home, sections, pages) {
   ]));
   // About is already in the nav; the second button jumps to the latest news further down.
   // It is removed again after the news section renders if there is no news to show.
-  if (document.getElementById('news-section')) {
-    const newsBtn = internalLink('splash-btn splash-btn-ghost', '#news-section', [
+  if (document.getElementById('latest-news')) {
+    const newsBtn = internalLink('splash-btn splash-btn-ghost', '#latest-news', [
       icon('news', 'icon-sm'),
       el('span', { text: 'Latest news' })
     ]);
@@ -420,7 +420,7 @@ function renderProjectsIntro(home) {
   renderProjectsIntro(SITE_DATA.home);
   renderHomeButtons(sections, pages);
   renderNewsPreview();
-  { const nb = document.getElementById('splash-news-btn'), ns = document.getElementById('news-section'); if (nb && ns && ns.hidden) nb.remove(); }
+  { const nb = document.getElementById('splash-news-btn'), ns = document.getElementById('latest-news'); if (nb && ns && ns.hidden) nb.remove(); }
   renderStats(typeof STATS_DATA !== 'undefined' ? STATS_DATA : null);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderStructuredData(SITE_DATA, null);

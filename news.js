@@ -422,9 +422,9 @@ function renderNewsItem(entry, opts = {}) {
   ]);
 }
 
-// Home page: fills #news-section with the latest entries; hidden if there are none.
+// Home page: fills #latest-news with the latest entries; hidden if there are none.
 function renderNewsPreview() {
-  const wrap = document.getElementById('news-section');
+  const wrap = document.getElementById('latest-news');
   const news = newsData();
   if (!wrap || !news) return;
 
