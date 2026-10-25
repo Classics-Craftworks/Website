@@ -313,6 +313,17 @@ function renderChannel(ch, projectId) {
   }, [badge, header, downloads]);
 }
 
+// Info panel for a project's `note`. Fills the slot a second channel box would use.
+function renderProjectNote(p) {
+  if (!p.note) return null;
+  return el('div', { class: 'project-note', attrs: { role: 'note' } }, [
+    el('div', { class: 'project-note-inner' }, [
+      icon('info', 'icon-sm'),
+      el('p', { text: p.note })
+    ])
+  ]);
+}
+
 function renderVersionsNote(p) {
   if (!(p.channels || []).length) return null;
 
@@ -336,11 +347,13 @@ function renderProject(p, id) {
   ));
 
   const channelRow = el('div', { class: 'channel-row' }, (p.channels || []).map(ch => renderChannel(ch, id)));
+  const note = (p.channels || []).length === 1 ? renderProjectNote(p) : null; // only fills a free slot
+  if (note) channelRow.appendChild(note);
   watchChannelRow(channelRow);
 
   const hasChannels = (p.channels || []).length > 0;
 
-  return el('article', { class: 'project' + (hasChannels ? ' has-channels' : ''), attrs: { id } }, [
+  return el('article', { class: 'project' + (hasChannels ? ' has-channels' : '') + (note ? ' has-note' : ''), attrs: { id } }, [
     el('img', { class: 'project-image', src: p.image, alt: p.imageAlt || '', attrs: { loading: 'lazy', width: '320', height: '320' } }),
     el('div', { class: 'project-body' }, [
       el('div', { class: 'project-info' }, [

@@ -1616,6 +1616,42 @@ p { margin: 0; }
   .channel-row > .channel-group { flex: 1 1 auto; }
 }
 
+/* ---------- Project note (fills the empty 2nd channel slot) ---------- */
+/* Same footprint as a channel box so single-channel rows stay balanced; neutral grey,
+   dashed border to read as an annotation rather than a download channel. */
+.project-note {
+  flex: 0 1 calc(50% - 6px);
+  min-width: 0;
+  display: flex;
+  align-items: center; /* centres the text block vertically; lines stay left-aligned */
+  padding: 11px 14px;
+  border: 1px dashed rgba(var(--ch-unsupported-rgb), var(--alpha-border));
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-soft);
+  opacity: 0.8;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+.project-note-inner {
+  display: flex;
+  align-items: flex-start; /* icon stays level with the first line */
+  gap: 10px;
+}
+.project-note .icon {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  margin-top: 3px; /* centres on the first line of text */
+  color: var(--text-soft);
+  opacity: 0.7;
+}
+.project-note p { margin: 0; }
+
+@container project (max-width: 1000px) {
+  .project-note { flex: 1 1 auto; }
+}
+
 .channel-group {
   /* Sized for two boxes side by side, but won't stretch to fill the
    row if there's only one. */
@@ -2010,7 +2046,7 @@ p { margin: 0; }
 
   /* A lone channel box is only half the row wide, so the note is limited to the
      box's width and sits under its right edge instead of at the far page edge. */
-  .project.has-channels:not(:has(.channel-group + .channel-group)) .versions-note {
+  .project.has-channels:not(.has-note):not(:has(.channel-group + .channel-group)) .versions-note {
     max-width: calc(50% - 6px);
     margin-top: 8px;
   }

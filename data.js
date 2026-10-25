@@ -4,6 +4,8 @@
    - imageAlt: screen-reader text for the project icon; omit for decorative images.
    - Channels: "stable" | "beta" | "alpha" | "unsupported".
    - Downloads: each needs a "version"; add `disabled: true` (and optional "tooltip") if unavailable.
+   - Notes: optional `note: "text"` on a project adds an info panel in the empty second-channel slot
+     (use it on archived/unsupported projects with a single channel).
    - Badges: `badge: "new" | "updated"` on a channel; dismissible, returns when its versions change.
    - New project: copy an existing project block. */
 
@@ -162,6 +164,7 @@ const SITE_DATA = {
           imageAlt: "New Sword Blocking logo: the letters NSB",
           title: "New Sword Blocking",
           description: "Restores and enhances sword blocking in Minecraft 1.21.5 – 1.21.8!",
+          note: "This data pack is no longer supported and will not receive further updates. There are better alternatives available elsewhere.",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/new-sword-blocking" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/New-Sword-Blocking" },
@@ -227,6 +230,7 @@ const SITE_DATA = {
           imageAlt: "Classic's Disc Tweaks logo: the letters DT",
           title: "Classic's Disc Tweaks",
           description: "Subtly widens music discs and unifies their design for a more cohesive look.",
+          note: "This resource pack has been merged into Classic's Tweaks and is no longer updated. Use Classic's Tweaks instead.",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-disc-tweaks" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Disc-Tweaks" },
@@ -251,6 +255,7 @@ const SITE_DATA = {
           imageAlt: "Classic's Dye Tweaks logo: the letters DT",
           title: "Classic's Dye Tweaks",
           description: "Tweaks Minecraft's new dye textures and brings them to older versions of the game!",
+          note: "This resource pack has been merged into Classic's Tweaks and is no longer updated. Use Classic's Tweaks instead.",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-dye-tweaks" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Dye-Tweaks" },
@@ -275,6 +280,7 @@ const SITE_DATA = {
           imageAlt: "Classic's Lantern Tweaks logo: the letters LT",
           title: "Classic's Lantern Tweaks",
           description: "Adjusts the edges of Soul & Copper Lanterns so they better match the regular Lantern. Little details matter!",
+          note: "This resource pack has been merged into Classic's Tweaks and is no longer updated. Use Classic's Tweaks instead.",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Lantern-Tweaks" },
@@ -324,6 +330,7 @@ const SITE_DATA = {
           imageAlt: "Zisteau Pigmen logo: the letters ZP",
           title: "Zisteau Pigmen",
           description: "Zombified Piglins named 'Zisteau' become Zombie Pigmen.",
+          note: "This resource pack has been merged into Classic's Tweaks and is no longer updated. Use Classic's Tweaks instead.",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/zisteau-pigmen" }
           ],
