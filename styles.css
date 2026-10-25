@@ -1132,12 +1132,43 @@ p { margin: 0; }
 .splash-featured-slide .splash-featured-desc { flex: 1 0 auto; }
 .splash-featured-slide.is-active { opacity: 1; visibility: visible; }
 @media (prefers-reduced-motion: no-preference) {
-  /* Outgoing slide fades out first, then the incoming one fades in, so the text never overlaps. */
-  .splash-featured-slide { transition: opacity 0.2s ease, visibility 0s linear 0.2s; }
-  .splash-featured-slide.is-active { transition: opacity 0.3s ease 0.2s, visibility 0s linear 0.2s; }
+  /* Swipe: the outgoing slide fades and slides away in the swipe direction first, then the incoming
+     one slides in from the opposite side, so the text never overlaps. index.js sets data-dir
+     ("next" or "prev") on the wrapper and an .is-leaving class on the outgoing slide. */
+  .splash-featured-slides {
+    --swipe-distance: 44px;
+    /* The clip edge sits this far outside the content (inside the card's own padding) and fades out,
+       so a sliding slide dissolves rather than being cut off in a hard line. Keep it within the
+       card's side padding (24px on desktop, 14px on mobile). */
+    --swipe-bleed: 24px;
+    margin-inline: calc(var(--swipe-bleed) * -1);
+    padding-inline: var(--swipe-bleed);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--swipe-bleed), #000 calc(100% - var(--swipe-bleed)), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 var(--swipe-bleed), #000 calc(100% - var(--swipe-bleed)), transparent);
+    --enter-x: var(--swipe-distance);
+    --leave-x: calc(var(--swipe-distance) * -1);
+    overflow-x: clip;
+    touch-action: pan-y;
+  }
+  @media (max-width: 900px) {
+    .splash-featured-slides { --swipe-bleed: 14px; }
+  }
+  .splash-featured-slides[data-dir="prev"] {
+    --enter-x: calc(var(--swipe-distance) * -1);
+    --leave-x: var(--swipe-distance);
+  }
+  .splash-featured-slide { transform: translateX(var(--enter-x)); }
+  .splash-featured-slide.is-leaving {
+    transform: translateX(var(--leave-x));
+    transition: opacity 0.2s ease, transform 0.22s cubic-bezier(0.4, 0, 1, 1), visibility 0s linear 0.2s;
+  }
+  .splash-featured-slide.is-active {
+    transform: none;
+    transition: opacity 0.3s ease 0.18s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.18s, visibility 0s linear 0.18s;
+  }
 }
 /* Single project: no wrapper changes needed. */
-.splash-featured-slides > .splash-featured-slide:only-child { opacity: 1; visibility: visible; }
+.splash-featured-slides > .splash-featured-slide:only-child { opacity: 1; visibility: visible; transform: none; }
 @media (max-width: 900px) {
   .splash-featured-top { margin: 0 0 10px; }
 }

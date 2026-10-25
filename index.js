@@ -196,8 +196,29 @@ function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn) {
   let timer = null;
   let paused = false;
 
-  function show(i) {
+  const slidesWrap = slides[0].parentElement;
+  const SLIDE_MS = 380; // how long an outgoing slide keeps its "leaving" state
+
+  // dir: 'next' slides content out to the left and the new slide in from the right; 'prev' mirrors it.
+  function show(i, dir = 'next') {
+    const prevIndex = index;
     index = (i + slides.length) % slides.length;
+    slidesWrap.dataset.dir = dir;
+
+    const incoming = slides[index];
+    if (index !== prevIndex) {
+      // Park the incoming slide on the correct side without animating, so it always enters from that side.
+      incoming.style.transition = 'none';
+      incoming.classList.remove('is-leaving');
+      void incoming.offsetWidth;
+      incoming.style.transition = '';
+
+      const outgoing = slides[prevIndex];
+      outgoing.classList.add('is-leaving');
+      clearTimeout(outgoing._leaveTimer);
+      outgoing._leaveTimer = setTimeout(() => outgoing.classList.remove('is-leaving'), SLIDE_MS);
+    }
+
     slides.forEach((slide, n) => {
       const on = n === index;
       slide.classList.toggle('is-active', on);
@@ -211,13 +232,13 @@ function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn) {
   function start() {
     stop();
     if (paused || reduced.matches || document.hidden) return;
-    timer = setInterval(() => show(index + 1), FEATURED_INTERVAL_MS);
+    timer = setInterval(() => show(index + 1, 'next'), FEATURED_INTERVAL_MS);
   }
-  function go(i) { show(i); start(); }
+  function go(i, dir) { show(i, dir || (i > index ? 'next' : 'prev')); start(); }
 
   dots.forEach((d, n) => d.addEventListener('click', () => go(n)));
-  prevBtn.addEventListener('click', () => go(index - 1));
-  nextBtn.addEventListener('click', () => go(index + 1));
+  prevBtn.addEventListener('click', () => go(index - 1, 'prev'));
+  nextBtn.addEventListener('click', () => go(index + 1, 'next'));
 
   card.addEventListener('mouseenter', () => { paused = true; stop(); });
   card.addEventListener('mouseleave', () => { paused = false; start(); });
@@ -227,20 +248,54 @@ function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn) {
   reduced.addEventListener('change', start);
 
   card.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft') { go(index - 1); e.preventDefault(); }
-    else if (e.key === 'ArrowRight') { go(index + 1); e.preventDefault(); }
+    if (e.key === 'ArrowLeft') { go(index - 1, 'prev'); e.preventDefault(); }
+    else if (e.key === 'ArrowRight') { go(index + 1, 'next'); e.preventDefault(); }
   });
 
-  // Horizontal swipe; vertical scrolling is left alone.
-  let startX = null, startY = null;
-  card.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; }, { passive: true });
-  card.addEventListener('touchend', e => {
-    if (startX === null) return;
-    const dx = e.changedTouches[0].clientX - startX;
-    const dy = e.changedTouches[0].clientY - startY;
-    startX = startY = null;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) go(index + (dx < 0 ? 1 : -1));
+  // Horizontal swipe: the slide follows the finger (with resistance), then either commits to the
+  // next/previous slide or springs back. Vertical scrolling is left alone.
+  let startX = null, startY = null, dragging = false;
+
+  function setDrag(dx) {
+    const slide = slides[index];
+    if (dx === null) {
+      slide.style.transition = '';
+      slide.style.transform = '';
+      slide.style.opacity = '';
+      return;
+    }
+    slide.style.transition = 'none';
+    slide.style.transform = `translateX(${dx * 0.45}px)`;
+    slide.style.opacity = String(1 - Math.min(Math.abs(dx) / 260, 0.5));
+  }
+
+  card.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    dragging = false;
   }, { passive: true });
+
+  card.addEventListener('touchmove', e => {
+    if (startX === null || reduced.matches) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    if (!dragging && !(Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5)) return;
+    dragging = true;
+    setDrag(dx);
+  }, { passive: true });
+
+  function endSwipe(e) {
+    if (startX === null) return;
+    const touch = e.changedTouches && e.changedTouches[0];
+    const dx = touch ? touch.clientX - startX : 0;
+    const dy = touch ? touch.clientY - startY : 0;
+    startX = startY = null;
+    if (dragging) setDrag(null); // release: the slide animates from where the finger left it
+    dragging = false;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) go(index + (dx < 0 ? 1 : -1), dx < 0 ? 'next' : 'prev');
+  }
+  card.addEventListener('touchend', endSwipe, { passive: true });
+  card.addEventListener('touchcancel', endSwipe, { passive: true });
 
   show(0);
   start();
