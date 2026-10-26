@@ -1,63 +1,7 @@
 /* News feed: renders LATEST_UPDATES (format documented in latest-updates.js) as the
    home page preview and the full News page. Needs latest-updates.js, data.js and section-page.js. */
 
-const NEWS_DEFAULT_RGB = '65, 160, 200'; // same blue as --nav-accent-rgb
-
-function newsData() {
-  return typeof LATEST_UPDATES !== 'undefined' ? LATEST_UPDATES : null;
-}
-
-function newsEntries() {
-  const news = newsData();
-  const entries = ((news && news.entries) || []).filter(e => e && e.title && e.date);
-  // ISO dates sort as text; the sort is stable, so same-day entries keep their file order.
-  return entries.slice().sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-}
-
-// Stable anchor for an entry, used to link to it on the News page.
-function newsEntryId(entry) {
-  return slugify(entry.date + ' ' + entry.title);
-}
-
-/* ---------- "New since your last visit" ----------
-   Seen entries are kept in localStorage; newer ones get a dot. The previous visit's list is
-   held for the browser session so reloads don't clear the dots. A first visit marks nothing. */
-
-const NEWS_SEEN_KEY = 'news-seen';
-const NEWS_BASELINE_KEY = 'news-seen-baseline';
-
-function parseIdList(text) {
-  try {
-    const list = JSON.parse(text);
-    return Array.isArray(list) ? list : null;
-  } catch { return null; }
-}
-
-let newsBaselineCache; // Set of already-seen entry ids, or null if unknown
-
-// Entry ids seen before this visit; null when unknown.
-function newsBaseline() {
-  if (newsBaselineCache !== undefined) return newsBaselineCache;
-  let list = null;
-  try { list = parseIdList(sessionStorage.getItem(NEWS_BASELINE_KEY)); } catch { /* session storage unavailable */ }
-  if (!list) {
-    list = parseIdList(storageGet(NEWS_SEEN_KEY));
-    if (list) { try { sessionStorage.setItem(NEWS_BASELINE_KEY, JSON.stringify(list)); } catch { /* ignore */ } }
-  }
-  newsBaselineCache = list ? new Set(list) : null;
-  return newsBaselineCache;
-}
-
-function isNewEntry(entry) {
-  const seen = newsBaseline();
-  return !!seen && !seen.has(newsEntryId(entry));
-}
-
-// Everything listed on the News page counts as seen from the next visit on.
-function markNewsSeen(entries) {
-  newsBaseline(); // fix this visit's baseline before the saved list changes
-  storageSet(NEWS_SEEN_KEY, JSON.stringify(entries.map(newsEntryId)));
-}
+const NEWS_DEFAULT_RGB = '116, 196, 231'; // same blue as --accent-rgb
 
 function newDot() {
   return el('span', { class: 'news-new-dot', attrs: { 'data-tooltip': 'New since your last visit', role: 'img', 'aria-label': 'New since your last visit' } });
@@ -77,10 +21,6 @@ function hexToRgb(hex) {
   if (/^[0-9a-f]{3}$/i.test(h)) h = h.replace(/./g, c => c + c);
   if (!/^[0-9a-f]{6}$/i.test(h)) return null;
   return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)).join(', ');
-}
-
-function capitalise(text) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 // { key, label, rgb } for a tag key, with fallbacks for tags not in `tags`.
@@ -200,33 +140,6 @@ function calendarIcon() {
   probe.onerror = () => node.remove();
   probe.src = sitePath('images/icons/calendar.svg');
   return node;
-}
-
-const relativeWords = new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' });
-const relativeCounts = new Intl.RelativeTimeFormat('en-GB', { numeric: 'always' });
-
-// "Today", "Yesterday", "3 days ago", "2 weeks ago" for entries under a month old; future
-// dates likewise ("Tomorrow", "In 3 days") up to a month ahead; null otherwise.
-function relativeNewsDate(iso) {
-  const d = new Date(iso + 'T00:00:00Z');
-  if (isNaN(d)) return null;
-
-  const now = new Date();
-  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  const days = Math.round((today - d.getTime()) / 86400000); // negative = in the future
-
-  // The date one month from today in the entry's direction; a short month clamps
-  // (31 Mar - 1 month = 28 Feb, not 3 Mar).
-  const shift = days < 0 ? 1 : -1;
-  const limit = new Date(today);
-  const day = limit.getUTCDate();
-  limit.setUTCDate(1);
-  limit.setUTCMonth(limit.getUTCMonth() + shift);
-  limit.setUTCDate(Math.min(day, new Date(Date.UTC(limit.getUTCFullYear(), limit.getUTCMonth() + 1, 0)).getUTCDate()));
-  if (days < 0 ? d.getTime() >= limit.getTime() : d.getTime() <= limit.getTime()) return null;
-
-  const n = Math.abs(days);
-  return capitalise(n < 7 ? relativeWords.format(shift * n, 'day') : relativeCounts.format(shift * Math.floor(n / 7), 'week'));
 }
 
 // Date with calendar icon. Recent entries show a relative date with the full date as a tooltip.
@@ -422,9 +335,9 @@ function renderNewsItem(entry, opts = {}) {
   ]);
 }
 
-// Home page: fills #news-section with the latest entries; hidden if there are none.
+// Home page: fills #latest-news with the latest entries; hidden if there are none.
 function renderNewsPreview() {
-  const wrap = document.getElementById('news-section');
+  const wrap = document.getElementById('latest-news');
   const news = newsData();
   if (!wrap || !news) return;
 
@@ -507,9 +420,9 @@ const RELEASE_CHANNELS = {
 // "2026-10-13" -> "13 Oct"
 const formatShortDate = iso => formatDate(iso, { day: 'numeric', month: 'short' });
 
-// Sidebar "Latest releases" panel: one row per release (icon, project, version pill, date).
-function renderLatestReleases(cfg) {
-  const rows = ((cfg && cfg.releases) || []).filter(r => r && r.project).map(r => {
+// One <li> per release (icon, project, version pill, date); shared by the News sidebar and the home page.
+function releaseRows(cfg) {
+  return ((cfg && cfg.releases) || []).filter(r => r && r.project).map(r => {
     const channel = RELEASE_CHANNELS[String(r.channel || '').toLowerCase()];
     const meta = [];
     if (r.version) meta.push(versionPill(r.version, channel));
@@ -526,6 +439,11 @@ function renderLatestReleases(cfg) {
       el('div', { class: 'release-body' }, [name, el('div', { class: 'release-meta' }, meta)])
     ]);
   });
+}
+
+// Sidebar "Latest releases" panel.
+function renderLatestReleases(cfg) {
+  const rows = releaseRows(cfg);
   if (!rows.length) return null;
 
   const KEY = 'news-releases-collapsed';
@@ -970,6 +888,7 @@ if (document.getElementById('news-page')) {
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderNewsPage();
   markNewsSeen(newsEntries());
+  clearSkeletons();
   initBackToTop();
 }
 
@@ -1014,7 +933,7 @@ function initAnnouncementCard() {
 
   const link = viewUpdateLink(entry);
 
-  const close = el('button', { class: 'announce-close', attrs: { type: 'button', 'aria-label': 'Dismiss announcement', 'data-tooltip': 'Dismiss' } });
+  const close = el('button', { class: 'announce-close', attrs: { type: 'button', 'aria-label': 'Dismiss announcement', 'data-tooltip': 'Dismiss' } }, [el('span', { class: 'close-glyph', attrs: { 'aria-hidden': 'true' } })]);
   const card = el('aside', { class: 'announce' + (link ? ' is-linked' : ''), attrs: { role: 'region', 'aria-label': 'Latest news' } }, [
     el('div', { class: 'news-meta announce-meta' }, [
       ...newsTagPills(entry),

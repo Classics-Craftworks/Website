@@ -59,3 +59,4 @@ renderBrand(SITE_DATA.brand);
 renderSiteHeader(SITE_DATA.pages || [], 'about');
 renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
 renderAbout();
+clearSkeletons();

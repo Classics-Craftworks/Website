@@ -3,10 +3,14 @@
    - Icons: SVGs in /images/icons/, referenced by filename without extension.
    - imageAlt: screen-reader text for the project icon; omit for decorative images.
    - Channels: "stable" | "beta" | "alpha" | "unsupported".
-   - Downloads: each needs a "version"; add `disabled: true` (and optional "tooltip") if unavailable.
-   - Notes: optional `note: "text"` on a project adds an info panel in the empty second-channel slot
-     (use it on archived/unsupported projects with a single channel).
-   - Badges: `badge: "new" | "updated"` on a channel; dismissible, returns when its versions change.
+   - Downloads: each needs a "label" (its table column), a "version" and a "url"; add `disabled: true`
+     (and optional "tooltip") if unavailable. Optional `date: "YYYY-MM-DD"` sets the release date shown
+     in its cell; without it the date comes from latest-updates.js (matching project and version),
+     else the cell shows a "Date TBC" placeholder.
+   - Notes: optional `note: "text"` on a project adds an info panel under its release table.
+   - Notifications: `notify: true` on a download puts a dot beside its version and in the navigation until
+     the project's page has been opened (a new visitor sees every dot). The dot
+     shows again when that download's version number changes.
    - New project: copy an existing project block. */
 
 const SITE_DATA = {
@@ -17,14 +21,14 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v3.17.0.2",
+    label: "v4.0.0",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
   home: {
     splash: {
       headline: ["SOMETIMES USEFUL.", "ALWAYS MINECRAFT."],
-      subtitle: "Minecraft Java Edition data packs, mods & resource packs by Classic's Craftworks",
+      subtitle: "Quality-of-life recipes, texture tweaks and more for Minecraft Java Edition.",
       featured: [
         { title: "Classic's Tweaks", image: "images/featured-CT.webp" },
         { title: "Better Craftables", image: "images/featured-BC.webp" },
@@ -69,17 +73,16 @@ const SITE_DATA = {
               label: "Release",
               mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v8.0.0", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0" },
-                { label: "Mod", icon: "box", version: "v8.0.0+mod", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0+mod" }
+                { label: "Data Pack", icon: "brackets", version: "v8.0.0", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0", date: "2026-09-15" },
+                { label: "Mod", icon: "box", version: "v8.0.0+mod", url: "https://modrinth.com/datapack/better-craftables/version/v8.0.0+mod", date: "2026-09-15" }
               ]
             },
             {
               channel: "beta",
               label: "Beta",
               mcVersion: "26.3 – 26.4-snap-5",
-              badge: "updated",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v8.1.0-beta.4", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.4" },
+                { label: "Data Pack", icon: "brackets", version: "v8.1.0-beta.4", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.4", date: "2026-10-20", notify: true },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
@@ -105,17 +108,16 @@ const SITE_DATA = {
               label: "Release",
               mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v5.0.1", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.1" },
-                { label: "Mod", icon: "box", version: "v5.0.1+mod", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.1+mod" }
+                { label: "Data Pack", icon: "brackets", version: "v5.0.1", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.1", date: "2026-10-13" },
+                { label: "Mod", icon: "box", version: "v5.0.1+mod", url: "https://modrinth.com/datapack/better-unpackables/version/v5.0.1+mod", date: "2026-10-13" }
               ]
             },
             {
               channel: "beta",
               label: "Beta",
               mcVersion: "26.3 – 26.4-snap-5",
-              badge: "updated",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.6", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6" },
+                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.6", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6", date: "2026-10-20", notify: true },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
@@ -141,8 +143,8 @@ const SITE_DATA = {
               label: "Release",
               mcVersion: "26.3",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v5.0.0", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0" },
-                { label: "Mod", icon: "box", version: "v5.0.0+mod", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0+mod" }
+                { label: "Data Pack", icon: "brackets", version: "v5.0.0", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0", date: "2026-09-15" },
+                { label: "Mod", icon: "box", version: "v5.0.0+mod", url: "https://modrinth.com/datapack/silly-eatables/version/v5.0.0+mod", date: "2026-09-15" }
               ]
             },
             {
@@ -164,7 +166,7 @@ const SITE_DATA = {
           imageAlt: "New Sword Blocking logo: the letters NSB",
           title: "New Sword Blocking",
           description: "Restores and enhances sword blocking in Minecraft 1.21.5 – 1.21.8!",
-          note: "This data pack is no longer supported and will not receive further updates. There are better alternatives available elsewhere.",
+          note: "This project is no longer supported and will not receive further updates. There are better alternatives available elsewhere.",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/new-sword-blocking" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/New-Sword-Blocking" },
@@ -176,8 +178,8 @@ const SITE_DATA = {
               label: "Unsupported",
               mcVersion: "1.21.5 – 1.21.8",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v1.1.2", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2" },
-                { label: "Mod", icon: "box", version: "v1.1.2+mod", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2+mod" }
+                { label: "Data Pack", icon: "brackets", version: "v1.1.2", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2", date: "2025-07-17" },
+                { label: "Mod", icon: "box", version: "v1.1.2+mod", url: "https://modrinth.com/datapack/new-sword-blocking/version/v1.1.2+mod", date: "2025-07-17" }
               ]
             }
           ]
@@ -206,10 +208,9 @@ const SITE_DATA = {
             {
               channel: "stable",
               label: "Release",
-              badge: "new",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v3.0.0", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0" }
+                { label: "Resource Pack", icon: "brush", version: "v3.0.0", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0", date: "2026-10-26", notify: true }
               ]
             },
             {
@@ -242,7 +243,7 @@ const SITE_DATA = {
               label: "Archived",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v3.4.0", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0" }
+                { label: "Resource Pack", icon: "brush", version: "v3.4.0", url: "https://modrinth.com/resourcepack/classics-disc-tweaks/version/v3.4.0", date: "2026-09-14" }
               ]
             }
           ]
@@ -267,7 +268,7 @@ const SITE_DATA = {
               label: "Archived",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v1.4.0", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0" }
+                { label: "Resource Pack", icon: "brush", version: "v1.4.0", url: "https://modrinth.com/resourcepack/classics-dye-tweaks/version/v1.4.0", date: "2026-09-14" }
               ]
             }
           ]
@@ -292,7 +293,7 @@ const SITE_DATA = {
               label: "Archived",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v2.4.0", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0" }
+                { label: "Resource Pack", icon: "brush", version: "v2.4.0", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks/version/v2.4.0", date: "2026-09-14" }
               ]
             }
           ]
@@ -305,6 +306,7 @@ const SITE_DATA = {
           imageAlt: "Classic's Note Block Tweaks logo: the letters NT",
           title: "Classic's Note Block Tweaks",
           description: "Updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
+          note: "This resource pack has been merged into Classic's Tweaks. It will continue to receive updates throughout the 26.4 development cycle, but will be archived after v1.0.0.",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Note-Block-Tweaks" },
@@ -315,9 +317,8 @@ const SITE_DATA = {
               channel: "alpha",
               label: "Alpha",
               mcVersion: "1.21.9 – 26.4-snap-5",
-              badge: "new",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v0.5.0", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0" }
+                { label: "Resource Pack", icon: "brush", version: "v0.5.0", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0", date: "2026-10-20", notify: true }
               ]
             }
           ]
@@ -340,7 +341,7 @@ const SITE_DATA = {
               label: "Archived",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v2.4.1", url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1" }
+                { label: "Resource Pack", icon: "brush", version: "v2.4.1", url: "https://modrinth.com/resourcepack/zisteau-pigmen/version/v2.4.1", date: "2026-09-16" }
               ]
             }
           ]

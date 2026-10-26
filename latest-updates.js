@@ -77,13 +77,13 @@ const LATEST_UPDATES = {
   },
 
   tags: {
-    news: { label: "News", color: "#41A0C8" },
+    news: { label: "News", color: "#9BA7BF" },
     release: { label: "Release", color: "#22C55E" },
     beta: { label: "Beta", color: "#FF9D47" },
     alpha: { label: "Alpha", color: "#F2607E" },
-    archived: { label: "Archived", color: "#929292" },
-    new: { label: "New Project", color: "#EFDD65" },
-    snapshot: { label: "Snapshot", color: "#85C8E4" }
+    archived: { label: "Archived", color: "#9BA7BF" },
+    new: { label: "New Project", color: "#74C4E7" },
+    snapshot: { label: "Snapshot", color: "#9BA7BF" }
   },
 
   entries: [
@@ -92,7 +92,7 @@ const LATEST_UPDATES = {
       date: "2026-10-26",
       title: "Classic's Tweaks v3.0.0",
       text: "The first full release of Classic's Tweaks. No changes since v3.0.0-beta.2.",
-      tags: ["stable"],
+      tags: ["release"],
       mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3"],
       image: "images/classics-tweaks.webp",
       projects: ["classics-tweaks"],

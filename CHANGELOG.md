@@ -4,6 +4,39 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.0.0 — 2026-10-26
+
+### Project pages redesign
+- Redesigned the project cards. Each project is now a single card with a release table (download types as rows, release channels as columns) in place of the separate channel boxes
+- Moved project links and "Older versions" into a footer strip at the bottom of each card
+- Added release dates to every download. Releases under a month old show a relative date ("3 days ago") with the full date on hover
+- Download buttons now say where they go, e.g. "View on Modrinth"
+- Added a "Jump to project" panel linking to each project on the page. It can be collapsed and remembers your choice
+- Replaced the "New" and "Updated" badges and their dismiss buttons with notification dots beside version numbers and on the navigation bar. The dots show until you open that project page, and reappear when a version changes
+
+### Home page redesign
+- Moved the statistics into the splash section
+- Removed the splash banner image and the pixel background
+- Updated the splash subtitle
+- Renamed the "Explore" button to "Browse projects"
+- Replaced the "About" button with "Latest news", which jumps to the news section
+- Added a project counter (e.g. 1/2) to the Featured Project card
+- Renamed the "Downloadable Projects" statistic to "Projects" and "Hours of Playtime" to "Hours Played", and removed the statistic icons
+- Replaced the statistics footnote with a tooltip on each statistic explaining how it is measured
+
+### Added
+- Notification dot on the News tab on the nav bar for entries added since your last visit
+
+### Changed
+- Refreshed the site's visual design with consistent spacing, corner radii, type sizes and colours. Headings now use the Minercraftory display font throughout
+- Changed the news page's News, Archived and Snapshot tag colours to a neutral grey-blue, and the New Project tag from yellow to the site accent blue
+- Added a note to Classic's Note Block Tweaks explaining it has been merged into Classic's Tweaks and will be archived after v1.0.0
+- Updated the home page title, description and link preview text
+- Updated the calendar icon
+
+### Fixed
+- Fixed the Classic's Tweaks v3.0.0 news entry using an undefined "stable" tag instead of "Release"
+
 ## v3.17.0.2 — 2026-10-26
 
 ### Changed

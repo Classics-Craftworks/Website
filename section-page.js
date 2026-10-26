@@ -46,7 +46,7 @@ function uniqueSlug(text, fallback, used) {
 }
 
 // The one place that decides element IDs for a section (heading first, then each
-// project), so links, search, badge keys and structured data can't drift apart.
+// project), so links, search, notification keys and structured data can't drift apart.
 // Returns { headingId, projects: [{ project, id }], byProject }.
 const sectionIdCache = new WeakMap();
 function sectionIds(section) {
@@ -113,6 +113,37 @@ function storageSet(key, value) {
   try { localStorage.setItem(key, value); } catch { /* storage unavailable */ }
 }
 
+function capitalise(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+const relativeWords = new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' });
+const relativeCounts = new Intl.RelativeTimeFormat('en-GB', { numeric: 'always' });
+
+// "Today", "Yesterday", "3 days ago", "2 weeks ago" for entries under a month old; future
+// dates likewise ("Tomorrow", "In 3 days") up to a month ahead; null otherwise.
+function relativeNewsDate(iso) {
+  const d = new Date(iso + 'T00:00:00Z');
+  if (isNaN(d)) return null;
+
+  const now = new Date();
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.round((today - d.getTime()) / 86400000); // negative = in the future
+
+  // The date one month from today in the entry's direction; a short month clamps
+  // (31 Mar - 1 month = 28 Feb, not 3 Mar).
+  const shift = days < 0 ? 1 : -1;
+  const limit = new Date(today);
+  const day = limit.getUTCDate();
+  limit.setUTCDate(1);
+  limit.setUTCMonth(limit.getUTCMonth() + shift);
+  limit.setUTCDate(Math.min(day, new Date(Date.UTC(limit.getUTCFullYear(), limit.getUTCMonth() + 1, 0)).getUTCDate()));
+  if (days < 0 ? d.getTime() >= limit.getTime() : d.getTime() <= limit.getTime()) return null;
+
+  const n = Math.abs(days);
+  return capitalise(n < 7 ? relativeWords.format(shift * n, 'day') : relativeCounts.format(shift * Math.floor(n / 7), 'week'));
+}
+
 // Full URL for a project's deep link. Copying it leaves the address bar alone.
 function deepLinkUrl(id) {
   return `${location.origin}${location.pathname}#${id}`;
@@ -120,46 +151,6 @@ function deepLinkUrl(id) {
 
 /* ---------- Channel row layout ----------
    Channel boxes and download columns stack rather than wrap mid-line. */
-
-function headerWraps(header) {
-  const label = header && header.querySelector('.channel-label');
-  const group = header && header.querySelector('.channel-mc-group');
-  return !!(label && group && group.offsetTop > label.offsetTop + 1);
-}
-
-function pillWraps(header) {
-  const label = header.querySelector('.download-type-label');
-  const pill = header.querySelector('.pill');
-  return !!(label && pill && pill.offsetTop > label.offsetTop + 1);
-}
-
-function layoutChannelRow(rowEl) {
-  const groups = Array.from(rowEl.querySelectorAll(':scope > .channel-group'));
-  if (!groups.length) return;
-
-  rowEl.classList.remove('stacked');
-  if (groups.some(g => headerWraps(g.querySelector('.channel-header')))) rowEl.classList.add('stacked');
-
-  groups.forEach(g => {
-    const header = g.querySelector('.channel-header');
-    header.classList.remove('header-force-wrap');
-    if (headerWraps(header)) header.classList.add('header-force-wrap');
-  });
-
-  const downloadLists = groups.map(g => g.querySelector('.channel-downloads')).filter(Boolean);
-  downloadLists.forEach(dl => dl.classList.remove('downloads-stacked'));
-  const pillNeedsRoom = downloadLists.some(dl => {
-    const headers = Array.from(dl.querySelectorAll('.download-col-header'));
-    return headers.length > 1 && headers.some(pillWraps);
-  });
-  if (pillNeedsRoom) downloadLists.forEach(dl => dl.classList.add('downloads-stacked'));
-}
-
-// Re-runs layoutChannelRow() on every size change, height included: stacking changes
-// the height, and those follow-up passes settle the layout after a resize.
-function watchChannelRow(rowEl) {
-  if (window.ResizeObserver) new ResizeObserver(() => layoutChannelRow(rowEl)).observe(rowEl);
-}
 
 /* ---------- Project cards ---------- */
 
@@ -228,164 +219,369 @@ function renderBrand(brand) {
   document.getElementById('brand-name').textContent = brand.name;
 }
 
-// A badge reappears when the versions it was dismissed against change.
-const badgeFingerprint = ch => (ch.downloads || []).map(d => d.version || 'N/A').join('|');
-const badgeKey = (projectId, ch) => `badge-dismissed:${projectId}:${(ch.channel || 'stable').toLowerCase()}`;
+/* ---------- Project notifications ----------
+   A download with `notify: true` in data.js gets a dot until its page has been opened since its
+   version last changed. Nothing counts as seen on a first visit, so the dots show. The previous
+   visit's state is held for the browser session so reloads don't clear them. */
 
-function renderChannelBadge(ch, key) {
-  const fingerprint = badgeFingerprint(ch);
-  if (storageGet(key) === fingerprint) return null;
+const PROJECTS_SEEN_KEY = 'downloads-seen';
+const PROJECTS_BASELINE_KEY = 'downloads-seen-baseline';
 
-  const text = String(ch.badge).toLowerCase() === 'updated' ? 'Updated' : 'New';
-  const badge = el('button', {
-    class: 'channel-badge',
-    attrs: { type: 'button', 'data-badge': text.toLowerCase(), 'data-tooltip': 'Dismiss', 'aria-label': `Dismiss "${text}" label` }
-  }, [
-    el('span', { class: 'channel-badge-text', text }),
-    el('span', { class: 'channel-badge-dismiss' })
-  ]);
+// A download counts as new again when its version changes.
+const downloadAvailable = d => !!(d && !d.disabled && d.url);
+const notifyKey = (projectId, ch, d) => `${projectId}:${(ch.channel || 'stable').toLowerCase()}:${d.label}`;
+const notifyFingerprint = d => d.version || 'N/A';
 
-  badge.addEventListener('click', e => {
-    e.preventDefault();
-    e.stopPropagation();
-    storageSet(key, fingerprint);
-    badge.classList.add('is-dismissed');
-    badge.addEventListener('transitionend', () => badge.remove(), { once: true });
-    window.setTimeout(() => badge.remove(), 250);
-  });
-
-  return badge;
+function parseSeenMap(text) {
+  try {
+    const map = JSON.parse(text);
+    return map && typeof map === 'object' && !Array.isArray(map) ? map : null;
+  } catch { return null; }
 }
 
-function renderDownload(d) {
-  const disabled = d.disabled || !d.url;
+// Every available download in a notify channel: { key, fingerprint, section }.
+function allNotifyDownloads() {
+  const out = [];
+  (SITE_DATA.sections || []).forEach(section => {
+    sectionIds(section).projects.forEach(({ project, id }) => {
+      (project.channels || []).forEach(ch => {
+        (ch.downloads || []).filter(d => d.notify && downloadAvailable(d)).forEach(d =>
+          out.push({ key: notifyKey(id, ch, d), fingerprint: notifyFingerprint(d), section: section.heading }));
+      });
+    });
+  });
+  return out;
+}
 
-  const colHeader = el('div', { class: 'download-col-header' + (disabled ? ' is-disabled' : '') }, [
-    icon(d.icon || 'box', 'icon-sm'),
-    el('span', { class: 'download-type-label', text: d.label }),
-    el('span', { class: 'pill' + (disabled ? ' disabled-pill' : ''), text: disabled ? 'N/A' : (d.version || 'N/A') })
+let projectsBaselineCache; // map of seen fingerprints as of this visit (empty if nothing seen yet)
+
+function projectsBaseline() {
+  if (projectsBaselineCache !== undefined) return projectsBaselineCache;
+  let map = null;
+  try { map = parseSeenMap(sessionStorage.getItem(PROJECTS_BASELINE_KEY)); } catch { /* session storage unavailable */ }
+  if (!map) {
+    map = parseSeenMap(storageGet(PROJECTS_SEEN_KEY));
+    if (map) { try { sessionStorage.setItem(PROJECTS_BASELINE_KEY, JSON.stringify(map)); } catch { /* ignore */ } }
+  }
+  projectsBaselineCache = map || {};
+  return projectsBaselineCache;
+}
+
+// Dot on a download: new since this visit began (survives reloads in the session).
+function isNotifyDownload(projectId, ch, d) {
+  const seen = projectsBaseline();
+  return !!(d.notify && downloadAvailable(d) && seen[notifyKey(projectId, ch, d)] !== notifyFingerprint(d));
+}
+
+// Navigation counts: one per channel with an unseen download, cleared on the next page load
+// once the project page has been opened.
+function isUnseenChannel(projectId, ch) {
+  const seen = parseSeenMap(storageGet(PROJECTS_SEEN_KEY)) || {};
+  return !!((ch.downloads || []).some(d =>
+    d.notify && downloadAvailable(d) && seen[notifyKey(projectId, ch, d)] !== notifyFingerprint(d)));
+}
+
+// Opening a project page counts as seeing everything on it.
+function markProjectsSeen(section) {
+  projectsBaseline(); // fix this visit's baseline before the saved map changes
+  const seen = parseSeenMap(storageGet(PROJECTS_SEEN_KEY)) || {};
+  allNotifyDownloads().filter(c => c.section === section.heading).forEach(c => { seen[c.key] = c.fingerprint; });
+  storageSet(PROJECTS_SEEN_KEY, JSON.stringify(seen));
+}
+
+function projectDot() {
+  const text = 'New since your last visit';
+  return el('span', { class: 'news-new-dot', attrs: { 'data-tooltip': text, role: 'img', 'aria-label': text } });
+}
+
+const HOST_LABELS = { 'modrinth.com': 'Modrinth', 'www.spigotmc.org': 'SpigotMC', 'spigotmc.org': 'SpigotMC', 'github.com': 'GitHub' };
+
+function hostLabel(url) {
+  try { return HOST_LABELS[new URL(url).hostname] || ''; } catch { return ''; }
+}
+
+// A download's release date: its own `date` (ISO), else the matching entry in
+// latest-updates.js. Returns '' when neither has one, and the cell shows a placeholder.
+function releaseDate(project, d) {
+  // Must be a quoted "YYYY-MM-DD" string. An unquoted 2026-09-15 is arithmetic (= 2002) in JavaScript,
+  // so anything else is ignored with a console warning instead of showing a wrong year.
+  if (d.date !== undefined && !(typeof d.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d.date))) {
+    console.warn(`data.js: ignoring date ${JSON.stringify(d.date)} on ${project.title} ${d.version || ''}; use a quoted "YYYY-MM-DD" string.`);
+  } else if (d.date) {
+    return d.date;
+  }
+  const list = typeof LATEST_UPDATES !== 'undefined' && LATEST_UPDATES.sidebar
+    && LATEST_UPDATES.sidebar.latestReleases && LATEST_UPDATES.sidebar.latestReleases.releases;
+  const hit = (list || []).find(r => r.project === project.title && r.version === d.version);
+  return hit ? hit.date : '';
+}
+
+function formatDate(iso) {
+  const date = new Date(iso + 'T00:00:00Z');
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
+// Table columns: every download type used by any channel, in first-seen order.
+function tableColumns(channels) {
+  const columns = [];
+  channels.forEach(ch => (ch.downloads || []).forEach(d => {
+    if (!columns.some(c => c.label === d.label)) columns.push({ label: d.label, icon: d.icon || 'box' });
+  }));
+  return columns;
+}
+
+function unavailableCell(d) {
+  const tip = d && d.tooltip;
+  const attrs = tip ? { 'data-tooltip': tip, tabindex: '0', 'aria-label': `Not available: ${tip}` } : {};
+  const box = el('div', { class: 'download-unavailable' + (tip ? ' has-tooltip' : ''), attrs }, [
+    icon('unavailable', 'icon-sm'),
+    el('span', { text: 'Not available' })
   ]);
 
-  let action;
-  if (disabled) {
-    const attrs = d.tooltip
-      ? { 'data-tooltip': d.tooltip, tabindex: '0', 'aria-label': `Not available: ${d.tooltip}` }
-      : {};
-    action = el('div', { class: 'download-unavailable' + (d.tooltip ? ' has-tooltip' : ''), attrs }, [
-      icon('unavailable', 'icon-sm'),
-      el('span', { text: 'Not available' })
-    ]);
+  // Touch has no hover, so a tap shows the tooltip briefly.
+  if (tip) {
+    box.addEventListener('click', () => {
+      box.classList.add('tooltip-open');
+      window.clearTimeout(box._tooltipTimer);
+      box._tooltipTimer = window.setTimeout(() => box.classList.remove('tooltip-open'), 3000);
+    });
+  }
+  return box;
+}
 
-    // Touch has no hover, so a tap shows the tooltip briefly.
-    if (d.tooltip) {
-      action.addEventListener('click', () => {
-        action.classList.add('tooltip-open');
-        window.clearTimeout(action._tooltipTimer);
-        action._tooltipTimer = window.setTimeout(() => action.classList.remove('tooltip-open'), 3000);
-      });
-    }
-  } else {
-    action = el('a', { class: 'download-btn', href: d.url }, [
-      icon('newtab', 'icon-sm'),
-      el('span', { text: 'View' })
-    ]);
+// Channel title shared by the column header and the narrow layout's cell label.
+function channelTitle(ch, cls) {
+  return el('span', { class: cls }, [
+    el('span', { class: 'rt-channel' }, [
+      el('span', { class: 'status-dot' }),
+      el('span', { class: 'channel-label', text: ch.label })
+    ]),
+    ch.mcVersion ? el('span', { class: 'rt-java', text: 'Java ' + ch.mcVersion }) : null
+  ]);
+}
+
+// Releases under a month old show a relative date with the full date as a tooltip.
+function releaseDateNode(iso) {
+  const full = formatDate(iso);
+  const relative = relativeNewsDate(iso);
+  return el('span', { class: 'rt-date' + (relative ? ' has-tooltip' : ''), attrs: relative ? { 'data-tooltip': full } : {} }, [
+    icon('calendar', 'icon-sm'),
+    el('time', { text: relative || full, attrs: { datetime: iso } })
+  ]);
+}
+
+function renderCell(project, ch, column, d, notifiedSet) {
+  const channel = (ch.channel || 'stable').toLowerCase();
+  const label = channelTitle(ch, 'rt-cell-label');
+
+  const available = d && !d.disabled && d.url;
+  if (!available) {
+    return el('div', { class: 'rt-cell is-unavailable', attrs: { role: 'cell', 'data-channel': channel } }, [label, unavailableCell(d)]);
   }
 
-  return el('div', { class: 'download-col' + (disabled ? ' is-disabled' : '') }, [colHeader, action]);
-}
+  const iso = releaseDate(project, d);
+  const date = iso
+    ? releaseDateNode(iso)
+    // PLACEHOLDER: no release date in the data yet. Add `date: "YYYY-MM-DD"` to the download in data.js.
+    : el('span', { class: 'rt-date is-placeholder', attrs: { 'data-placeholder': 'release-date' } }, [
+        icon('calendar', 'icon-sm'),
+        el('span', { text: 'Date TBC' })
+      ]);
 
-function renderChannel(ch, projectId) {
-  const header = el('div', { class: 'channel-header' }, [
-    el('span', { class: 'status-dot' }),
-    el('span', { class: 'channel-label', text: ch.label }),
-    ch.mcVersion ? el('span', { class: 'channel-mc-group' }, [
-      el('span', { class: 'channel-sep', text: '|' }),
-      el('span', { class: 'channel-mc', text: 'Java ' + ch.mcVersion })
-    ]) : null
+  const host = hostLabel(d.url);
+  const action = host ? `View on ${host}` : 'View';
+  const button = el('a', {
+    class: 'download-btn',
+    href: d.url,
+    attrs: { 'aria-label': `${action}: ${project.title} ${column.label} ${d.version || ''}, ${ch.label}`.replace(/\s+/g, ' ') }
+  }, [
+    el('span', { text: action }),
+    icon('newtab', 'icon-sm')
   ]);
 
-  const badge = ch.badge ? renderChannelBadge(ch, badgeKey(projectId, ch)) : null;
-  const downloads = el('div', { class: 'channel-downloads' }, (ch.downloads || []).map(renderDownload));
-
-  return el('div', {
-    class: 'channel-group',
-    attrs: { 'data-channel': (ch.channel || 'stable').toLowerCase() }
-  }, [badge, header, downloads]);
+  return el('div', { class: 'rt-cell', attrs: { role: 'cell', 'data-channel': channel } }, [
+    label,
+    el('div', { class: 'rt-meta' }, [
+      el('span', { class: 'rt-version' }, [
+        el('span', { class: 'pill', text: d.version || 'N/A' }),
+        notifiedSet.has(d) ? projectDot() : null
+      ]),
+      date
+    ]),
+    button
+  ]);
 }
 
-// Info panel for a project's `note`. Fills the slot a second channel box would use.
+// One row per download type; one cell per channel.
+function renderTypeRow(project, column, channels, notifiedSet) {
+  const head = el('div', { class: 'rt-rowhead', attrs: { role: 'rowheader' } }, [
+    icon(column.icon, 'icon-sm'),
+    el('span', { text: column.label })
+  ]);
+  const cells = channels.map(ch => renderCell(project, ch, column, (ch.downloads || []).find(d => d.label === column.label), notifiedSet));
+  return el('div', { class: 'rt-row', attrs: { role: 'row' } }, [head, ...cells]);
+}
+
+function renderReleaseTable(project, columns, sideNote, notifiedSet) {
+  const channels = project.channels || [];
+
+  const headRow = el('div', { class: 'rt-row rt-head', attrs: { role: 'row' } }, [
+    el('span', { class: 'rt-colhead', attrs: { role: 'columnheader' } }, [el('span', { class: 'visually-hidden', text: 'Download' })]),
+    ...channels.map(ch => {
+      const colhead = channelTitle(ch, 'rt-colhead');
+      colhead.setAttribute('role', 'columnheader');
+      colhead.setAttribute('data-channel', (ch.channel || 'stable').toLowerCase());
+      return colhead;
+    })
+  ]);
+
+  const table = el('div', {
+    class: 'release-table',
+    attrs: { role: 'table', 'aria-label': `${project.title} releases`, 'data-cols': String(channels.length) }
+  }, [headRow, ...columns.map(column => renderTypeRow(project, column, channels, notifiedSet))]);
+
+  // A one-channel table is narrow, so its note sits beside it (and wraps below when there is no room).
+  return el('div', { class: 'rt' + (sideNote ? ' rt-with-note' : '') }, [table, sideNote]);
+}
+
 function renderProjectNote(p) {
   if (!p.note) return null;
   return el('div', { class: 'project-note', attrs: { role: 'note' } }, [
-    el('div', { class: 'project-note-inner' }, [
-      icon('info', 'icon-sm'),
-      el('p', { text: p.note })
-    ])
+    icon('info', 'icon-sm'),
+    el('p', { text: p.note })
   ]);
 }
 
-function renderVersionsNote(p) {
-  if (!(p.channels || []).length) return null;
-
+// Footer strip: icon links to the project's pages, then "Older versions" on the right.
+function renderProjectFooter(p) {
   const findLink = name => (p.links || []).find(l => (l.label || '').toLowerCase() === name);
   const modrinth = findLink('modrinth');
   const github = findLink('github');
-  if (!modrinth && !github) return null;
+  const older = (p.channels || []).length
+    ? (modrinth ? `${modrinth.url}/versions` : github ? `${github.url}/wiki/Versions` : '')
+    : '';
+  if (!(p.links || []).length && !older) return null;
 
-  const note = el('p', { class: 'versions-note' });
-  note.appendChild(icon('history', 'icon-sm'));
-  note.appendChild(document.createTextNode('Older versions: '));
-  if (modrinth) note.appendChild(el('a', { class: 'versions-note-link', href: `${modrinth.url}/versions`, text: 'Modrinth' }));
-  if (modrinth && github) note.appendChild(document.createTextNode(' | '));
-  if (github) note.appendChild(el('a', { class: 'versions-note-link', href: `${github.url}/wiki/Versions`, text: 'GitHub' }));
-  return note;
+  return el('footer', { class: 'project-footer' }, [
+    el('ul', { class: 'project-links' }, (p.links || []).map(l =>
+      el('li', {}, [el('a', { class: 'project-link', href: l.url }, [icon(l.icon, 'icon-sm'), el('span', { text: l.label })])])
+    )),
+    older ? el('a', { class: 'project-older', href: older }, [icon('history', 'icon-sm'), el('span', { text: 'Older versions' })]) : null
+  ]);
 }
 
 function renderProject(p, id) {
-  const linkRow = el('div', { class: 'project-links' }, (p.links || []).map(l =>
-    el('a', { class: 'text-link', href: l.url }, [icon(l.icon, 'icon-sm'), el('span', { text: l.label })])
-  ));
+  const channels = p.channels || [];
+  const columns = tableColumns(channels);
 
-  const channelRow = el('div', { class: 'channel-row' }, (p.channels || []).map(ch => renderChannel(ch, id)));
-  const note = (p.channels || []).length === 1 ? renderProjectNote(p) : null; // only fills a free slot
-  if (note) channelRow.appendChild(note);
-  watchChannelRow(channelRow);
+  const notified = new Set();
+  channels.forEach(ch => (ch.downloads || []).forEach(d => { if (isNotifyDownload(id, ch, d)) notified.add(d); }));
 
-  const hasChannels = (p.channels || []).length > 0;
+  const body = [];
+  const note = renderProjectNote(p);
+  const noteBeside = channels.length === 1 && note;
+  if (channels.length) body.push(renderReleaseTable(p, columns, noteBeside ? note : null, notified));
+  if (note && !noteBeside) body.push(note);
 
-  return el('article', { class: 'project' + (hasChannels ? ' has-channels' : '') + (note ? ' has-note' : ''), attrs: { id } }, [
-    el('img', { class: 'project-image', src: p.image, alt: p.imageAlt || '', attrs: { loading: 'lazy', width: '320', height: '320' } }),
-    el('div', { class: 'project-body' }, [
+  return el('article', { class: 'project', attrs: { id } }, [
+    el('header', { class: 'project-header' }, [
+      el('img', { class: 'project-image', src: p.image, alt: p.imageAlt || '', attrs: { loading: 'lazy', width: '320', height: '320' } }),
       el('div', { class: 'project-info' }, [
         el('h2', {}, [copyLinkButton(id, p.title)]),
-        el('p', { class: 'project-description', text: p.description }),
-        linkRow
-      ]),
-      channelRow,
-      renderVersionsNote(p)
-    ])
+        el('p', { class: 'project-description', text: p.description })
+      ])
+    ]),
+    body.length ? el('div', { class: 'project-body' }, body) : null,
+    renderProjectFooter(p)
   ]);
 }
 
 /* ---------- Header ---------- */
 
-// Undismissed "New"/"Updated" badges on a page's projects.
-function countUndismissedBadges(page) {
+// Unseen `notify` channels on a page's projects.
+function countUnseenNotifications(page) {
   const section = (SITE_DATA.sections || []).find(s => s.heading === page.section);
   if (!section) return 0;
 
   let count = 0;
   sectionIds(section).projects.forEach(({ project, id }) => {
     (project.channels || []).forEach(ch => {
-      if (ch.badge && storageGet(badgeKey(id, ch)) !== badgeFingerprint(ch)) count++;
+      if (isUnseenChannel(id, ch)) count++;
     });
   });
   return count;
 }
 
+/* ---------- News data and seen-state (shared with news.js) ---------- */
+
+function newsData() {
+  return typeof LATEST_UPDATES !== 'undefined' ? LATEST_UPDATES : null;
+}
+
+function newsEntries() {
+  const news = newsData();
+  const entries = ((news && news.entries) || []).filter(e => e && e.title && e.date);
+  // ISO dates sort as text; the sort is stable, so same-day entries keep their file order.
+  return entries.slice().sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+}
+
+// Stable anchor for an entry, used to link to it on the News page.
+function newsEntryId(entry) {
+  return slugify(entry.date + ' ' + entry.title);
+}
+
+/* ---------- "New since your last visit" ----------
+   Seen entries are kept in localStorage; newer ones get a dot. The previous visit's list is
+   held for the browser session so reloads don't clear the dots. A first visit marks nothing. */
+
+const NEWS_SEEN_KEY = 'news-seen';
+const NEWS_BASELINE_KEY = 'news-seen-baseline';
+
+function parseIdList(text) {
+  try {
+    const list = JSON.parse(text);
+    return Array.isArray(list) ? list : null;
+  } catch { return null; }
+}
+
+let newsBaselineCache; // Set of already-seen entry ids, or null if unknown
+
+// Entry ids seen before this visit; null when unknown.
+function newsBaseline() {
+  if (newsBaselineCache !== undefined) return newsBaselineCache;
+  let list = null;
+  try { list = parseIdList(sessionStorage.getItem(NEWS_BASELINE_KEY)); } catch { /* session storage unavailable */ }
+  if (!list) {
+    list = parseIdList(storageGet(NEWS_SEEN_KEY));
+    if (list) { try { sessionStorage.setItem(NEWS_BASELINE_KEY, JSON.stringify(list)); } catch { /* ignore */ } }
+  }
+  newsBaselineCache = list ? new Set(list) : null;
+  return newsBaselineCache;
+}
+
+function isNewEntry(entry) {
+  const seen = newsBaseline();
+  return !!seen && !seen.has(newsEntryId(entry));
+}
+
+// Everything listed on the News page counts as seen from the next visit on.
+function markNewsSeen(entries) {
+  newsBaseline(); // fix this visit's baseline before the saved list changes
+  storageSet(NEWS_SEEN_KEY, JSON.stringify(entries.map(newsEntryId)));
+}
+
+// Entries not yet listed on the News page by this browser; 0 until it has opened News once.
+function countUnseenNews() {
+  const seen = parseIdList(storageGet(NEWS_SEEN_KEY));
+  if (!seen) return 0;
+  const known = new Set(seen);
+  return newsEntries().filter(e => !known.has(newsEntryId(e))).length;
+}
+
 // Count pill for nav items; shows "9+" above nine.
-function navBadgeDot(count) {
-  const text = `${count} new ${count === 1 ? 'update' : 'updates'}`;
+function navBadgeDot(count, noun = ['update', 'updates']) {
+  const text = `${count} new ${noun[count === 1 ? 0 : 1]}`;
   return el('span', {
     class: 'nav-jump-dot',
     attrs: { 'data-tooltip': text, 'aria-label': text }
@@ -415,15 +611,15 @@ function renderSiteHeader(pages, currentUrl) {
 
   // Elements carrying a count pill; syncDots() redraws them at load and on back/forward restore.
   const dotTargets = [];
-  const trackDots = (target, getCount) => dotTargets.push({ target, getCount });
-  const totalProjectBadges = () => projectPages.reduce((sum, p) => sum + countUndismissedBadges(p), 0);
+  const trackDots = (target, getCount, noun) => dotTargets.push({ target, getCount, noun });
+  const totalProjectBadges = () => projectPages.reduce((sum, p) => sum + countUnseenNotifications(p), 0);
 
   function syncDots() {
-    dotTargets.forEach(({ target, getCount }) => {
+    dotTargets.forEach(({ target, getCount, noun }) => {
       const existing = target.querySelector(':scope > .nav-jump-dot');
       const count = getCount();
       if (count > 0) {
-        const fresh = navBadgeDot(count);
+        const fresh = navBadgeDot(count, noun);
         if (existing) existing.replaceWith(fresh);
         else target.appendChild(fresh);
       } else if (existing) {
@@ -461,7 +657,7 @@ function renderSiteHeader(pages, currentUrl) {
 
     const items = projectPages.map(page => {
       const a = pageLink(page, 'nav-dropdown-item');
-      trackDots(a, () => countUndismissedBadges(page));
+      trackDots(a, () => countUnseenNotifications(page));
       return a;
     });
     const menu = el('div', { class: 'nav-dropdown-menu', attrs: { id: menuId, hidden: '' } }, items);
@@ -509,7 +705,11 @@ function renderSiteHeader(pages, currentUrl) {
     });
   }
 
-  if (newsPage) nav.appendChild(pageLink(newsPage, 'nav-link'));
+  if (newsPage) {
+    const newsLink = pageLink(newsPage, 'nav-link');
+    trackDots(newsLink, countUnseenNews, ['news entry', 'news entries']);
+    nav.appendChild(newsLink);
+  }
   if (about) nav.appendChild(pageLink(about, 'nav-link'));
 
   // Mobile menu button; its pill totals every project page.
@@ -519,7 +719,7 @@ function renderSiteHeader(pages, currentUrl) {
   }, [
     el('span', { class: 'nav-toggle-bars', attrs: { 'aria-hidden': 'true' } })
   ]);
-  trackDots(toggle, totalProjectBadges);
+  trackDots(toggle, () => totalProjectBadges() + countUnseenNews());
   inner.insertBefore(toggle, menuWrap);
 
   const setMenu = open => {
@@ -593,7 +793,7 @@ function renderFlatSection(section) {
 
   const noticeText = SITE_DATA.downloadNotice;
   if (noticeText && sectionHasDownloads(section) && !noticeDismissed(noticeText)) {
-    const close = el('button', { class: 'notice-close', attrs: { type: 'button', 'aria-label': 'Dismiss notice', 'data-tooltip': 'Dismiss' } });
+    const close = el('button', { class: 'notice-close', attrs: { type: 'button', 'aria-label': 'Dismiss notice', 'data-tooltip': 'Dismiss' } }, [el('span', { class: 'close-glyph', attrs: { 'aria-hidden': 'true' } })]);
     const notice = el('div', { class: 'download-notice', attrs: { role: 'note' } }, [
       icon('info', 'icon-sm'),
       el('p', { text: noticeText }),
@@ -606,7 +806,49 @@ function renderFlatSection(section) {
     main.appendChild(notice);
   }
 
-  main.appendChild(el('div', { class: 'project-list' }, ids.projects.map(({ project, id }) => renderProject(project, id))));
+  const list = el('div', { class: 'project-list' }, ids.projects.map(({ project, id }) => renderProject(project, id)));
+  const jump = renderProjectJump(ids.projects);
+  main.appendChild(el('div', { class: 'catalog-layout' }, [jump, list]));
+}
+
+// Side panel with a link to each project on the page. Reuses the news page's collapsible panel.
+function renderProjectJump(projects) {
+  if (projects.length < 2) return null;
+
+  const KEY = 'catalog-jump-collapsed';
+  const stored = storageGet(KEY);
+  let open = stored === null ? window.matchMedia('(min-width: 1100px)').matches : stored !== '1';
+
+  const listId = 'project-jump-list';
+  const items = projects.map(({ project, id }) => el('li', {}, [
+    (() => {
+      const link = internalLink('jump-link', '#' + id, [
+        el('img', { src: project.image, alt: '', attrs: { loading: 'lazy', width: '48', height: '48' } }),
+        el('span', { text: project.title })
+      ]);
+      return link;
+    })()
+  ]));
+  const body = el('div', { class: 'news-filter-panel', attrs: { id: listId } }, [el('ul', { class: 'jump-list' }, items)]);
+  const toggle = el('button', { class: 'news-filter-toggle', attrs: { type: 'button', 'aria-controls': listId } }, [
+    el('span', { class: 'news-filter-toggle-label', text: 'Jump to project' }),
+    el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+  ]);
+  const box = el('section', { class: 'news-filter-box' }, [toggle, body]);
+
+  const apply = () => {
+    toggle.setAttribute('aria-expanded', String(open));
+    body.hidden = !open;
+    box.classList.toggle('is-open', open);
+  };
+  toggle.addEventListener('click', () => {
+    open = !open;
+    apply();
+    storageSet(KEY, open ? '0' : '1');
+  });
+  apply();
+
+  return el('aside', { class: 'catalog-aside', attrs: { 'aria-label': 'Projects on this page' } }, [box]);
 }
 
 function footerLink(href, iconName, label) {
@@ -651,9 +893,15 @@ function renderFooter(socials, footer, version) {
 
 /* ---------- Page behaviour ---------- */
 
+// Removes the loading placeholders that each page's HTML ships with ([data-skeleton]).
+function clearSkeletons() {
+  document.querySelectorAll('[data-skeleton]').forEach(node => node.remove());
+}
+
 function initBackToTop() {
   const btn = document.getElementById('back-to-top');
   if (!btn) return;
+  btn.appendChild(el('span', { class: 'back-to-top-glyph', attrs: { 'aria-hidden': 'true' } }));
 
   const SHOW_AFTER = 180; // px scrolled before the button appears
 
@@ -805,8 +1053,10 @@ function initSectionPage(pageUrl) {
   const section = (SITE_DATA.sections || []).find(s => s.heading === (pageEntry && pageEntry.section)) || SITE_DATA.sections[0];
 
   renderFlatSection(section);
+  markProjectsSeen(section);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderStructuredData(SITE_DATA, section);
+  clearSkeletons();
   initBackToTop();
   handleDeepLink();
   window.addEventListener('hashchange', handleDeepLink);
