@@ -318,7 +318,7 @@ const SITE_DATA = {
               label: "Alpha",
               mcVersion: "1.21.9 – 26.4-snap-5",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v0.5.0", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0", date: "2026-10-20" }
+                { label: "Resource Pack", icon: "brush", version: "v0.5.0", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0", date: "2026-10-20", notify: true }
               ]
             }
           ]
