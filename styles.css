@@ -1123,6 +1123,8 @@ main:focus, #catalog:focus { outline: none; }
 .copy-link-btn .icon-sm {
   /* Takes no line width, so the icon can never wrap onto a line of its own. */
   margin: 0 calc((var(--s-2) + 16px) * -1) 0 var(--s-2);
+  position: relative;
+  top: -0.1em; /* optically centres the icon on the capitals */
   vertical-align: middle;
   color: var(--text-soft);
   transition: color var(--ease);
@@ -1188,6 +1190,8 @@ main:focus, #catalog:focus { outline: none; }
 }
 .rt-channel { display: flex; align-items: center; gap: var(--s-2); font-size: var(--text-md); line-height: var(--lh-md); }
 .rt-cell-label { display: none; }
+.rt-version { display: inline-flex; align-items: center; gap: var(--s-2); }
+.rt-version .news-new-dot { flex: none; margin-right: 0; vertical-align: baseline; }
 .status-dot { flex: none; width: var(--s-2); height: var(--s-2); background: var(--channel-color); }
 .rt [data-channel="stable"] .status-dot { border-radius: 50%; }
 .rt [data-channel="beta"] .status-dot { border-radius: 0; transform: rotate(45deg); }
@@ -1227,6 +1231,7 @@ main:focus, #catalog:focus { outline: none; }
 
 .rt-date { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--text-soft); font-size: var(--text-sm); line-height: var(--lh-sm); white-space: nowrap; }
 .rt-date.is-placeholder { font-style: italic; }
+.rt-date.has-tooltip { position: relative; cursor: default; }
 
 /* One width for every version button. The 44px hit area is added without changing the 40px control. */
 .download-btn { position: relative; flex: none; width: var(--action-w); min-height: var(--control-h); padding: 0 var(--s-2); }

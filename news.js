@@ -79,10 +79,6 @@ function hexToRgb(hex) {
   return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)).join(', ');
 }
 
-function capitalise(text) {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
 // { key, label, rgb } for a tag key, with fallbacks for tags not in `tags`.
 function newsTag(key) {
   const defined = ((newsData() || {}).tags || {})[key] || {};
@@ -200,33 +196,6 @@ function calendarIcon() {
   probe.onerror = () => node.remove();
   probe.src = sitePath('images/icons/calendar.svg');
   return node;
-}
-
-const relativeWords = new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' });
-const relativeCounts = new Intl.RelativeTimeFormat('en-GB', { numeric: 'always' });
-
-// "Today", "Yesterday", "3 days ago", "2 weeks ago" for entries under a month old; future
-// dates likewise ("Tomorrow", "In 3 days") up to a month ahead; null otherwise.
-function relativeNewsDate(iso) {
-  const d = new Date(iso + 'T00:00:00Z');
-  if (isNaN(d)) return null;
-
-  const now = new Date();
-  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  const days = Math.round((today - d.getTime()) / 86400000); // negative = in the future
-
-  // The date one month from today in the entry's direction; a short month clamps
-  // (31 Mar - 1 month = 28 Feb, not 3 Mar).
-  const shift = days < 0 ? 1 : -1;
-  const limit = new Date(today);
-  const day = limit.getUTCDate();
-  limit.setUTCDate(1);
-  limit.setUTCMonth(limit.getUTCMonth() + shift);
-  limit.setUTCDate(Math.min(day, new Date(Date.UTC(limit.getUTCFullYear(), limit.getUTCMonth() + 1, 0)).getUTCDate()));
-  if (days < 0 ? d.getTime() >= limit.getTime() : d.getTime() <= limit.getTime()) return null;
-
-  const n = Math.abs(days);
-  return capitalise(n < 7 ? relativeWords.format(shift * n, 'day') : relativeCounts.format(shift * Math.floor(n / 7), 'week'));
 }
 
 // Date with calendar icon. Recent entries show a relative date with the full date as a tooltip.

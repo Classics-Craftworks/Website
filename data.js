@@ -8,8 +8,9 @@
      in its cell; without it the date comes from latest-updates.js (matching project and version),
      else the cell shows a "Date TBC" placeholder.
    - Notes: optional `note: "text"` on a project adds an info panel under its release table.
-   - Badges: `badge: "new" | "updated"` on a channel no longer shows a tag on the card; it only
-     drives the navigation dot until the project's page has been opened.
+   - Notifications: `notify: true` on a download puts a dot beside its version and in the navigation until
+     the project's page has been opened (a new visitor sees every dot). The dot
+     shows again when that download's version number changes.
    - New project: copy an existing project block. */
 
 const SITE_DATA = {
@@ -80,9 +81,8 @@ const SITE_DATA = {
               channel: "beta",
               label: "Beta",
               mcVersion: "26.3 – 26.4-snap-5",
-              badge: "updated",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v8.1.0-beta.4", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.4", date: "2026-10-20" },
+                { label: "Data Pack", icon: "brackets", version: "v8.1.0-beta.4", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.4", date: "2026-10-20", notify: true },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
@@ -116,9 +116,8 @@ const SITE_DATA = {
               channel: "beta",
               label: "Beta",
               mcVersion: "26.3 – 26.4-snap-5",
-              badge: "updated",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.6", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6", date: "2026-10-20" },
+                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.6", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6", date: "2026-10-20", notify: true },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
@@ -209,10 +208,9 @@ const SITE_DATA = {
             {
               channel: "stable",
               label: "Release",
-              badge: "updated",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v3.0.0", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0", date: "2026-10-26" }
+                { label: "Resource Pack", icon: "brush", version: "v3.0.0", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0", date: "2026-10-26", notify: true }
               ]
             },
             {
@@ -319,7 +317,6 @@ const SITE_DATA = {
               channel: "alpha",
               label: "Alpha",
               mcVersion: "1.21.9 – 26.4-snap-5",
-              badge: "new",
               downloads: [
                 { label: "Resource Pack", icon: "brush", version: "v0.5.0", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0", date: "2026-10-20" }
               ]

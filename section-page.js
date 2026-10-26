@@ -46,7 +46,7 @@ function uniqueSlug(text, fallback, used) {
 }
 
 // The one place that decides element IDs for a section (heading first, then each
-// project), so links, search, badge keys and structured data can't drift apart.
+// project), so links, search, notification keys and structured data can't drift apart.
 // Returns { headingId, projects: [{ project, id }], byProject }.
 const sectionIdCache = new WeakMap();
 function sectionIds(section) {
@@ -111,6 +111,37 @@ function storageGet(key) {
 }
 function storageSet(key, value) {
   try { localStorage.setItem(key, value); } catch { /* storage unavailable */ }
+}
+
+function capitalise(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+const relativeWords = new Intl.RelativeTimeFormat('en-GB', { numeric: 'auto' });
+const relativeCounts = new Intl.RelativeTimeFormat('en-GB', { numeric: 'always' });
+
+// "Today", "Yesterday", "3 days ago", "2 weeks ago" for entries under a month old; future
+// dates likewise ("Tomorrow", "In 3 days") up to a month ahead; null otherwise.
+function relativeNewsDate(iso) {
+  const d = new Date(iso + 'T00:00:00Z');
+  if (isNaN(d)) return null;
+
+  const now = new Date();
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.round((today - d.getTime()) / 86400000); // negative = in the future
+
+  // The date one month from today in the entry's direction; a short month clamps
+  // (31 Mar - 1 month = 28 Feb, not 3 Mar).
+  const shift = days < 0 ? 1 : -1;
+  const limit = new Date(today);
+  const day = limit.getUTCDate();
+  limit.setUTCDate(1);
+  limit.setUTCMonth(limit.getUTCMonth() + shift);
+  limit.setUTCDate(Math.min(day, new Date(Date.UTC(limit.getUTCFullYear(), limit.getUTCMonth() + 1, 0)).getUTCDate()));
+  if (days < 0 ? d.getTime() >= limit.getTime() : d.getTime() <= limit.getTime()) return null;
+
+  const n = Math.abs(days);
+  return capitalise(n < 7 ? relativeWords.format(shift * n, 'day') : relativeCounts.format(shift * Math.floor(n / 7), 'week'));
 }
 
 // Full URL for a project's deep link. Copying it leaves the address bar alone.
@@ -188,9 +219,80 @@ function renderBrand(brand) {
   document.getElementById('brand-name').textContent = brand.name;
 }
 
-// A badge reappears when the versions it was dismissed against change.
-const badgeFingerprint = ch => (ch.downloads || []).map(d => d.version || 'N/A').join('|');
-const badgeKey = (projectId, ch) => `badge-dismissed:${projectId}:${(ch.channel || 'stable').toLowerCase()}`;
+/* ---------- Project notifications ----------
+   A download with `notify: true` in data.js gets a dot until its page has been opened since its
+   version last changed. Nothing counts as seen on a first visit, so the dots show. The previous
+   visit's state is held for the browser session so reloads don't clear them. */
+
+const PROJECTS_SEEN_KEY = 'downloads-seen';
+const PROJECTS_BASELINE_KEY = 'downloads-seen-baseline';
+
+// A download counts as new again when its version changes.
+const downloadAvailable = d => !!(d && !d.disabled && d.url);
+const notifyKey = (projectId, ch, d) => `${projectId}:${(ch.channel || 'stable').toLowerCase()}:${d.label}`;
+const notifyFingerprint = d => d.version || 'N/A';
+
+function parseSeenMap(text) {
+  try {
+    const map = JSON.parse(text);
+    return map && typeof map === 'object' && !Array.isArray(map) ? map : null;
+  } catch { return null; }
+}
+
+// Every available download in a notify channel: { key, fingerprint, section }.
+function allNotifyDownloads() {
+  const out = [];
+  (SITE_DATA.sections || []).forEach(section => {
+    sectionIds(section).projects.forEach(({ project, id }) => {
+      (project.channels || []).forEach(ch => {
+        (ch.downloads || []).filter(d => d.notify && downloadAvailable(d)).forEach(d =>
+          out.push({ key: notifyKey(id, ch, d), fingerprint: notifyFingerprint(d), section: section.heading }));
+      });
+    });
+  });
+  return out;
+}
+
+let projectsBaselineCache; // map of seen fingerprints as of this visit (empty if nothing seen yet)
+
+function projectsBaseline() {
+  if (projectsBaselineCache !== undefined) return projectsBaselineCache;
+  let map = null;
+  try { map = parseSeenMap(sessionStorage.getItem(PROJECTS_BASELINE_KEY)); } catch { /* session storage unavailable */ }
+  if (!map) {
+    map = parseSeenMap(storageGet(PROJECTS_SEEN_KEY));
+    if (map) { try { sessionStorage.setItem(PROJECTS_BASELINE_KEY, JSON.stringify(map)); } catch { /* ignore */ } }
+  }
+  projectsBaselineCache = map || {};
+  return projectsBaselineCache;
+}
+
+// Dot on a download: new since this visit began (survives reloads in the session).
+function isNotifyDownload(projectId, ch, d) {
+  const seen = projectsBaseline();
+  return !!(d.notify && downloadAvailable(d) && seen[notifyKey(projectId, ch, d)] !== notifyFingerprint(d));
+}
+
+// Navigation counts: one per channel with an unseen download, cleared on the next page load
+// once the project page has been opened.
+function isUnseenChannel(projectId, ch) {
+  const seen = parseSeenMap(storageGet(PROJECTS_SEEN_KEY)) || {};
+  return !!((ch.downloads || []).some(d =>
+    d.notify && downloadAvailable(d) && seen[notifyKey(projectId, ch, d)] !== notifyFingerprint(d)));
+}
+
+// Opening a project page counts as seeing everything on it.
+function markProjectsSeen(section) {
+  projectsBaseline(); // fix this visit's baseline before the saved map changes
+  const seen = parseSeenMap(storageGet(PROJECTS_SEEN_KEY)) || {};
+  allNotifyDownloads().filter(c => c.section === section.heading).forEach(c => { seen[c.key] = c.fingerprint; });
+  storageSet(PROJECTS_SEEN_KEY, JSON.stringify(seen));
+}
+
+function projectDot() {
+  const text = 'New since your last visit';
+  return el('span', { class: 'news-new-dot', attrs: { 'data-tooltip': text, role: 'img', 'aria-label': text } });
+}
 
 const HOST_LABELS = { 'modrinth.com': 'Modrinth', 'www.spigotmc.org': 'SpigotMC', 'spigotmc.org': 'SpigotMC', 'github.com': 'GitHub' };
 
@@ -259,7 +361,17 @@ function channelTitle(ch, cls) {
   ]);
 }
 
-function renderCell(project, ch, column, d) {
+// Releases under a month old show a relative date with the full date as a tooltip.
+function releaseDateNode(iso) {
+  const full = formatDate(iso);
+  const relative = relativeNewsDate(iso);
+  return el('span', { class: 'rt-date' + (relative ? ' has-tooltip' : ''), attrs: relative ? { 'data-tooltip': full } : {} }, [
+    icon('calendar', 'icon-sm'),
+    el('time', { text: relative || full, attrs: { datetime: iso } })
+  ]);
+}
+
+function renderCell(project, ch, column, d, notifiedSet) {
   const channel = (ch.channel || 'stable').toLowerCase();
   const label = channelTitle(ch, 'rt-cell-label');
 
@@ -270,10 +382,7 @@ function renderCell(project, ch, column, d) {
 
   const iso = releaseDate(project, d);
   const date = iso
-    ? el('span', { class: 'rt-date' }, [
-        icon('calendar', 'icon-sm'),
-        el('time', { text: formatDate(iso), attrs: { datetime: iso } })
-      ])
+    ? releaseDateNode(iso)
     // PLACEHOLDER: no release date in the data yet. Add `date: "YYYY-MM-DD"` to the download in data.js.
     : el('span', { class: 'rt-date is-placeholder', attrs: { 'data-placeholder': 'release-date' } }, [
         icon('calendar', 'icon-sm'),
@@ -294,7 +403,10 @@ function renderCell(project, ch, column, d) {
   return el('div', { class: 'rt-cell', attrs: { role: 'cell', 'data-channel': channel } }, [
     label,
     el('div', { class: 'rt-meta' }, [
-      el('span', { class: 'pill', text: d.version || 'N/A' }),
+      el('span', { class: 'rt-version' }, [
+        el('span', { class: 'pill', text: d.version || 'N/A' }),
+        notifiedSet.has(d) ? projectDot() : null
+      ]),
       date
     ]),
     button
@@ -302,16 +414,16 @@ function renderCell(project, ch, column, d) {
 }
 
 // One row per download type; one cell per channel.
-function renderTypeRow(project, column, channels) {
+function renderTypeRow(project, column, channels, notifiedSet) {
   const head = el('div', { class: 'rt-rowhead', attrs: { role: 'rowheader' } }, [
     icon(column.icon, 'icon-sm'),
     el('span', { text: column.label })
   ]);
-  const cells = channels.map(ch => renderCell(project, ch, column, (ch.downloads || []).find(d => d.label === column.label)));
+  const cells = channels.map(ch => renderCell(project, ch, column, (ch.downloads || []).find(d => d.label === column.label), notifiedSet));
   return el('div', { class: 'rt-row', attrs: { role: 'row' } }, [head, ...cells]);
 }
 
-function renderReleaseTable(project, columns, sideNote) {
+function renderReleaseTable(project, columns, sideNote, notifiedSet) {
   const channels = project.channels || [];
 
   const headRow = el('div', { class: 'rt-row rt-head', attrs: { role: 'row' } }, [
@@ -327,7 +439,7 @@ function renderReleaseTable(project, columns, sideNote) {
   const table = el('div', {
     class: 'release-table',
     attrs: { role: 'table', 'aria-label': `${project.title} releases`, 'data-cols': String(channels.length) }
-  }, [headRow, ...columns.map(column => renderTypeRow(project, column, channels))]);
+  }, [headRow, ...columns.map(column => renderTypeRow(project, column, channels, notifiedSet))]);
 
   // A one-channel table is narrow, so its note sits beside it (and wraps below when there is no room).
   return el('div', { class: 'rt' + (sideNote ? ' rt-with-note' : '') }, [table, sideNote]);
@@ -363,14 +475,13 @@ function renderProject(p, id) {
   const channels = p.channels || [];
   const columns = tableColumns(channels);
 
-  // The "New"/"Updated" tags are gone from the cards; opening the page counts as seeing them,
-  // which clears the matching dots in the navigation on the next load.
-  channels.forEach(ch => { if (ch.badge) storageSet(badgeKey(id, ch), badgeFingerprint(ch)); });
+  const notified = new Set();
+  channels.forEach(ch => (ch.downloads || []).forEach(d => { if (isNotifyDownload(id, ch, d)) notified.add(d); }));
 
   const body = [];
   const note = renderProjectNote(p);
   const noteBeside = channels.length === 1 && note;
-  if (channels.length) body.push(renderReleaseTable(p, columns, noteBeside ? note : null));
+  if (channels.length) body.push(renderReleaseTable(p, columns, noteBeside ? note : null, notified));
   if (note && !noteBeside) body.push(note);
 
   return el('article', { class: 'project', attrs: { id } }, [
@@ -388,15 +499,15 @@ function renderProject(p, id) {
 
 /* ---------- Header ---------- */
 
-// Undismissed "New"/"Updated" badges on a page's projects.
-function countUndismissedBadges(page) {
+// Unseen `notify` channels on a page's projects.
+function countUnseenNotifications(page) {
   const section = (SITE_DATA.sections || []).find(s => s.heading === page.section);
   if (!section) return 0;
 
   let count = 0;
   sectionIds(section).projects.forEach(({ project, id }) => {
     (project.channels || []).forEach(ch => {
-      if (ch.badge && storageGet(badgeKey(id, ch)) !== badgeFingerprint(ch)) count++;
+      if (isUnseenChannel(id, ch)) count++;
     });
   });
   return count;
@@ -435,7 +546,7 @@ function renderSiteHeader(pages, currentUrl) {
   // Elements carrying a count pill; syncDots() redraws them at load and on back/forward restore.
   const dotTargets = [];
   const trackDots = (target, getCount) => dotTargets.push({ target, getCount });
-  const totalProjectBadges = () => projectPages.reduce((sum, p) => sum + countUndismissedBadges(p), 0);
+  const totalProjectBadges = () => projectPages.reduce((sum, p) => sum + countUnseenNotifications(p), 0);
 
   function syncDots() {
     dotTargets.forEach(({ target, getCount }) => {
@@ -480,7 +591,7 @@ function renderSiteHeader(pages, currentUrl) {
 
     const items = projectPages.map(page => {
       const a = pageLink(page, 'nav-dropdown-item');
-      trackDots(a, () => countUndismissedBadges(page));
+      trackDots(a, () => countUnseenNotifications(page));
       return a;
     });
     const menu = el('div', { class: 'nav-dropdown-menu', attrs: { id: menuId, hidden: '' } }, items);
@@ -871,6 +982,7 @@ function initSectionPage(pageUrl) {
   const section = (SITE_DATA.sections || []).find(s => s.heading === (pageEntry && pageEntry.section)) || SITE_DATA.sections[0];
 
   renderFlatSection(section);
+  markProjectsSeen(section);
   renderFooter(SITE_DATA.socials, SITE_DATA.footer, SITE_DATA.version);
   renderStructuredData(SITE_DATA, section);
   clearSkeletons();
