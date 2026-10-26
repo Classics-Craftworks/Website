@@ -623,7 +623,6 @@ function renderFlatSection(section) {
   const list = el('div', { class: 'project-list' }, ids.projects.map(({ project, id }) => renderProject(project, id)));
   const jump = renderProjectJump(ids.projects);
   main.appendChild(el('div', { class: 'catalog-layout' }, [jump, list]));
-  if (jump) watchCurrentProject(jump, list);
 }
 
 // Side panel with a link to each project on the page. Reuses the news page's collapsible panel.
@@ -641,7 +640,6 @@ function renderProjectJump(projects) {
         el('img', { src: project.image, alt: '', attrs: { loading: 'lazy', width: '48', height: '48' } }),
         el('span', { text: project.title })
       ]);
-      link.dataset.jump = id;
       return link;
     })()
   ]));
@@ -665,28 +663,6 @@ function renderProjectJump(projects) {
   apply();
 
   return el('aside', { class: 'catalog-aside', attrs: { 'aria-label': 'Projects on this page' } }, [box]);
-}
-
-// Highlights the link for the project currently under the header.
-function watchCurrentProject(jump, list) {
-  if (!('IntersectionObserver' in window)) return;
-  const links = new Map(Array.from(jump.querySelectorAll('[data-jump]')).map(a => [a.dataset.jump, a]));
-  const visible = new Set();
-
-  const mark = () => {
-    const first = Array.from(list.children).find(card => visible.has(card.id));
-    links.forEach((a, id) => {
-      const on = !!first && first.id === id;
-      a.classList.toggle('is-current', on);
-      if (on) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current');
-    });
-  };
-
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) visible.add(e.target.id); else visible.delete(e.target.id); });
-    mark();
-  }, { rootMargin: '-96px 0px -50% 0px' });
-  Array.from(list.children).forEach(card => observer.observe(card));
 }
 
 function footerLink(href, iconName, label) {

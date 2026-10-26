@@ -1007,10 +1007,9 @@ main:focus, #catalog:focus { outline: none; }
   align-items: start;
 }
 .catalog-layout > .project-list { grid-area: list; }
-.catalog-aside { grid-area: aside; position: sticky; top: calc(var(--s-8) + var(--s-4)); min-width: 0; }
+.catalog-aside { grid-area: aside; min-width: 0; }
 @media (max-width: 1099px) {
   .catalog-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "aside" "list"; row-gap: var(--s-5); }
-  .catalog-aside { position: static; }
 }
 
 .jump-list { margin: 0; padding: 0; list-style: none; }
@@ -1030,7 +1029,6 @@ main:focus, #catalog:focus { outline: none; }
 .jump-link img { flex: none; width: var(--s-5); height: var(--s-5); border-radius: var(--r-0); object-fit: cover; background: var(--surface-2); }
 .jump-link span { min-width: 0; }
 @media (hover: hover) { .jump-link:hover { background: var(--surface-2); color: var(--text); } }
-.jump-link.is-current { background: var(--surface-2); color: var(--accent); }
 .catalog-aside .news-filter-panel { padding-bottom: var(--s-2); }
 
 .project-list { display: flex; flex-direction: column; gap: var(--s-5); }
@@ -1635,7 +1633,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 
 .news-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 336px;
+  grid-template-columns: minmax(0, 1fr) var(--aside-w);
   grid-template-areas: "toolbar search" "feed filters" "feed extra";
   grid-template-rows: auto auto 1fr;
   column-gap: var(--s-6);
