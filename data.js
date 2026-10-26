@@ -21,7 +21,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v3.17.0",
+    label: "v4.0.0",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -166,7 +166,7 @@ const SITE_DATA = {
           imageAlt: "New Sword Blocking logo: the letters NSB",
           title: "New Sword Blocking",
           description: "Restores and enhances sword blocking in Minecraft 1.21.5 – 1.21.8!",
-          note: "This data pack is no longer supported and will not receive further updates. There are better alternatives available elsewhere.",
+          note: "This project is no longer supported and will not receive further updates. There are better alternatives available elsewhere.",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/new-sword-blocking" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/New-Sword-Blocking" },
