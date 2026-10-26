@@ -612,7 +612,7 @@ main:focus, #catalog:focus { outline: none; }
   display: flex;
   align-items: center;
   gap: var(--s-3);
-  margin: var(--s-7) 0 var(--s-5);
+  margin: var(--s-5) 0 var(--s-5);
 }
 .section-count {
   display: inline-flex;

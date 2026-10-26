@@ -3,62 +3,6 @@
 
 const NEWS_DEFAULT_RGB = '116, 196, 231'; // same blue as --accent-rgb
 
-function newsData() {
-  return typeof LATEST_UPDATES !== 'undefined' ? LATEST_UPDATES : null;
-}
-
-function newsEntries() {
-  const news = newsData();
-  const entries = ((news && news.entries) || []).filter(e => e && e.title && e.date);
-  // ISO dates sort as text; the sort is stable, so same-day entries keep their file order.
-  return entries.slice().sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-}
-
-// Stable anchor for an entry, used to link to it on the News page.
-function newsEntryId(entry) {
-  return slugify(entry.date + ' ' + entry.title);
-}
-
-/* ---------- "New since your last visit" ----------
-   Seen entries are kept in localStorage; newer ones get a dot. The previous visit's list is
-   held for the browser session so reloads don't clear the dots. A first visit marks nothing. */
-
-const NEWS_SEEN_KEY = 'news-seen';
-const NEWS_BASELINE_KEY = 'news-seen-baseline';
-
-function parseIdList(text) {
-  try {
-    const list = JSON.parse(text);
-    return Array.isArray(list) ? list : null;
-  } catch { return null; }
-}
-
-let newsBaselineCache; // Set of already-seen entry ids, or null if unknown
-
-// Entry ids seen before this visit; null when unknown.
-function newsBaseline() {
-  if (newsBaselineCache !== undefined) return newsBaselineCache;
-  let list = null;
-  try { list = parseIdList(sessionStorage.getItem(NEWS_BASELINE_KEY)); } catch { /* session storage unavailable */ }
-  if (!list) {
-    list = parseIdList(storageGet(NEWS_SEEN_KEY));
-    if (list) { try { sessionStorage.setItem(NEWS_BASELINE_KEY, JSON.stringify(list)); } catch { /* ignore */ } }
-  }
-  newsBaselineCache = list ? new Set(list) : null;
-  return newsBaselineCache;
-}
-
-function isNewEntry(entry) {
-  const seen = newsBaseline();
-  return !!seen && !seen.has(newsEntryId(entry));
-}
-
-// Everything listed on the News page counts as seen from the next visit on.
-function markNewsSeen(entries) {
-  newsBaseline(); // fix this visit's baseline before the saved list changes
-  storageSet(NEWS_SEEN_KEY, JSON.stringify(entries.map(newsEntryId)));
-}
-
 function newDot() {
   return el('span', { class: 'news-new-dot', attrs: { 'data-tooltip': 'New since your last visit', role: 'img', 'aria-label': 'New since your last visit' } });
 }
