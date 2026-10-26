@@ -308,6 +308,7 @@ const SITE_DATA = {
           imageAlt: "Classic's Note Block Tweaks logo: the letters NT",
           title: "Classic's Note Block Tweaks",
           description: "Updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
+          note: "This resource pack has been merged into Classic's Tweaks. It will continue to receive updates throughout the 26.4 development cycle, but will be archived after v1.0.0.",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Note-Block-Tweaks" },
