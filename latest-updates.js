@@ -88,6 +88,18 @@ const LATEST_UPDATES = {
 
   entries: [
     {
+      announce: true,
+      date: "2026-10-26",
+      title: "Classic's Tweaks v3.0.0",
+      text: "The first full release of Classic's Tweaks. No changes since v3.0.0-beta.2.",
+      tags: ["beta"],
+      mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3"],
+      image: "images/classics-tweaks.webp",
+      projects: ["classics-tweaks"],
+      url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0",
+      linkText: "View update on Modrinth"
+    },
+    {
       date: "2026-10-23",
       title: "Classic's Tweaks v3.0.0-beta.2",
       text: "This update adds a new Zombified Piglin Fix tweak and improves upon Zisteau Pigmen and Lantern Tweaks, while also fixing Respackopts config screen issues.",
@@ -99,7 +111,6 @@ const LATEST_UPDATES = {
       linkText: "View update on Modrinth"
     },
     {
-      announce: true,
       date: "2026-10-21",
       title: "Introducing Classic's Tweaks",
       text: "An all-in-one resource pack combining existing tweaks packs and Zisteau Pigmen, with individually toggleable tweaks thanks to Respackopts.",
