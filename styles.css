@@ -103,6 +103,7 @@
   --hit: 44px;          /* minimum touch target; only ever used for hit areas */
   --action-w: 160px;    /* every version button is exactly this wide */
   --aside-w: 336px;     /* side panel width (news page and project pages) */
+  --cell-w: 320px;      /* width of the single cell in a one-channel release table */
   --label-w: 176px;     /* smallest the channel label column gets in the release table */
 
   /* Elevation and motion */
@@ -1154,18 +1155,30 @@ main:focus, #catalog:focus { outline: none; }
 .release-table { border: 1px solid var(--border); border-radius: var(--r-1); }
 
 .rt-row { display: grid; grid-template-columns: minmax(var(--label-w), 0.5fr) repeat(var(--cols), minmax(0, 1fr)); border-top: 1px solid var(--border); }
-.rt-row[data-channel="stable"]      { --channel-color: var(--ch-stable);      --channel-rgb: var(--ch-stable-rgb); }
-.rt-row[data-channel="beta"]        { --channel-color: var(--ch-beta);        --channel-rgb: var(--ch-beta-rgb); }
-.rt-row[data-channel="alpha"]       { --channel-color: var(--ch-alpha);       --channel-rgb: var(--ch-alpha-rgb); }
-.rt-row[data-channel="unsupported"] { --channel-color: var(--ch-unsupported); --channel-rgb: var(--ch-unsupported-rgb); }
+.rt [data-channel="stable"]      { --channel-color: var(--ch-stable);      --channel-rgb: var(--ch-stable-rgb); }
+.rt [data-channel="beta"]        { --channel-color: var(--ch-beta);        --channel-rgb: var(--ch-beta-rgb); }
+.rt [data-channel="alpha"]       { --channel-color: var(--ch-alpha);       --channel-rgb: var(--ch-alpha-rgb); }
+.rt [data-channel="unsupported"] { --channel-color: var(--ch-unsupported); --channel-rgb: var(--ch-unsupported-rgb); }
 
 .rt-head { border-top: 0; border-radius: calc(var(--r-1) - 1px) calc(var(--r-1) - 1px) 0 0; background: var(--surface-2); }
 .rt-colhead {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--s-2);
+  gap: var(--s-1) var(--s-3);
+  min-width: 0;
   padding: var(--s-3) var(--s-4);
   border-left: 1px solid var(--border);
+}
+.rt-colhead:first-child { border-left: 0; }
+
+/* Row title: the download type. */
+.rt-rowhead {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  padding: var(--s-4) var(--s-3);
   color: var(--text-soft);
   font-size: var(--text-xs);
   line-height: var(--lh-xs);
@@ -1173,15 +1186,13 @@ main:focus, #catalog:focus { outline: none; }
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
-.rt-colhead:first-child { border-left: 0; }
-
-.rt-rowhead { display: flex; flex-direction: column; justify-content: center; gap: var(--s-1); min-width: 0; padding: var(--s-4) var(--s-3); }
 .rt-channel { display: flex; align-items: center; gap: var(--s-2); font-size: var(--text-md); line-height: var(--lh-md); }
+.rt-cell-label { display: none; }
 .status-dot { flex: none; width: var(--s-2); height: var(--s-2); background: var(--channel-color); }
-.rt-row[data-channel="stable"] .status-dot { border-radius: 50%; }
-.rt-row[data-channel="beta"] .status-dot { border-radius: var(--r-0); transform: rotate(45deg); }
-.rt-row[data-channel="alpha"] .status-dot { border-radius: 0; }
-.rt-row[data-channel="unsupported"] .status-dot { border-radius: var(--r-0); }
+.rt [data-channel="stable"] .status-dot { border-radius: 50%; }
+.rt [data-channel="beta"] .status-dot { border-radius: 0; transform: rotate(45deg); }
+.rt [data-channel="alpha"] .status-dot { border-radius: 0; }
+.rt [data-channel="unsupported"] .status-dot { border-radius: var(--r-0); }
 .channel-label { color: var(--channel-color); font-weight: 600; }
 .rt-java { color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); white-space: nowrap; }
 
@@ -1194,7 +1205,6 @@ main:focus, #catalog:focus { outline: none; }
   padding: var(--s-4) var(--s-3);
   border-left: 1px solid var(--border);
 }
-.rt-cell-label { display: none; }
 .rt-meta { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-2); }
 
 /* Version pill: a tag, tinted in the channel colour. */
@@ -1224,9 +1234,9 @@ main:focus, #catalog:focus { outline: none; }
 .download-btn:focus-visible { outline-color: var(--channel-color); }
 
 /* Every channel's button is filled in its own colour. */
-.rt-row .download-btn { background: var(--channel-color); border-color: var(--channel-color); color: var(--on-accent); }
+.rt-cell .download-btn { background: var(--channel-color); border-color: var(--channel-color); color: var(--on-accent); }
 @media (hover: hover) {
-  .rt-row .download-btn:hover { background: color-mix(in srgb, var(--channel-color), white 16%); border-color: color-mix(in srgb, var(--channel-color), white 16%); }
+  .rt-cell .download-btn:hover { background: color-mix(in srgb, var(--channel-color), white 16%); border-color: color-mix(in srgb, var(--channel-color), white 16%); }
 }
 
 /* A missing build fills its whole cell. */
@@ -1252,32 +1262,28 @@ main:focus, #catalog:focus { outline: none; }
 /* Tooltip is centred on the box (the default placement); long text wraps. */
 .download-unavailable[data-tooltip]::after { width: max-content; max-width: 224px; white-space: normal; text-align: center; }
 
+/* A one-channel table is one label column plus one cell wide, rather than stretching across the card. */
+.release-table[data-cols="1"] { flex: 0 1 calc(var(--label-w) + var(--cell-w)); max-width: calc(var(--label-w) + var(--cell-w)); }
+.rt-with-note { display: flex; flex-wrap: wrap; align-items: stretch; gap: var(--s-4); }
+.rt-with-note > .release-table { min-width: 0; }
+.rt-with-note > .project-note { flex: 1 1 var(--s-9); min-width: calc(var(--s-9) * 2 + var(--s-6)); align-items: center; }
+
 /* Medium: not enough room for details beside the button, so the cell stacks. */
 @container release-table (max-width: 803px) {
   .rt-cell { flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--s-3); }
   .rt-cell.is-unavailable { align-items: stretch; }
 }
 
-/* Narrow: one column; each cell shows its own label. */
+/* Narrow: one column; each cell shows its own channel label. */
 @container release-table (max-width: 655px) {
   .rt-head { display: none; }
   .rt-head + .rt-row { border-top: 0; }
   .rt-row { grid-template-columns: minmax(0, 1fr); }
-  .rt-rowhead { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-1) var(--s-4); padding-bottom: var(--s-3); }
+  .rt-rowhead { padding-bottom: var(--s-3); }
   .rt-cell { align-items: stretch; gap: var(--s-2); border-left: 0; border-top: 1px solid var(--border); }
   .rt-meta { flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-3); }
   .download-btn { width: 100%; }
-  .rt-cell-label {
-    display: flex;
-    align-items: center;
-    gap: var(--s-2);
-    color: var(--text-soft);
-    font-size: var(--text-xs);
-    line-height: var(--lh-xs);
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
+  .rt-cell-label { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-1) var(--s-3); }
 }
 
 /* Project note (archived and unsupported projects). */

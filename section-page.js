@@ -248,15 +248,24 @@ function unavailableCell(d) {
   return box;
 }
 
-function renderCell(project, ch, column, d) {
-  const label = el('span', { class: 'rt-cell-label' }, [
-    icon(column.icon, 'icon-sm'),
-    el('span', { text: column.label })
+// Channel title shared by the column header and the narrow layout's cell label.
+function channelTitle(ch, cls) {
+  return el('span', { class: cls }, [
+    el('span', { class: 'rt-channel' }, [
+      el('span', { class: 'status-dot' }),
+      el('span', { class: 'channel-label', text: ch.label })
+    ]),
+    ch.mcVersion ? el('span', { class: 'rt-java', text: 'Java ' + ch.mcVersion }) : null
   ]);
+}
+
+function renderCell(project, ch, column, d) {
+  const channel = (ch.channel || 'stable').toLowerCase();
+  const label = channelTitle(ch, 'rt-cell-label');
 
   const available = d && !d.disabled && d.url;
   if (!available) {
-    return el('div', { class: 'rt-cell is-unavailable', attrs: { role: 'cell' } }, [label, unavailableCell(d)]);
+    return el('div', { class: 'rt-cell is-unavailable', attrs: { role: 'cell', 'data-channel': channel } }, [label, unavailableCell(d)]);
   }
 
   const iso = releaseDate(project, d);
@@ -282,7 +291,7 @@ function renderCell(project, ch, column, d) {
     icon('newtab', 'icon-sm')
   ]);
 
-  return el('div', { class: 'rt-cell', attrs: { role: 'cell' } }, [
+  return el('div', { class: 'rt-cell', attrs: { role: 'cell', 'data-channel': channel } }, [
     label,
     el('div', { class: 'rt-meta' }, [
       el('span', { class: 'pill', text: d.version || 'N/A' }),
@@ -292,41 +301,36 @@ function renderCell(project, ch, column, d) {
   ]);
 }
 
-function renderChannelRow(project, ch, columns) {
+// One row per download type; one cell per channel.
+function renderTypeRow(project, column, channels) {
   const head = el('div', { class: 'rt-rowhead', attrs: { role: 'rowheader' } }, [
-    el('span', { class: 'rt-channel' }, [
-      el('span', { class: 'status-dot' }),
-      el('span', { class: 'channel-label', text: ch.label })
-    ]),
-    ch.mcVersion ? el('span', { class: 'rt-java', text: 'Java ' + ch.mcVersion }) : null
+    icon(column.icon, 'icon-sm'),
+    el('span', { text: column.label })
   ]);
-
-  const cells = columns.map(column =>
-    renderCell(project, ch, column, (ch.downloads || []).find(d => d.label === column.label)));
-
-  return el('div', {
-    class: 'rt-row',
-    attrs: { role: 'row', 'data-channel': (ch.channel || 'stable').toLowerCase() }
-  }, [head, ...cells]);
+  const cells = channels.map(ch => renderCell(project, ch, column, (ch.downloads || []).find(d => d.label === column.label)));
+  return el('div', { class: 'rt-row', attrs: { role: 'row' } }, [head, ...cells]);
 }
 
-function renderReleaseTable(project, columns) {
+function renderReleaseTable(project, columns, sideNote) {
   const channels = project.channels || [];
 
   const headRow = el('div', { class: 'rt-row rt-head', attrs: { role: 'row' } }, [
-    el('span', { class: 'rt-colhead', attrs: { role: 'columnheader' } }, [el('span', { class: 'visually-hidden', text: 'Channel' })]),
-    ...columns.map(column => el('span', { class: 'rt-colhead', attrs: { role: 'columnheader' } }, [
-      icon(column.icon, 'icon-sm'),
-      el('span', { text: column.label })
-    ]))
+    el('span', { class: 'rt-colhead', attrs: { role: 'columnheader' } }, [el('span', { class: 'visually-hidden', text: 'Download' })]),
+    ...channels.map(ch => {
+      const colhead = channelTitle(ch, 'rt-colhead');
+      colhead.setAttribute('role', 'columnheader');
+      colhead.setAttribute('data-channel', (ch.channel || 'stable').toLowerCase());
+      return colhead;
+    })
   ]);
 
   const table = el('div', {
     class: 'release-table',
-    attrs: { role: 'table', 'aria-label': `${project.title} releases`, 'data-cols': String(columns.length) }
-  }, [headRow, ...channels.map(ch => renderChannelRow(project, ch, columns))]);
+    attrs: { role: 'table', 'aria-label': `${project.title} releases`, 'data-cols': String(channels.length) }
+  }, [headRow, ...columns.map(column => renderTypeRow(project, column, channels))]);
 
-  return el('div', { class: 'rt' }, [table]);
+  // A one-channel table is narrow, so its note sits beside it (and wraps below when there is no room).
+  return el('div', { class: 'rt' + (sideNote ? ' rt-with-note' : '') }, [table, sideNote]);
 }
 
 function renderProjectNote(p) {
@@ -364,9 +368,10 @@ function renderProject(p, id) {
   channels.forEach(ch => { if (ch.badge) storageSet(badgeKey(id, ch), badgeFingerprint(ch)); });
 
   const body = [];
-  if (channels.length) body.push(renderReleaseTable(p, columns));
   const note = renderProjectNote(p);
-  if (note) body.push(note);
+  const noteBeside = channels.length === 1 && note;
+  if (channels.length) body.push(renderReleaseTable(p, columns, noteBeside ? note : null));
+  if (note && !noteBeside) body.push(note);
 
   return el('article', { class: 'project', attrs: { id } }, [
     el('header', { class: 'project-header' }, [
