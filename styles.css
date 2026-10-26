@@ -1300,9 +1300,10 @@ main:focus, #catalog:focus { outline: none; }
   .rt-head { display: none; }
   .rt-head + .rt-row { border-top: 0; }
   .rt-row { grid-template-columns: minmax(0, 1fr); }
-  .rt-rowhead { padding-bottom: var(--s-3); }
+  .rt-rowhead { padding-bottom: 0; }
   /* Cell grid: channel + version tag, date at the top right, Java versions below, then the button. */
-  .rt-cell { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--s-2) var(--s-3); border-left: 0; border-top: 1px solid var(--border); }
+  .rt-cell { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--s-2) var(--s-3); border-left: 0; border-top: 0; }
+  .rt-cell + .rt-cell { padding-top: var(--s-2); }
   .rt-cell-label, .rt-meta { display: contents; }
   .rt-cell-label > .rt-channel { grid-column: 1; grid-row: 1; }
   .rt-version { grid-column: 2; grid-row: 1; justify-self: start; }
@@ -1392,6 +1393,33 @@ main:focus, #catalog:focus { outline: none; }
   transform: translateX(-50%) translateY(calc(-4px * var(--tt-flip, 1))) rotate(calc(45deg + (1 - var(--tt-flip, 1)) * 90deg));
 }
 [data-tooltip].tooltip-below::before { bottom: auto; top: 100%; }
+
+/* Count pills inside the mobile menu: the panel clips sideways, so the tooltip opens below the pill instead.
+   Pills beside a label anchor to their left edge; pills at the end of a row anchor to their right edge. */
+@media (max-width: 900px) {
+  .site-header .site-menu .nav-jump-dot[data-tooltip]::after {
+    top: calc(100% + var(--s-2));
+    bottom: auto;
+    left: 0;
+    right: auto;
+    transform: translateY(-4px);
+  }
+  .site-header .site-menu .nav-dropdown-item .nav-jump-dot[data-tooltip]::after { left: auto; right: 0; }
+  .site-header .site-menu .nav-jump-dot[data-tooltip]:hover::after,
+  .site-header .site-menu .nav-jump-dot[data-tooltip]:focus-visible::after,
+  .site-header .site-menu .nav-jump-dot[data-tooltip].tooltip-open::after { transform: translateY(0); }
+
+  .site-header .site-menu .nav-jump-dot[data-tooltip]::before {
+    top: 100%;
+    bottom: auto;
+    left: calc(50% - 4px);
+    right: auto;
+    transform: translateY(0) rotate(225deg);
+  }
+  .site-header .site-menu .nav-jump-dot[data-tooltip]:hover::before,
+  .site-header .site-menu .nav-jump-dot[data-tooltip]:focus-visible::before,
+  .site-header .site-menu .nav-jump-dot[data-tooltip].tooltip-open::before { transform: translateY(4px) rotate(225deg); }
+}
 
 /* Right-aligned tooltips (close buttons, back to top): the pointer sits over the button centre. */
 #back-to-top[data-tooltip]::before, .announce-close[data-tooltip]::before, .notice-close[data-tooltip]::before { left: auto; right: calc(50% - 4px); transform: rotate(45deg); }
