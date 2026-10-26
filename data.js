@@ -217,6 +217,7 @@ const SITE_DATA = {
             },
             {
               channel: "beta",
+              label: "Beta",
               mcVersion: "1.21.9 – 26.4-snap-5",
               downloads: [
                 { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for 26.4 are coming soon!" },
