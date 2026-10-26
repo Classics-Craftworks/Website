@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v3.17.0.2 — 2026-10-26
+
+### Changed
+- Updated latest releases on news page
+
+### Fixed
+- Fixed beta tag on Classic's Tweaks v3.0.0 release news entry
+
 ## v3.17.0.1 — 2026-10-26
 
 ### Changed
