@@ -390,13 +390,29 @@ main:focus, #catalog:focus { outline: none; }
   box-shadow: var(--shadow-float);
 }
 .nav-dropdown-menu[hidden] { display: none; }
+/* Desktop menu pointer, facing the Projects button. */
+@media (min-width: 901px) {
+  .nav-dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    transform: translateX(-50%) rotate(45deg);
+  }
+}
 
 .nav-dropdown-menu {
   position: absolute;
-  top: calc(100% + var(--s-3));
-  left: 0;
+  top: calc(100% + var(--s-5));
+  left: 50%;
   z-index: 50;
-  min-width: 256px;
+  transform: translateX(-50%);
+  min-width: 208px;
   padding: var(--s-2);
 }
 
@@ -442,7 +458,6 @@ main:focus, #catalog:focus { outline: none; }
   line-height: 1;
   font-weight: 700;
 }
-.nav-jump-dot::before { content: ''; position: absolute; inset: -8px; }
 .nav-dropdown-item .nav-jump-dot { position: relative; top: auto; right: auto; margin-left: auto; border-color: var(--surface); }
 .nav-dropdown.is-open > .nav-link > .nav-jump-dot,
 .site-header.is-menu-open .nav-toggle > .nav-jump-dot { display: none; }
@@ -989,7 +1004,8 @@ main:focus, #catalog:focus { outline: none; }
   cursor: pointer;
   transition: color var(--ease), background-color var(--ease);
 }
-.notice-close::before, .announce-close::before {
+.notice-close > .close-glyph, .announce-close > .close-glyph {
+  pointer-events: none;
   content: '';
   position: absolute;
   inset: 0;
@@ -1340,6 +1356,58 @@ main:focus, #catalog:focus { outline: none; }
 [data-tooltip].tooltip-below { --tt-flip: -1; }
 [data-tooltip].tooltip-below::after { bottom: auto; top: 100%; }
 
+/* Pointer: an 8px rotated square on the edge facing the element. Tokens: --tt-flip is 1 above, -1 below. */
+[data-tooltip]::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  z-index: 61;
+  width: 8px;
+  height: 8px;
+  border-right: 1px solid var(--border-2);
+  border-bottom: 1px solid var(--border-2);
+  background: var(--surface-2);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) rotate(calc(45deg + (1 - var(--tt-flip, 1)) * 90deg));
+  transition: opacity var(--ease), transform var(--ease);
+}
+[data-tooltip]:hover::before,
+[data-tooltip]:focus-visible::before,
+[data-tooltip].tooltip-open::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(calc(-4px * var(--tt-flip, 1))) rotate(calc(45deg + (1 - var(--tt-flip, 1)) * 90deg));
+}
+[data-tooltip].tooltip-below::before { bottom: auto; top: 100%; }
+
+/* Right-aligned tooltips (close buttons, back to top): the pointer sits over the button centre. */
+#back-to-top[data-tooltip]::before, .announce-close[data-tooltip]::before, .notice-close[data-tooltip]::before { left: auto; right: calc(50% - 4px); transform: rotate(45deg); }
+#back-to-top[data-tooltip]:hover::before, #back-to-top[data-tooltip]:focus-visible::before,
+.announce-close[data-tooltip]:hover::before, .announce-close[data-tooltip]:focus-visible::before,
+.notice-close[data-tooltip]:hover::before, .notice-close[data-tooltip]:focus-visible::before { transform: translateY(-4px) rotate(45deg); }
+
+/* Stat figures: the tooltip is offset from the left edge, so the pointer is too. */
+.stat-box[data-tooltip]::before { left: calc(var(--s-5) + var(--s-4)); }
+.stat-box:first-child[data-tooltip]::before { left: var(--s-5); }
+@media (max-width: 720px) {
+  .stat-box[data-tooltip]::before, .stat-box:first-child[data-tooltip]::before { left: 50%; }
+}
+
+/* Nav count pill: the tooltip opens to the left, so the pointer faces right. */
+.site-header .nav-jump-dot[data-tooltip]::before {
+  top: 50%;
+  bottom: auto;
+  left: auto;
+  right: calc(100% + var(--s-2) - 4px);
+  transform: translate(4px, -50%) rotate(-45deg);
+}
+.site-header .nav-jump-dot[data-tooltip]:hover::before,
+.site-header .nav-jump-dot[data-tooltip]:focus-visible::before,
+.site-header .nav-jump-dot[data-tooltip].tooltip-open::before { transform: translate(0, -50%) rotate(-45deg); }
+
 #back-to-top[data-tooltip]::after, .announce-close[data-tooltip]::after { left: auto; right: 0; transform: translateY(-4px); }
 #back-to-top[data-tooltip]:hover::after, #back-to-top[data-tooltip]:focus-visible::after,
 .announce-close[data-tooltip]:hover::after, .announce-close[data-tooltip]:focus-visible::after { transform: translateY(-8px); }
@@ -1369,8 +1437,8 @@ main:focus, #catalog:focus { outline: none; }
 }
 .back-to-top.is-visible { opacity: 1; pointer-events: auto; }
 @media (hover: hover) { .back-to-top:hover { background: var(--border); } }
-.back-to-top::before {
-  content: '';
+.back-to-top > .back-to-top-glyph {
+  pointer-events: none;
   width: 8px;
   height: 8px;
   border-top: 2px solid var(--text);
@@ -1977,7 +2045,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
   .nav-chevron { order: 2; margin-left: auto; }
   .nav-link > .nav-jump-dot { position: relative; top: auto; right: auto; order: 1; margin-left: var(--s-2); }
   .nav-dropdown-toggle { width: 100%; }
-  .nav-dropdown-menu { position: static; min-width: 0; margin-top: var(--s-1); padding: var(--s-1); border: 0; background: var(--surface); box-shadow: none; }
+  .nav-dropdown-menu { position: static; transform: none; min-width: 0; margin-top: var(--s-1); padding: var(--s-1); border: 0; background: var(--surface); box-shadow: none; }
   .nav-dropdown-item { min-height: 48px; padding: 0 var(--s-4); font-size: var(--text-md); }
 
   .nav-search { flex: none; min-width: 0; margin-left: 0; }

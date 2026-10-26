@@ -723,7 +723,7 @@ function renderFlatSection(section) {
 
   const noticeText = SITE_DATA.downloadNotice;
   if (noticeText && sectionHasDownloads(section) && !noticeDismissed(noticeText)) {
-    const close = el('button', { class: 'notice-close', attrs: { type: 'button', 'aria-label': 'Dismiss notice', 'data-tooltip': 'Dismiss' } });
+    const close = el('button', { class: 'notice-close', attrs: { type: 'button', 'aria-label': 'Dismiss notice', 'data-tooltip': 'Dismiss' } }, [el('span', { class: 'close-glyph', attrs: { 'aria-hidden': 'true' } })]);
     const notice = el('div', { class: 'download-notice', attrs: { role: 'note' } }, [
       icon('info', 'icon-sm'),
       el('p', { text: noticeText }),
@@ -831,6 +831,7 @@ function clearSkeletons() {
 function initBackToTop() {
   const btn = document.getElementById('back-to-top');
   if (!btn) return;
+  btn.appendChild(el('span', { class: 'back-to-top-glyph', attrs: { 'aria-hidden': 'true' } }));
 
   const SHOW_AFTER = 180; // px scrolled before the button appears
 
