@@ -121,46 +121,6 @@ function deepLinkUrl(id) {
 /* ---------- Channel row layout ----------
    Channel boxes and download columns stack rather than wrap mid-line. */
 
-function headerWraps(header) {
-  const label = header && header.querySelector('.channel-label');
-  const group = header && header.querySelector('.channel-mc-group');
-  return !!(label && group && group.offsetTop > label.offsetTop + 1);
-}
-
-function pillWraps(header) {
-  const label = header.querySelector('.download-type-label');
-  const pill = header.querySelector('.pill');
-  return !!(label && pill && pill.offsetTop > label.offsetTop + 1);
-}
-
-function layoutChannelRow(rowEl) {
-  const groups = Array.from(rowEl.querySelectorAll(':scope > .channel-group'));
-  if (!groups.length) return;
-
-  rowEl.classList.remove('stacked');
-  if (groups.some(g => headerWraps(g.querySelector('.channel-header')))) rowEl.classList.add('stacked');
-
-  groups.forEach(g => {
-    const header = g.querySelector('.channel-header');
-    header.classList.remove('header-force-wrap');
-    if (headerWraps(header)) header.classList.add('header-force-wrap');
-  });
-
-  const downloadLists = groups.map(g => g.querySelector('.channel-downloads')).filter(Boolean);
-  downloadLists.forEach(dl => dl.classList.remove('downloads-stacked'));
-  const pillNeedsRoom = downloadLists.some(dl => {
-    const headers = Array.from(dl.querySelectorAll('.download-col-header'));
-    return headers.length > 1 && headers.some(pillWraps);
-  });
-  if (pillNeedsRoom) downloadLists.forEach(dl => dl.classList.add('downloads-stacked'));
-}
-
-// Re-runs layoutChannelRow() on every size change, height included: stacking changes
-// the height, and those follow-up passes settle the layout after a resize.
-function watchChannelRow(rowEl) {
-  if (window.ResizeObserver) new ResizeObserver(() => layoutChannelRow(rowEl)).observe(rowEl);
-}
-
 /* ---------- Project cards ---------- */
 
 // The project title is itself the button (click copies a direct link). It sits inside
@@ -232,138 +192,192 @@ function renderBrand(brand) {
 const badgeFingerprint = ch => (ch.downloads || []).map(d => d.version || 'N/A').join('|');
 const badgeKey = (projectId, ch) => `badge-dismissed:${projectId}:${(ch.channel || 'stable').toLowerCase()}`;
 
-function renderChannelBadge(ch, key) {
-  const fingerprint = badgeFingerprint(ch);
-  if (storageGet(key) === fingerprint) return null;
+const HOST_LABELS = { 'modrinth.com': 'Modrinth', 'www.spigotmc.org': 'SpigotMC', 'spigotmc.org': 'SpigotMC', 'github.com': 'GitHub' };
 
-  const text = String(ch.badge).toLowerCase() === 'updated' ? 'Updated' : 'New';
-  const badge = el('button', {
-    class: 'channel-badge',
-    attrs: { type: 'button', 'data-badge': text.toLowerCase(), 'data-tooltip': 'Dismiss', 'aria-label': `Dismiss "${text}" label` }
-  }, [
-    el('span', { class: 'channel-badge-text', text }),
-    el('span', { class: 'channel-badge-dismiss' })
-  ]);
-
-  badge.addEventListener('click', e => {
-    e.preventDefault();
-    e.stopPropagation();
-    storageSet(key, fingerprint);
-    badge.classList.add('is-dismissed');
-    badge.addEventListener('transitionend', () => badge.remove(), { once: true });
-    window.setTimeout(() => badge.remove(), 250);
-  });
-
-  return badge;
+function hostLabel(url) {
+  try { return HOST_LABELS[new URL(url).hostname] || ''; } catch { return ''; }
 }
 
-function renderDownload(d) {
-  const disabled = d.disabled || !d.url;
+// A download's release date: its own `date` (ISO), else the matching entry in
+// latest-updates.js. Returns '' when neither has one, and the cell shows a placeholder.
+function releaseDate(project, d) {
+  // Must be a quoted "YYYY-MM-DD" string. An unquoted 2026-09-15 is arithmetic (= 2002) in JavaScript,
+  // so anything else is ignored with a console warning instead of showing a wrong year.
+  if (d.date !== undefined && !(typeof d.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d.date))) {
+    console.warn(`data.js: ignoring date ${JSON.stringify(d.date)} on ${project.title} ${d.version || ''}; use a quoted "YYYY-MM-DD" string.`);
+  } else if (d.date) {
+    return d.date;
+  }
+  const list = typeof LATEST_UPDATES !== 'undefined' && LATEST_UPDATES.sidebar
+    && LATEST_UPDATES.sidebar.latestReleases && LATEST_UPDATES.sidebar.latestReleases.releases;
+  const hit = (list || []).find(r => r.project === project.title && r.version === d.version);
+  return hit ? hit.date : '';
+}
 
-  const colHeader = el('div', { class: 'download-col-header' + (disabled ? ' is-disabled' : '') }, [
-    icon(d.icon || 'box', 'icon-sm'),
-    el('span', { class: 'download-type-label', text: d.label }),
-    el('span', { class: 'pill' + (disabled ? ' disabled-pill' : ''), text: disabled ? 'N/A' : (d.version || 'N/A') })
+function formatDate(iso) {
+  const date = new Date(iso + 'T00:00:00Z');
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
+// Table columns: every download type used by any channel, in first-seen order.
+function tableColumns(channels) {
+  const columns = [];
+  channels.forEach(ch => (ch.downloads || []).forEach(d => {
+    if (!columns.some(c => c.label === d.label)) columns.push({ label: d.label, icon: d.icon || 'box' });
+  }));
+  return columns;
+}
+
+function unavailableCell(d) {
+  const tip = d && d.tooltip;
+  const attrs = tip ? { 'data-tooltip': tip, tabindex: '0', 'aria-label': `Not available: ${tip}` } : {};
+  const box = el('div', { class: 'download-unavailable' + (tip ? ' has-tooltip' : ''), attrs }, [
+    icon('unavailable', 'icon-sm'),
+    el('span', { text: 'Not available' })
   ]);
 
-  let action;
-  if (disabled) {
-    const attrs = d.tooltip
-      ? { 'data-tooltip': d.tooltip, tabindex: '0', 'aria-label': `Not available: ${d.tooltip}` }
-      : {};
-    action = el('div', { class: 'download-unavailable' + (d.tooltip ? ' has-tooltip' : ''), attrs }, [
-      icon('unavailable', 'icon-sm'),
-      el('span', { text: 'Not available' })
-    ]);
+  // Touch has no hover, so a tap shows the tooltip briefly.
+  if (tip) {
+    box.addEventListener('click', () => {
+      box.classList.add('tooltip-open');
+      window.clearTimeout(box._tooltipTimer);
+      box._tooltipTimer = window.setTimeout(() => box.classList.remove('tooltip-open'), 3000);
+    });
+  }
+  return box;
+}
 
-    // Touch has no hover, so a tap shows the tooltip briefly.
-    if (d.tooltip) {
-      action.addEventListener('click', () => {
-        action.classList.add('tooltip-open');
-        window.clearTimeout(action._tooltipTimer);
-        action._tooltipTimer = window.setTimeout(() => action.classList.remove('tooltip-open'), 3000);
-      });
-    }
-  } else {
-    action = el('a', { class: 'download-btn', href: d.url }, [
-      icon('newtab', 'icon-sm'),
-      el('span', { text: 'View' })
-    ]);
+function renderCell(project, ch, column, d) {
+  const label = el('span', { class: 'rt-cell-label' }, [
+    icon(column.icon, 'icon-sm'),
+    el('span', { text: column.label })
+  ]);
+
+  const available = d && !d.disabled && d.url;
+  if (!available) {
+    return el('div', { class: 'rt-cell is-unavailable', attrs: { role: 'cell' } }, [label, unavailableCell(d)]);
   }
 
-  return el('div', { class: 'download-col' + (disabled ? ' is-disabled' : '') }, [colHeader, action]);
-}
+  const iso = releaseDate(project, d);
+  const date = iso
+    ? el('span', { class: 'rt-date' }, [
+        icon('calendar', 'icon-sm'),
+        el('time', { text: formatDate(iso), attrs: { datetime: iso } })
+      ])
+    // PLACEHOLDER: no release date in the data yet. Add `date: "YYYY-MM-DD"` to the download in data.js.
+    : el('span', { class: 'rt-date is-placeholder', attrs: { 'data-placeholder': 'release-date' } }, [
+        icon('calendar', 'icon-sm'),
+        el('span', { text: 'Date TBC' })
+      ]);
 
-function renderChannel(ch, projectId) {
-  const header = el('div', { class: 'channel-header' }, [
-    el('span', { class: 'status-dot' }),
-    el('span', { class: 'channel-label', text: ch.label }),
-    ch.mcVersion ? el('span', { class: 'channel-mc-group' }, [
-      el('span', { class: 'channel-sep', text: '|' }),
-      el('span', { class: 'channel-mc', text: 'Java ' + ch.mcVersion })
-    ]) : null
+  const host = hostLabel(d.url);
+  const action = host ? `View on ${host}` : 'View';
+  const button = el('a', {
+    class: 'download-btn',
+    href: d.url,
+    attrs: { 'aria-label': `${action}: ${project.title} ${column.label} ${d.version || ''}, ${ch.label}`.replace(/\s+/g, ' ') }
+  }, [
+    el('span', { text: action }),
+    icon('newtab', 'icon-sm')
   ]);
 
-  const badge = ch.badge ? renderChannelBadge(ch, badgeKey(projectId, ch)) : null;
-  const downloads = el('div', { class: 'channel-downloads' }, (ch.downloads || []).map(renderDownload));
-
-  return el('div', {
-    class: 'channel-group',
-    attrs: { 'data-channel': (ch.channel || 'stable').toLowerCase() }
-  }, [badge, header, downloads]);
+  return el('div', { class: 'rt-cell', attrs: { role: 'cell' } }, [
+    label,
+    el('div', { class: 'rt-meta' }, [
+      el('span', { class: 'pill', text: d.version || 'N/A' }),
+      date
+    ]),
+    button
+  ]);
 }
 
-// Info panel for a project's `note`. Fills the slot a second channel box would use.
+function renderChannelRow(project, ch, columns) {
+  const head = el('div', { class: 'rt-rowhead', attrs: { role: 'rowheader' } }, [
+    el('span', { class: 'rt-channel' }, [
+      el('span', { class: 'status-dot' }),
+      el('span', { class: 'channel-label', text: ch.label })
+    ]),
+    ch.mcVersion ? el('span', { class: 'rt-java', text: 'Java ' + ch.mcVersion }) : null
+  ]);
+
+  const cells = columns.map(column =>
+    renderCell(project, ch, column, (ch.downloads || []).find(d => d.label === column.label)));
+
+  return el('div', {
+    class: 'rt-row',
+    attrs: { role: 'row', 'data-channel': (ch.channel || 'stable').toLowerCase() }
+  }, [head, ...cells]);
+}
+
+function renderReleaseTable(project, columns) {
+  const channels = project.channels || [];
+
+  const headRow = el('div', { class: 'rt-row rt-head', attrs: { role: 'row' } }, [
+    el('span', { class: 'rt-colhead', attrs: { role: 'columnheader' } }, [el('span', { class: 'visually-hidden', text: 'Channel' })]),
+    ...columns.map(column => el('span', { class: 'rt-colhead', attrs: { role: 'columnheader' } }, [
+      icon(column.icon, 'icon-sm'),
+      el('span', { text: column.label })
+    ]))
+  ]);
+
+  const table = el('div', {
+    class: 'release-table',
+    attrs: { role: 'table', 'aria-label': `${project.title} releases`, 'data-cols': String(columns.length) }
+  }, [headRow, ...channels.map(ch => renderChannelRow(project, ch, columns))]);
+
+  return el('div', { class: 'rt' }, [table]);
+}
+
 function renderProjectNote(p) {
   if (!p.note) return null;
   return el('div', { class: 'project-note', attrs: { role: 'note' } }, [
-    el('div', { class: 'project-note-inner' }, [
-      icon('info', 'icon-sm'),
-      el('p', { text: p.note })
-    ])
+    icon('info', 'icon-sm'),
+    el('p', { text: p.note })
   ]);
 }
 
-function renderVersionsNote(p) {
-  if (!(p.channels || []).length) return null;
-
+// Footer strip: icon links to the project's pages, then "Older versions" on the right.
+function renderProjectFooter(p) {
   const findLink = name => (p.links || []).find(l => (l.label || '').toLowerCase() === name);
   const modrinth = findLink('modrinth');
   const github = findLink('github');
-  if (!modrinth && !github) return null;
+  const older = (p.channels || []).length
+    ? (modrinth ? `${modrinth.url}/versions` : github ? `${github.url}/wiki/Versions` : '')
+    : '';
+  if (!(p.links || []).length && !older) return null;
 
-  const note = el('p', { class: 'versions-note' });
-  note.appendChild(icon('history', 'icon-sm'));
-  note.appendChild(document.createTextNode('Older versions: '));
-  if (modrinth) note.appendChild(el('a', { class: 'versions-note-link', href: `${modrinth.url}/versions`, text: 'Modrinth' }));
-  if (modrinth && github) note.appendChild(document.createTextNode(' | '));
-  if (github) note.appendChild(el('a', { class: 'versions-note-link', href: `${github.url}/wiki/Versions`, text: 'GitHub' }));
-  return note;
+  return el('footer', { class: 'project-footer' }, [
+    el('ul', { class: 'project-links' }, (p.links || []).map(l =>
+      el('li', {}, [el('a', { class: 'project-link', href: l.url }, [icon(l.icon, 'icon-sm'), el('span', { text: l.label })])])
+    )),
+    older ? el('a', { class: 'project-older', href: older }, [icon('history', 'icon-sm'), el('span', { text: 'Older versions' })]) : null
+  ]);
 }
 
 function renderProject(p, id) {
-  const linkRow = el('div', { class: 'project-links' }, (p.links || []).map(l =>
-    el('a', { class: 'text-link', href: l.url }, [icon(l.icon, 'icon-sm'), el('span', { text: l.label })])
-  ));
+  const channels = p.channels || [];
+  const columns = tableColumns(channels);
 
-  const channelRow = el('div', { class: 'channel-row' }, (p.channels || []).map(ch => renderChannel(ch, id)));
-  const note = (p.channels || []).length === 1 ? renderProjectNote(p) : null; // only fills a free slot
-  if (note) channelRow.appendChild(note);
-  watchChannelRow(channelRow);
+  // The "New"/"Updated" tags are gone from the cards; opening the page counts as seeing them,
+  // which clears the matching dots in the navigation on the next load.
+  channels.forEach(ch => { if (ch.badge) storageSet(badgeKey(id, ch), badgeFingerprint(ch)); });
 
-  const hasChannels = (p.channels || []).length > 0;
+  const body = [];
+  if (channels.length) body.push(renderReleaseTable(p, columns));
+  const note = renderProjectNote(p);
+  if (note) body.push(note);
 
-  return el('article', { class: 'project' + (hasChannels ? ' has-channels' : '') + (note ? ' has-note' : ''), attrs: { id } }, [
-    el('img', { class: 'project-image', src: p.image, alt: p.imageAlt || '', attrs: { loading: 'lazy', width: '320', height: '320' } }),
-    el('div', { class: 'project-body' }, [
+  return el('article', { class: 'project', attrs: { id } }, [
+    el('header', { class: 'project-header' }, [
+      el('img', { class: 'project-image', src: p.image, alt: p.imageAlt || '', attrs: { loading: 'lazy', width: '320', height: '320' } }),
       el('div', { class: 'project-info' }, [
         el('h2', {}, [copyLinkButton(id, p.title)]),
-        el('p', { class: 'project-description', text: p.description }),
-        linkRow
-      ]),
-      channelRow,
-      renderVersionsNote(p)
-    ])
+        el('p', { class: 'project-description', text: p.description })
+      ])
+    ]),
+    body.length ? el('div', { class: 'project-body' }, body) : null,
+    renderProjectFooter(p)
   ]);
 }
 
@@ -606,7 +620,73 @@ function renderFlatSection(section) {
     main.appendChild(notice);
   }
 
-  main.appendChild(el('div', { class: 'project-list' }, ids.projects.map(({ project, id }) => renderProject(project, id))));
+  const list = el('div', { class: 'project-list' }, ids.projects.map(({ project, id }) => renderProject(project, id)));
+  const jump = renderProjectJump(ids.projects);
+  main.appendChild(el('div', { class: 'catalog-layout' }, [jump, list]));
+  if (jump) watchCurrentProject(jump, list);
+}
+
+// Side panel with a link to each project on the page. Reuses the news page's collapsible panel.
+function renderProjectJump(projects) {
+  if (projects.length < 2) return null;
+
+  const KEY = 'catalog-jump-collapsed';
+  const stored = storageGet(KEY);
+  let open = stored === null ? window.matchMedia('(min-width: 1100px)').matches : stored !== '1';
+
+  const listId = 'project-jump-list';
+  const items = projects.map(({ project, id }) => el('li', {}, [
+    (() => {
+      const link = internalLink('jump-link', '#' + id, [
+        el('img', { src: project.image, alt: '', attrs: { loading: 'lazy', width: '48', height: '48' } }),
+        el('span', { text: project.title })
+      ]);
+      link.dataset.jump = id;
+      return link;
+    })()
+  ]));
+  const body = el('div', { class: 'news-filter-panel', attrs: { id: listId } }, [el('ul', { class: 'jump-list' }, items)]);
+  const toggle = el('button', { class: 'news-filter-toggle', attrs: { type: 'button', 'aria-controls': listId } }, [
+    el('span', { class: 'news-filter-toggle-label', text: 'Jump to project' }),
+    el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+  ]);
+  const box = el('section', { class: 'news-filter-box' }, [toggle, body]);
+
+  const apply = () => {
+    toggle.setAttribute('aria-expanded', String(open));
+    body.hidden = !open;
+    box.classList.toggle('is-open', open);
+  };
+  toggle.addEventListener('click', () => {
+    open = !open;
+    apply();
+    storageSet(KEY, open ? '0' : '1');
+  });
+  apply();
+
+  return el('aside', { class: 'catalog-aside', attrs: { 'aria-label': 'Projects on this page' } }, [box]);
+}
+
+// Highlights the link for the project currently under the header.
+function watchCurrentProject(jump, list) {
+  if (!('IntersectionObserver' in window)) return;
+  const links = new Map(Array.from(jump.querySelectorAll('[data-jump]')).map(a => [a.dataset.jump, a]));
+  const visible = new Set();
+
+  const mark = () => {
+    const first = Array.from(list.children).find(card => visible.has(card.id));
+    links.forEach((a, id) => {
+      const on = !!first && first.id === id;
+      a.classList.toggle('is-current', on);
+      if (on) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current');
+    });
+  };
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) visible.add(e.target.id); else visible.delete(e.target.id); });
+    mark();
+  }, { rootMargin: '-96px 0px -50% 0px' });
+  Array.from(list.children).forEach(card => observer.observe(card));
 }
 
 function footerLink(href, iconName, label) {

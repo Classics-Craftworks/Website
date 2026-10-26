@@ -86,7 +86,7 @@
   --lh-md:    1.5rem;
   --text-lg:  1.125rem;  /* 18 / 28: card titles (h3) */
   --lh-lg:    1.75rem;
-  --text-xl:  1.5rem;    /* 24 / 32: project and sub-section titles (Inter) */
+  --text-xl:  1.5rem;    /* 24 / 32: project titles (display, caps) and sub-section titles (Inter) */
   --lh-xl:    2rem;
   --text-2xl: 1.5rem;    /* 24 / 32: section and page titles (display, caps) */
   --lh-2xl:   2rem;
@@ -99,6 +99,11 @@
   --section-gap: var(--s-8);
   --measure: 68ch;
   --control-h: 40px;
+  --control-h-lg: 48px; /* large controls: hero buttons and version buttons */
+  --hit: 44px;          /* minimum touch target; only ever used for hit areas */
+  --action-w: 160px;    /* every version button is exactly this wide */
+  --aside-w: 336px;     /* side panel width (news page and project pages) */
+  --label-w: 176px;     /* smallest the channel label column gets in the release table */
 
   /* Elevation and motion */
   --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.4);
@@ -237,7 +242,7 @@ main:focus, #catalog:focus { outline: none; }
 /* ---------- Buttons and links ---------- */
 /* One control: 40px tall, 8px radius, 1px border. Variants change colour only. */
 
-.top-link, .text-link, .download-btn, .splash-btn, .news-btn, .news-show-more, .news-sort-trigger,
+.top-link, .download-btn, .splash-btn, .news-btn, .news-show-more, .news-sort-trigger,
 .site-error button {
   display: inline-flex;
   align-items: center;
@@ -258,15 +263,12 @@ main:focus, #catalog:focus { outline: none; }
   transition: background-color var(--ease), border-color var(--ease), color var(--ease);
 }
 @media (hover: hover) {
-  .top-link:hover, .text-link:hover, .news-btn:hover, .news-show-more:hover, .news-sort-trigger:hover,
+  .top-link:hover, .news-btn:hover, .news-show-more:hover, .news-sort-trigger:hover,
   .splash-btn-ghost:hover, .site-error button:hover {
     background: var(--surface-2);
     border-color: var(--border-2);
   }
 }
-
-.text-link { color: var(--text-soft); font-weight: 500; }
-@media (hover: hover) { .text-link:hover { color: var(--text); } }
 
 /* Primary */
 .splash-btn-primary {
@@ -639,7 +641,7 @@ main:focus, #catalog:focus { outline: none; }
 
 .splash-subtitle { max-width: 52ch; margin-bottom: var(--s-6); color: var(--text-soft); font-size: var(--text-lg); line-height: var(--lh-lg); }
 .splash-actions { display: flex; flex-wrap: wrap; gap: var(--s-3); }
-.splash-btn { min-height: 48px; padding: 0 var(--s-5); }
+.splash-btn { min-height: var(--control-h-lg); padding: 0 var(--s-5); }
 
 .splash-btn-arrow { margin-left: var(--s-1); }
 
@@ -996,62 +998,113 @@ main:focus, #catalog:focus { outline: none; }
 }
 @media (hover: hover) { .notice-close:hover, .announce-close:hover { color: var(--text); background: var(--surface-2); } }
 
-.project-list { display: flex; flex-direction: column; container: project-list / inline-size; }
-
-.project {
+/* Project pages: cards on the left, a "jump to project" panel on the right (stacked above on narrow screens). */
+.catalog-layout {
   display: grid;
-  grid-template-columns: 104px minmax(0, 1fr);
-  gap: var(--s-5);
+  grid-template-columns: minmax(0, 1fr) var(--aside-w);
+  grid-template-areas: "list aside";
+  column-gap: var(--s-6);
   align-items: start;
-  padding: var(--s-6) 0;
-  border-bottom: 1px solid var(--border);
 }
-.project:first-child { padding-top: 0; }
-.project:last-child { border-bottom: 0; }
+.catalog-layout > .project-list { grid-area: list; }
+.catalog-aside { grid-area: aside; position: sticky; top: calc(var(--s-8) + var(--s-4)); min-width: 0; }
+@media (max-width: 1099px) {
+  .catalog-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: "aside" "list"; row-gap: var(--s-5); }
+  .catalog-aside { position: static; }
+}
 
-.project-image {
-  display: block;
-  width: 104px;
-  height: 104px;
-  object-fit: cover;
+.jump-list { margin: 0; padding: 0; list-style: none; }
+.jump-link {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: var(--hit);
+  padding: var(--s-1) var(--s-2);
+  border-radius: var(--r-1);
+  color: var(--text-soft);
+  font-size: var(--text-sm);
+  line-height: var(--lh-sm);
+  font-weight: 500;
+  transition: background-color var(--ease), color var(--ease);
+}
+.jump-link img { flex: none; width: var(--s-5); height: var(--s-5); border-radius: var(--r-0); object-fit: cover; background: var(--surface-2); }
+.jump-link span { min-width: 0; }
+@media (hover: hover) { .jump-link:hover { background: var(--surface-2); color: var(--text); } }
+.jump-link.is-current { background: var(--surface-2); color: var(--accent); }
+.catalog-aside .news-filter-panel { padding-bottom: var(--s-2); }
+
+.project-list { display: flex; flex-direction: column; gap: var(--s-5); }
+
+/* Number of download-type columns in a card's table. */
+.project { --cols: 2; }
+.project:has(.release-table[data-cols="1"]) { --cols: 1; }
+.project:has(.release-table[data-cols="3"]) { --cols: 3; }
+
+/* One flat card per project: header, release table, footer strip. */
+.project {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  scroll-margin-top: calc(var(--s-8) + var(--s-4));
   border: 1px solid var(--border);
   border-radius: var(--r-2);
+  background: var(--surface);
+}
+
+.project-header { display: flex; align-items: center; gap: var(--s-5); padding: var(--s-5); }
+.project-image {
+  display: block;
+  flex: none;
+  width: calc(var(--s-8) + var(--s-4));
+  height: calc(var(--s-8) + var(--s-4));
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: var(--r-1);
   background: var(--surface-2);
 }
-
-.project-body { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
-.project-info { display: flex; flex-direction: column; gap: var(--s-2); min-width: 0; }
-.project-info h2 { font-family: var(--font-body); font-size: var(--text-xl); line-height: var(--lh-xl); font-weight: 600; letter-spacing: 0; text-transform: none; }
+.project-info { display: flex; flex-direction: column; gap: var(--s-1); min-width: 0; }
+.project-info h2 { padding-right: calc(var(--s-2) + 16px); font-size: var(--text-xl); line-height: var(--lh-xl); } /* room for the copy-link icon */
 .project-description { max-width: var(--measure); color: var(--text-soft); }
 
-/* Links sit in a two-column grid; an odd last link spans the row, so there are no orphans. */
-.project-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-2); max-width: 448px; margin-top: var(--s-2); }
-.project-links a:last-child:nth-child(odd) { grid-column: 1 / -1; }
-.project-links .text-link { min-width: 0; }
+.project-body { display: flex; flex-direction: column; gap: var(--s-4); padding: 0 var(--s-5) var(--s-5); }
 
-/* Release channels sit side by side while the body is wide enough for two full boxes. */
-@container project-list (max-width: 900px) {
-  .channel-row { grid-template-columns: minmax(0, 1fr); }
+/* Footer strip: icon links to the project's pages, "Older versions" on the right. */
+.project-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-1) var(--s-4);
+  padding: var(--s-2) var(--s-4);
+  border-top: 1px solid var(--border);
+}
+.project:not(:has(.project-body)) .project-footer { border-top: 0; padding-top: 0; }
+.project-links { display: flex; flex-wrap: wrap; gap: var(--s-1); margin: 0; padding: 0; list-style: none; }
+.project-link, .project-older {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--hit);
+  padding: 0 var(--s-3);
+  border-radius: var(--r-1);
+  font-size: var(--text-sm);
+  line-height: var(--lh-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color var(--ease), color var(--ease);
+}
+.project-link { color: var(--text); }
+.project-older { color: var(--text-soft); }
+@media (hover: hover) {
+  .project-link:hover, .project-older:hover { background: var(--surface-2); }
+  .project-older:hover { color: var(--text); }
 }
 
-/* Wide: thumbnail, info and release channels in three columns. */
-@container project-list (min-width: 1240px) {
-  .project.has-channels { grid-template-columns: 104px minmax(0, 3fr) minmax(0, 7fr); column-gap: var(--s-5); row-gap: var(--s-3); }
-  .project.has-channels .project-body { display: contents; }
-  .project.has-channels .project-image { grid-row: 1 / span 2; }
-  .project.has-channels .project-info { grid-column: 2; grid-row: 1 / span 2; }
-  .project.has-channels .channel-row { grid-column: 3; grid-row: 1; }
-  .project.has-channels .versions-note { grid-column: 3; grid-row: 2; align-self: start; }
-}
-
-/* Narrow: thumbnail beside the title, everything else full width. */
 @media (max-width: 720px) {
-  .project { grid-template-columns: 64px minmax(0, 1fr); column-gap: var(--s-4); row-gap: var(--s-4); padding: var(--s-5) 0; align-items: center; }
-  .project-body, .project-info { display: contents; }
-  .project-image { grid-column: 1; grid-row: 1; width: 64px; height: 64px; border-radius: var(--r-1); }
-  .project-info h2 { grid-column: 2; grid-row: 1; }
-  .project-description, .project-links, .channel-row, .versions-note { grid-column: 1 / -1; }
-  .project-links { max-width: none; margin-top: 0; }
+  .project-header { gap: var(--s-4); padding: var(--s-4); }
+  .project-image { width: var(--s-8); height: var(--s-8); }
+  .project-info h2 { font-size: var(--text-lg); line-height: var(--lh-lg); }
+  .project-body { padding: 0 var(--s-4) var(--s-4); }
 }
 
 /* Title doubles as the copy-link button. */
@@ -1063,13 +1116,15 @@ main:focus, #catalog:focus { outline: none; }
   background: transparent;
   font: inherit;
   letter-spacing: inherit;
+  text-transform: inherit;
   text-align: left;
   cursor: pointer;
 }
 .copy-link-btn > span:first-child { transition: color var(--ease); }
 .copy-link-btn .icon-sm {
   /* Takes no line width, so the icon can never wrap onto a line of its own. */
-  margin: 0 calc((var(--s-2) + 16px) * -1) -2px var(--s-2);
+  margin: 0 calc((var(--s-2) + 16px) * -1) 0 var(--s-2);
+  vertical-align: middle;
   color: var(--text-soft);
   transition: color var(--ease);
 }
@@ -1079,6 +1134,9 @@ main:focus, #catalog:focus { outline: none; }
 .copy-link-btn:focus-visible > span:first-child, .copy-link-btn:focus-visible .icon-sm,
 .copy-link-btn.is-copied .icon-sm { color: var(--accent); }
 
+/* The tooltip is a child of a display-face heading; keep it in the body face. */
+.copy-link-btn[data-tooltip]::after { font-family: var(--font-body); font-weight: 500; letter-spacing: 0; text-transform: none; }
+
 /* Brief highlight after arriving from a direct link. */
 .is-linked-target { position: relative; }
 .is-linked-target::before { content: ''; position: absolute; inset: calc(var(--s-3) * -1) calc(var(--s-3) * -1); border-radius: var(--r-2); pointer-events: none; }
@@ -1087,71 +1145,61 @@ main:focus, #catalog:focus { outline: none; }
 }
 @keyframes linked-target { 0% { box-shadow: 0 0 0 2px var(--accent); } 100% { box-shadow: 0 0 0 2px transparent; } }
 
-/* ---------- Channels ---------- */
+/* ---------- Release table ---------- */
+/* Rows are channels (Release, Beta), columns are download types (Data Pack, Mod).
+   Wide: label column plus one column per type. Narrower: each cell stacks its contents.
+   Below 656px (the label column plus two stacked cells), the table is one column and
+   each cell carries its own label. */
 
-.channel-group[data-channel="stable"]      { --channel-color: var(--ch-stable);      --channel-rgb: var(--ch-stable-rgb); }
-.channel-group[data-channel="beta"]        { --channel-color: var(--ch-beta);        --channel-rgb: var(--ch-beta-rgb); }
-.channel-group[data-channel="alpha"]       { --channel-color: var(--ch-alpha);       --channel-rgb: var(--ch-alpha-rgb); }
-.channel-group[data-channel="unsupported"] { --channel-color: var(--ch-unsupported); --channel-rgb: var(--ch-unsupported-rgb); }
+.rt { container: release-table / inline-size; }
 
-.channel-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4); align-items: stretch; }
-/* A lone box keeps the width of one column rather than stretching. */
-.channel-row > .channel-group:only-child { grid-column: 1; }
+.release-table { border: 1px solid var(--border); border-radius: var(--r-1); }
 
-.channel-group {
-  position: relative;
+.rt-row { display: grid; grid-template-columns: minmax(var(--label-w), 0.5fr) repeat(var(--cols), minmax(0, 1fr)); border-top: 1px solid var(--border); }
+.rt-row[data-channel="stable"]      { --channel-color: var(--ch-stable);      --channel-rgb: var(--ch-stable-rgb); }
+.rt-row[data-channel="beta"]        { --channel-color: var(--ch-beta);        --channel-rgb: var(--ch-beta-rgb); }
+.rt-row[data-channel="alpha"]       { --channel-color: var(--ch-alpha);       --channel-rgb: var(--ch-alpha-rgb); }
+.rt-row[data-channel="unsupported"] { --channel-color: var(--ch-unsupported); --channel-rgb: var(--ch-unsupported-rgb); }
+
+.rt-head { border-top: 0; border-radius: calc(var(--r-1) - 1px) calc(var(--r-1) - 1px) 0 0; background: var(--surface-2); }
+.rt-colhead {
   display: flex;
-  flex-direction: column;
-  min-width: 0;
-  padding: var(--s-4);
-  border: 1px solid rgba(var(--channel-rgb), var(--tint-3));
-  border-radius: var(--r-2);
-  background: rgba(var(--channel-rgb), 0.04);
-}
-
-.channel-header {
-  display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: var(--s-1) var(--s-2);
-  padding-bottom: var(--s-3);
-  font-size: var(--text-sm);
-  line-height: var(--lh-sm);
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-4);
+  border-left: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: var(--text-xs);
+  line-height: var(--lh-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
-.status-dot { width: 8px; height: 8px; flex-shrink: 0; background: var(--channel-color); }
-.channel-group[data-channel="stable"] .status-dot { border-radius: 50%; }
-.channel-group[data-channel="beta"] .status-dot { border-radius: var(--r-0); transform: rotate(45deg); }
-.channel-group[data-channel="alpha"] .status-dot { border-radius: 0; }
-.channel-group[data-channel="unsupported"] .status-dot { border-radius: var(--r-0); }
-.channel-label { color: var(--channel-color); font-weight: 600; }
-.channel-mc-group { display: inline-flex; align-items: center; gap: var(--s-2); min-width: 0; }
-.channel-sep { color: rgba(var(--channel-rgb), var(--tint-3)); }
-.channel-mc { color: var(--text-soft); white-space: nowrap; }
+.rt-colhead:first-child { border-left: 0; }
 
-/* Each download is a row: type and version on the left, action on the right. */
-.channel-downloads { display: flex; flex-direction: column; }
-.download-col {
+.rt-rowhead { display: flex; flex-direction: column; justify-content: center; gap: var(--s-1); min-width: 0; padding: var(--s-4) var(--s-3); }
+.rt-channel { display: flex; align-items: center; gap: var(--s-2); font-size: var(--text-md); line-height: var(--lh-md); }
+.status-dot { flex: none; width: var(--s-2); height: var(--s-2); background: var(--channel-color); }
+.rt-row[data-channel="stable"] .status-dot { border-radius: 50%; }
+.rt-row[data-channel="beta"] .status-dot { border-radius: var(--r-0); transform: rotate(45deg); }
+.rt-row[data-channel="alpha"] .status-dot { border-radius: 0; }
+.rt-row[data-channel="unsupported"] .status-dot { border-radius: var(--r-0); }
+.channel-label { color: var(--channel-color); font-weight: 600; }
+.rt-java { color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); white-space: nowrap; }
+
+.rt-cell {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--s-3);
-  padding: var(--s-3) 0;
-  border-top: 1px solid rgba(var(--channel-rgb), var(--tint-2));
-}
-.download-col:last-child { padding-bottom: 0; }
-
-.download-col-header {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--s-1) var(--s-2);
   min-width: 0;
-  font-size: var(--text-sm);
-  line-height: var(--lh-sm);
-  font-weight: 600;
+  padding: var(--s-4) var(--s-3);
+  border-left: 1px solid var(--border);
 }
-.download-type-label { white-space: nowrap; }
+.rt-cell-label { display: none; }
+.rt-meta { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-2); }
 
+/* Version pill: a tag, tinted in the channel colour. */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -1164,31 +1212,36 @@ main:focus, #catalog:focus { outline: none; }
   color: var(--channel-color);
   font-size: var(--text-xs);
   line-height: var(--lh-xs);
-  font-weight: 500;
+  font-weight: 600;
   flex-shrink: 0;
   white-space: nowrap;
 }
-.pill.disabled-pill { background: transparent; border-color: rgba(var(--channel-rgb), var(--tint-2)); color: var(--text-soft); }
 
-.download-btn, .download-unavailable { flex: 0 1 120px; min-width: 88px; min-height: var(--control-h); padding: 0 var(--s-3); }
-.download-btn .icon-sm { width: 16px; height: 16px; }
+.rt-date { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--text-soft); font-size: var(--text-sm); line-height: var(--lh-sm); white-space: nowrap; }
+.rt-date.is-placeholder { font-style: italic; }
 
-/* Stable is the filled action; other channels are outlined in their colour. */
-.channel-group[data-channel="stable"] .download-btn { background: var(--channel-color); border-color: var(--channel-color); color: var(--on-accent); }
-.channel-group:not([data-channel="stable"]) .download-btn { border-color: rgba(var(--channel-rgb), 0.6); color: var(--channel-color); }
-@media (hover: hover) {
-  .channel-group[data-channel="stable"] .download-btn:hover { background: color-mix(in srgb, var(--channel-color), white 16%); border-color: color-mix(in srgb, var(--channel-color), white 16%); }
-  .channel-group:not([data-channel="stable"]) .download-btn:hover { background: rgba(var(--channel-rgb), var(--tint-2)); border-color: var(--channel-color); }
-}
+/* One width for every version button. The 44px hit area is added without changing the 40px control. */
+.download-btn { position: relative; flex: none; width: var(--action-w); min-height: var(--control-h); padding: 0 var(--s-2); }
+.download-btn::after { content: ''; position: absolute; inset: calc((var(--control-h) - var(--hit)) / 2) 0; }
 .download-btn:focus-visible { outline-color: var(--channel-color); }
 
+/* Every channel's button is filled in its own colour. */
+.rt-row .download-btn { background: var(--channel-color); border-color: var(--channel-color); color: var(--on-accent); }
+@media (hover: hover) {
+  .rt-row .download-btn:hover { background: color-mix(in srgb, var(--channel-color), white 16%); border-color: color-mix(in srgb, var(--channel-color), white 16%); }
+}
+
+/* A missing build fills its whole cell. */
+.rt-cell.is-unavailable { align-items: stretch; }
 .download-unavailable {
   position: relative;
   display: flex;
+  flex: 1;
   align-items: center;
   justify-content: center;
   gap: var(--s-2);
-  border: 1px dashed rgba(var(--channel-rgb), var(--tint-3));
+  min-height: var(--control-h);
+  border: 1px dashed var(--border-2);
   border-radius: var(--r-1);
   color: var(--text-soft);
   font-size: var(--text-sm);
@@ -1198,86 +1251,50 @@ main:focus, #catalog:focus { outline: none; }
   user-select: none;
   cursor: not-allowed;
 }
-.download-unavailable.has-tooltip:focus-visible { outline-color: var(--channel-color); }
-.download-unavailable[data-tooltip]::after {
-  left: auto;
-  right: 0;
-  width: max-content;
-  max-width: 224px;
-  white-space: normal;
-  text-align: left;
-}
-.download-unavailable[data-tooltip]::after { transform: translateY(calc(-4px * var(--tt-flip, 1))); }
-.download-unavailable[data-tooltip]:hover::after,
-.download-unavailable[data-tooltip]:focus-visible::after,
-.download-unavailable[data-tooltip].tooltip-open::after { transform: translateY(calc(-8px * var(--tt-flip, 1))); }
+/* Tooltip is centred on the box (the default placement); long text wraps. */
+.download-unavailable[data-tooltip]::after { width: max-content; max-width: 224px; white-space: normal; text-align: center; }
 
-/* "New" / "Updated" tag hanging off the box's top edge. Dismissal is remembered per version. */
-.channel-badge {
-  position: absolute;
-  top: calc(var(--s-3) * -1);
-  right: var(--s-4);
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-1);
-  height: var(--s-5);
-  padding: 0 var(--s-1) 0 var(--s-2);
-  border: 1px solid var(--accent);
-  border-radius: var(--r-pill);
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: var(--text-xs);
-  line-height: 1;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: opacity var(--ease);
+/* Medium: not enough room for details beside the button, so the cell stacks. */
+@container release-table (max-width: 803px) {
+  .rt-cell { flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--s-3); }
+  .rt-cell.is-unavailable { align-items: stretch; }
 }
-.channel-badge::before { content: ''; position: absolute; inset: -8px; }
-.channel-badge[data-tooltip]::after { text-transform: none; letter-spacing: 0; font-weight: 500; }
-.channel-badge.is-dismissed { opacity: 0; }
-.channel-badge-dismiss {
-  position: relative;
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: rgba(13, 17, 26, 0.12);
-}
-.channel-badge-dismiss::before, .channel-badge-dismiss::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 8px;
-  height: 2px;
-  border-radius: 1px;
-  background: currentColor;
-}
-.channel-badge-dismiss::before { transform: translate(-50%, -50%) rotate(45deg); }
-.channel-badge-dismiss::after { transform: translate(-50%, -50%) rotate(-45deg); }
 
-/* Note that fills the empty second slot on archived projects. */
+/* Narrow: one column; each cell shows its own label. */
+@container release-table (max-width: 655px) {
+  .rt-head { display: none; }
+  .rt-head + .rt-row { border-top: 0; }
+  .rt-row { grid-template-columns: minmax(0, 1fr); }
+  .rt-rowhead { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-1) var(--s-4); padding-bottom: var(--s-3); }
+  .rt-cell { align-items: stretch; gap: var(--s-2); border-left: 0; border-top: 1px solid var(--border); }
+  .rt-meta { flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-3); }
+  .download-btn { width: 100%; }
+  .rt-cell-label {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--text-soft);
+    font-size: var(--text-xs);
+    line-height: var(--lh-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+/* Project note (archived and unsupported projects). */
 .project-note {
   display: flex;
-  align-items: center;
-  min-width: 0;
+  align-items: flex-start;
+  gap: var(--s-3);
   padding: var(--s-4);
-  border: 1px dashed var(--border-2);
-  border-radius: var(--r-2);
+  border-radius: var(--r-1);
+  background: var(--surface-2);
   color: var(--text-soft);
   font-size: var(--text-sm);
   line-height: var(--lh-sm);
 }
-.project-note-inner { display: flex; align-items: flex-start; gap: var(--s-3); }
-.project-note .icon { margin-top: 2px; }
-
-.versions-note { color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); }
-.versions-note .icon { margin-right: var(--s-1); vertical-align: -3px; }
-.versions-note-link { text-decoration: underline; text-underline-offset: 2px; transition: color var(--ease); }
-@media (hover: hover) { .versions-note-link:hover { color: var(--text); } }
+.project-note .icon { margin-top: var(--s-1); flex: none; }
 
 /* ---------- Tooltips ---------- */
 /* Any [data-tooltip] element must be positioned. Opens above; .tooltip-below flips it. */
@@ -1905,7 +1922,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .skel-hero .skel-h1 { height: var(--s-9); margin-bottom: var(--s-4); }
 .skel-hero .skel-panel { height: 336px; border-radius: var(--r-2); }
 .skel-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-5); margin-top: var(--s-5); }
-.skel-project { height: 192px; border-radius: var(--r-2); margin-bottom: var(--s-5); }
+.skel-project { height: calc(var(--s-9) * 4); border-radius: var(--r-2); margin-bottom: var(--s-5); }
 @media (max-width: 1023px) { .skel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 900px) { .skel-hero { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); padding-top: var(--s-6); } .skel-hero .skel-panel { height: 256px; } }
 @media (max-width: 720px) { .skel-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); } }
