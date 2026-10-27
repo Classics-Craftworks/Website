@@ -12,5 +12,5 @@ const STATS_DATA = {
       tooltip: "Playtime stats are tracked by Modrinth via the Modrinth App only, and are updated manually." }
   ],
 
-  lastUpdated: "October 24, 2026"
+  lastUpdated: "24 October 2026"
 };
