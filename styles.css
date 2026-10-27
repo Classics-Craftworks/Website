@@ -657,7 +657,7 @@ main:focus, #catalog:focus { outline: none; }
 
 /* The headline sizes itself to its column: at most 48px, shrinking so the longest line (about 13.4em wide
    in the display font) never wraps. */
-.splash-copy { container-type: inline-size; }
+.splash-copy { container-type: inline-size; position: relative; z-index: 2; }
 .splash-headline { margin-bottom: var(--s-4); font-size: min(var(--text-hero), 7.2cqw); line-height: var(--lh-hero); }
 .splash-line { display: block; white-space: nowrap; }
 .splash-line-accent { color: var(--accent); }
