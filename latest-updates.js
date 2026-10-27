@@ -54,11 +54,11 @@ const LATEST_UPDATES = {
     latestReleases: {
       heading: "Latest releases",
       releases: [
+        { project: "Classic's Note Block Tweaks", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v1.0.0-beta.1", version: "v1.0.0-beta.1", channel: "beta", date: "2026-10-27" },
+        { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.7", version: "v5.1.0-beta.7", channel: "beta", date: "2026-10-27" },
         { project: "Classic's Tweaks", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0", version: "v3.0.0", channel: "stable", date: "2026-10-26" },
         { project: "Classic's Tweaks", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.2", version: "v3.0.0-beta.2", channel: "beta", date: "2026-10-23" },
         { project: "Classic's Tweaks", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0-beta.1", version: "v3.0.0-beta.1", channel: "beta", date: "2026-10-21" },
-        { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6", version: "v5.1.0-beta.6", channel: "beta", date: "2026-10-20" },
-        { project: "Classic's Note Block Tweaks", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0", version: "v0.5.0", channel: "alpha", date: "2026-10-20" },
       ]
     },
 
@@ -87,6 +87,19 @@ const LATEST_UPDATES = {
   },
 
   entries: [
+    {
+      pinned: true,
+      date: "2026-10-27",
+      title: "26.4 Snapshot 6",
+      text: "New betas have been released for Java 26.4-snapshot-6.",
+      tags: ["snapshot", "beta"],
+      image: "images/icons/snapshot.svg",
+      mc: "26.4",
+      projects: [
+        { id: "better-unpackables", version: "v5.1.0-beta.7", text: "Snow Bricks can now be turned back into blocks with \"back to block\" recipes." },
+        { id: "classics-note-block-tweaks", version: "v1.0.0-beta.1", text: "First beta with support for 26.4-snapshot-6." }
+      ]
+    },
     {
       announce: true,
       date: "2026-10-26",
@@ -122,7 +135,6 @@ const LATEST_UPDATES = {
       linkText: "View Classic's Tweaks"
     },
     {
-      pinned: true,
       date: "2026-10-21",
       title: "Standalone Tweaks Packs archived",
       text: "Classic's Disc, Dye & Lantern Tweaks and Zisteau Pigmen have merged into Classic's Tweaks and will no longer receive updates. Classic's Note Block Tweaks will be archived after v1.0.0.",

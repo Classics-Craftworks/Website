@@ -21,7 +21,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v4.1.1",
+    label: "v4.1.1.1",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -80,7 +80,7 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              mcVersion: "26.3 – 26.4-snap-5",
+              mcVersion: "26.3 – 26.4-snap-6",
               downloads: [
                 { label: "Data Pack", icon: "brackets", version: "v8.1.0-beta.4", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.4", date: "2026-10-20", notify: true },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
@@ -115,9 +115,9 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              mcVersion: "26.3 – 26.4-snap-5",
+              mcVersion: "26.3 – 26.4-snap-6",
               downloads: [
-                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.6", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.6", date: "2026-10-20", notify: true },
+                { label: "Data Pack", icon: "brackets", version: "v5.1.0-beta.7", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.7", date: "2026-10-27", notify: true },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
               ]
             }
@@ -150,7 +150,7 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              mcVersion: "26.3 – 26.4-snap-5",
+              mcVersion: "26.3 – 26.4-snap-6",
               downloads: [
                 { label: "Data Pack", icon: "brackets", disabled: true, tooltip: "Betas for this project usually release later in the Minecraft development cycle, unless changes need testing." },
                 { label: "Mod", icon: "box", disabled: true, tooltip: "Beta mod versions are not published during Minecraft development cycles." }
@@ -216,7 +216,7 @@ const SITE_DATA = {
             {
               channel: "beta",
               label: "Beta",
-              mcVersion: "1.21.9 – 26.4-snap-5",
+              mcVersion: "1.21.9 – 26.4-snap-6",
               downloads: [
                 { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for 26.4 are coming soon!" },
               ]
@@ -314,11 +314,11 @@ const SITE_DATA = {
           ],
           channels: [
             {
-              channel: "alpha",
-              label: "Alpha",
-              mcVersion: "1.21.9 – 26.4-snap-5",
+              channel: "beta",
+              label: "Beta",
+              mcVersion: "1.21.9 – 26.4-snap-6",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v0.5.0", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v0.5.0", date: "2026-10-20", notify: true }
+                { label: "Resource Pack", icon: "brush", version: "v1.0.0-beta.1", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v1.0.0-beta.1", date: "2026-10-27", notify: true }
               ]
             }
           ]
