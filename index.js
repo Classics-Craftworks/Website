@@ -18,17 +18,27 @@ function projectMeta(project) {
   return [first && first.version, ch.mcVersion].filter(Boolean).join(' · ');
 }
 
+// Tag text for a project with an "unsupported" channel in data.js: that channel's label ("Archived", "Unsupported"...).
+function statusTag(project) {
+  const ch = (project.channels || []).find(c => c.channel === 'unsupported');
+  return ch ? (ch.label || 'Unsupported') : '';
+}
+
 function homeArrow(className) {
   return el('span', { class: className, attrs: { 'aria-hidden': 'true' } });
 }
 
 function renderHomeProject(project, section, page) {
   const meta = projectMeta(project);
+  const tag = statusTag(project);
   return el('li', { class: 'home-project-item' }, [
     internalLink('home-project', projectUrl(page, section, project), [
       el('img', { class: 'home-project-img', src: project.image, alt: '', attrs: { draggable: 'false', width: '320', height: '320', loading: 'lazy', decoding: 'async' } }),
       el('span', { class: 'home-project-text' }, [
-        el('span', { class: 'home-project-title', text: project.title }),
+        el('span', { class: 'home-project-heading' }, [
+          el('span', { class: 'home-project-title', text: project.title }),
+          tag ? el('span', { class: 'home-project-tag', text: tag }) : null
+        ]),
         meta ? el('span', { class: 'home-project-meta', text: meta }) : null
       ]),
       homeArrow('home-project-arrow')

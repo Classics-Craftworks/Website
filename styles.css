@@ -877,6 +877,7 @@ main:focus, #catalog:focus { outline: none; }
 }
 .home-project-text { display: flex; flex: 1; flex-direction: column; min-width: 0; }
 .home-project-title {
+  min-width: 0;
   font-size: var(--text-sm);
   line-height: var(--lh-sm);
   font-weight: 600;
@@ -886,6 +887,18 @@ main:focus, #catalog:focus { outline: none; }
   line-clamp: 2;
   overflow: hidden;
   overflow-wrap: anywhere;
+}
+.home-project-heading { display: flex; align-items: center; gap: var(--s-2); min-width: 0; }
+.home-project-tag {
+  flex: none;
+  padding: 0 var(--s-2);
+  border: 1px solid rgba(var(--ch-unsupported-rgb), 0.4);
+  border-radius: var(--r-pill);
+  background: rgba(var(--ch-unsupported-rgb), 0.12);
+  color: var(--ch-unsupported);
+  font-size: var(--text-xs);
+  line-height: var(--lh-xs);
+  font-weight: 600;
 }
 .home-project-meta { overflow: hidden; color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); text-overflow: ellipsis; white-space: nowrap; }
 
