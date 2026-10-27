@@ -8,11 +8,11 @@ const STATS_DATA = {
       tooltip: "Downloadable projects only, so excludes CraftHorizon and the website." },
     { icon: "download", label: "Downloads", value: "132,000+",
       tooltip: "Download stats combine totals from Modrinth and SpigotMC, fetched daily from the Modrinth API and Spiget and rounded down to the nearest 1000." },
-    { icon: "heart", label: "Followers", value: "—",
+    { icon: "heart", label: "Followers", value: "400+",
       tooltip: "Followers across all Modrinth projects, fetched daily from the Modrinth API and rounded down to the nearest 10." },
     { icon: "clock", label: "Hours Played", value: "520+",
       tooltip: "Playtime stats are tracked by Modrinth via the Modrinth App only. Updated manually and rounded down to the nearest 10." }
   ],
 
-  lastUpdated: "27 October 2026"
+  lastUpdated: "October 27, 2026"
 };
