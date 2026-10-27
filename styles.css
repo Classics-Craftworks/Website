@@ -92,6 +92,10 @@
   --lh-2xl:   2rem;
   --text-3xl: 2rem;      /* 32 / 40: hero title (display, caps) */
   --lh-3xl:   2.5rem;
+  --text-page: 2rem;     /* 32 / 40: page titles (h1, display, caps) */
+  --lh-page:   2.5rem;
+  --text-hero: clamp(2.5rem, 1.75rem + 2.4vw, 3rem); /* 40-48 / 1.1: hero headline */
+  --lh-hero:   1.1;
 
   /* Layout */
   --container: 1280px;
@@ -159,7 +163,7 @@ h1, h2 {
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-h1 { font-size: var(--text-2xl); line-height: var(--lh-2xl); }
+h1 { font-size: var(--text-page); line-height: var(--lh-page); }
 h2 { font-size: var(--text-2xl); line-height: var(--lh-2xl); }
 h3 { font-size: var(--text-lg); line-height: var(--lh-lg); font-weight: 600; }
 
@@ -651,8 +655,11 @@ main:focus, #catalog:focus { outline: none; }
 }
 .splash-no-card .splash-inner { grid-template-columns: minmax(0, 1fr); }
 
-.splash-headline { margin-bottom: var(--s-4); font-size: var(--text-3xl); line-height: var(--lh-3xl); text-wrap: balance; }
-.splash-line { display: block; }
+/* The headline sizes itself to its column: at most 48px, shrinking so the longest line (about 13.4em wide
+   in the display font) never wraps. */
+.splash-copy { container-type: inline-size; }
+.splash-headline { margin-bottom: var(--s-4); font-size: min(var(--text-hero), 7.2cqw); line-height: var(--lh-hero); }
+.splash-line { display: block; white-space: nowrap; }
 .splash-line-accent { color: var(--accent); }
 
 .splash-subtitle { max-width: 52ch; margin-bottom: var(--s-6); color: var(--text-soft); font-size: var(--text-lg); line-height: var(--lh-lg); }
