@@ -9,7 +9,7 @@
      else the cell shows a "Date TBC" placeholder.
    - Notes: optional `note: "text"` on a project adds an info panel under its release table.
    - Notifications: `notify: true` on a download puts a dot beside its version and in the navigation until
-     the project's page has been opened (a new visitor sees every dot). The dot
+     the project's page has been opened (a first-time visitor sees none; only releases published after their first visit). The dot
      shows again when that download's version number changes.
    - New project: copy an existing project block. */
 

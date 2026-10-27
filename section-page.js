@@ -221,7 +221,7 @@ function renderBrand(brand) {
 
 /* ---------- Project notifications ----------
    A download with `notify: true` in data.js gets a dot until its page has been opened since its
-   version last changed. Nothing counts as seen on a first visit, so the dots show. The previous
+   version last changed. On a first visit everything already published counts as seen, so no dots show. The previous
    visit's state is held for the browser session so reloads don't clear them. */
 
 const PROJECTS_SEEN_KEY = 'downloads-seen';
@@ -261,6 +261,12 @@ function projectsBaseline() {
   try { map = parseSeenMap(sessionStorage.getItem(PROJECTS_BASELINE_KEY)); } catch { /* session storage unavailable */ }
   if (!map) {
     map = parseSeenMap(storageGet(PROJECTS_SEEN_KEY));
+    if (!map) {
+      // First visit: everything currently published counts as seen, so only later releases get a dot.
+      map = {};
+      allNotifyDownloads().forEach(c => { map[c.key] = c.fingerprint; });
+      storageSet(PROJECTS_SEEN_KEY, JSON.stringify(map));
+    }
     if (map) { try { sessionStorage.setItem(PROJECTS_BASELINE_KEY, JSON.stringify(map)); } catch { /* ignore */ } }
   }
   projectsBaselineCache = map || {};
@@ -276,7 +282,8 @@ function isNotifyDownload(projectId, ch, d) {
 // Navigation counts: one per channel with an unseen download, cleared on the next page load
 // once the project page has been opened.
 function isUnseenChannel(projectId, ch) {
-  const seen = parseSeenMap(storageGet(PROJECTS_SEEN_KEY)) || {};
+  projectsBaseline(); // seeds the saved map on a first visit
+  const seen = parseSeenMap(storageGet(PROJECTS_SEEN_KEY)) || projectsBaseline();
   return !!((ch.downloads || []).some(d =>
     d.notify && downloadAvailable(d) && seen[notifyKey(projectId, ch, d)] !== notifyFingerprint(d)));
 }
