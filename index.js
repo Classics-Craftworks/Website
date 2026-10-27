@@ -205,12 +205,13 @@ function featuredEntries(splash) {
 const FEATURED_INTERVAL_MS = 8000;
 
 // Auto-advancing slides (paused on hover/focus/hidden tab, never with reduced motion), plus dots, arrows and swipe.
-function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn, counter) {
+function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn, counter, pauseBtn) {
   const dots = [...dotsWrap.children];
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   let index = 0;
   let timer = null;
-  let paused = false;
+  let paused = false;     // temporary: hover / focus
+  let userPaused = false; // explicit: pause button
 
   const slidesWrap = slides[0].parentElement;
   const SLIDE_MS = 380; // how long an outgoing slide keeps its "leaving" state
@@ -252,10 +253,19 @@ function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn, counter)
   function stop() { clearInterval(timer); timer = null; }
   function start() {
     stop();
-    if (paused || reduced.matches || document.hidden) return;
+    if (paused || userPaused || reduced.matches || document.hidden) return;
     timer = setInterval(() => show(index + 1, 'next'), FEATURED_INTERVAL_MS);
   }
   function go(i, dir) { show(i, dir || (i > index ? 'next' : 'prev')); start(); }
+
+  function setUserPaused(on) {
+    userPaused = on;
+    pauseBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    pauseBtn.setAttribute('aria-label', on ? 'Play automatic rotation' : 'Pause automatic rotation');
+    pauseBtn.classList.toggle('is-paused', on);
+    start();
+  }
+  pauseBtn.addEventListener('click', () => setUserPaused(!userPaused));
 
   dots.forEach((d, n) => d.addEventListener('click', () => go(n)));
   prevBtn.addEventListener('click', () => go(index - 1, 'prev'));
@@ -344,17 +354,21 @@ function renderFeatured(card, entries) {
     attrs: { type: 'button', 'aria-label': 'Show featured project ' + (n + 1) + ': ' + e.found.project.title }
   })));
 
+  const pause = el('button', {
+    class: 'splash-featured-arrow splash-featured-pause',
+    attrs: { type: 'button', 'aria-label': 'Pause automatic rotation', 'aria-pressed': 'false' }
+  });
   const counter = el('span', { class: 'splash-featured-count', attrs: { role: 'status' } });
 
   card.setAttribute('aria-roledescription', 'carousel');
   card.append(
     el('div', { class: 'splash-featured-top' }, [
       el('div', { class: 'splash-featured-heading' }, [label, counter]),
-      el('div', { class: 'splash-featured-nav' }, [prev, dotsWrap, next])
+      el('div', { class: 'splash-featured-nav' }, [pause, prev, dotsWrap, next])
     ]),
     slidesWrap
   );
-  initFeaturedCarousel(card, slides, dotsWrap, prev, next, counter);
+  initFeaturedCarousel(card, slides, dotsWrap, prev, next, counter, pause);
 }
 
 // Fills the splash from SITE_DATA.home.splash (hidden without one).

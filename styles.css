@@ -712,6 +712,11 @@ main:focus, #catalog:focus { outline: none; }
   .splash-featured-arrow:hover { color: var(--text); }
 }
 .splash-featured-arrow::before { content: ''; width: 8px; height: 8px; border: solid currentColor; border-width: 2px 2px 0 0; }
+/* Pause/play toggle: two bars when running, a triangle when paused. Hidden with reduced motion (no autoplay then). */
+.splash-featured-pause { margin-right: var(--s-1); }
+.splash-featured-pause::before { width: 10px; height: 10px; border: 0; border-left: 3px solid currentColor; border-right: 3px solid currentColor; box-sizing: border-box; }
+.splash-featured-pause.is-paused::before { width: 0; height: 0; border: solid transparent; border-width: 5px 0 5px 9px; border-left-color: currentColor; border-right: 0; transform: translateX(1px); }
+@media (prefers-reduced-motion: reduce) { .splash-featured-pause { display: none; } }
 .splash-featured-arrow-prev::before { transform: translateX(2px) rotate(-135deg); }
 .splash-featured-arrow-next::before { transform: translateX(-2px) rotate(45deg); }
 
