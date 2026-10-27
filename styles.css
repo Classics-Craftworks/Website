@@ -1671,8 +1671,10 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
   vertical-align: 0.1em;
   cursor: default;
 }
-.news-new-dot[data-tooltip]::after { left: calc(var(--s-1) * -1); transform: translateY(calc(-4px * var(--tt-flip, 1))); }
-.news-new-dot[data-tooltip]:hover::after { transform: translateY(calc(-8px * var(--tt-flip, 1))); }
+.news-new-dot[data-tooltip]::after { left: calc(var(--s-1) - var(--s-4)); transform: translateY(calc(-4px * var(--tt-flip, 1))); }
+.news-new-dot[data-tooltip]:hover::after,
+.news-new-dot[data-tooltip]:focus-visible::after,
+.news-new-dot[data-tooltip].tooltip-open::after { transform: translateY(calc(-8px * var(--tt-flip, 1))); }
 .news-title { font-size: var(--text-lg); line-height: var(--lh-lg); font-weight: 600; transition: color var(--ease); }
 .news-text { color: var(--text-soft); }
 
