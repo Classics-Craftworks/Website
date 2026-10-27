@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.1.0 — 2026-10-27
+
+### Added
+- Pause button for home page carousel
+- Tags to archived/unsupported projects on the home page
+- Followers stat on the home page, showing the total Modrinth followers across all projects.
+- Icons beside each home page stat
+
+### Changed
+- Unified the date formats across the site (Oct 27, 2026 -> 27 Oct 2026)
+- Made the "jump to projects" sidebar on project pages sticky
+
+### Fixed
+- Fixed first-time visitors seeing notification dots on every project
+- Fixed pointers on tooltips sometimes being broken on mobile, depending on their position on the page
+
 ## v4.0.0.1 — 2026-10-27
 
 ### Changed
