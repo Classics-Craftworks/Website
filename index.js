@@ -119,7 +119,10 @@ function renderStat(s) {
     attrs: hasTip ? { 'data-tooltip': s.tooltip, tabindex: '0' } : {}
   }, [
     statValue(fillPlaceholders(s.value)),
-    el('span', { class: 'stat-label', text: s.label }),
+    el('span', { class: 'stat-label-row' }, [
+      s.icon ? icon(s.icon, 'icon-sm') : null,
+      el('span', { class: 'stat-label', text: s.label })
+    ]),
     hasTip ? el('span', { class: 'visually-hidden', text: '. ' + s.tooltip }) : null
   ]);
 

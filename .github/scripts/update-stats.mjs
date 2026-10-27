@@ -1,5 +1,6 @@
-// Updates the "Downloads" stat in stats.js from Modrinth + SpigotMC (via Spiget).
-// When the stat changes, it also bumps the hotfix number of the site version in
+// Updates the "Downloads" stat in stats.js from Modrinth + SpigotMC (via Spiget), and the
+// "Followers" stat from Modrinth (project followers, summed over the same projects).
+// When either stat changes, it also bumps the hotfix number of the site version in
 // data.js (v3.7.5 -> v3.7.5.1, v3.7.5.1 -> v3.7.5.2, ...) and adds a matching
 // entry to CHANGELOG.md, and sets the home page's <lastmod> in sitemap.xml to today.
 //
@@ -8,8 +9,9 @@
 //     organizations and anything in EXCLUDE_SLUGS.
 //   - SpigotMC: every spigotmc.org/resources/<name>.<id>/ link.
 //
-// Safety: if any request fails, a project is missing from the response, or the
-// new total is lower than the one on the site, nothing is written.
+// Safety: if any request fails, a project is missing from the response, or the new
+// download total is lower than the one on the site, nothing is written. (Followers can
+// legitimately go down, so they are not checked that way.)
 //
 // Usage: node .github/scripts/update-stats.mjs [--dry-run]
 
@@ -27,6 +29,7 @@ const SITEMAP_FILE = resolve(ROOT, 'sitemap.xml');
 const EXCLUDE_SLUGS = new Set(['crafthorizon']);
 const IGNORED_MODRINTH_TYPES = new Set(['server', 'organization', 'user', 'collection']);
 const ROUND_DOWN_TO = 1000; // 1000 -> "125,000+"; set to 1 for exact numbers
+const FOLLOWERS_ROUND_DOWN_TO = 10; // 10 -> "240+" (keeps daily churn, and so version bumps, down); set to 1 for exact
 const USER_AGENT = 'Classics-Craftworks/Website (stats updater; https://github.com/Classics-Craftworks/Website)';
 const DRY_RUN = process.argv.includes('--dry-run');
 
@@ -78,22 +81,25 @@ async function getJson(url, tries = 3) {
   throw new Error(`${url}: ${lastError.message}`);
 }
 
-async function modrinthDownloads(slugs) {
+async function modrinthStats(slugs) {
   const url = `https://api.modrinth.com/v2/projects?ids=${encodeURIComponent(JSON.stringify(slugs))}`;
   const projects = await getJson(url);
   const found = new Map();
   for (const p of projects) {
-    found.set(p.slug.toLowerCase(), p.downloads);
-    found.set(p.id, p.downloads);
+    found.set(p.slug.toLowerCase(), p);
+    found.set(p.id, p);
   }
-  let total = 0;
+  let downloads = 0;
+  let followers = 0;
   for (const slug of slugs) {
-    const n = found.get(slug.toLowerCase());
-    if (!Number.isFinite(n)) throw new Error(`Modrinth did not return a download count for "${slug}"`);
-    console.log(`  Modrinth  ${slug}: ${n}`);
-    total += n;
+    const p = found.get(slug.toLowerCase());
+    if (!p || !Number.isFinite(p.downloads)) throw new Error(`Modrinth did not return a download count for "${slug}"`);
+    if (!Number.isFinite(p.followers)) throw new Error(`Modrinth did not return a follower count for "${slug}"`);
+    console.log(`  Modrinth  ${slug}: ${p.downloads} downloads, ${p.followers} followers`);
+    downloads += p.downloads;
+    followers += p.followers;
   }
-  return total;
+  return { downloads, followers };
 }
 
 async function spigotDownloads(resources) {
@@ -110,11 +116,18 @@ async function spigotDownloads(resources) {
 // ---------- stats.js ----------
 
 const DOWNLOADS_RE = /(label:\s*"Downloads",\s*value:\s*")([^"]*)(")/;
+const FOLLOWERS_RE = /(label:\s*"Followers",\s*value:\s*")([^"]*)(")/;
 const UPDATED_RE = /(lastUpdated:\s*")([^"]*)(")/;
 
 function formatTotal(total) {
   const rounded = Math.floor(total / ROUND_DOWN_TO) * ROUND_DOWN_TO;
   return rounded.toLocaleString('en-US') + (ROUND_DOWN_TO > 1 ? '+' : '');
+}
+
+function formatFollowers(total) {
+  if (total < FOLLOWERS_ROUND_DOWN_TO) return String(total);
+  const rounded = Math.floor(total / FOLLOWERS_ROUND_DOWN_TO) * FOLLOWERS_ROUND_DOWN_TO;
+  return rounded.toLocaleString('en-US') + (FOLLOWERS_ROUND_DOWN_TO > 1 ? '+' : '');
 }
 
 function today() {
@@ -141,7 +154,7 @@ function addChangelogEntry(changelog, version) {
   const headings = [...changelog.matchAll(/^## .*$/gm)];
   const released = headings.find(h => !/XX/i.test(h[0]));
   if (!released) throw new Error('Could not find a released version heading in CHANGELOG.md');
-  const entry = `## ${version} — ${isoToday()}\n\n### Changed\n- Updated download statistics [automated]\n\n`;
+  const entry = `## ${version} — ${isoToday()}\n\n### Changed\n- Updated site statistics [automated]\n\n`;
   return changelog.slice(0, released.index) + entry + changelog.slice(released.index);
 }
 
@@ -161,14 +174,18 @@ const { modrinth, spigot } = collectProjects(loadSiteData());
 if (!modrinth.length) throw new Error('No Modrinth projects found in data.js');
 console.log(`Found ${modrinth.length} Modrinth projects and ${spigot.size} SpigotMC resources.`);
 
-const total = (await modrinthDownloads(modrinth)) + (await spigotDownloads(spigot));
-console.log(`Combined total: ${total}`);
+const modrinthTotals = await modrinthStats(modrinth);
+const total = modrinthTotals.downloads + (await spigotDownloads(spigot));
+console.log(`Combined downloads: ${total}`);
+console.log(`Modrinth followers: ${modrinthTotals.followers}`);
 
 const source = readFileSync(STATS_FILE, 'utf8');
-const current = source.match(DOWNLOADS_RE);
-if (!current) throw new Error('Could not find the "Downloads" stat in stats.js');
+const currentDownloads = source.match(DOWNLOADS_RE);
+if (!currentDownloads) throw new Error('Could not find the "Downloads" stat in stats.js');
+const currentFollowers = source.match(FOLLOWERS_RE);
+if (!currentFollowers) throw new Error('Could not find the "Followers" stat in stats.js');
 
-const oldValue = current[2];
+const oldValue = currentDownloads[2];
 const newValue = formatTotal(total);
 const oldNumber = Number(oldValue.replace(/\D/g, ''));
 const newNumber = Number(newValue.replace(/\D/g, ''));
@@ -176,12 +193,17 @@ const newNumber = Number(newValue.replace(/\D/g, ''));
 if (newNumber < oldNumber) {
   throw new Error(`New total (${newValue}) is lower than the current one (${oldValue}); not writing.`);
 }
-if (newValue === oldValue) {
-  console.log(`Downloads already "${oldValue}"; nothing to do.`);
+
+const oldFollowers = currentFollowers[2];
+const newFollowers = formatFollowers(modrinthTotals.followers);
+
+if (newValue === oldValue && newFollowers === oldFollowers) {
+  console.log(`Downloads already "${oldValue}" and followers already "${oldFollowers}"; nothing to do.`);
   process.exit(0);
 }
 
-console.log(`Downloads: "${oldValue}" -> "${newValue}"`);
+if (newValue !== oldValue) console.log(`Downloads: "${oldValue}" -> "${newValue}"`);
+if (newFollowers !== oldFollowers) console.log(`Followers: "${oldFollowers}" -> "${newFollowers}"`);
 
 // Work out every change before writing anything, so a problem with the version
 // or changelog can't leave the files half-updated.
@@ -200,7 +222,7 @@ if (DRY_RUN) {
   process.exit(0);
 }
 
-let updated = source.replace(DOWNLOADS_RE, `$1${newValue}$3`);
+let updated = source.replace(DOWNLOADS_RE, `$1${newValue}$3`).replace(FOLLOWERS_RE, `$1${newFollowers}$3`);
 updated = updated.replace(UPDATED_RE, `$1${today()}$3`);
 writeFileSync(STATS_FILE, updated);
 writeFileSync(DATA_FILE, dataSource.replace(VERSION_RE, `$1${newVersion}$3`));

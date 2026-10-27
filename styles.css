@@ -949,6 +949,7 @@ main:focus, #catalog:focus { outline: none; }
 .stats-updated { margin-top: var(--s-4); font-size: var(--text-xs); line-height: var(--lh-xs); font-weight: 600; }
 
 .stats-grid { display: flex; flex-wrap: wrap; gap: var(--s-4) 0; }
+.stats-grid > .stat-box { flex: 1 1 auto; } /* figures share the row, filling the hero column */
 
 /* Plain figures separated by dividers: information, not buttons. */
 .stat-box {
@@ -956,11 +957,11 @@ main:focus, #catalog:focus { outline: none; }
   display: flex;
   flex-direction: column;
   gap: var(--s-1);
-  padding: 0 var(--s-5);
+  padding: 0 var(--s-4);
   border-left: 1px solid var(--border);
 }
 .stat-box:first-child { padding-left: 0; border-left: 0; }
-.stat-value { font-family: var(--font-display); font-size: var(--text-xl); line-height: var(--lh-xl); }
+.stat-value { font-family: var(--font-display); font-size: min(var(--text-page), 4.6cqw); line-height: var(--lh-page); }
 .stat-plus {
   display: inline-block;
   width: 0.5em;
@@ -971,6 +972,16 @@ main:focus, #catalog:focus { outline: none; }
     linear-gradient(currentColor, currentColor) center / 100% 0.18em no-repeat,
     linear-gradient(currentColor, currentColor) center / 0.18em 100% no-repeat;
 }
+/* Narrow hero column (small desktops): four figures would not fit one row, so use two columns. */
+@container (max-width: 560px) {
+  @media (min-width: 721px) {
+    .stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-4) 0; }
+    .stats-grid > .stat-box:nth-child(odd) { padding-left: 0; border-left: 0; }
+    .stats-grid > .stat-box:nth-child(even) { padding-left: var(--s-5); }
+  }
+}
+.stat-label-row { display: flex; align-items: center; gap: var(--s-2); }
+.stat-label-row .icon { flex: none; color: var(--accent); }
 .stat-label { color: var(--text-soft); font-size: var(--text-sm); line-height: var(--lh-sm); font-weight: 500; }
 
 /* Figures with a tooltip show a help cursor. */
@@ -1701,6 +1712,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
   vertical-align: 0.1em;
   cursor: default;
 }
+/* Bubble is left-aligned to the dot, with the pointer (dot centre) kept clear of its rounded corner. */
 .news-new-dot[data-tooltip]::after { left: calc(var(--s-1) - var(--s-4)); transform: translateY(calc(-4px * var(--tt-flip, 1))); }
 .news-new-dot[data-tooltip]:hover::after,
 .news-new-dot[data-tooltip]:focus-visible::after,
