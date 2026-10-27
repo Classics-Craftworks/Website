@@ -823,8 +823,10 @@ function renderProjectJump(projects) {
   if (projects.length < 2) return null;
 
   const KEY = 'catalog-jump-collapsed';
+  // Desktop (side panel): open unless the visitor collapsed it. Mobile (stacked above the list): always starts collapsed.
+  const desktop = window.matchMedia('(min-width: 1100px)').matches;
   const stored = storageGet(KEY);
-  let open = stored === null ? window.matchMedia('(min-width: 1100px)').matches : stored !== '1';
+  let open = desktop && stored !== '1';
 
   const listId = 'project-jump-list';
   const items = projects.map(({ project, id }) => el('li', {}, [
@@ -851,7 +853,7 @@ function renderProjectJump(projects) {
   toggle.addEventListener('click', () => {
     open = !open;
     apply();
-    storageSet(KEY, open ? '0' : '1');
+    if (desktop) storageSet(KEY, open ? '0' : '1');
   });
   apply();
 
