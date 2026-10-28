@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.1.2 — 2026-10-28
+
+### Changed
+- Swapped the exclamation mark for a period in New Sword Blocking's description
+
+### Fixed
+- Fixed pages not shows "&" correctly in its browser tab title and in link previews when the page is shared
+
 ## v4.1.1.1 — 2026-10-27
 
 ### Changed
