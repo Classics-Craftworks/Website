@@ -1052,6 +1052,167 @@ function placeTooltip(target) {
 ['mouseover', 'focusin', 'pointerdown'].forEach(type =>
   document.addEventListener(type, e => placeTooltip(e.target)));
 
+/* ---------- News helpers and announcement card ----------
+   Shared here (not in news.js) so pages without a news feed can show the corner card
+   without loading news.js. */
+
+const NEWS_DEFAULT_RGB = '116, 196, 231'; // same blue as --accent-rgb
+
+// "#41a0c8" or "#4ac" -> "65, 160, 200"; anything else -> null.
+function hexToRgb(hex) {
+  let h = String(hex || '').trim().replace(/^#/, '');
+  if (/^[0-9a-f]{3}$/i.test(h)) h = h.replace(/./g, c => c + c);
+  if (!/^[0-9a-f]{6}$/i.test(h)) return null;
+  return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)).join(', ');
+}
+
+// { key, label, rgb } for a tag key, with fallbacks for tags not in `tags`.
+function newsTag(key) {
+  const defined = ((newsData() || {}).tags || {})[key] || {};
+  return {
+    key,
+    label: defined.label || capitalise(String(key)),
+    rgb: hexToRgb(defined.color) || NEWS_DEFAULT_RGB
+  };
+}
+
+// Set through the style API, which the Content-Security-Policy allows (inline style="" isn't).
+function setTagColor(node, tag) {
+  node.style.setProperty('--news-rgb', tag.rgb);
+}
+
+const formatNewsDate = iso => formatDate(iso, { day: 'numeric', month: 'long', year: 'numeric' });
+
+// Calendar icon for dates; dropped if images/icons/calendar.svg is missing.
+function calendarIcon() {
+  const node = icon('calendar', 'icon-sm news-date-icon');
+  const probe = new Image();
+  probe.onerror = () => node.remove();
+  probe.src = sitePath('images/icons/calendar.svg');
+  return node;
+}
+
+// Date with calendar icon. Recent entries show a relative date with the full date as a tooltip.
+function newsDate(entry) {
+  const full = formatNewsDate(entry.date);
+  const relative = relativeNewsDate(entry.date);
+  return el('span', { class: 'news-when' + (relative ? ' has-tooltip' : ''), attrs: relative ? { 'data-tooltip': full } : {} }, [
+    calendarIcon(),
+    el('time', { class: 'news-date', text: relative || full, attrs: { datetime: entry.date } })
+  ]);
+}
+
+const newsArrow = () => el('span', { class: 'news-link-arrow', attrs: { 'aria-hidden': 'true' } });
+
+// True for an .svg image path.
+function isSvgSrc(src) {
+  return /\.svg(?:[?#].*)?$/i.test(src);
+}
+
+// SVGs in <img> are black and vanish on the dark background, so draw them as a coloured mask.
+function svgMask(src, cls) {
+  const node = el('span', { class: 'icon ' + cls, attrs: { 'aria-hidden': 'true' } });
+  setMask(node, `url('${sitePath(src)}')`);
+  return node;
+}
+
+// The newest entry with announce: true; shown as the corner card and pinned first on the News page.
+const announcedEntry = entries => entries.find(e => e.announce === true) || null;
+
+function newsTagPills(entry) {
+  return (entry.tags || []).map(key => {
+    const tag = newsTag(key);
+    const pill = el('span', { class: 'news-tag', text: tag.label });
+    setTagColor(pill, tag);
+    return pill;
+  });
+}
+
+// "View full update" link to an entry on the News page, or null if the site has no News page.
+function viewUpdateLink(entry) {
+  const page = (SITE_DATA.pages || []).find(p => p.url === 'news');
+  return page && internalLink('news-link', `${page.url}#entry=${newsEntryId(entry)}`, [
+    el('span', { text: 'View full update' }),
+    newsArrow()
+  ]);
+}
+
+/* Corner card on every page except News and 404, built from the newest `announce: true`
+   entry. Dismissal is remembered per entry. */
+
+const ANNOUNCE_KEY = 'announcement-dismissed';
+
+// The entry's `image`, else the icon of the project its same-site `url` points at.
+function announceImage(entry) {
+  if (entry.image) return entry.image;
+  if (!entry.url) return null;
+
+  let u;
+  try { u = new URL(entry.url, location.origin); } catch { return null; }
+  if (u.origin !== location.origin) return null;
+
+  const path = u.pathname.replace(/^\/|\/$/g, '');
+  const id = decodeURIComponent(u.hash.slice(1));
+  const page = (SITE_DATA.pages || []).find(p => p.url === path && p.section);
+  const section = page && (SITE_DATA.sections || []).find(s => s.heading === page.section);
+  const match = section && sectionIds(section).projects.find(p => p.id === id);
+  return match ? match.project.image || null : null;
+}
+
+function initAnnouncementCard() {
+  if (document.getElementById('news-page')) return;
+
+  const entry = announcedEntry(newsEntries());
+  if (!entry) return;
+
+  const id = entry.date + '|' + entry.title;
+  if (storageGet(ANNOUNCE_KEY) === id) return;
+
+  const src = announceImage(entry);
+  const media = el('div', { class: 'announce-media', attrs: { 'aria-hidden': 'true' } }, [
+    !src ? icon('announcements', 'announce-icon')
+      : isSvgSrc(src) ? svgMask(src, 'announce-svg')
+      : el('img', { class: 'announce-img', src, alt: '', attrs: { width: '120', height: '120', draggable: 'false', decoding: 'async' } })
+  ]);
+
+  const link = viewUpdateLink(entry);
+
+  const close = el('button', { class: 'announce-close', attrs: { type: 'button', 'aria-label': 'Dismiss announcement', 'data-tooltip': 'Dismiss' } }, [el('span', { class: 'close-glyph', attrs: { 'aria-hidden': 'true' } })]);
+  const card = el('aside', { class: 'announce' + (link ? ' is-linked' : ''), attrs: { role: 'region', 'aria-label': 'Latest news' } }, [
+    el('div', { class: 'news-meta announce-meta' }, [
+      ...newsTagPills(entry),
+      newsDate(entry)
+    ]),
+    media,
+    el('div', { class: 'announce-body' }, [
+      el('p', { class: 'announce-title', text: entry.title }),
+      entry.text ? el('p', { class: 'announce-text', text: fillPlaceholders(entry.text) }) : null,
+      link
+    ]),
+    close
+  ]);
+
+  const root = document.documentElement;
+  let observer = null;
+  const setHeight = () => root.style.setProperty('--announce-h', card.offsetHeight + 'px');
+
+  close.addEventListener('click', () => {
+    storageSet(ANNOUNCE_KEY, id);
+    if (observer) observer.disconnect();
+    card.remove();
+    document.body.classList.remove('has-announcement');
+    root.style.removeProperty('--announce-h');
+  });
+
+  document.body.appendChild(card);
+  document.body.classList.add('has-announcement');
+  setHeight();
+  if ('ResizeObserver' in window) {
+    observer = new ResizeObserver(setHeight);
+    observer.observe(card);
+  }
+}
+
 /* ---------- Entry point ---------- */
 
 function initSectionPage(pageUrl) {
@@ -1074,6 +1235,7 @@ function initSectionPage(pageUrl) {
 }
 
 if (document.body.dataset.page) initSectionPage(document.body.dataset.page);
+if (!document.querySelector('.not-found')) initAnnouncementCard();
 
 // Service worker (sw.js): installable site, offline page shell.
 if ('serviceWorker' in navigator) {
