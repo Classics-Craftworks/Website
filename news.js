@@ -1,17 +1,7 @@
 /* News feed: renders LATEST_UPDATES (format documented in latest-updates.js) as the
-   home page preview and the full News page. Needs latest-updates.js, data.js and section-page.js. */
+   home page preview and the full News page. Needs latest-updates.js, data.js and section-page.js (shared helpers such as formatDate, newDot). */
 
 const NEWS_DEFAULT_RGB = '116, 196, 231'; // same blue as --accent-rgb
-
-function newDot() {
-  return el('span', { class: 'news-new-dot', attrs: { 'data-tooltip': 'New since your last visit', role: 'img', 'aria-label': 'New since your last visit' } });
-}
-
-// "2026-10-13" -> "13 October 2026" (or with other Intl options); invalid input is returned as is.
-function formatDate(iso, options) {
-  const d = new Date(iso + 'T00:00:00Z');
-  return isNaN(d) ? iso : d.toLocaleDateString('en-GB', { ...options, timeZone: 'UTC' });
-}
 
 const formatNewsDate = iso => formatDate(iso, { day: 'numeric', month: 'long', year: 'numeric' });
 

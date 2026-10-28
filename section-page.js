@@ -296,7 +296,8 @@ function markProjectsSeen(section) {
   storageSet(PROJECTS_SEEN_KEY, JSON.stringify(seen));
 }
 
-function projectDot() {
+// Marker for something new since the visitor's last visit (news entries and project downloads).
+function newDot() {
   const text = 'New since your last visit';
   return el('span', { class: 'news-new-dot', attrs: { 'data-tooltip': text, role: 'img', 'aria-label': text } });
 }
@@ -323,10 +324,11 @@ function releaseDate(project, d) {
   return hit ? hit.date : '';
 }
 
-function formatDate(iso) {
+// "2026-10-13" -> "13 Oct 2026" (or with other Intl options); invalid input is returned as is.
+function formatDate(iso, options = { day: 'numeric', month: 'short', year: 'numeric' }) {
   const date = new Date(iso + 'T00:00:00Z');
   if (Number.isNaN(date.getTime())) return iso;
-  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  return date.toLocaleDateString('en-GB', { ...options, timeZone: 'UTC' });
 }
 
 // Table columns: every download type used by any channel, in first-seen order.
@@ -412,7 +414,7 @@ function renderCell(project, ch, column, d, notifiedSet) {
     el('div', { class: 'rt-meta' }, [
       el('span', { class: 'rt-version' }, [
         el('span', { class: 'pill', text: d.version || 'N/A' }),
-        notifiedSet.has(d) ? projectDot() : null
+        notifiedSet.has(d) ? newDot() : null
       ]),
       date
     ]),
