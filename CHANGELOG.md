@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.1.3 — 2026-10-31
+
+### Changed
+- Swapped the position of the featured card and stats on the home page on mobile
+- Made the stats on mobile a 2x2 grid instead of a single long column
+
 ## v4.1.2.3 — 2026-10-30
 
 ### Changed
