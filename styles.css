@@ -650,10 +650,14 @@ main:focus, #catalog:focus { outline: none; }
 .splash-inner {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-  gap: var(--s-8);
-  align-items: center;
+  grid-template-rows: 1fr auto auto 1fr;
+  grid-template-areas: ". featured" "copy featured" "stats featured" ". featured";
+  column-gap: var(--s-8);
 }
-.splash-no-card .splash-inner { grid-template-columns: minmax(0, 1fr); }
+.splash-inner > .splash-copy { grid-area: copy; }
+.splash-inner > .stats-section { grid-area: stats; }
+.splash-inner > .splash-featured { grid-area: featured; align-self: center; }
+.splash-no-card .splash-inner { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; grid-template-areas: "copy" "stats"; }
 
 /* The headline sizes itself to its column: at most 48px, shrinking so the longest line (about 13.4em wide
    in the display font) never wraps. */
@@ -805,13 +809,14 @@ main:focus, #catalog:focus { outline: none; }
 
 @media (max-width: 900px) {
   .splash { padding: var(--s-6) 0 var(--section-gap); }
-  .splash-inner { grid-template-columns: minmax(0, 1fr); gap: var(--s-6); }
+  .splash-inner { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "copy" "featured" "stats"; row-gap: var(--s-6); }
+  .splash-no-card .splash-inner { grid-template-areas: "copy" "stats"; }
   .splash-subtitle { font-size: var(--text-md); line-height: var(--lh-md); margin-bottom: var(--s-5); }
   .splash-actions .splash-btn { flex: 1 1 0; }
   .splash-copy { text-align: center; }
   .splash-subtitle { margin-left: auto; margin-right: auto; }
   .splash-actions { justify-content: center; }
-  .stats-section { margin-top: var(--s-7); }
+  .splash-inner > .stats-section { margin-top: 0; }
   .splash-featured { padding: var(--s-4); }
 }
 
@@ -945,7 +950,7 @@ main:focus, #catalog:focus { outline: none; }
 
 /* ---------- Home: stats ---------- */
 
-.stats-section { margin-top: var(--s-8); }
+.stats-section { position: relative; z-index: 3; margin-top: var(--s-8); } /* above the featured card so tooltips are not covered */
 .stats-updated { margin-top: var(--s-4); font-size: var(--text-xs); line-height: var(--lh-xs); font-weight: 600; }
 
 .stats-grid { display: flex; flex-wrap: wrap; gap: var(--s-4) 0; }
@@ -1003,10 +1008,13 @@ main:focus, #catalog:focus { outline: none; }
 .stat-box[data-tooltip].tooltip-open::after { transform: translateY(calc(-8px * var(--tt-flip, 1))); }
 
 @media (max-width: 720px) {
-  .stats-grid { flex-direction: column; gap: 0; }
-  .stat-box, .stat-box:first-child { align-items: center; text-align: center; padding: var(--s-4) 0; border-left: 0; border-top: 1px solid var(--border); }
-  .stat-box:first-child { border-top: 0; padding-top: 0; }
-  .stat-box[data-tooltip]::after, .stat-box:first-child[data-tooltip]::after { left: 50%; margin-left: calc(min(288px, calc(100vw - var(--s-6))) / -2); text-align: center; max-width: min(288px, calc(100vw - var(--s-6))); }
+  .stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
+  .stat-box, .stat-box:first-child { align-items: center; text-align: center; padding: var(--s-4) var(--s-2); border-left: 0; border-top: 1px solid var(--border); }
+  .stat-box:nth-child(-n+2) { border-top: 0; padding-top: 0; }
+  .stat-box:nth-child(odd) { border-right: 1px solid var(--border); }
+  /* Tooltips stay inside the viewport: left column anchors to its left edge, right column to its right edge. */
+  .stat-box[data-tooltip]::after, .stat-box:first-child[data-tooltip]::after { max-width: min(288px, calc(100vw - var(--s-6))); text-align: center; left: 0; right: auto; }
+  .stat-box:nth-child(even)[data-tooltip]::after { left: auto; right: 0; }
 }
 
 /* ---------- Project pages ---------- */
