@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.1.3.3 — 2026-11-03
+
+### Changed
+- Updated for Classic's Tweaks v3.1.0-beta.1
+
 ## v4.1.3.2 — 2026-11-03
 
 ### Changed

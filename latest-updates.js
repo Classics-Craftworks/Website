@@ -54,11 +54,11 @@ const LATEST_UPDATES = {
     latestReleases: {
       heading: "Latest releases",
       releases: [
+        { project: "Classic's Tweaks", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.1.0-beta.1", version: "v3.1.0-beta.1", channel: "beta", date: "2026-11-03" },
         { project: "Classic's Note Block Tweaks", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v1.0.0-beta.2", version: "v1.0.0-beta.2", channel: "beta", date: "2026-11-03" },
         { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.8", version: "v5.1.0-beta.8", channel: "beta", date: "2026-11-03" },
         { project: "Better Craftables", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.5", version: "v8.1.0-beta.5", channel: "beta", date: "2026-11-03" },
         { project: "Classic's Note Block Tweaks", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v1.0.0-beta.1", version: "v1.0.0-beta.1", channel: "beta", date: "2026-10-27" },
-        { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.7", version: "v5.1.0-beta.7", channel: "beta", date: "2026-10-27" },
       ]
     },
 
@@ -88,13 +88,25 @@ const LATEST_UPDATES = {
 
   entries: [
     {
+      pinned: true,
+      date: "2026-11-03",
+      title: "Classic's Tweaks v3.1.0-beta.1",
+      text: "This beta adds a new texture to Disc Tweaks for the new \"flurry\" music disc, as well as support for the 26.4 snapshots.",
+      tags: ["beta"],
+      mc: ["1.21.9", "1.21.10", "1.21.11", "26.1.x", "26.2", "26.3", "26.4"],
+      image: "images/classics-tweaks.webp",
+      projects: ["classics-tweaks"],
+      url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.1.0-beta.1",
+      linkText: "View update on Modrinth"
+    },
+    {
       announce: true,
       date: "2026-11-03",
       title: "26.4 Snapshot 7",
       text: "New betas have been released for Java 26.4-snapshot-7.",
       tags: ["snapshot", "beta"],
-      image: "images/icons/snapshot.svg",
       mc: "26.4",
+      image: "images/icons/snapshot.svg",
       projects: [
         { id: "better-craftables", version: "v8.1.0-beta.5", text: "Updated pack format for 26.4-snapshot-7." },
         { id: "better-unpackables", version: "v5.1.0-beta.8", text: "All new Calcite block variants can now be turned back into blocks with \"back to block\" recipes." },
@@ -106,8 +118,8 @@ const LATEST_UPDATES = {
       title: "26.4 Snapshot 6",
       text: "New betas have been released for Java 26.4-snapshot-6.",
       tags: ["snapshot", "beta"],
-      image: "images/icons/snapshot.svg",
       mc: "26.4",
+      image: "images/icons/snapshot.svg",
       projects: [
         { id: "better-unpackables", version: "v5.1.0-beta.7", text: "Snow Bricks can now be turned back into blocks with \"back to block\" recipes." },
         { id: "classics-note-block-tweaks", version: "v1.0.0-beta.1", text: "First beta with support for 26.4-snapshot-6." }
@@ -180,8 +192,8 @@ const LATEST_UPDATES = {
       title: "26.4 Snapshot 5",
       text: "New betas have been released for Java 26.4-snapshot-5.",
       tags: ["snapshot", "beta"],
-      image: "images/icons/snapshot.svg",
       mc: "26.4",
+      image: "images/icons/snapshot.svg",
       projects: [
         { id: "better-craftables", version: "v8.1.0-beta.4", text: "Crafting Ice now costs 2 Ice Crystals instead of 4, and the recipe is shapeless." },
         { id: "better-unpackables", version: "v5.1.0-beta.5", text: "Converting Ice into Ice Crystals now gives 2 per Ice instead of 4." }

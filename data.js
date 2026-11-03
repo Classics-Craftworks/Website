@@ -21,7 +21,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v4.1.3.2",
+    label: "v4.1.3.3",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/CHANGELOG.md"
   },
 
@@ -210,7 +210,7 @@ const SITE_DATA = {
               label: "Release",
               mcVersion: "1.21.9 – 26.3",
               downloads: [
-                { label: "Resource Pack", icon: "brush", version: "v3.0.0", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0", date: "2026-10-26", notify: true }
+                { label: "Resource Pack", icon: "brush", version: "v3.0.0", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.0.0", date: "2026-10-26" }
               ]
             },
             {
@@ -218,7 +218,7 @@ const SITE_DATA = {
               label: "Beta",
               mcVersion: "1.21.9 – 26.4-snap-7",
               downloads: [
-                { label: "Resource Pack", icon: "brush", disabled: true, tooltip: "Betas for 26.4 are coming soon!" },
+                { label: "Resource Pack", icon: "brush", version: "v3.1.0-beta.1", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.1.0-beta.1", date: "2026-11-03", notify: true }
               ]
             }
           ]
