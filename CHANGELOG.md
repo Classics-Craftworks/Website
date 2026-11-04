@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.1.3.4 — 2026-11-04
+
+### Changed
+- Revised download stats due to a misconfiguration in Modrinth's CDN causing downloads to be counted twice for October 2026
+
 ## v4.1.3.3 — 2026-11-03
 
 ### Changed
