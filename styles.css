@@ -2191,7 +2191,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .news-btn-row .news-btn-secondary { flex: 1 1 0; min-width: max-content; margin-top: 0; width: auto; }
 .news-btn-arrow { color: var(--text-soft); }
 
-/* ---------- Loading: skeletons and reveal ---------- */
+/* ---------- Loading: skeletons ---------- */
 /* Skeleton blocks are inline in each page's HTML and removed by the page script
    once it has rendered. They only show when JavaScript is running (html.js). */
 
@@ -2221,17 +2221,6 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 @media (max-width: 1023px) { .skel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 900px) { .skel-hero { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); padding-top: var(--s-6); } .skel-hero .skel-panel { height: 256px; } }
 @media (max-width: 720px) { .skel-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); } }
-
-/* Rendered content fades in; opacity only, so nothing shifts. */
-:where(:root:not([data-motion="reduce"])) #catalog > *,
-:where(:root:not([data-motion="reduce"])) .splash:not([hidden]),
-:where(:root:not([data-motion="reduce"])) .news-section:not([hidden]),
-:where(:root:not([data-motion="reduce"])) .stats-section,
-:where(:root:not([data-motion="reduce"])) #about > *,
-:where(:root:not([data-motion="reduce"])) #news-page > * {
-  animation: reveal 240ms ease-out both;
-}
-@keyframes reveal { from { opacity: 0; } to { opacity: 1; } }
 
 /* ---------- Reduced motion ----------
    Driven by data-motion="reduce" on <html> (settings.js: the device setting unless the visitor
