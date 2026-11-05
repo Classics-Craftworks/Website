@@ -152,8 +152,9 @@ const SIZE_OPTIONS = [
 }));
 
 const DENSITY_OPTIONS = [
+  { value: 'compact', name: 'Compact', note: 'Tighter, fits more on screen' },
   { value: 'comfortable', name: 'Comfortable', note: 'The usual spacing' },
-  { value: 'compact', name: 'Compact', note: 'Tighter, fits more' }
+  { value: 'spacious', name: 'Spacious', note: 'Coming Soon - currently identical to Comfortable' }
 ].map(o => ({
   value: o.value,
   render: input => el('label', { class: 'choice' }, [

@@ -28,7 +28,7 @@ const SETTING_CHOICES = {
   dateFormat: ['auto', 'text', 'us-text', 'dmy', 'mdy', 'iso'],
   headingFont: ['pixel', 'plain'],
   textSize: ['small', 'default', 'large'],
-  density: ['comfortable', 'compact']
+  density: ['compact', 'comfortable', 'spacious']
 };
 
 const SETTING_DEFAULTS = Object.freeze({
