@@ -93,7 +93,7 @@ function seasonalRow() {
   return el('div', { class: 'setting', attrs: { id: 'setting-seasonal' } }, [
     settingText(
       el('div', { class: 'setting-title' }, [el('span', { text: 'Seasonal theme' }), el('span', { class: 'soon-tag', text: 'Coming soon' })]),
-      settingDescription(descId, 'Festive looks that appear at certain times of the year.')
+      settingDescription(descId, 'Festive looks that appear at certain times of the year. Choosing one overwrites any that are automatically set in the future.')
     )
   ]);
 }
@@ -131,7 +131,7 @@ const FONT_OPTIONS = [
   value: o.value,
   render: input => el('label', { class: 'choice' }, [
     input,
-    el('span', { class: `font-sample font-sample-${o.face}`, text: 'Projects', attrs: { 'aria-hidden': 'true' } }),
+    el('span', { class: `font-sample font-sample-${o.face}`, text: 'Heading', attrs: { 'aria-hidden': 'true' } }),
     el('span', { class: 'choice-head' }, [el('span', { class: 'choice-name', text: o.name }), radioMark()]),
     el('span', { class: 'choice-note', text: o.note })
   ])
@@ -177,12 +177,12 @@ function isoDaysAgo(days) {
 }
 
 const DATE_OPTIONS = [
-  { value: 'auto',    name: 'Automatic' },
-  { value: 'text',    name: 'Day Month Year' },
+  { value: 'auto', name: 'Automatic' },
+  { value: 'text', name: 'Day Month Year' },
   { value: 'us-text', name: 'Month Day, Year' },
-  { value: 'dmy',     name: 'DD/MM/YYYY' },
-  { value: 'mdy',     name: 'MM/DD/YYYY' },
-  { value: 'iso',     name: 'YYYY-MM-DD' }
+  { value: 'dmy', name: 'DD/MM/YYYY' },
+  { value: 'mdy', name: 'MM/DD/YYYY' },
+  { value: 'iso', name: 'YYYY-MM-DD' }
 ].map(o => ({
   value: o.value,
   render: input => {
@@ -288,7 +288,7 @@ function renderSettings() {
     seasonalRow(),
     choiceRow({
       key: 'accent', title: 'Accent colour', groupClass: 'choices-accent', options: ACCENT_OPTIONS,
-      description: 'Used for links, highlights and buttons. Release channel colours (stable, beta, alpha) always keep their own colours.'
+      description: 'Used for links, highlights and buttons. Project release channels (stable, beta, alpha) always keep their own colours.'
     }),
     choiceRow({
       key: 'headingFont', title: 'Header font', groupClass: 'choices-font', options: FONT_OPTIONS,
@@ -296,11 +296,11 @@ function renderSettings() {
     }),
     choiceRow({
       key: 'textSize', title: 'Text size', groupClass: 'choices-size', options: SIZE_OPTIONS,
-      description: 'Makes all text on the site smaller or larger. Your browser zoom still works on top of this.'
+      description: 'Makes all text on the site smaller or larger.'
     }),
     choiceRow({
       key: 'density', title: 'Spacing', groupClass: 'choices-density', options: DENSITY_OPTIONS,
-      description: 'Adjust the spacing between elements across the website.'
+      description: 'Adjusts the density of elements across the site.'
     })
   ], 'group-appearance'));
 
@@ -312,7 +312,7 @@ function renderSettings() {
     }),
     switchRow({
       key: 'reduceMotion', title: 'Reduce motion',
-      description: 'Turns off animations, fades and the automatic rotation of featured projects.',
+      description: 'Turns off animations and the automatic rotation of featured projects.',
       extra: deviceStatus('reduceMotion', deviceQueries.motion)
     })
   ], 'group-accessibility'));
@@ -320,16 +320,16 @@ function renderSettings() {
   content.appendChild(settingsGroup('Content and links', [
     choiceRow({
       key: 'dateFormat', title: 'Date format', groupClass: 'choices-date', options: DATE_OPTIONS,
-      description: 'How release and news dates are written.'
+      description: 'How release and news entry dates are written.'
     }),
     switchRow({
       key: 'newDots', title: 'New content dots',
-      description: "Show a dot on news entries and downloads you haven't seen yet, and the counts in the header.",
+      description: "Show a dot on news entries and downloads you haven't seen yet, and their counters in the header.",
       extra: unreadControls()
     }),
     switchRow({
-      key: 'externalNewTab', title: 'Open external links in a new tab',
-      description: 'Links to other sites open in a new tab. Turn this off to open them in the current tab.'
+      key: 'externalNewTab', title: 'Open external links in new tab',
+      description: 'Links to other sites open in a new tab. Turn off to open them in the current tab.'
     })
   ], 'group-content'));
 
