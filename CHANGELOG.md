@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.2.0 — 2026-11-05
+
+### Added
+- Settings page with the following options:
+  - Colour theme
+  - Seasonal theme (coming soon)
+  - Accent colour
+  - Header font
+  - High contrast
+  - Reduced motion
+  - Text size
+  - Spacing
+  - Date format
+  - New content dots
+  - External links
+
 ## v4.1.3.4 — 2026-11-04
 
 ### Changed
