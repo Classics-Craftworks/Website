@@ -238,7 +238,7 @@ function settingsGroup(title, rows, id) {
 const JUMP_LINKS = [
   { id: 'group-appearance', label: 'Appearance', icon: 'brush', items: [
     ['theme', 'Colour theme', 'moon'], ['seasonal', 'Seasonal theme', 'snowflake'], ['accent', 'Accent colour', 'drop'],
-    ['headingFont', 'Header font', 'font'], ['textSize', 'Text size', 'text-size'], ['density', 'Spacing', 'spacing']
+    ['headingFont', 'Heading font', 'font'], ['textSize', 'Text size', 'text-size'], ['density', 'Spacing', 'spacing']
   ] },
   { id: 'group-accessibility', label: 'Accessibility', icon: 'accessibility', items: [
     ['highContrast', 'High contrast', 'contrast'], ['reduceMotion', 'Reduce motion', 'motion']
@@ -302,7 +302,7 @@ function renderSettings() {
       description: 'Used for links, highlights and buttons. Project release channels (stable, beta, alpha) always keep their own colours.'
     }),
     choiceRow({
-      key: 'headingFont', title: 'Header font', groupClass: 'choices-font', options: FONT_OPTIONS,
+      key: 'headingFont', title: 'Heading font', groupClass: 'choices-font', options: FONT_OPTIONS,
       description: 'The font for page titles, headings and the site name.'
     }),
     choiceRow({
