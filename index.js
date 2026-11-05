@@ -220,7 +220,6 @@ const FEATURED_INTERVAL_MS = 8000;
 // Auto-advancing slides (paused on hover/focus/hidden tab, never with reduced motion), plus dots, arrows and swipe.
 function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn, counter, pauseBtn) {
   const dots = [...dotsWrap.children];
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   let index = 0;
   let timer = null;
   let paused = false;     // temporary: hover / focus
@@ -266,7 +265,7 @@ function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn, counter,
   function stop() { clearInterval(timer); timer = null; }
   function start() {
     stop();
-    if (paused || userPaused || reduced.matches || document.hidden) return;
+    if (paused || userPaused || prefersReducedMotion() || document.hidden) return;
     timer = setInterval(() => show(index + 1, 'next'), FEATURED_INTERVAL_MS);
   }
   function go(i, dir) { show(i, dir || (i > index ? 'next' : 'prev')); start(); }
@@ -289,7 +288,7 @@ function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn, counter,
   card.addEventListener('focusin', () => { paused = true; stop(); });
   card.addEventListener('focusout', () => { paused = false; start(); });
   document.addEventListener('visibilitychange', start);
-  reduced.addEventListener('change', start);
+  document.addEventListener(SETTINGS_EVENT, start); // reduced motion switched in Settings or on the device
 
   card.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft') { go(index - 1, 'prev'); e.preventDefault(); }
@@ -320,7 +319,7 @@ function initFeaturedCarousel(card, slides, dotsWrap, prevBtn, nextBtn, counter,
   }, { passive: true });
 
   card.addEventListener('touchmove', e => {
-    if (startX === null || reduced.matches) return;
+    if (startX === null || prefersReducedMotion()) return;
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
     if (!dragging && !(Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5)) return;

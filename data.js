@@ -40,14 +40,15 @@ const SITE_DATA = {
   },
 
   // Header pages. Entries with a "section" go in the Projects dropdown and
-  // must match a section heading below; Home ("/") and About get their own links.
+  // must match a section heading below; Home ("/"), News, About and Settings get their own links.
   pages: [
     { label: "Home", url: "/", icon: "home" },
     { label: "Data Packs & Mods", url: "data-packs-mods", section: "Data Packs & Mods", icon: "brackets" },
     { label: "Resource Packs", url: "resource-packs", section: "Resource Packs", icon: "brush" },
     { label: "Other Projects", url: "other-projects", section: "Other Projects", icon: "wrench" },
     { label: "News", url: "news", icon: "news" },
-    { label: "About", url: "about", icon: "about" }
+    { label: "About", url: "about", icon: "about" },
+    { label: "Settings", url: "settings", icon: "settings" }
   ],
 
   sections: [

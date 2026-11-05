@@ -112,6 +112,7 @@
 
   /* Elevation and motion */
   --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --hover-mix: white; /* what hovered filled buttons are lightened towards (black in the light theme) */
   --ease: 160ms ease-out;
 }
 
@@ -125,6 +126,132 @@
     --lh-3xl: 2rem;
   }
 }
+
+/* ---------- Themes, accent colours and contrast (Settings) ----------
+   settings.js puts the visitor's choices on <html> as data-theme, data-accent, data-contrast,
+   data-motion, data-heading-font and data-newtab. The defaults (dark, blue, normal contrast,
+   pixel headings) are the :root tokens above and need no attribute.
+   - Order matters: themes, then accents, then high contrast; later rules at equal specificity win.
+   - Accent text must stay readable on every surface: dark themes use the bright accent, the light
+     theme a darker one (and a darker one again in high contrast). */
+
+:root[data-theme="oled"] {
+  --bg:        #000000;
+  --surface:   #08090d;
+  --surface-2: #11141b;
+  --border:    #232b3a;
+  --border-2:  #38425a;
+  --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.8);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg:         #f4f7fc;
+  --surface:    #ffffff;
+  --surface-2:  #e9eef7;
+  --border:     #d5ddeb;
+  --border-2:   #b6c3da;
+  --text:       #101729;
+  --text-soft:  #4a5875;
+  --accent:      #0b6a9a;
+  --accent-rgb:  11, 106, 154;
+  --on-accent:   #ffffff;
+  --ch-stable:          #137536;
+  --ch-stable-rgb:      19, 117, 54;
+  --ch-beta:            #a84a07;
+  --ch-beta-rgb:        168, 74, 7;
+  --ch-alpha:           #be123c;
+  --ch-alpha-rgb:       190, 18, 60;
+  --ch-unsupported:     #52607a;
+  --ch-unsupported-rgb: 82, 96, 122;
+  --hover-mix: black;
+  --shadow-float: 0 8px 24px rgba(16, 23, 41, 0.16);
+}
+
+/* News tag and version pill text, drawn in each entry's own colour, is darkened on light surfaces. */
+:root[data-theme="light"] .news-tag,
+:root[data-theme="light"] .version-pill,
+:root[data-theme="light"] .news-filter[aria-pressed="true"] { color: color-mix(in srgb, rgb(var(--news-rgb)), black 45%); }
+
+/* The logo is white artwork; it is inverted to black on the light theme. */
+:root[data-theme="light"] .brand-logo,
+:root[data-theme="light"] .footer-logo { filter: invert(1); }
+
+/* Accent colours. Dark and OLED use the bright value, light a darker one. */
+:root[data-accent="purple"] { --accent: #bb9dff; --accent-rgb: 187, 157, 255; --on-accent: #0d111a; }
+:root[data-accent="pink"] { --accent: #ec8ff7; --accent-rgb: 236, 143, 247; --on-accent: #0d111a; }
+:root[data-accent="red"] { --accent: #ff9494; --accent-rgb: 255, 148, 148; --on-accent: #0d111a; }
+:root[data-accent="orange"] { --accent: #ffa75a; --accent-rgb: 255, 167, 90; --on-accent: #0d111a; }
+:root[data-accent="gold"] { --accent: #f2c244; --accent-rgb: 242, 194, 68; --on-accent: #0d111a; }
+:root[data-accent="green"] { --accent: #a3e35d; --accent-rgb: 163, 227, 93; --on-accent: #0d111a; }
+:root[data-accent="teal"] { --accent: #3ed8c6; --accent-rgb: 62, 216, 198; --on-accent: #0d111a; }
+:root[data-theme="light"][data-accent="purple"] { --accent: #7a3fe0; --accent-rgb: 122, 63, 224; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="pink"] { --accent: #a61fb8; --accent-rgb: 166, 31, 184; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="red"] { --accent: #c42b2b; --accent-rgb: 196, 43, 43; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="orange"] { --accent: #b0470a; --accent-rgb: 176, 71, 10; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="gold"] { --accent: #8a5a00; --accent-rgb: 138, 90, 0; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="green"] { --accent: #477509; --accent-rgb: 71, 117, 9; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="teal"] { --accent: #0a7268; --accent-rgb: 10, 114, 104; --on-accent: #ffffff; }
+
+/* High contrast: stronger text and borders, firmer tints, a thicker focus ring. */
+:root[data-contrast="high"] {
+  --text:      #ffffff;
+  --text-soft: #d6deef;
+  --border:    #62759b;
+  --border-2:  #9fb2d6;
+  --tint-2: 0.2;
+  --tint-3: 0.75;
+}
+:root[data-contrast="high"][data-theme="oled"] { --border: #6b7b9c; --border-2: #a3b3d3; }
+:root[data-contrast="high"][data-theme="light"] {
+  --text:      #000000;
+  --text-soft: #1f2a42;
+  --border:    #56688a;
+  --border-2:  #2c3a58;
+  --accent:      #064e73;
+  --accent-rgb:  6, 78, 115;
+  --ch-stable:          #0c5826;
+  --ch-stable-rgb:      12, 88, 38;
+  --ch-beta:            #7d3905;
+  --ch-beta-rgb:        125, 57, 5;
+  --ch-alpha:           #930c2d;
+  --ch-alpha-rgb:       147, 12, 45;
+  --ch-unsupported:     #3f4c66;
+  --ch-unsupported-rgb: 63, 76, 102;
+}
+:root[data-contrast="high"][data-theme="light"][data-accent="purple"] { --accent: #5b27b8; --accent-rgb: 91, 39, 184; }
+:root[data-contrast="high"][data-theme="light"][data-accent="pink"] { --accent: #7e1390; --accent-rgb: 126, 19, 144; }
+:root[data-contrast="high"][data-theme="light"][data-accent="red"] { --accent: #9b1c1c; --accent-rgb: 155, 28, 28; }
+:root[data-contrast="high"][data-theme="light"][data-accent="orange"] { --accent: #823407; --accent-rgb: 130, 52, 7; }
+:root[data-contrast="high"][data-theme="light"][data-accent="gold"] { --accent: #664300; --accent-rgb: 102, 67, 0; }
+:root[data-contrast="high"][data-theme="light"][data-accent="green"] { --accent: #335705; --accent-rgb: 51, 87, 5; }
+:root[data-contrast="high"][data-theme="light"][data-accent="teal"] { --accent: #04504a; --accent-rgb: 4, 80, 74; }
+
+:root[data-contrast="high"] :focus-visible { outline-width: 3px; }
+:root[data-contrast="high"] .footer-link,
+:root[data-contrast="high"] .news-link { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Text size scales everything set in rem (all type); spacing and control sizes are px and stay put. */
+:root[data-text-size="small"] { font-size: 87.5%; }
+:root[data-text-size="large"] { font-size: 112.5%; }
+
+/* Compact spacing: the spacing scale shrinks, so gaps, padding and section breaks follow. */
+:root[data-density="compact"] {
+  --s-2: 6px;
+  --s-3: 10px;
+  --s-4: 12px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-7: 36px;
+  --s-8: 48px;
+  --s-9: 72px;
+}
+
+/* Heading font: Minercraftory (pixel, the default) or the body face. */
+:root[data-heading-font="plain"] { --font-display: var(--font-body); }
+
+/* External links opening in the same tab: the "opens in a new tab" icon would be misleading. */
+:root[data-newtab="off"] .newtab-icon { display: none; }
 
 /* ---------- Base ---------- */
 
@@ -247,7 +374,7 @@ main:focus, #catalog:focus { outline: none; }
 /* ---------- Buttons and links ---------- */
 /* One control: 40px tall, 8px radius, 1px border. Variants change colour only. */
 
-.top-link, .download-btn, .splash-btn, .news-btn, .news-show-more, .news-sort-trigger,
+.top-link, .download-btn, .splash-btn, .news-btn, .news-show-more, .news-sort-trigger, .settings-btn,
 .site-error button {
   display: inline-flex;
   align-items: center;
@@ -269,7 +396,7 @@ main:focus, #catalog:focus { outline: none; }
 }
 @media (hover: hover) {
   .top-link:hover, .news-btn:hover, .news-show-more:hover, .news-sort-trigger:hover,
-  .splash-btn-ghost:hover, .site-error button:hover {
+  .splash-btn-ghost:hover, .settings-btn:hover, .site-error button:hover {
     background: var(--surface-2);
     border-color: var(--border-2);
   }
@@ -283,13 +410,13 @@ main:focus, #catalog:focus { outline: none; }
 }
 @media (hover: hover) {
   .splash-btn-primary:hover {
-    background: color-mix(in srgb, var(--accent), white 16%);
-    border-color: color-mix(in srgb, var(--accent), white 16%);
+    background: color-mix(in srgb, var(--accent), var(--hover-mix) 16%);
+    border-color: color-mix(in srgb, var(--accent), var(--hover-mix) 16%);
   }
 }
 .top-link { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 @media (hover: hover) {
-  .top-link:hover { background: color-mix(in srgb, var(--accent), white 16%); border-color: color-mix(in srgb, var(--accent), white 16%); }
+  .top-link:hover { background: color-mix(in srgb, var(--accent), var(--hover-mix) 16%); border-color: color-mix(in srgb, var(--accent), var(--hover-mix) 16%); }
 }
 
 @media (hover: hover) {
@@ -727,7 +854,7 @@ main:focus, #catalog:focus { outline: none; }
 .splash-featured-pause { margin-right: var(--s-1); }
 .splash-featured-pause::before { width: 10px; height: 10px; border: 0; border-left: 3px solid currentColor; border-right: 3px solid currentColor; box-sizing: border-box; }
 .splash-featured-pause.is-paused::before { width: 0; height: 0; border: solid transparent; border-width: 5px 0 5px 9px; border-left-color: currentColor; border-right: 0; transform: translateX(1px); }
-@media (prefers-reduced-motion: reduce) { .splash-featured-pause { display: none; } }
+:root[data-motion="reduce"] .splash-featured-pause { display: none; }
 .splash-featured-arrow-prev::before { transform: translateX(2px) rotate(-135deg); }
 .splash-featured-arrow-next::before { transform: translateX(-2px) rotate(45deg); }
 
@@ -746,29 +873,27 @@ main:focus, #catalog:focus { outline: none; }
 /* Swipe: the outgoing slide fades and slides away in the swipe direction, then the incoming one
    slides in from the opposite side, so text never overlaps. index.js sets data-dir ("next" or "prev")
    on the wrapper and .is-leaving on the outgoing slide. The clip edge dissolves into the card padding. */
-@media (prefers-reduced-motion: no-preference) {
-  .splash-featured-slides {
-    --swipe-distance: var(--s-6);
-    --swipe-bleed: var(--s-5);
-    --enter-x: var(--swipe-distance);
-    --leave-x: calc(var(--swipe-distance) * -1);
-    margin-inline: calc(var(--swipe-bleed) * -1);
-    padding-inline: var(--swipe-bleed);
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--swipe-bleed), #000 calc(100% - var(--swipe-bleed)), transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 var(--swipe-bleed), #000 calc(100% - var(--swipe-bleed)), transparent);
-    overflow-x: clip;
-    touch-action: pan-y;
-  }
-  .splash-featured-slides[data-dir="prev"] { --enter-x: calc(var(--swipe-distance) * -1); --leave-x: var(--swipe-distance); }
-  .splash-featured-slide { transform: translateX(var(--enter-x)); }
-  .splash-featured-slide.is-leaving {
-    transform: translateX(var(--leave-x));
-    transition: opacity 160ms ease-in, transform 160ms ease-in, visibility 0s linear 160ms;
-  }
-  .splash-featured-slide.is-active {
-    transform: none;
-    transition: opacity 240ms ease-out 160ms, transform 240ms ease-out 160ms, visibility 0s linear 160ms;
-  }
+:where(:root:not([data-motion="reduce"])) .splash-featured-slides {
+  --swipe-distance: var(--s-6);
+  --swipe-bleed: var(--s-5);
+  --enter-x: var(--swipe-distance);
+  --leave-x: calc(var(--swipe-distance) * -1);
+  margin-inline: calc(var(--swipe-bleed) * -1);
+  padding-inline: var(--swipe-bleed);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--swipe-bleed), #000 calc(100% - var(--swipe-bleed)), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 var(--swipe-bleed), #000 calc(100% - var(--swipe-bleed)), transparent);
+  overflow-x: clip;
+  touch-action: pan-y;
+}
+:where(:root:not([data-motion="reduce"])) .splash-featured-slides[data-dir="prev"] { --enter-x: calc(var(--swipe-distance) * -1); --leave-x: var(--swipe-distance); }
+:where(:root:not([data-motion="reduce"])) .splash-featured-slide { transform: translateX(var(--enter-x)); }
+:where(:root:not([data-motion="reduce"])) .splash-featured-slide.is-leaving {
+  transform: translateX(var(--leave-x));
+  transition: opacity 160ms ease-in, transform 160ms ease-in, visibility 0s linear 160ms;
+}
+:where(:root:not([data-motion="reduce"])) .splash-featured-slide.is-active {
+  transform: none;
+  transition: opacity 240ms ease-out 160ms, transform 240ms ease-out 160ms, visibility 0s linear 160ms;
 }
 @media (max-width: 900px) { .splash-featured-slides { --swipe-bleed: var(--s-4); } }
 
@@ -946,7 +1071,7 @@ main:focus, #catalog:focus { outline: none; }
 
 /* ---------- Smooth anchor jumps ---------- */
 
-@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+:where(:root:not([data-motion="reduce"])) { scroll-behavior: smooth; }
 
 /* ---------- Home: stats ---------- */
 
@@ -1067,7 +1192,7 @@ main:focus, #catalog:focus { outline: none; }
   column-gap: var(--s-6);
   align-items: start;
 }
-.catalog-layout > .project-list { grid-area: list; }
+.catalog-layout > .project-list, .catalog-layout > .settings-content { grid-area: list; min-width: 0; }
 .catalog-aside { grid-area: aside; min-width: 0; }
 /* Desktop: the panel follows the page below the sticky header; a long list scrolls inside it. */
 @media (min-width: 1100px) {
@@ -1211,9 +1336,7 @@ main:focus, #catalog:focus { outline: none; }
 /* Brief highlight after arriving from a direct link. */
 .is-linked-target { position: relative; }
 .is-linked-target::before { content: ''; position: absolute; inset: calc(var(--s-3) * -1) calc(var(--s-3) * -1); border-radius: var(--r-2); pointer-events: none; }
-@media (prefers-reduced-motion: no-preference) {
-  .is-linked-target::before { animation: linked-target 1.6s ease-out; }
-}
+:where(:root:not([data-motion="reduce"])) .is-linked-target::before { animation: linked-target 1.6s ease-out; }
 @keyframes linked-target { 0% { box-shadow: 0 0 0 2px var(--accent); } 100% { box-shadow: 0 0 0 2px transparent; } }
 
 /* ---------- Release table ---------- */
@@ -1311,7 +1434,7 @@ main:focus, #catalog:focus { outline: none; }
 /* Every channel's button is filled in its own colour. */
 .rt-cell .download-btn { background: var(--channel-color); border-color: var(--channel-color); color: var(--on-accent); }
 @media (hover: hover) {
-  .rt-cell .download-btn:hover { background: color-mix(in srgb, var(--channel-color), white 16%); border-color: color-mix(in srgb, var(--channel-color), white 16%); }
+  .rt-cell .download-btn:hover { background: color-mix(in srgb, var(--channel-color), var(--hover-mix) 16%); border-color: color-mix(in srgb, var(--channel-color), var(--hover-mix) 16%); }
 }
 
 /* A missing build fills its whole cell. */
@@ -2100,19 +2223,186 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 @media (max-width: 720px) { .skel-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); } }
 
 /* Rendered content fades in; opacity only, so nothing shifts. */
-@media (prefers-reduced-motion: no-preference) {
-  #catalog > *, .splash:not([hidden]), .news-section:not([hidden]), .stats-section, #about > *, #news-page > * {
-    animation: reveal 240ms ease-out both;
-  }
+:where(:root:not([data-motion="reduce"])) #catalog > *,
+:where(:root:not([data-motion="reduce"])) .splash:not([hidden]),
+:where(:root:not([data-motion="reduce"])) .news-section:not([hidden]),
+:where(:root:not([data-motion="reduce"])) .stats-section,
+:where(:root:not([data-motion="reduce"])) #about > *,
+:where(:root:not([data-motion="reduce"])) #news-page > * {
+  animation: reveal 240ms ease-out both;
 }
 @keyframes reveal { from { opacity: 0; } to { opacity: 1; } }
 
-/* ---------- Reduced motion ---------- */
+/* ---------- Reduced motion ----------
+   Driven by data-motion="reduce" on <html> (settings.js: the device setting unless the visitor
+   overrode it in Settings). The animated rules above are written against :root:not([data-motion="reduce"]). */
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-  .skel { animation: none; }
+:root[data-motion="reduce"] *, :root[data-motion="reduce"] *::before, :root[data-motion="reduce"] *::after {
+  animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important;
 }
+:root[data-motion="reduce"] .skel { animation: none; }
+
+/* ---------- Settings ---------- */
+
+/* Header link: icon only beside the other links on wide screens; the mobile menu shows the label. */
+@media (min-width: 901px) {
+  .nav-settings { flex: none; width: var(--hit); height: var(--hit); padding: 0; justify-content: center; }
+  .nav-settings > .icon { width: 26px; height: 26px; }
+  .nav-settings > span:not(.icon) {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
+  /* Header tooltips open below the link (they can't open above the top of the page). */
+  .site-header .nav-settings[data-tooltip]::after { bottom: auto; top: 100%; left: auto; right: 0; transform: translateY(4px); }
+  .site-header .nav-settings[data-tooltip]:hover::after,
+  .site-header .nav-settings[data-tooltip]:focus-visible::after { transform: translateY(8px); }
+  .site-header .nav-settings[data-tooltip]::before { bottom: auto; top: 100%; transform: translateX(-50%) translateY(4px) rotate(225deg); }
+  .site-header .nav-settings[data-tooltip]:hover::before,
+  .site-header .nav-settings[data-tooltip]:focus-visible::before { transform: translateX(-50%) translateY(4px) rotate(225deg); }
+}
+/* Just above the mobile breakpoint the header is tight: the search box gives way first. */
+@media (min-width: 901px) and (max-width: 1080px) {
+  .site-header-inner { gap: var(--s-4); }
+  .site-menu { gap: var(--s-2); }
+  .site-nav { gap: 0; }
+  .nav-link { padding: 0 var(--s-2); }
+  .nav-search { flex-basis: 140px; min-width: 96px; }
+}
+@media (max-width: 900px) {
+  .nav-settings[data-tooltip]::before, .nav-settings[data-tooltip]::after { display: none; }
+}
+
+.settings { padding-bottom: var(--s-7); }
+.settings-content > section:first-child > .settings-group-title { margin-top: 0; }
+.settings-intro { margin-bottom: var(--s-2); color: var(--text-soft); }
+.settings-group-title { margin: var(--s-6) 0 var(--s-3); font-family: var(--font-body); font-size: var(--text-xl); line-height: var(--lh-xl); font-weight: 600; letter-spacing: 0; text-transform: none; }
+.settings-list { border: 1px solid var(--border); border-radius: var(--r-2); background: var(--surface); }
+
+.setting { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--s-3) var(--s-5); padding: var(--s-4) var(--s-5); }
+.setting + .setting { border-top: 1px solid var(--border); }
+.setting-wide { grid-template-columns: minmax(0, 1fr); }
+.setting-title { display: block; font-size: var(--text-md); line-height: var(--lh-md); font-weight: 600; }
+.soon-tag { display: inline-flex; align-items: center; height: var(--s-5); margin-left: var(--s-2); padding: 0 var(--s-2); border: 1px solid var(--border-2); border-radius: var(--r-pill); background: var(--surface-2); color: var(--text-soft); font-size: var(--text-xs); line-height: 1; font-weight: 600; vertical-align: 0.1em; }
+.setting-desc { margin-top: var(--s-1); color: var(--text-soft); font-size: var(--text-sm); line-height: var(--lh-sm); }
+.setting-extra { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); margin-top: var(--s-3); }
+.setting-status { color: var(--text-soft); font-size: var(--text-sm); line-height: var(--lh-sm); }
+@media (max-width: 720px) {
+  .setting { padding: var(--s-4); }
+  .setting:not(.setting-wide) { grid-template-columns: minmax(0, 1fr) auto; gap: var(--s-3); }
+}
+
+/* Choices: native radio buttons (hidden) inside option cards, so keyboard and screen readers work as usual. */
+.choices { display: grid; gap: var(--s-3); }
+.choices-theme { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.choices-font, .choices-density { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.choices-size { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.choices-date { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-2) var(--s-3); }
+.choices-accent { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+@media (max-width: 720px) {
+  .choices-theme { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .choices-date { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 420px) { .choices-font, .choices-density { grid-template-columns: minmax(0, 1fr); } }
+
+.choice {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-1);
+  background: var(--bg);
+  cursor: pointer;
+  transition: background-color var(--ease), border-color var(--ease);
+}
+@media (hover: hover) { .choice:hover { border-color: var(--border-2); } }
+.choice:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.choice:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.choice-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); min-width: 0; }
+.choice-name { font-size: var(--text-sm); line-height: var(--lh-sm); font-weight: 600; }
+.choice-note { color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); }
+
+/* Radio mark: a ring, filled when chosen (shape, not just colour, shows the state). */
+.choice-mark { flex: none; width: 16px; height: 16px; border: 2px solid var(--border-2); border-radius: 50%; transition: border-color var(--ease), background-color var(--ease); }
+.choice:has(input:checked) .choice-mark { border-color: var(--accent); background: radial-gradient(circle, var(--accent) 0 38%, transparent 42%); }
+
+/* Theme previews: a tiny page drawn in each theme's own colours. */
+.theme-preview { display: flex; height: 64px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--r-1); }
+.pv { --pv-bg: #0d111a; --pv-surface: #1a2334; --pv-text: #f2f5fa; --pv-line: #34476a; position: relative; flex: 1 1 0; background: var(--pv-bg); }
+.pv[data-pv="oled"] { --pv-bg: #000000; --pv-surface: #11141b; --pv-line: #38425a; }
+.pv[data-pv="light"] { --pv-bg: #f4f7fc; --pv-surface: #ffffff; --pv-text: #101729; --pv-line: #b6c3da; }
+.pv-bar { position: absolute; top: 0; left: 0; right: 0; height: 10px; border-bottom: 1px solid var(--pv-line); background: var(--pv-bg); }
+.pv-bar::before { content: ''; position: absolute; top: 3px; left: 6px; width: 14px; height: 3px; border-radius: 2px; background: var(--pv-text); }
+.pv-card { position: absolute; top: 16px; left: 6px; right: 6px; bottom: 6px; border: 1px solid var(--pv-line); border-radius: 4px; background: var(--pv-surface); }
+.pv-card::before { content: ''; position: absolute; top: 6px; left: 6px; width: 55%; height: 4px; border-radius: 2px; background: var(--pv-text); opacity: 0.85; }
+.pv-card::after { content: ''; position: absolute; bottom: 5px; left: 6px; width: 22px; height: 6px; border-radius: 3px; background: var(--accent); }
+
+/* Accent swatches */
+.swatch[data-accent="blue"] { --sw: #74c4e7; }
+.swatch[data-accent="purple"] { --sw: #bb9dff; }
+.swatch[data-accent="pink"] { --sw: #ec8ff7; }
+.swatch[data-accent="red"] { --sw: #ff9494; }
+.swatch[data-accent="orange"] { --sw: #ffa75a; }
+.swatch[data-accent="gold"] { --sw: #f2c244; }
+.swatch[data-accent="green"] { --sw: #a3e35d; }
+.swatch[data-accent="teal"] { --sw: #3ed8c6; }
+:root[data-theme="light"] .swatch[data-accent="blue"] { --sw: #0b6a9a; }
+:root[data-theme="light"] .swatch[data-accent="purple"] { --sw: #7a3fe0; }
+:root[data-theme="light"] .swatch[data-accent="pink"] { --sw: #a61fb8; }
+:root[data-theme="light"] .swatch[data-accent="red"] { --sw: #c42b2b; }
+:root[data-theme="light"] .swatch[data-accent="orange"] { --sw: #b0470a; }
+:root[data-theme="light"] .swatch[data-accent="gold"] { --sw: #8a5a00; }
+:root[data-theme="light"] .swatch[data-accent="green"] { --sw: #477509; }
+:root[data-theme="light"] .swatch[data-accent="teal"] { --sw: #0a7268; }
+.swatch { position: relative; display: inline-flex; align-items: center; gap: var(--s-2); min-height: var(--control-h); padding: 0 var(--s-4) 0 var(--s-2); border: 1px solid var(--border); border-radius: var(--r-pill); background: var(--bg); cursor: pointer; font-size: var(--text-sm); line-height: var(--lh-sm); font-weight: 500; transition: background-color var(--ease), border-color var(--ease); }
+@media (hover: hover) { .swatch:hover { border-color: var(--border-2); } }
+.swatch:has(input:checked) { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.swatch:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.swatch-dot { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--sw); color: var(--on-accent); }
+.swatch-dot::after { content: ''; width: 14px; height: 14px; background-color: currentColor; opacity: 0; -webkit-mask: url('/images/icons/tick.svg') center / contain no-repeat; mask: url('/images/icons/tick.svg') center / contain no-repeat; }
+.swatch:has(input:checked) .swatch-dot::after { opacity: 1; }
+
+/* Heading font samples always use their own face, whatever the setting is. */
+.font-sample { margin-bottom: var(--s-1); font-size: var(--text-xl); line-height: var(--lh-xl); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.font-sample-pixel { font-family: 'Minercraftory', 'Inter', system-ui, sans-serif; }
+.font-sample-plain { font-family: 'Inter', system-ui, sans-serif; }
+
+/* Text size and spacing samples use fixed px values so they don't change with the setting itself. */
+.size-sample { height: 40px; display: flex; align-items: baseline; font-weight: 600; line-height: 1; }
+.size-sample-small { font-size: 14px; }
+.size-sample-default { font-size: 16px; }
+.size-sample-large { font-size: 18px; }
+.density-preview { display: flex; flex-direction: column; justify-content: center; height: 40px; }
+.density-preview span { display: block; height: 6px; border-radius: 3px; background: var(--text-soft); opacity: 0.7; }
+.density-preview span:nth-child(2) { width: 70%; }
+.density-preview span:nth-child(3) { width: 85%; }
+.density-preview-compact { gap: 3px; }
+.density-preview-comfortable { gap: 8px; }
+
+/* Jump panel: setting links nest under their section. */
+.jump-sub { margin: 0; padding: 0 0 0 var(--s-3); list-style: none; }
+.jump-link-group { font-weight: 600; }
+
+/* Date format rows */
+.choice-row { flex-flow: row wrap; align-items: center; justify-content: space-between; gap: var(--s-1) var(--s-3); min-height: 48px; padding: var(--s-2) var(--s-4); }
+.choice-row .choice-head { flex: 1 1 auto; justify-content: flex-start; gap: var(--s-3); }
+.choice-example { margin-left: auto; text-align: right; color: var(--text-soft); font-size: var(--text-sm); line-height: var(--lh-sm); font-variant-numeric: tabular-nums; }
+
+/* Switch (a checkbox with role="switch"); the hidden input is larger than the track for a 44px hit area. */
+.switch { position: relative; flex: none; width: 48px; height: 28px; }
+.switch input { position: absolute; inset: -8px; width: calc(100% + 16px); height: calc(100% + 16px); margin: 0; opacity: 0; cursor: pointer; }
+.switch-track { position: absolute; inset: 0; border: 1px solid var(--border-2); border-radius: var(--r-pill); background: var(--surface-2); pointer-events: none; transition: background-color var(--ease), border-color var(--ease); }
+.switch-track::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--text-soft); transition: transform var(--ease), background-color var(--ease); }
+.switch input:checked + .switch-track { border-color: var(--accent); background: var(--accent); }
+.switch input:checked + .switch-track::after { background: var(--on-accent); transform: translateX(20px); }
+.switch input:focus-visible + .switch-track { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.settings-btn[aria-disabled="true"] { opacity: 0.5; cursor: default; }
+.settings-textbtn { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-size: var(--text-sm); line-height: var(--lh-sm); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+@media (hover: hover) { .settings-textbtn:hover { color: var(--text); } }
+.settings-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); margin-top: var(--s-6); }
 
 /* ---------- Mobile navigation (900px; keep in step with MOBILE_NAV_QUERY in section-page.js) ---------- */
 

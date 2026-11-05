@@ -327,7 +327,7 @@ const RELEASE_CHANNELS = {
 };
 
 // "2026-10-13" -> "13 Oct"
-const formatShortDate = iso => formatDate(iso, { day: 'numeric', month: 'short' });
+const formatShortDate = iso => displayDate(iso, 'short');
 
 // One <li> per release (icon, project, version pill, date); shared by the News sidebar and the home page.
 function releaseRows(cfg) {

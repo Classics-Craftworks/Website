@@ -8,7 +8,7 @@
 
    Bump CACHE when the strategy changes. SHELL is only a head start; anything else is
    cached on first fetch. */
-const CACHE = 'ccw-cache-v10';
+const CACHE = 'ccw-cache-v11';
 const NETWORK_TIMEOUT_MS = 4000;
 const IMAGE_REFRESH_MS = 24 * 60 * 60 * 1000;
 const STAMP = 'x-sw-cached-at'; // header recording when an image was cached
@@ -20,8 +20,11 @@ const SHELL = [
   '/other-projects',
   '/about',
   '/news',
+  '/settings',
   '/styles.css',
   '/js-flag.js',
+  '/settings.js',
+  '/settings-page.js',
   '/site-error.js',
   '/data.js',
   '/stats.js',

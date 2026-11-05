@@ -103,8 +103,7 @@ function fillPlaceholders(text) {
   return String(text).replace(/\{projects\}/g, countDownloadableProjects());
 }
 
-const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-const prefersReducedMotion = () => reducedMotionQuery.matches;
+// prefersReducedMotion() comes from settings.js: the device setting unless the visitor overrode it.
 
 function storageGet(key) {
   try { return localStorage.getItem(key); } catch { return null; }
@@ -274,19 +273,23 @@ function projectsBaseline() {
 }
 
 // Dot on a download: new since this visit began (survives reloads in the session).
+// Dots can be switched off in Settings; what has been seen is still tracked, so switching them
+// back on shows only what is really unread.
 function isNotifyDownload(projectId, ch, d) {
+  if (!newDotsEnabled()) return false;
   const seen = projectsBaseline();
   return !!(d.notify && downloadAvailable(d) && seen[notifyKey(projectId, ch, d)] !== notifyFingerprint(d));
 }
 
 // Navigation counts: one per channel with an unseen download, cleared on the next page load
 // once the project page has been opened.
-function isUnseenChannel(projectId, ch) {
+function channelHasUnseen(projectId, ch) {
   projectsBaseline(); // seeds the saved map on a first visit
   const seen = parseSeenMap(storageGet(PROJECTS_SEEN_KEY)) || projectsBaseline();
   return !!((ch.downloads || []).some(d =>
     d.notify && downloadAvailable(d) && seen[notifyKey(projectId, ch, d)] !== notifyFingerprint(d)));
 }
+const isUnseenChannel = (projectId, ch) => newDotsEnabled() && channelHasUnseen(projectId, ch);
 
 // Opening a project page counts as seeing everything on it.
 function markProjectsSeen(section) {
@@ -370,10 +373,11 @@ function channelTitle(ch, cls) {
   ]);
 }
 
-// Releases under a month old show a relative date with the full date as a tooltip.
+// Releases under a month old show a relative date with the full date as a tooltip
+// (default date format only; see settings.js for the others).
 function releaseDateNode(iso) {
-  const full = formatDate(iso);
-  const relative = relativeNewsDate(iso);
+  const full = displayDate(iso, 'medium');
+  const relative = datesAreRelative() ? relativeNewsDate(iso) : null;
   return el('span', { class: 'rt-date' + (relative ? ' has-tooltip' : ''), attrs: relative ? { 'data-tooltip': full } : {} }, [
     icon('calendar', 'icon-sm'),
     el('time', { text: relative || full, attrs: { datetime: iso } })
@@ -406,7 +410,7 @@ function renderCell(project, ch, column, d, notifiedSet) {
     attrs: { 'aria-label': `${action}: ${project.title} ${column.label} ${d.version || ''}, ${ch.label}`.replace(/\s+/g, ' ') }
   }, [
     el('span', { text: action }),
-    icon('newtab', 'icon-sm')
+    icon('newtab', 'icon-sm newtab-icon')
   ]);
 
   return el('div', { class: 'rt-cell', attrs: { role: 'cell', 'data-channel': channel } }, [
@@ -570,6 +574,7 @@ function newsBaseline() {
 }
 
 function isNewEntry(entry) {
+  if (!newDotsEnabled()) return false;
   const seen = newsBaseline();
   return !!seen && !seen.has(newsEntryId(entry));
 }
@@ -581,11 +586,43 @@ function markNewsSeen(entries) {
 }
 
 // Entries not yet listed on the News page by this browser; 0 until it has opened News once.
-function countUnseenNews() {
+function unseenNewsCount() {
   const seen = parseIdList(storageGet(NEWS_SEEN_KEY));
   if (!seen) return 0;
   const known = new Set(seen);
   return newsEntries().filter(e => !known.has(newsEntryId(e))).length;
+}
+const countUnseenNews = () => newDotsEnabled() ? unseenNewsCount() : 0;
+
+/* ---------- Unread summary and "Mark all as read" (used by the Settings page) ---------- */
+
+const DOTS_EVENT = 'ccw:dots'; // fired on document when what counts as read changes
+
+// What is waiting, whether or not dots are switched on: { downloads, news }.
+function unreadSummary() {
+  let downloads = 0;
+  (SITE_DATA.sections || []).forEach(section => {
+    sectionIds(section).projects.forEach(({ project, id }) => {
+      (project.channels || []).forEach(ch => { if (channelHasUnseen(id, ch)) downloads++; });
+    });
+  });
+  return { downloads, news: unseenNewsCount() };
+}
+
+// Everything published so far counts as seen, now and for the rest of this browser session.
+function markAllSeen() {
+  const projects = parseSeenMap(storageGet(PROJECTS_SEEN_KEY)) || {};
+  allNotifyDownloads().forEach(c => { projects[c.key] = c.fingerprint; });
+  storageSet(PROJECTS_SEEN_KEY, JSON.stringify(projects));
+  try { sessionStorage.setItem(PROJECTS_BASELINE_KEY, JSON.stringify(projects)); } catch { /* ignore */ }
+  projectsBaselineCache = projects;
+
+  const ids = newsEntries().map(newsEntryId);
+  storageSet(NEWS_SEEN_KEY, JSON.stringify(ids));
+  try { sessionStorage.setItem(NEWS_BASELINE_KEY, JSON.stringify(ids)); } catch { /* ignore */ }
+  newsBaselineCache = new Set(ids);
+
+  document.dispatchEvent(new Event(DOTS_EVENT));
 }
 
 // Count pill for nav items; shows "9+" above nine.
@@ -616,6 +653,7 @@ function renderSiteHeader(pages, currentUrl) {
   const home = pages.find(p => p.url === '/');
   const about = pages.find(p => p.url === 'about');
   const newsPage = pages.find(p => p.url === 'news');
+  const settingsPage = pages.find(p => p.url === 'settings');
   const projectPages = pages.filter(p => p.section);
 
   // Elements carrying a count pill; syncDots() redraws them at load and on back/forward restore.
@@ -720,6 +758,12 @@ function renderSiteHeader(pages, currentUrl) {
     nav.appendChild(newsLink);
   }
   if (about) nav.appendChild(pageLink(about, 'nav-link'));
+  if (settingsPage) {
+    // Icon only beside the other links on wide screens (the label returns in the mobile menu).
+    const settingsLink = pageLink(settingsPage, 'nav-link nav-settings');
+    settingsLink.setAttribute('data-tooltip', settingsPage.label);
+    nav.appendChild(settingsLink);
+  }
 
   // Mobile menu button; its pill totals every project page.
   const toggle = el('button', {
@@ -756,6 +800,9 @@ function renderSiteHeader(pages, currentUrl) {
   window.addEventListener('pageshow', event => {
     if (event.persisted) syncDots();
   });
+  // Settings turned dots on or off, or marked everything as read.
+  document.addEventListener(DOTS_EVENT, syncDots);
+  document.addEventListener(SETTINGS_EVENT, syncDots);
 
   // Keeps linked headings clear of the sticky header (skipped while the mobile menu overlays the page).
   const syncScrollOffset = () => {
@@ -1081,7 +1128,7 @@ function setTagColor(node, tag) {
   node.style.setProperty('--news-rgb', tag.rgb);
 }
 
-const formatNewsDate = iso => formatDate(iso, { day: 'numeric', month: 'long', year: 'numeric' });
+const formatNewsDate = iso => displayDate(iso, 'long');
 
 // Calendar icon for dates; dropped if images/icons/calendar.svg is missing.
 function calendarIcon() {
@@ -1095,7 +1142,7 @@ function calendarIcon() {
 // Date with calendar icon. Recent entries show a relative date with the full date as a tooltip.
 function newsDate(entry) {
   const full = formatNewsDate(entry.date);
-  const relative = relativeNewsDate(entry.date);
+  const relative = datesAreRelative() ? relativeNewsDate(entry.date) : null;
   return el('span', { class: 'news-when' + (relative ? ' has-tooltip' : ''), attrs: relative ? { 'data-tooltip': full } : {} }, [
     calendarIcon(),
     el('time', { class: 'news-date', text: relative || full, attrs: { datetime: entry.date } })
