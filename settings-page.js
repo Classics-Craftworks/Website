@@ -22,7 +22,7 @@ function settingDescription(id, text) {
 }
 
 // A row with a switch on the right.
-function switchRow({ key, title, description, extra }) {
+function switchRow({ key, title, description, extra, system }) {
   const id = controlId('switch');
   const descId = id + '-desc';
   const input = el('input', { attrs: { type: 'checkbox', role: 'switch', id, 'aria-describedby': descId } });
@@ -33,6 +33,8 @@ function switchRow({ key, title, description, extra }) {
   // Contrast and motion show what is in effect (which may come from the device).
   const effective = { highContrast: effectiveHighContrast, reduceMotion: effectiveReducedMotion };
   syncers.push(() => { input.checked = key in effective ? effective[key]() : getSettings()[key]; });
+
+  if (system) extra = systemSwitch(key, system, input, effective[key]);
 
   return el('div', { class: 'setting', attrs: { id: 'setting-' + key } }, [
     settingText(el('label', { class: 'setting-title', text: title, attrs: { for: id } }), settingDescription(descId, description), extra),
@@ -69,20 +71,21 @@ function choiceRow({ key, title, description, groupClass, options }) {
 
 const radioMark = () => el('span', { class: 'choice-mark', attrs: { 'aria-hidden': 'true' } });
 
-// "Following your device (currently on)" with a way back once the visitor has overridden it.
-function deviceStatus(key, query) {
-  const text = el('span', { class: 'setting-status' });
-  const reset = el('button', { class: 'settings-textbtn', text: 'Follow device setting', attrs: { type: 'button' } });
-  reset.addEventListener('click', () => updateSettings({ [key]: null }));
+// "Use system setting": while on, the setting follows the device and its own switch is locked to
+// what the device says; turning it off keeps the current value and makes it the visitor's own.
+function systemSwitch(key, query, mainInput, effectiveValue) {
+  const id = controlId('system');
+  const input = el('input', { attrs: { type: 'checkbox', role: 'switch', id } });
+  const control = el('span', { class: 'switch' }, [input, el('span', { class: 'switch-track', attrs: { 'aria-hidden': 'true' } })]);
+
+  input.addEventListener('change', () => updateSettings({ [key]: input.checked ? null : effectiveValue() }));
 
   syncers.push(() => {
     const following = getSettings()[key] === null;
-    text.textContent = following
-      ? `Following your device setting, which is currently ${query.matches ? 'on' : 'off'}.`
-      : 'Set on this site.';
-    reset.hidden = following;
+    input.checked = following;
+    mainInput.disabled = following;
   });
-  return el('div', { class: 'setting-extra' }, [text, reset]);
+  return el('div', { class: 'setting-extra' }, [el('label', { class: 'setting-system-label', text: 'Use system setting', attrs: { for: id } }), control]);
 }
 
 /* ---------- Appearance ---------- */
@@ -316,12 +319,12 @@ function renderSettings() {
     switchRow({
       key: 'highContrast', title: 'High contrast',
       description: 'Stronger text, borders and focus outlines.',
-      extra: deviceStatus('highContrast', deviceQueries.contrast)
+      system: deviceQueries.contrast
     }),
     switchRow({
       key: 'reduceMotion', title: 'Reduce motion',
       description: 'Turns off animations and the automatic rotation of featured projects.',
-      extra: deviceStatus('reduceMotion', deviceQueries.motion)
+      system: deviceQueries.motion
     })
   ], 'group-accessibility'));
 
