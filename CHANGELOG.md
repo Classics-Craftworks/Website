@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.3.0 — 2026-11-05
+
+### Added
+- Switch to toggle system settings for reduced motion and high contrast
+- Icons to the Settings page sidebar & section headers
+- Separators in settings buttons with previews
+- Placeholder "Spacious" option for spacing setting
+  - Currently identical to the "Comfortable" option, but will be properly added soon
+
+### Changed
+- Increased spacing between options on the Settings page
+- Renamed the Header font setting to "Heading font"
+- Rotated the Settings icon by 90 degrees
+- Swapped positions of "Comfortable" and "Compact" spacing options on the Settings page
+- Various text and wording improvements across the Settings page
+
+### Removed
+- Removed the fade-in animation from all pages
+
 ## v4.2.0 — 2026-11-05
 
 ### Added
