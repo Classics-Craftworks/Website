@@ -222,19 +222,26 @@ function unreadControls() {
 
 function settingsGroup(title, rows, id) {
   return el('section', { attrs: { id, 'aria-label': title } }, [
-    el('h2', { class: 'settings-group-title', text: title }),
+    el('h2', { class: 'settings-group-title' }, [
+      icon((JUMP_LINKS.find(section => section.id === id) || {}).icon || 'link', 'icon-md'),
+      el('span', { text: title })
+    ]),
     el('div', { class: 'settings-list' }, rows)
   ]);
 }
 
 // Side panel linking to each setting; the same collapsible panel as the project pages' "Jump to project".
 const JUMP_LINKS = [
-  { id: 'group-appearance', label: 'Appearance', items: [
-    ['theme', 'Colour theme'], ['seasonal', 'Seasonal theme'], ['accent', 'Accent colour'], ['headingFont', 'Header font'],
-    ['textSize', 'Text size'], ['density', 'Spacing']
+  { id: 'group-appearance', label: 'Appearance', icon: 'brush', items: [
+    ['theme', 'Colour theme', 'moon'], ['seasonal', 'Seasonal theme', 'snowflake'], ['accent', 'Accent colour', 'drop'],
+    ['headingFont', 'Header font', 'font'], ['textSize', 'Text size', 'text-size'], ['density', 'Spacing', 'spacing']
   ] },
-  { id: 'group-accessibility', label: 'Accessibility', items: [['highContrast', 'High contrast'], ['reduceMotion', 'Reduce motion']] },
-  { id: 'group-content', label: 'Content and links', items: [['dateFormat', 'Date format'], ['newDots', 'New content dots'], ['externalNewTab', 'External links']] }
+  { id: 'group-accessibility', label: 'Accessibility', icon: 'accessibility', items: [
+    ['highContrast', 'High contrast', 'contrast'], ['reduceMotion', 'Reduce motion', 'motion']
+  ] },
+  { id: 'group-content', label: 'Content and links', icon: 'link', items: [
+    ['dateFormat', 'Date format', 'calendar'], ['newDots', 'New content dots', 'bell'], ['externalNewTab', 'External links', 'newtab']
+  ] }
 ];
 
 function renderSettingsJump() {
@@ -244,9 +251,9 @@ function renderSettingsJump() {
 
   const listId = 'settings-jump-list';
   const items = JUMP_LINKS.map(section => el('li', {}, [
-    internalLink('jump-link jump-link-group', '#' + section.id, [el('span', { text: section.label })]),
-    el('ul', { class: 'jump-sub' }, section.items.map(([key, label]) =>
-      el('li', {}, [internalLink('jump-link', '#setting-' + key, [el('span', { text: label })])])))
+    internalLink('jump-link jump-link-group', '#' + section.id, [icon(section.icon, 'icon-md'), el('span', { text: section.label })]),
+    el('ul', { class: 'jump-sub' }, section.items.map(([key, label, iconName]) =>
+      el('li', {}, [internalLink('jump-link', '#setting-' + key, [icon(iconName, 'icon-sm'), el('span', { text: label })])])))
   ]));
   const body = el('div', { class: 'news-filter-panel', attrs: { id: listId } }, [el('ul', { class: 'jump-list' }, items)]);
   const toggle = el('button', { class: 'news-filter-toggle', attrs: { type: 'button', 'aria-controls': listId } }, [
