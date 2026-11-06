@@ -36,7 +36,7 @@ const SETTING_DEFAULTS = Object.freeze({
   accent: 'blue',
   highContrast: null,   // null = follow the device
   reduceMotion: null,   // null = follow the device
-  dateFormat: 'auto',   // relative when recent, otherwise "3 Nov 2026"
+  dateFormat: 'text',
   headingFont: 'pixel',
   textSize: 'default',
   density: 'comfortable',

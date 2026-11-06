@@ -179,8 +179,8 @@ const DENSITY_OPTIONS = [
 const SAMPLE_DATE = '2026-11-03'; // day and month both under 13, so DD/MM and MM/DD visibly differ
 
 const DATE_OPTIONS = [
-  { value: 'us-text', name: 'Month Day, Year' },
   { value: 'text', name: 'Day Month Year' },
+  { value: 'us-text', name: 'Month Day, Year' },
   { value: 'dmy', name: 'DD/MM/YYYY' },
   { value: 'mdy', name: 'MM/DD/YYYY' },
   { value: 'iso', name: 'YYYY-MM-DD' }
@@ -325,8 +325,8 @@ function renderSettings() {
 
   content.appendChild(settingsGroup('Content and links', [
     choiceRow({
-      key: 'dateFormat', title: 'Date format', groupClass: 'choices-date', options: DATE_OPTIONS, fallback: 'us-text',
-      description: 'How release, news and statistics dates are written. Anything from the last month shows as "3 days ago" instead.'
+      key: 'dateFormat', title: 'Date format', groupClass: 'choices-date', options: DATE_OPTIONS, fallback: 'text',
+      description: 'How release, news and statistics dates are written. Dates are relative (e.g. "3 days ago") until one month has passed.'
     }),
     switchRow({
       key: 'newDots', title: 'New content dots',

@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.4.0 — 2026-11-06
+
+### Added
+
+### Changed
+- All date format options now show the relative date (e.g. "3 days ago") until one month has passed
+
+### Removed
+- Removed the "Automatic" date setting - the default is now Day Month Year (e.g. "6 Nov 2026")
+
+### Fixed
+- Fixed the statistics "last updated" date not respecting the user's option
+
 ## v4.3.0 — 2026-11-05
 
 ### Added
