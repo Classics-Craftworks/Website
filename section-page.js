@@ -1207,8 +1207,17 @@ function announceImage(entry) {
   return match ? match.project.image || null : null;
 }
 
+function removeAnnouncementCard() {
+  const card = document.querySelector('aside.announce');
+  if (card) card.remove();
+  document.body.classList.remove('has-announcement');
+  document.documentElement.style.removeProperty('--announce-h');
+}
+
 function initAnnouncementCard() {
   if (document.getElementById('news-page')) return;
+  if (!getSettings().showAnnouncements) return; // Settings > "Announcement pop-ups"
+  if (document.querySelector('aside.announce')) return;
 
   const entry = announcedEntry(newsEntries());
   if (!entry) return;
@@ -1283,7 +1292,13 @@ function initSectionPage(pageUrl) {
 }
 
 if (document.body.dataset.page) initSectionPage(document.body.dataset.page);
-if (!document.querySelector('.not-found')) initAnnouncementCard();
+if (!document.querySelector('.not-found')) {
+  initAnnouncementCard();
+  // Turned off (or back on) in Settings, here or in another tab.
+  document.addEventListener(SETTINGS_EVENT, () => {
+    if (getSettings().showAnnouncements) initAnnouncementCard(); else removeAnnouncementCard();
+  });
+}
 
 // Service worker (sw.js): installable site, offline page shell.
 if ('serviceWorker' in navigator) {

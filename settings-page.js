@@ -282,7 +282,7 @@ const JUMP_LINKS = [
     ['highContrast', 'High contrast', 'contrast'], ['reduceMotion', 'Reduce motion', 'motion']
   ] },
   { id: 'group-content', label: 'Content and links', icon: 'link', items: [
-    ['dateFormat', 'Date format', 'calendar'], ['relativeDates', 'Relative dates', 'clock'], ['newDots', 'New content dots', 'bell'], ['externalNewTab', 'External links', 'newtab']
+    ['dateFormat', 'Date format', 'calendar'], ['relativeDates', 'Relative dates', 'clock'], ['showAnnouncements', 'Announcement pop-ups', 'announcements'], ['newDots', 'New content dots', 'bell'], ['externalNewTab', 'External links', 'newtab']
   ] }
 ];
 
@@ -374,6 +374,10 @@ function renderSettings() {
     switchRow({
       key: 'relativeDates', title: 'Relative dates',
       description: 'Show recent dates as "3 days ago" or "Yesterday" until one month has passed, with the full date on hover. Turn off to always show the full date.'
+    }),
+    switchRow({
+      key: 'showAnnouncements', title: 'Announcement pop-ups',
+      description: 'Show the announcement card in the corner of the page. Turn off to never see it; announcements stay on the News page.'
     }),
     switchRow({
       key: 'newDots', title: 'New content dots',

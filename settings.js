@@ -46,6 +46,7 @@ const SETTING_DEFAULTS = Object.freeze({
   textSize: 'default',
   density: 'comfortable',
   seasonal: 'auto',
+  showAnnouncements: true,
   newDots: true,
   externalNewTab: true
 });
@@ -70,7 +71,7 @@ function sanitizeSettings(raw) {
   for (const [key, choices] of Object.entries(SETTING_CHOICES)) {
     if (choices.includes(raw[key])) out[key] = raw[key];
   }
-  for (const key of ['highContrast', 'reduceMotion', 'relativeDates', 'newDots', 'externalNewTab']) {
+  for (const key of ['highContrast', 'reduceMotion', 'relativeDates', 'showAnnouncements', 'newDots', 'externalNewTab']) {
     if (typeof raw[key] === 'boolean') out[key] = raw[key];
   }
   return out;
