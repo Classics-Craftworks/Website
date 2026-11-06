@@ -2408,8 +2408,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .density-preview-comfortable { gap: 8px; }
 .density-preview-spacious { gap: 11px; }
 
-/* Project page sidebar: no dividers. */
-#project-jump-list { border-top: 0; }
+/* Project page sidebar: no dividers between projects (the one under the header stays). */
 #project-jump-list .jump-list > li + li { border-top: 0; padding-top: 0; }
 
 /* Jump panel: setting links nest under their section. */
