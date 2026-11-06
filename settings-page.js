@@ -149,7 +149,7 @@ function seasonalRow() {
 }
 
 const THEME_OPTIONS = [
-  { value: 'auto',  name: 'System',  note: 'Matches your system', halves: ['light', 'dark'] },
+  { value: 'auto',  name: 'Automatic',  note: 'Matches your system', halves: ['light', 'dark'] },
   { value: 'dark',  name: 'Dark',  note: 'Sleek and modern', halves: ['dark'] },
   { value: 'oled',  name: 'OLED',  note: 'True black', halves: ['oled'] },
   { value: 'light', name: 'Light', note: 'Bright and clear', halves: ['light'] }
