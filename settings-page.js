@@ -117,18 +117,34 @@ function seasonPreview(value) {
 
 const SEASON_OPTIONS = [
   { value: 'auto', name: 'Automatic', note: 'Each theme is set automatically on specific dates.' },
-  ...Object.entries(SEASONS).map(([value, season]) => ({
-    value, name: season.name, note: `${season.blurb} Automatically enabled on ${season.when}`
-  })),
+  // Calendar order. Names that aren't in SEASONS are placeholders for themes still to come: shown greyed
+  // out, not selectable and not saved as a setting.
+  ...['fireworks', 'April Fools', 'Easter', 'Friday 13th', 'Halloween', 'christmas'].map(key => {
+    const season = SEASONS[key];
+    return season
+      ? { value: key, name: season.name, note: `${season.blurb} Automatically enabled on ${season.when}` }
+      : { value: 'soon-' + key, name: key, soon: true, note: 'Not available yet.' };
+  }),
   { value: 'off', name: 'Off', note: 'No seasonal theme, and none set automatically.' }
 ].map(o => ({
   value: o.value,
-  render: input => el('label', { class: 'choice' }, [
-    input,
-    seasonPreview(o.value),
-    el('span', { class: 'choice-head' }, [el('span', { class: 'choice-name', text: o.name }), radioMark()]),
-    el('span', { class: 'choice-note', text: o.note })
-  ])
+  render: input => {
+    if (o.soon) {
+      return el('div', { class: 'choice is-soon', attrs: { 'aria-disabled': 'true' } }, [
+        el('span', { class: 'season-preview season-preview-soon', attrs: { 'aria-hidden': 'true' } }),
+        el('span', { class: 'choice-head' }, [
+          el('span', { class: 'choice-name-group' }, [el('span', { class: 'choice-name', text: o.name }), el('span', { class: 'soon-pill', text: 'Coming Soon' })])
+        ]),
+        el('span', { class: 'choice-note', text: o.note })
+      ]);
+    }
+    return el('label', { class: 'choice' }, [
+      input,
+      seasonPreview(o.value),
+      el('span', { class: 'choice-head' }, [el('span', { class: 'choice-name', text: o.name }), radioMark()]),
+      el('span', { class: 'choice-note', text: o.note })
+    ]);
+  }
 }));
 
 function seasonalRow() {

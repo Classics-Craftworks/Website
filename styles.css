@@ -2494,3 +2494,20 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
   }
   html[data-sidebar="left"] .news-layout.no-filters { grid-template-areas: "search toolbar" "extra feed"; }
 }
+
+/* Seasonal theme placeholders ("Coming Soon"): visible but not selectable. */
+.choice.is-soon { cursor: default; opacity: 0.6; }
+@media (hover: hover) { .choice.is-soon:hover { border-color: var(--border); } }
+.season-preview-soon { background: repeating-linear-gradient(135deg, var(--bg) 0 8px, var(--surface-2) 8px 16px); border-style: dashed; }
+.choice-name-group { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-2); min-width: 0; }
+.soon-pill {
+  flex: none;
+  padding: 1px var(--s-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-pill);
+  color: var(--text-soft);
+  font-size: var(--text-xs);
+  line-height: var(--lh-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}

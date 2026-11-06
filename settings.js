@@ -105,17 +105,17 @@ function effectiveTheme(s = getSettings()) {
      on(month, day, region)  true on a date it is set automatically (the visitor's local date;
                              region is "US", "GB" or ""). The first theme that matches wins. */
 const SEASONS = {
-  christmas: {
-    name: 'Christmas', blurb: 'Falling snow.',
-    when: '1 to 27 December.',
-    on: (month, day) => month === 12 && day <= 27
-  },
   fireworks: {
     name: 'Fireworks', blurb: 'Rockets and sparks.',
     when: '4 July (US), 5 November (UK) and 31 December to 1 January.',
     on: (month, day, region) =>
       (month === 12 && day === 31) || (month === 1 && day === 1) ||
       (month === 7 && day === 4 && region === 'US') || (month === 11 && day === 5 && region === 'GB')
+  },
+  christmas: {
+    name: 'Christmas', blurb: 'Falling snow.',
+    when: '1 to 27 December.',
+    on: (month, day) => month === 12 && day <= 27
   }
 };
 const SEASON_NAMES = Object.fromEntries(Object.entries(SEASONS).map(([key, season]) => [key, season.name]));
