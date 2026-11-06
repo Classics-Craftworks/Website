@@ -221,6 +221,7 @@ const DENSITY_OPTIONS = [
 const SAMPLE_DATE = '2026-11-03'; // day and month both under 13, so DD/MM and MM/DD visibly differ
 
 const DATE_OPTIONS = [
+  { value: 'system', name: 'System' },
   { value: 'text', name: 'Day Month Year' },
   { value: 'us-text', name: 'Month Day, Year' },
   { value: 'dmy', name: 'DD/MM/YYYY' },
@@ -281,7 +282,7 @@ const JUMP_LINKS = [
     ['highContrast', 'High contrast', 'contrast'], ['reduceMotion', 'Reduce motion', 'motion']
   ] },
   { id: 'group-content', label: 'Content and links', icon: 'link', items: [
-    ['dateFormat', 'Date format', 'calendar'], ['newDots', 'New content dots', 'bell'], ['externalNewTab', 'External links', 'newtab']
+    ['dateFormat', 'Date format', 'calendar'], ['relativeDates', 'Relative dates', 'clock'], ['newDots', 'New content dots', 'bell'], ['externalNewTab', 'External links', 'newtab']
   ] }
 ];
 
@@ -368,7 +369,11 @@ function renderSettings() {
   content.appendChild(settingsGroup('Content and links', [
     choiceRow({
       key: 'dateFormat', title: 'Date format', groupClass: 'choices-date', options: DATE_OPTIONS, fallback: 'text',
-      description: 'How release, news and statistics dates are written. Dates are relative (e.g. "3 days ago") until one month has passed.'
+      description: 'How release, news and statistics dates are written. "System" follows your device\'s language and region.'
+    }),
+    switchRow({
+      key: 'relativeDates', title: 'Relative dates',
+      description: 'Show recent dates as "3 days ago" or "Yesterday" until one month has passed, with the full date on hover. Turn off to always show the full date.'
     }),
     switchRow({
       key: 'newDots', title: 'New content dots',

@@ -26,7 +26,7 @@ const SETTINGS_EVENT = 'ccw:settings'; // fired on document after every change; 
 const SETTING_CHOICES = {
   theme: ['auto', 'dark', 'oled', 'light'],
   accent: ['red', 'orange', 'gold', 'green', 'teal', 'blue', 'purple', 'pink'],
-  dateFormat: ['auto', 'text', 'us-text', 'dmy', 'mdy', 'iso'],
+  dateFormat: ['system', 'text', 'us-text', 'dmy', 'mdy', 'iso'],
   headingFont: ['pixel', 'plain'],
   textSize: ['small', 'default', 'large'],
   density: ['compact', 'comfortable', 'spacious'],
@@ -40,7 +40,8 @@ const SETTING_DEFAULTS = Object.freeze({
   accent: 'blue',
   highContrast: null,   // null = follow the device
   reduceMotion: null,   // null = follow the device
-  dateFormat: 'text',
+  dateFormat: 'system',
+  relativeDates: true,
   headingFont: 'pixel',
   textSize: 'default',
   density: 'comfortable',
@@ -63,11 +64,13 @@ function sanitizeSettings(raw) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
   const renamed = { violet: 'purple', fuchsia: 'pink' }; // earlier names
   if (renamed[raw.accent]) raw = { ...raw, accent: renamed[raw.accent] };
+  // Earlier versions stored "relative dates" as a date format called "auto".
+  if (raw.dateFormat === 'auto') raw = { ...raw, dateFormat: 'system', relativeDates: true };
 
   for (const [key, choices] of Object.entries(SETTING_CHOICES)) {
     if (choices.includes(raw[key])) out[key] = raw[key];
   }
-  for (const key of ['highContrast', 'reduceMotion', 'newDots', 'externalNewTab']) {
+  for (const key of ['highContrast', 'reduceMotion', 'relativeDates', 'newDots', 'externalNewTab']) {
     if (typeof raw[key] === 'boolean') out[key] = raw[key];
   }
   return out;
@@ -166,7 +169,7 @@ const effectiveReducedMotion = (s = getSettings()) => s.reduceMotion === null ? 
 const prefersReducedMotion = () => effectiveReducedMotion();
 const newDotsEnabled = () => getSettings().newDots;
 const linksOpenInNewTab = () => getSettings().externalNewTab;
-const datesAreRelative = () => getSettings().dateFormat === 'auto';
+const datesAreRelative = () => getSettings().relativeDates;
 
 /* ---------- Applying ---------- */
 
@@ -215,7 +218,7 @@ function resetSettings() {
 
 /* ---------- Dates ---------- */
 
-// "2026-03-07" in the visitor's chosen format. length: "short" (no year), "medium" (7 Mar 2026)
+// "2026-03-07" in the visitor's chosen format ("system" = the device's regional format). length: "short" (no year), "medium" (7 Mar 2026)
 // or "long" (7 March 2026). Anything that isn't YYYY-MM-DD is returned as it came.
 function displayDate(iso, length = 'medium', format = getSettings().dateFormat) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
@@ -229,7 +232,9 @@ function displayDate(iso, length = 'medium', format = getSettings().dateFormat) 
 
   const options = { day: 'numeric', month: length === 'long' ? 'long' : 'short', timeZone: 'UTC' };
   if (length !== 'short') options.year = 'numeric';
-  return date.toLocaleDateString(format === 'us-text' ? 'en-US' : 'en-GB', options);
+  // "system" uses the device's own language and region (undefined = the browser default).
+  const locale = format === 'system' ? undefined : format === 'us-text' ? 'en-US' : 'en-GB';
+  return date.toLocaleDateString(locale, options);
 }
 
 /* ---------- External links ---------- */

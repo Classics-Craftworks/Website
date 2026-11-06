@@ -122,6 +122,7 @@ const relativeCounts = new Intl.RelativeTimeFormat('en-GB', { numeric: 'always' 
 // "Today", "Yesterday", "3 days ago", "2 weeks ago" for entries under a month old; future
 // dates likewise ("Tomorrow", "In 3 days") up to a month ahead; null otherwise.
 function relativeNewsDate(iso) {
+  if (!datesAreRelative()) return null;
   const d = new Date(iso + 'T00:00:00Z');
   if (isNaN(d)) return null;
 
