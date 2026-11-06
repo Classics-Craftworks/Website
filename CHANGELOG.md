@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 ## v4.4.0 — 2026-11-06
 
 ### Added
+- Spacious density setting
 
 ### Changed
 - All date format options now show the relative date (e.g. "3 days ago") until one month has passed
