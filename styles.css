@@ -2408,6 +2408,10 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .density-preview-comfortable { gap: 8px; }
 .density-preview-spacious { gap: 11px; }
 
+/* Project page sidebar: no dividers. */
+#project-jump-list { border-top: 0; }
+#project-jump-list .jump-list > li + li { border-top: 0; padding-top: 0; }
+
 /* Jump panel: setting links nest under their section. */
 .catalog-aside .jump-list > li + li { margin-top: var(--s-1); padding-top: var(--s-1); border-top: 1px solid var(--border); }
 .jump-sub { margin: 0 0 0 var(--s-2); padding: 0; list-style: none; }
