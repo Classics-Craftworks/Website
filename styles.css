@@ -2479,3 +2479,19 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
   .search-panel { position: static; width: auto; max-height: min(50vh, 360px); margin-top: var(--s-2); box-shadow: none; }
   .nav-jump-dot { min-width: 24px; height: 24px; font-size: var(--text-xs); }
 }
+
+/* ---------- Left-aligned sidebars (Settings > Appearance) ----------
+   Only where the layouts are two-column; narrower screens already stack the panel above the content. */
+@media (min-width: 1100px) {
+  html[data-sidebar="left"] .catalog-layout {
+    grid-template-columns: var(--aside-w) minmax(0, 1fr);
+    grid-template-areas: "aside list";
+  }
+}
+@media (min-width: 961px) {
+  html[data-sidebar="left"] .news-layout {
+    grid-template-columns: var(--aside-w) minmax(0, 1fr);
+    grid-template-areas: "search toolbar" "filters feed" "extra feed";
+  }
+  html[data-sidebar="left"] .news-layout.no-filters { grid-template-areas: "search toolbar" "extra feed"; }
+}

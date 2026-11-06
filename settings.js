@@ -14,6 +14,7 @@
      data-heading-font   plain                 (absent = pixel font)
      data-text-size      small | large         (absent = default size)
      data-density        compact               (absent = comfortable spacing)
+     data-sidebar        left                  (absent = side panels on the right)
      data-newtab         off                   (absent = external links open in a new tab)
      data-season         fireworks | christmas (absent = no seasonal theme; drawn by seasonal.js)
 
@@ -47,6 +48,7 @@ const SETTING_DEFAULTS = Object.freeze({
   density: 'comfortable',
   seasonal: 'auto',
   showAnnouncements: true,
+  leftSidebars: false,
   newDots: true,
   externalNewTab: true
 });
@@ -71,7 +73,7 @@ function sanitizeSettings(raw) {
   for (const [key, choices] of Object.entries(SETTING_CHOICES)) {
     if (choices.includes(raw[key])) out[key] = raw[key];
   }
-  for (const key of ['highContrast', 'reduceMotion', 'relativeDates', 'showAnnouncements', 'newDots', 'externalNewTab']) {
+  for (const key of ['highContrast', 'reduceMotion', 'relativeDates', 'showAnnouncements', 'leftSidebars', 'newDots', 'externalNewTab']) {
     if (typeof raw[key] === 'boolean') out[key] = raw[key];
   }
   return out;
@@ -185,6 +187,7 @@ function applySettings() {
   toggle('data-contrast', effectiveHighContrast(s), 'high');
   toggle('data-motion', effectiveReducedMotion(s), 'reduce');
   toggle('data-heading-font', s.headingFont !== 'pixel', s.headingFont);
+  toggle('data-sidebar', s.leftSidebars, 'left');
   toggle('data-newtab', !s.externalNewTab, 'off');
   toggle('data-text-size', s.textSize !== 'default', s.textSize);
   toggle('data-density', s.density !== 'comfortable', s.density);

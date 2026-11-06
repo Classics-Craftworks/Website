@@ -276,7 +276,7 @@ function settingsGroup(title, rows, id) {
 const JUMP_LINKS = [
   { id: 'group-appearance', label: 'Appearance', icon: 'appearance', items: [
     ['theme', 'Colour theme', 'moon'], ['seasonal', 'Seasonal theme', 'snowflake'], ['accent', 'Accent colour', 'drop'],
-    ['headingFont', 'Heading font', 'font'], ['textSize', 'Text size', 'text-size'], ['density', 'Spacing', 'spacing']
+    ['headingFont', 'Heading font', 'font'], ['textSize', 'Text size', 'text-size'], ['density', 'Spacing', 'spacing'], ['leftSidebars', 'Left-aligned sidebars', 'pin']
   ] },
   { id: 'group-accessibility', label: 'Accessibility', icon: 'accessibility', items: [
     ['highContrast', 'High contrast', 'contrast'], ['reduceMotion', 'Reduce motion', 'motion']
@@ -350,6 +350,10 @@ function renderSettings() {
     choiceRow({
       key: 'density', title: 'Spacing', groupClass: 'choices-density', options: DENSITY_OPTIONS,
       description: 'Adjusts the density of elements across the site.'
+    }),
+    switchRow({
+      key: 'leftSidebars', title: 'Left-aligned sidebars',
+      description: 'Show side panels on the left instead of the right (project pages, News and Settings). On narrow screens they stay above the content either way.'
     })
   ], 'group-appearance'));
 
