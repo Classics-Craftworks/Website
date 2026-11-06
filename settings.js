@@ -15,6 +15,7 @@
      data-text-size      small | large         (absent = default size)
      data-density        compact               (absent = comfortable spacing)
      data-newtab         off                   (absent = external links open in a new tab)
+     data-season         fireworks | christmas (absent = no seasonal theme; drawn by seasonal.js)
 
    High contrast and reduced motion follow the device setting until the visitor changes them
    (stored as null = "follow the device"). */
@@ -28,7 +29,10 @@ const SETTING_CHOICES = {
   dateFormat: ['auto', 'text', 'us-text', 'dmy', 'mdy', 'iso'],
   headingFont: ['pixel', 'plain'],
   textSize: ['small', 'default', 'large'],
-  density: ['compact', 'comfortable', 'spacious']
+  density: ['compact', 'comfortable', 'spacious'],
+  // auto = follow the calendar (see automaticSeason), off = never set one automatically.
+  // Fireworks or Christmas chosen here stay on all year and override the automatic one.
+  seasonal: ['auto', 'fireworks', 'christmas', 'off']
 };
 
 const SETTING_DEFAULTS = Object.freeze({
@@ -40,6 +44,7 @@ const SETTING_DEFAULTS = Object.freeze({
   headingFont: 'pixel',
   textSize: 'default',
   density: 'comfortable',
+  seasonal: 'auto',
   newDots: true,
   externalNewTab: true
 });
@@ -85,6 +90,75 @@ function effectiveTheme(s = getSettings()) {
   if (s.theme !== 'auto') return s.theme;
   return deviceQueries.light.matches ? 'light' : 'dark';
 }
+/* ---------- Seasonal themes ---------- */
+
+/* Every seasonal theme lives here. To add one: add an entry (and draw it in seasonal.js's EFFECTS, and
+   add its name to SETTING_CHOICES.seasonal). The Settings page builds its cards from this list.
+     name, blurb        shown on the theme's card (its preview is the effect itself, from seasonal.js)
+     when               the dates it is set automatically, in words, shown on its card
+     on(month, day, region)  true on a date it is set automatically (the visitor's local date;
+                             region is "US", "GB" or ""). The first theme that matches wins. */
+const SEASONS = {
+  christmas: {
+    name: 'Christmas', blurb: 'Falling snow.',
+    when: '1 to 27 December.',
+    on: (month, day) => month === 12 && day <= 27
+  },
+  fireworks: {
+    name: 'Fireworks', blurb: 'Rockets and sparks.',
+    when: '4 July (US), 5 November (UK) and 31 December to 1 January.',
+    on: (month, day, region) =>
+      (month === 12 && day === 31) || (month === 1 && day === 1) ||
+      (month === 7 && day === 4 && region === 'US') || (month === 11 && day === 5 && region === 'GB')
+  }
+};
+const SEASON_NAMES = Object.fromEntries(Object.entries(SEASONS).map(([key, season]) => [key, season.name]));
+
+// Time zones used to tell which of the two countries with their own fireworks night a visitor is in.
+// The zone is a better guide than the browser language (an American in London still sees 5 November).
+const US_TIME_ZONES = new Set([
+  'America/New_York', 'America/Detroit', 'America/Kentucky/Louisville', 'America/Kentucky/Monticello',
+  'America/Indiana/Indianapolis', 'America/Indiana/Vincennes', 'America/Indiana/Winamac', 'America/Indiana/Marengo',
+  'America/Indiana/Petersburg', 'America/Indiana/Vevay', 'America/Indiana/Tell_City', 'America/Indiana/Knox',
+  'America/Chicago', 'America/Menominee', 'America/North_Dakota/Center', 'America/North_Dakota/New_Salem',
+  'America/North_Dakota/Beulah', 'America/Denver', 'America/Boise', 'America/Phoenix', 'America/Los_Angeles',
+  'America/Anchorage', 'America/Juneau', 'America/Sitka', 'America/Metlakatla', 'America/Yakutat', 'America/Nome',
+  'America/Adak', 'Pacific/Honolulu',
+  // older names some browsers still report
+  'America/Indianapolis', 'America/Fort_Wayne', 'America/Louisville', 'America/Knox_IN', 'America/Shiprock',
+  'America/Atka', 'Pacific/Johnston', 'EST5EDT', 'CST6CDT', 'MST7MDT', 'PST8PDT'
+]);
+const UK_TIME_ZONES = new Set(['Europe/London', 'Europe/Belfast', 'GB', 'GB-Eire']);
+
+// "US", "GB" or "" (anywhere else or unknown). Falls back to the browser language only when the
+// browser doesn't report a time zone at all.
+function visitorRegion() {
+  let zone = '';
+  try { zone = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* unavailable */ }
+  if (zone) {
+    if (US_TIME_ZONES.has(zone) || zone.startsWith('US/')) return 'US';
+    if (UK_TIME_ZONES.has(zone)) return 'GB';
+    return '';
+  }
+  try {
+    const region = new Intl.Locale(navigator.language).region;
+    return region === 'US' || region === 'GB' ? region : '';
+  } catch { return ''; }
+}
+
+// The theme the calendar picks for a date (the visitor's own local date), or "" for none.
+function automaticSeason(date = new Date(), region = visitorRegion()) {
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  return Object.keys(SEASONS).find(key => SEASONS[key].on(month, day, region)) || '';
+}
+
+function effectiveSeason(s = getSettings()) {
+  if (s.seasonal === 'off') return '';
+  if (s.seasonal === 'auto') return automaticSeason();
+  return s.seasonal;
+}
+
 const effectiveHighContrast = (s = getSettings()) => s.highContrast === null ? deviceQueries.contrast.matches : s.highContrast;
 const effectiveReducedMotion = (s = getSettings()) => s.reduceMotion === null ? deviceQueries.motion.matches : s.reduceMotion;
 
@@ -110,6 +184,7 @@ function applySettings() {
   toggle('data-newtab', !s.externalNewTab, 'off');
   toggle('data-text-size', s.textSize !== 'default', s.textSize);
   toggle('data-density', s.density !== 'comfortable', s.density);
+  toggle('data-season', effectiveSeason(s), effectiveSeason(s));
 
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.content = THEME_COLORS[theme] || THEME_COLORS.dark;
@@ -197,6 +272,21 @@ window.addEventListener('storage', e => {
   applySettings();
   announceSettings();
 });
+
+// The date can change while a page stays open (midnight, or a laptop waking up), which can start or
+// end an automatic theme.
+function refreshSeason() {
+  if (document.documentElement.getAttribute('data-season') === (effectiveSeason() || null)) return;
+  applySettings();
+  announceSettings();
+}
+function scheduleSeasonRefresh() {
+  const now = new Date();
+  const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
+  setTimeout(() => { refreshSeason(); scheduleSeasonRefresh(); }, Math.max(1000, nextMidnight - now));
+}
+scheduleSeasonRefresh();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshSeason(); });
 
 document.addEventListener('DOMContentLoaded', () => {
   applySettings(); // the theme-color <meta> and links didn't exist when this script first ran

@@ -268,6 +268,11 @@
 /* External links opening in the same tab: the "opens in a new tab" icon would be misleading. */
 :root[data-newtab="off"] .newtab-icon { display: none; }
 
+/* ---------- Seasonal theme ---------- */
+
+/* Drawn by seasonal.js: behind the page, never in the way of clicks, taps or text selection. */
+.season-canvas { position: fixed; inset: 0; z-index: -1; width: 100%; height: 100%; pointer-events: none; }
+
 /* ---------- Base ---------- */
 
 * { box-sizing: border-box; }
@@ -2288,7 +2293,6 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .setting-wide { grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
 
 .setting-title { display: block; font-size: var(--text-md); line-height: var(--lh-md); font-weight: 600; }
-.soon-tag { display: inline-flex; align-items: center; height: var(--s-5); margin-left: var(--s-2); padding: 0 var(--s-2); border: 1px solid var(--border-2); border-radius: var(--r-pill); background: var(--surface-2); color: var(--text-soft); font-size: var(--text-xs); line-height: 1; font-weight: 600; vertical-align: 0.1em; }
 .setting-desc { margin-top: var(--s-1); color: var(--text-soft); font-size: var(--text-sm); line-height: var(--lh-sm); }
 .setting-extra { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); margin-top: var(--s-3); }
 .setting-status { color: var(--text-soft); font-size: var(--text-sm); line-height: var(--lh-sm); }
@@ -2302,6 +2306,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .choices-theme { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .choices-font { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .choices-density { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.choices-season { grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); } /* grows with the number of themes */
 .choices-size { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .choices-date { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-2) var(--s-3); }
 .choices-accent { display: flex; flex-wrap: wrap; gap: var(--s-2); }
@@ -2331,12 +2336,23 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .choice-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); min-width: 0; }
 /* Cards with a preview: a line, edge to edge, between the preview and the name and note. */
 .choice:not(.choice-row) .choice-head { margin: var(--s-1) calc(var(--s-3) * -1) 0; padding: var(--s-3) var(--s-3) 0; border-top: 1px solid var(--border); }
+/* The chosen card has a 1px ring inside its border; stop the line at the ring instead of drawing over it. */
+.choice:not(.choice-row):has(input:checked) .choice-head { margin-inline: calc(1px - var(--s-3)); padding-inline: calc(var(--s-3) - 1px); }
 .choice-name { font-size: var(--text-sm); line-height: var(--lh-sm); font-weight: 600; }
 .choice-note { color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); }
 
 /* Radio mark: a ring, filled when chosen (shape, not just colour, shows the state). */
 .choice-mark { flex: none; width: 16px; height: 16px; border: 2px solid var(--border-2); border-radius: 50%; transition: border-color var(--ease), background-color var(--ease); }
 .choice:has(input:checked) .choice-mark { border-color: var(--accent); background: radial-gradient(circle, var(--accent) 0 38%, transparent 42%); }
+
+/* Seasonal theme previews: the real effect, small, on the page's own background (canvases are drawn by
+   seasonal.js; Automatic puts one per theme side by side). Off is a plain page with nothing falling. */
+.season-preview { position: relative; display: flex; height: 64px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--r-1); background: var(--bg); }
+.season-preview canvas { flex: 1 1 0; min-width: 0; height: 100%; }
+.season-preview canvas + canvas { border-left: 1px solid var(--border); }
+.season-preview-off { flex-direction: column; gap: 6px; padding: 8px; }
+.sp-bar { height: 4px; width: 28%; border-radius: 2px; background: var(--text-soft); opacity: 0.6; }
+.sp-card { flex: 1; border: 1px solid var(--border-2); border-radius: 4px; background: var(--surface-2); }
 
 /* Theme previews: a tiny page drawn in each theme's own colours. */
 .theme-preview { display: flex; height: 64px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--r-1); }

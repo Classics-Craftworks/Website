@@ -43,7 +43,7 @@ function switchRow({ key, title, description, extra, system }) {
 }
 
 // A row with a group of radio options beneath its text.
-function choiceRow({ key, title, description, groupClass, options, fallback }) {
+function choiceRow({ key, title, description, groupClass, options, fallback, extra }) {
   const id = controlId('group');
   const group = el('div', {
     class: 'choices ' + groupClass,
@@ -68,7 +68,8 @@ function choiceRow({ key, title, description, groupClass, options, fallback }) {
   return el('div', { class: 'setting setting-wide', attrs: { id: 'setting-' + key } }, [
     settingText(
       el('div', { class: 'setting-title', text: title, attrs: { id: id + '-title' } }),
-      settingDescription(id + '-desc', description)
+      settingDescription(id + '-desc', description),
+      extra
     ),
     group
   ]);
@@ -95,15 +96,56 @@ function systemSwitch(key, query, mainInput, effectiveValue) {
 
 /* ---------- Appearance ---------- */
 
-// Placeholder for a feature that isn't built yet: no control, just a "Coming soon" tag.
+/* Seasonal theme: Automatic follows the calendar (dates are in settings.js: automaticSeason); the
+   others are always on and override it; Off never sets one. */
+// The picture on each card: Automatic shows every theme side by side (like the System colour theme),
+// each theme runs its own effect, and Off is a plain page. The effects are seasonal.js's own.
+function seasonPreview(value) {
+  const tile = el('span', { class: 'season-preview', attrs: { 'aria-hidden': 'true' } });
+  if (value === 'off') {
+    tile.classList.add('season-preview-off');
+    tile.append(el('span', { class: 'sp-bar' }), el('span', { class: 'sp-card' }));
+    return tile;
+  }
+  (value === 'auto' ? Object.keys(SEASONS) : [value]).forEach(season => {
+    const canvas = document.createElement('canvas');
+    tile.appendChild(canvas);
+    if (window.mountSeasonPreview) window.mountSeasonPreview(canvas, season);
+  });
+  return tile;
+}
+
+const SEASON_OPTIONS = [
+  { value: 'auto', name: 'Automatic', note: 'Each theme is set on its own dates.' },
+  ...Object.entries(SEASONS).map(([value, season]) => ({
+    value, name: season.name, note: `${season.blurb} Automatic on ${season.when}`
+  })),
+  { value: 'off', name: 'Off', note: 'No seasonal theme, and none set automatically.' }
+].map(o => ({
+  value: o.value,
+  render: input => el('label', { class: 'choice' }, [
+    input,
+    seasonPreview(o.value),
+    el('span', { class: 'choice-head' }, [el('span', { class: 'choice-name', text: o.name }), radioMark()]),
+    el('span', { class: 'choice-note', text: o.note })
+  ])
+}));
+
 function seasonalRow() {
-  const descId = controlId('seasonal') + '-desc';
-  return el('div', { class: 'setting', attrs: { id: 'setting-seasonal' } }, [
-    settingText(
-      el('div', { class: 'setting-title' }, [el('span', { text: 'Seasonal theme' }), el('span', { class: 'soon-tag', text: 'Coming soon' })]),
-      settingDescription(descId, 'Festive looks that appear at certain times of the year. Choosing one overwrites any that are automatically set in the future.')
-    )
-  ]);
+  const status = el('span', { class: 'setting-status', attrs: { role: 'status' } });
+  syncers.push(() => {
+    const choice = getSettings().seasonal;
+    const name = SEASON_NAMES[effectiveSeason()];
+    status.textContent =
+      choice === 'off' ? 'Seasonal themes are off, including automatic ones.'
+      : choice === 'auto' ? (name ? `${name} is on today.` : 'No seasonal theme is on today.')
+      : `${name} is on until you change this.`;
+  });
+  return choiceRow({
+    key: 'seasonal', title: 'Seasonal theme', groupClass: 'choices-season', options: SEASON_OPTIONS,
+    description: 'Festive looks for certain times of the year. Choosing one yourself overrides Automatic, and works at any time of year. With Reduce motion on, they show as a still picture.',
+    extra: el('div', { class: 'setting-extra' }, [status])
+  });
 }
 
 const THEME_OPTIONS = [
