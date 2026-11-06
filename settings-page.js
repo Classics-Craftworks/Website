@@ -274,7 +274,7 @@ function settingsGroup(title, rows, id) {
 
 // Side panel linking to each setting; the same collapsible panel as the project pages' "Jump to project".
 const JUMP_LINKS = [
-  { id: 'group-appearance', label: 'Appearance', icon: 'brush', items: [
+  { id: 'group-appearance', label: 'Appearance', icon: 'appearance', items: [
     ['theme', 'Colour theme', 'moon'], ['seasonal', 'Seasonal theme', 'snowflake'], ['accent', 'Accent colour', 'drop'],
     ['headingFont', 'Heading font', 'font'], ['textSize', 'Text size', 'text-size'], ['density', 'Spacing', 'spacing']
   ] },
