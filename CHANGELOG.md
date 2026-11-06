@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.5.0 — 2026-11-06
+
+### Added
+- First two seasonal themes - can be set manually or will be automatically set on specific dates:
+  - Christmas: Animated snowfall
+    - Automatically enabled between 1 - 27 December
+  - Fireworks: Animated rockets and sparkles
+    - Automatically enabled between 31 December - 1 January, as well as 4 July in the US and 5 November in the UK
+- Placeholders for future seasonal themes, which will be added over the coming days
+- Relative dates setting - switch between "3 days ago" or the full date
+- System date format setting that follows the user's device language and region (new default)
+- Setting to permanently hide the announcement card pop-ups
+- Setting to move sidebars to the left side of the page
+
+### Changed
+- Renamed the "System" colour theme to "Automatic"
+- Changed Appearance icon from the Resource Pack paintbrush icon to a paint palette
+
+### Removed
+- Removed separators between projects on the project page sidebars
+
 ## v4.4.0 — 2026-11-06
 
 ### Added
