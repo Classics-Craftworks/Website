@@ -116,9 +116,9 @@ function seasonPreview(value) {
 }
 
 const SEASON_OPTIONS = [
-  { value: 'auto', name: 'Automatic', note: 'Each theme is set on its own dates.' },
+  { value: 'auto', name: 'Automatic', note: 'Each theme is set automatically on specific dates.' },
   ...Object.entries(SEASONS).map(([value, season]) => ({
-    value, name: season.name, note: `${season.blurb} Automatic on ${season.when}`
+    value, name: season.name, note: `${season.blurb} Automatically enabled on ${season.when}`
   })),
   { value: 'off', name: 'Off', note: 'No seasonal theme, and none set automatically.' }
 ].map(o => ({
@@ -138,12 +138,12 @@ function seasonalRow() {
     const name = SEASON_NAMES[effectiveSeason()];
     status.textContent =
       choice === 'off' ? 'Seasonal themes are off, including automatic ones.'
-      : choice === 'auto' ? (name ? `${name} is on today.` : 'No seasonal theme is on today.')
+      : choice === 'auto' ? (name ? `${name} is on today.` : 'No seasonal theme is active today.')
       : `${name} is on until you change this.`;
   });
   return choiceRow({
     key: 'seasonal', title: 'Seasonal theme', groupClass: 'choices-season', options: SEASON_OPTIONS,
-    description: 'Festive looks for certain times of the year. Choosing one yourself overrides Automatic, and works at any time of year. With Reduce motion on, they show as a still picture.',
+    description: 'Festive looks for certain times of the year. Choosing one yourself overrides Automatic, and works at any time of year. With reduced motion on, they show as a still picture.',
     extra: el('div', { class: 'setting-extra' }, [status])
   });
 }
