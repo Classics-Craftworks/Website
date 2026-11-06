@@ -247,6 +247,21 @@
   --s-9: 72px;
 }
 
+/* Spacious spacing: about a quarter more room. The two largest steps stay put because they also size
+   things (project icons, the header), so section breaks are widened through --section-gap instead. */
+:root[data-density="spacious"] {
+  --s-2: 10px;
+  --s-3: 16px;
+  --s-4: 20px;
+  --s-5: 30px;
+  --s-6: 40px;
+  --s-7: 56px;
+  --section-gap: 80px;
+}
+@media (max-width: 720px) { :root[data-density="spacious"] { --section-gap: var(--s-7); } }
+/* The home page figures share one row; keep their side padding at the usual 16px so they still fit. */
+@media (min-width: 721px) { :root[data-density="spacious"] .stat-box:not(:first-child) { padding-inline: 16px; } }
+
 /* Heading font: Minercraftory (pixel, the default) or the body face. */
 :root[data-heading-font="plain"] { --font-display: var(--font-body); }
 
