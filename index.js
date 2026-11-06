@@ -145,7 +145,7 @@ function renderStats(stats) {
   }
 
   const updated = document.getElementById('stats-updated');
-  if (updated && stats.lastUpdated) updated.textContent = 'As of ' + stats.lastUpdated;
+  if (updated && stats.lastUpdated) updated.textContent = 'As of ' + displayDate(stats.lastUpdated, 'long');
 }
 
 // Forwards old home-page deep links (#better-craftables) to the section pages. Returns true if it redirected.

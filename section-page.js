@@ -374,10 +374,10 @@ function channelTitle(ch, cls) {
 }
 
 // Releases under a month old show a relative date with the full date as a tooltip
-// (default date format only; see settings.js for the others).
+// (older ones use the visitor's date format from Settings).
 function releaseDateNode(iso) {
   const full = displayDate(iso, 'medium');
-  const relative = datesAreRelative() ? relativeNewsDate(iso) : null;
+  const relative = relativeNewsDate(iso);
   return el('span', { class: 'rt-date' + (relative ? ' has-tooltip' : ''), attrs: relative ? { 'data-tooltip': full } : {} }, [
     icon('calendar', 'icon-sm'),
     el('time', { text: relative || full, attrs: { datetime: iso } })
@@ -1142,7 +1142,7 @@ function calendarIcon() {
 // Date with calendar icon. Recent entries show a relative date with the full date as a tooltip.
 function newsDate(entry) {
   const full = formatNewsDate(entry.date);
-  const relative = datesAreRelative() ? relativeNewsDate(entry.date) : null;
+  const relative = relativeNewsDate(entry.date);
   return el('span', { class: 'news-when' + (relative ? ' has-tooltip' : ''), attrs: relative ? { 'data-tooltip': full } : {} }, [
     calendarIcon(),
     el('time', { class: 'news-date', text: relative || full, attrs: { datetime: entry.date } })

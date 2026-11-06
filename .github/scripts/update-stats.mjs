@@ -2,7 +2,8 @@
 // "Followers" stat from Modrinth (project followers, summed over the same projects).
 // When either stat changes, it also bumps the hotfix number of the site version in
 // data.js (v3.7.5 -> v3.7.5.1, v3.7.5.1 -> v3.7.5.2, ...) and adds a matching
-// entry to CHANGELOG.md, and sets the home page's <lastmod> in sitemap.xml to today.
+// entry to CHANGELOG.md, sets the home page's <lastmod> in sitemap.xml to today, and sets
+// stats.js's lastUpdated to today as YYYY-MM-DD (the site shows it in the visitor's chosen date format).
 //
 // Projects are read from data.js, so new projects are picked up automatically:
 //   - Modrinth: every modrinth.com/<type>/<slug> link, except servers,
@@ -130,10 +131,6 @@ function formatFollowers(total) {
   return rounded.toLocaleString('en-US') + (FOLLOWERS_ROUND_DOWN_TO > 1 ? '+' : '');
 }
 
-function today() {
-  return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
-}
-
 // ---------- version + changelog ----------
 
 const VERSION_RE = /(version:\s*\{\s*label:\s*")([^"]*)(")/; // the site version, not a download's "version"
@@ -223,7 +220,7 @@ if (DRY_RUN) {
 }
 
 let updated = source.replace(DOWNLOADS_RE, `$1${newValue}$3`).replace(FOLLOWERS_RE, `$1${newFollowers}$3`);
-updated = updated.replace(UPDATED_RE, `$1${today()}$3`);
+updated = updated.replace(UPDATED_RE, `$1${isoToday()}$3`);
 writeFileSync(STATS_FILE, updated);
 writeFileSync(DATA_FILE, dataSource.replace(VERSION_RE, `$1${newVersion}$3`));
 writeFileSync(CHANGELOG_FILE, newChangelog);

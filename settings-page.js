@@ -43,7 +43,7 @@ function switchRow({ key, title, description, extra, system }) {
 }
 
 // A row with a group of radio options beneath its text.
-function choiceRow({ key, title, description, groupClass, options }) {
+function choiceRow({ key, title, description, groupClass, options, fallback }) {
   const id = controlId('group');
   const group = el('div', {
     class: 'choices ' + groupClass,
@@ -58,7 +58,12 @@ function choiceRow({ key, title, description, groupClass, options }) {
     group.appendChild(option.render(input));
   });
 
-  syncers.push(() => { inputs.forEach(input => { input.checked = input.value === getSettings()[key]; }); });
+  // A saved value that matches no option (e.g. an old one) shows the default as selected instead of nothing.
+  syncers.push(() => {
+    const current = getSettings()[key];
+    const shown = inputs.some(input => input.value === current) ? current : (fallback ?? SETTING_DEFAULTS[key]);
+    inputs.forEach(input => { input.checked = input.value === shown; });
+  });
 
   return el('div', { class: 'setting setting-wide', attrs: { id: 'setting-' + key } }, [
     settingText(
@@ -173,26 +178,16 @@ const DENSITY_OPTIONS = [
 
 const SAMPLE_DATE = '2026-11-03'; // day and month both under 13, so DD/MM and MM/DD visibly differ
 
-function isoDaysAgo(days) {
-  const d = new Date();
-  d.setDate(d.getDate() - days);
-  const pad = n => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
-
 const DATE_OPTIONS = [
-  { value: 'auto', name: 'Automatic' },
-  { value: 'text', name: 'Day Month Year' },
   { value: 'us-text', name: 'Month Day, Year' },
+  { value: 'text', name: 'Day Month Year' },
   { value: 'dmy', name: 'DD/MM/YYYY' },
   { value: 'mdy', name: 'MM/DD/YYYY' },
   { value: 'iso', name: 'YYYY-MM-DD' }
 ].map(o => ({
   value: o.value,
   render: input => {
-    const example = o.value === 'auto'
-      ? `${relativeNewsDate(isoDaysAgo(2)) || '2 days ago'}, then ${displayDate(SAMPLE_DATE, 'medium', 'auto')}`
-      : displayDate(SAMPLE_DATE, 'medium', o.value);
+    const example = displayDate(SAMPLE_DATE, 'medium', o.value);
     return el('label', { class: 'choice choice-row' }, [
       input,
       el('span', { class: 'choice-head' }, [radioMark(), el('span', { class: 'choice-name', text: o.name })]),
@@ -330,8 +325,8 @@ function renderSettings() {
 
   content.appendChild(settingsGroup('Content and links', [
     choiceRow({
-      key: 'dateFormat', title: 'Date format', groupClass: 'choices-date', options: DATE_OPTIONS,
-      description: 'How release and news entry dates are written.'
+      key: 'dateFormat', title: 'Date format', groupClass: 'choices-date', options: DATE_OPTIONS, fallback: 'us-text',
+      description: 'How release, news and statistics dates are written. Anything from the last month shows as "3 days ago" instead.'
     }),
     switchRow({
       key: 'newDots', title: 'New content dots',
