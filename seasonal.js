@@ -6,7 +6,8 @@
 
    - Fireworks: rockets rise and burst into sparks.
    - Snowfall: snow drifts down.
-   - Christmas: a string of fairy lights twinkles along the top while golden sparkles drift down.
+   - Christmas: a string of fairy lights twinkles along the top, golden sparkles drift down and a treeline of
+     pines with small lights stands along the bottom.
    - Halloween: bats flap across a hazy moon while embers rise from a warm glow at the bottom.
    - Friday 13th: mist drifts across, faint "13"s float up and fade, and every few seconds, mostly near the
      side margins, a branching lightning bolt strikes down from the top and fades with a soft glow (one smooth
@@ -465,6 +466,101 @@
       ctx.fill();
     }
 
+    /* The treeline: two rows of pines along the bottom edge, taller towards the side margins and low in the
+       middle, so the middle of the page stays clear. Laid out once per window size from a fixed seed (so the
+       trees stand in the same places every time, whatever Math.random is doing), with a few small lights on
+       each front tree and a star on some of the tallest. */
+    let trees = null;
+    let treesFor = '';
+
+    function layoutTrees() {
+      const key = view.w + 'x' + view.h;
+      if (trees && treesFor === key) return;
+      treesFor = key;
+      const rng = seeded(25);
+      const between = (a, b) => a + rng() * (b - a);
+      const u = unit();
+      const rows = [{ back: true, scale: 0.68, shift: 0.5 }, { back: false, scale: 1, shift: 0 }];
+      trees = rows.map(row => {
+        const list = [];
+        let x = -20 * u + row.shift * 30 * u;
+        while (x < view.w + 20) {
+          const edge = Math.abs(x / view.w - 0.5) * 2; // 0 in the middle, 1 at the sides
+          const height = view.h * (0.06 + 0.23 * Math.pow(edge, 1.7)) * between(0.8, 1.2) * row.scale;
+          const width = Math.max(6, height * between(0.5, 0.62));
+          const tree = { x, height, width, tiers: height > 70 * u ? 4 : 3, bulbs: [], star: false };
+          if (!row.back && height > 30) { // trees too small to carry lights (the preview tiles) go without
+            const count = Math.max(2, Math.round(height / (20 * u + 8)));
+            for (let i = 0; i < count; i++) {
+              const t = between(0.25, 0.95); // down the tree
+              tree.bulbs.push({ dx: between(-0.8, 0.8) * t * width / 2, dy: -height * (1 - t), i: list.length * 7 + i });
+            }
+            tree.star = height > 110 * u && rng() < 0.45;
+          }
+          list.push(tree);
+          x += width * between(0.5, 0.75);
+        }
+        return { back: row.back, list };
+      });
+    }
+
+    // One tree as a single outline (apex, down the right side in tiers, trunk, back up the left), so that it
+    // fills as one shape.
+    function treePath(ctx, t, baseY) {
+      const apexY = baseY - t.height;
+      const trunk = Math.max(1, t.width * 0.08);
+      const hw = i => (t.width / 2) * (0.38 + 0.62 * (i + 1) / t.tiers);
+      const yb = i => apexY + t.height * 0.92 * (0.3 + 0.7 * (i + 1) / t.tiers);
+      ctx.beginPath();
+      ctx.moveTo(t.x, apexY);
+      for (let i = 0; i < t.tiers; i++) {
+        ctx.lineTo(t.x + hw(i), yb(i));
+        if (i < t.tiers - 1) ctx.lineTo(t.x + hw(i) * 0.5, yb(i));
+      }
+      ctx.lineTo(t.x + trunk, yb(t.tiers - 1));
+      ctx.lineTo(t.x + trunk, baseY);
+      ctx.lineTo(t.x - trunk, baseY);
+      ctx.lineTo(t.x - trunk, yb(t.tiers - 1));
+      for (let i = t.tiers - 1; i >= 0; i--) {
+        ctx.lineTo(t.x - hw(i), yb(i));
+        if (i > 0) ctx.lineTo(t.x - hw(i - 1) * 0.5, yb(i - 1));
+      }
+      ctx.closePath();
+    }
+
+    function drawTrees(ctx, light) {
+      layoutTrees();
+      const colours = LIGHT_COLOURS[light ? 'light' : 'dark'];
+      const baseY = view.h + 2;
+      trees.forEach(row => {
+        ctx.fillStyle = row.back
+          ? (light ? 'rgba(52, 84, 92, 0.45)' : 'rgb(18, 30, 42)')
+          : (light ? 'rgba(34, 62, 70, 0.78)' : 'rgb(22, 44, 54)');
+        row.list.forEach(t => { treePath(ctx, t, baseY); ctx.fill(); });
+      });
+
+      // the lights and stars on the front row
+      const front = trees[1].list;
+      ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
+      front.forEach(t => {
+        t.bulbs.forEach(b => {
+          const level = 0.6 + 0.4 * Math.sin(clock * (0.6 + (b.i % 5) * 0.2) + b.i * 2.1);
+          const bx = t.x + b.dx;
+          const by = baseY + b.dy;
+          const rad = Math.max(1, 2.2 * unit());
+          ctx.fillStyle = colours[b.i % colours.length];
+          ctx.globalAlpha = (light ? 0.22 : 0.3) * level;
+          ctx.beginPath(); ctx.arc(bx, by, rad * 3, 0, TAU); ctx.fill();
+          ctx.globalAlpha = 0.55 + 0.45 * level;
+          ctx.beginPath(); ctx.arc(bx, by, rad, 0, TAU); ctx.fill();
+        });
+      });
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = `rgb(${SPARKLE_COLOURS[light ? 'light' : 'dark']})`;
+      front.forEach(t => { if (t.star) star(ctx, t.x, baseY - t.height - 2, Math.max(2.5, t.width * 0.11)); });
+    }
+
     // The page's sticky header covers the top of the canvas, so the string hangs from just below it (the small
     // previews have no header and set lightsTop to 0).
     const headerBottom = () => {
@@ -532,6 +628,7 @@
 
     function draw(ctx) {
       const light = isLight();
+      drawTrees(ctx, light);
       drawLights(ctx, light);
 
       const rgb = SPARKLE_COLOURS[light ? 'light' : 'dark'];
@@ -546,6 +643,7 @@
     // One frame for reduced motion: the lights part-way through their glow and sparkles scattered about.
     function still() {
       sparkles = [];
+      trees = null;
       fill(true);
       clock = 3;
     }

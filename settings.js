@@ -120,7 +120,7 @@ const SEASONS = {
     on: (month, day) => month === 12 && (day <= 17 || (day >= 28 && day <= 30))
   },
   christmas: {
-    name: 'Christmas', blurb: 'Twinkling fairy lights and drifting sparkles.',
+    name: 'Christmas', blurb: 'Twinkling fairy lights, pine trees and drifting sparkles.',
     when: '18 to 27 December.',
     on: (month, day) => month === 12 && day >= 18 && day <= 27
   },
