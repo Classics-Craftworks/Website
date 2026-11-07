@@ -100,8 +100,53 @@ function systemSwitch(key, query, mainInput, effectiveValue) {
    others are always on and override it; Off never sets one. */
 // The picture on each card: Automatic shows every theme side by side (like the System colour theme),
 // each theme runs its own effect, and Off is a plain page. The effects are seasonal.js's own.
+// Automatic's picture: twelve little months, each with its themes' dates in their own colours, and this
+// month outlined. Built from SEASONS' own rules (so it can never disagree with them): every day is tested,
+// in both fireworks regions, and runs of days become bars. Friday 13th depends on the weekday, so it is
+// checked against the current year's calendar.
+const SEASON_COLORS = { fireworks: '#fbbf24', snowfall: '#7dd3fc', christmas: '#f87171', halloween: '#fb923c', friday13: '#a78bfa' };
+const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // a plain year: 29 Feb has no theme
+
+// The theme a day gets in this picture ("" for none): the same first-match order as automaticSeason.
+function previewSeason(month, day, weekday) {
+  return Object.keys(SEASONS).find(key => ['US', 'GB'].some(region => SEASONS[key].on(month, day, region, weekday))) || '';
+}
+
+function calendarPreview(tile) {
+  tile.classList.add('season-preview-calendar');
+  const year = new Date().getFullYear();
+  const grid = el('span', { class: 'sp-grid' });
+  const cells = MONTH_ABBR.map((abbr, m) => {
+    const track = el('span', { class: 'sp-mt' });
+    let from = 0;
+    let current = '';
+    for (let d = 1; d <= MONTH_LENGTHS[m] + 1; d++) {
+      const key = d <= MONTH_LENGTHS[m] ? previewSeason(m + 1, d, new Date(year, m, d).getDay()) : '';
+      if (key === current) continue;
+      if (current) {
+        const bar = el('span', { class: 'sp-run' });
+        const left = (from - 1) / MONTH_LENGTHS[m] * 100;
+        // Pinned inside the month, so a one-day bar at the very end isn't clipped by its rounded corner.
+        bar.style.cssText = `left:min(${left}%,calc(100% - 2px));width:${(d - from) / MONTH_LENGTHS[m] * 100}%;--c:${SEASON_COLORS[current] || 'var(--accent)'}`;
+        track.appendChild(bar);
+      }
+      current = key;
+      from = d;
+    }
+    const cell = el('span', { class: 'sp-cell' }, [el('span', { class: 'sp-label', text: abbr }), track]);
+    grid.appendChild(cell);
+    return cell;
+  });
+  const markNow = () => cells.forEach((cell, m) => cell.classList.toggle('is-now', m === new Date().getMonth()));
+  markNow();
+  syncers.push(markNow);
+  tile.appendChild(grid);
+}
+
 function seasonPreview(value) {
   const tile = el('span', { class: 'season-preview', attrs: { 'aria-hidden': 'true' } });
+  if (value === 'auto') { calendarPreview(tile); return tile; }
   if (value === 'off') {
     tile.classList.add('season-preview-off');
     tile.append(el('span', { class: 'sp-bar' }), el('span', { class: 'sp-card' }));
@@ -128,13 +173,31 @@ function seasonDates(dates, live) {
   ]);
 }
 
-// The Automatic card's line: today's theme from the calendar ("Today: Halloween", or "Today: None").
-// It follows the calendar whichever card is selected, and is re-read whenever the settings are synced.
+// The next theme the calendar will set, and how many days away its first day is: the first later day
+// whose theme is not today's. { name, days } or null (a theme is never more than a year away).
+function nextSeason() {
+  const now = new Date();
+  const today = automaticSeason(now);
+  for (let i = 1; i <= 366; i++) {
+    const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    const key = automaticSeason(date);
+    if (key && key !== today) return { name: SEASON_NAMES[key], days: i };
+  }
+  return null;
+}
+
+// The Automatic card's lines: today's theme from the calendar and the next one coming ("Today: None",
+// "Next: Friday 13th – 6 days"). They follow the calendar whichever card is selected, and are re-read
+// whenever the settings are synced.
 function seasonToday() {
-  const line = seasonDates(['Today: None'], true);
-  const text = line.querySelector('.choice-when-date');
+  const line = seasonDates(['Today: None', 'Next: None'], true);
+  const [today, next] = line.querySelectorAll('.choice-when-date');
   line.setAttribute('role', 'status');
-  syncers.push(() => { text.textContent = `Today: ${SEASON_NAMES[automaticSeason()] || 'None'}`; });
+  syncers.push(() => {
+    today.textContent = `Today: ${SEASON_NAMES[automaticSeason()] || 'None'}`;
+    const upcoming = nextSeason();
+    next.textContent = upcoming ? `Next: ${upcoming.name}, ${upcoming.days} ${upcoming.days === 1 ? 'day' : 'days'}` : 'Next: None';
+  });
   return line;
 }
 

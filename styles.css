@@ -2350,6 +2350,14 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .season-preview { position: relative; display: flex; height: 64px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--r-1); background: var(--bg); }
 .season-preview canvas { flex: 1 1 0; min-width: 0; height: 100%; }
 .season-preview canvas + canvas { border-left: 1px solid var(--border); }
+.season-preview-calendar { display: block; }
+.sp-grid { position: absolute; inset: 5px 6px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(3, 1fr); gap: 3px 7px; }
+.sp-cell { display: flex; flex-direction: column; justify-content: center; gap: 2px; padding: 0 3px; border-radius: 3px; }
+.sp-cell.is-now { outline: 1px solid var(--text); outline-offset: 1px; }
+.sp-label { color: var(--text-soft); font-size: 8px; line-height: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.sp-cell.is-now .sp-label { color: var(--text); }
+.sp-mt { position: relative; height: 4px; border-radius: 2px; background: var(--surface-2); overflow: hidden; }
+.sp-run { position: absolute; top: 0; bottom: 0; min-width: 2px; background: var(--c); }
 .season-preview-off { flex-direction: column; gap: 6px; padding: 8px; }
 .sp-bar { height: 4px; width: 28%; border-radius: 2px; background: var(--text-soft); opacity: 0.6; }
 .sp-card { flex: 1; border: 1px solid var(--border-2); border-radius: 4px; background: var(--surface-2); }
