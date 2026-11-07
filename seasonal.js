@@ -8,8 +8,8 @@
    - Snowfall: snow drifts down.
    - Christmas: a string of fairy lights twinkles along the top while golden sparkles drift down.
    - Halloween: bats flap across a hazy moon while embers rise from a warm glow at the bottom.
-   - Friday 13th: mist drifts across, faint "13"s float up and fade, and every several seconds a
-     branching lightning bolt strikes down from the top and fades with a soft glow (one smooth
+   - Friday 13th: mist drifts across, faint "13"s float up and fade, and every few seconds, mostly near the
+     side margins, a branching lightning bolt strikes down from the top and fades with a soft glow (one smooth
      strike, never a flicker).
    - Reduced motion (the device setting or the Settings page): one still frame, nothing moves.
    - Nothing runs while the tab is hidden (requestAnimationFrame pauses) and nothing is drawn
@@ -30,6 +30,10 @@
   };
   const rand = (min, max) => min + random() * (max - min);
   const pick = list => list[Math.floor(random() * list.length)];
+  // A position across the width, as a fraction: usually in the side margins (the outer fifth on each side,
+  // where the page has the least on it), otherwise anywhere in the middle. share = how often a margin.
+  const marginX = (share, middleMin = 0.12, middleMax = 0.88) =>
+    random() < share ? (random() < 0.5 ? rand(0.02, 0.12) : rand(0.88, 0.98)) : rand(middleMin, middleMax);
 
   // Sparks need to glow on dark themes and to be dark and saturated enough to read on the light one.
   const SPARK_COLOURS = {
@@ -51,7 +55,7 @@
     const line = () => view.line ?? 1; // thinner strokes on the small preview tiles
 
     function launch() {
-      const x = rand(view.w * 0.12, view.w * 0.88);
+      const x = view.w * marginX(0.7);
       const targetY = rand(view.h * 0.14, view.h * 0.5);
       const riseTime = rand(0.9, 1.3); // seconds from the bottom edge to the burst
       rockets.push({
@@ -81,9 +85,9 @@
 
     function step(dt) {
       untilLaunch -= dt;
-      if (untilLaunch <= 0 && rockets.length < 3) {
+      if (untilLaunch <= 0 && rockets.length < 4) {
         launch();
-        untilLaunch = rand(0.7, 1.6);
+        untilLaunch = rand(0.45, 1.1);
       }
 
       for (let i = rockets.length - 1; i >= 0; i--) {
@@ -141,7 +145,7 @@
 
     // One frame for reduced motion: a few bursts caught partway through.
     function still() {
-      const spots = [[0.2, 0.28], [0.52, 0.18], [0.8, 0.34], [0.36, 0.52], [0.7, 0.58]];
+      const spots = [[0.1, 0.28], [0.9, 0.22], [0.5, 0.16], [0.05, 0.56], [0.95, 0.5]];
       spots.forEach(([fx, fy]) => burst(view.w * fx, view.h * fy));
       sparks.forEach(p => {
         p.age = p.life * 0.25;
@@ -228,7 +232,7 @@
     let mist = [];
     let glyphs = [];
     let clock = 0;
-    let untilFlash = 3;   // the first one comes soon, so a new choice is seen to do something
+    let untilFlash = 2;   // the first one comes soon, so a new choice is seen to do something
     let flashAge = FLASH_TIME; // = no flash showing
     let flashX = 0.5;
     let bolt = []; // the strike showing now: paths of points, each starting after a short delay
@@ -304,7 +308,7 @@
         if (g.age >= g.life) glyphs[i] = glyph(false);
       }
       untilFlash -= dt;
-      if (untilFlash <= 0) { flashAge = 0; flashX = rand(0.15, 0.85); bolt = makeBolt(view.w * flashX); untilFlash = rand(8, 15); }
+      if (untilFlash <= 0) { flashAge = 0; flashX = marginX(0.8, 0.3, 0.7); bolt = makeBolt(view.w * flashX); untilFlash = rand(5, 10); }
       if (flashAge < FLASH_TIME) flashAge += dt;
     }
 
