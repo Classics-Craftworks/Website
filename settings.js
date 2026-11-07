@@ -16,7 +16,7 @@
      data-density        compact               (absent = comfortable spacing)
      data-sidebar        left                  (absent = side panels on the right)
      data-newtab         off                   (absent = external links open in a new tab)
-     data-season         fireworks | christmas | halloween | friday13 (absent = no seasonal theme; drawn by seasonal.js)
+     data-season         fireworks | snowfall | christmas | halloween | friday13 (absent = no seasonal theme; drawn by seasonal.js)
 
    High contrast and reduced motion follow the device setting until the visitor changes them
    (stored as null = "follow the device"). */
@@ -33,7 +33,7 @@ const SETTING_CHOICES = {
   density: ['compact', 'comfortable', 'spacious'],
   // auto = follow the calendar (see automaticSeason), off = never set one automatically.
   // A theme chosen here stays on all year and overrides the automatic one.
-  seasonal: ['auto', 'fireworks', 'christmas', 'halloween', 'friday13', 'off']
+  seasonal: ['auto', 'fireworks', 'snowfall', 'christmas', 'halloween', 'friday13', 'off']
 };
 
 const SETTING_DEFAULTS = Object.freeze({
@@ -114,19 +114,23 @@ const SEASONS = {
       (month === 12 && day === 31) || (month === 1 && day === 1) ||
       (month === 7 && day === 4 && region === 'US') || (month === 11 && day === 5 && region === 'GB')
   },
+  snowfall: {
+    name: 'Snowfall', blurb: 'Falling snow.',
+    when: '1 to 17 December and 28 to 30 December.',
+    on: (month, day) => month === 12 && (day <= 17 || (day >= 28 && day <= 30))
+  },
   christmas: {
-    name: 'Christmas', blurb: 'Falling snow.',
-    when: '1 to 27 December.',
-    on: (month, day) => month === 12 && day <= 27
+    name: 'Christmas', blurb: 'Twinkling fairy lights and drifting sparkles.',
+    when: '18 to 27 December.',
+    on: (month, day) => month === 12 && day >= 18 && day <= 27
   },
   halloween: {
     name: 'Halloween', blurb: 'Bats, a hazy moon and rising embers.',
-    when: '16 October to 1 November.',
-    on: (month, day) =>
-      (month === 10 && day >= 16) || (month === 11 && day === 1)
+    when: '25 to 31 October.',
+    on: (month, day) => month === 10 && day >= 25
   },
   friday13: {
-    name: 'Friday 13th', blurb: 'Drifting mist, floating 13s and lightning bolts.',
+    name: 'Friday 13th', blurb: 'Drifting mist, floating 13s and distant lightning.',
     when: 'every Friday 13th, unless another theme is already set for that day.',
     on: (month, day, region, weekday) => day === 13 && weekday === 5
   }

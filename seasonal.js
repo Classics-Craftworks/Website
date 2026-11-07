@@ -1,11 +1,12 @@
 /* Seasonal themes: the moving (or, with reduced motion, still) picture behind the page.
 
    settings.js decides which theme is in effect and puts it on <html> as data-season
-   ("fireworks", "christmas", "halloween" or "friday13", absent = none). This file only draws it:
+   ("fireworks", "snowfall", "christmas", "halloween" or "friday13", absent = none). This file only draws it:
    a fixed, click-through <canvas> behind everything (styles.css: .season-canvas).
 
    - Fireworks: rockets rise and burst into sparks.
-   - Christmas: snow drifts down.
+   - Snowfall: snow drifts down.
+   - Christmas: a string of fairy lights twinkles along the top while golden sparkles drift down.
    - Halloween: bats flap across a hazy moon while embers rise from a warm glow at the bottom.
    - Friday 13th: mist drifts across, faint "13"s float up and fade, and every several seconds a
      branching lightning bolt strikes down from the top and fades with a soft glow (one smooth
@@ -152,7 +153,7 @@
     return { step, draw, still, resize() {} };
   }
 
-  /* ---------- Christmas ---------- */
+  /* ---------- Snowfall ---------- */
 
   function createSnow(view) {
     let flakes = [];
@@ -411,6 +412,150 @@
     return { step, draw, still, resize };
   }
 
+  /* ---------- Christmas ---------- */
+
+  const LIGHT_COLOURS = { dark: SPARK_COLOURS.dark.slice(0, 4), light: SPARK_COLOURS.light.slice(0, 4) };
+  const SPARKLE_COLOURS = { dark: '255, 236, 170', light: '201, 138, 0' };
+
+  function createChristmas(view) {
+    let sparkles = [];
+    let clock = 0;
+
+    const unit = () => view.scale ?? Math.min(1.25, Math.max(0.6, Math.min(view.w, view.h) / 760));
+    const wantedSparkles = () => view.sparkles ?? Math.round(Math.min(26, Math.max(7, (view.w * view.h) / 38000)));
+
+    function sparkle(anywhere) {
+      const life = rand(5, 9);
+      return {
+        x: rand(0, view.w), y: anywhere ? rand(0, view.h) : rand(-10, view.h * 0.2),
+        size: rand(3, 8) * unit(), fall: rand(5, 14) * unit(),
+        sway: rand(4, 12), swaySpeed: rand(0.3, 0.7), phase: rand(0, TAU),
+        twinkle: rand(0.8, 1.6), age: anywhere ? rand(0, life) : 0, life
+      };
+    }
+
+    function fill(anywhere) {
+      while (sparkles.length < wantedSparkles()) sparkles.push(sparkle(anywhere));
+      if (sparkles.length > wantedSparkles()) sparkles.length = wantedSparkles();
+    }
+
+    function step(dt) {
+      clock += dt;
+      fill(false);
+      for (let i = 0; i < sparkles.length; i++) {
+        const p = sparkles[i];
+        p.age += dt;
+        p.y += p.fall * dt;
+        if (p.age >= p.life || p.y > view.h + 10) sparkles[i] = sparkle(false);
+      }
+    }
+
+    // A four-pointed star, drawn as four curves pinched in to the middle.
+    function star(ctx, x, y, r) {
+      ctx.beginPath();
+      ctx.moveTo(x, y - r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.quadraticCurveTo(x, y, x, y + r);
+      ctx.quadraticCurveTo(x, y, x - r, y);
+      ctx.quadraticCurveTo(x, y, x, y - r);
+      ctx.fill();
+    }
+
+    // The page's sticky header covers the top of the canvas, so the string hangs from just below it (the small
+    // previews have no header and set lightsTop to 0).
+    const headerBottom = () => {
+      const header = document.getElementById('site-header');
+      return header ? Math.min(view.h * 0.3, Math.max(0, header.getBoundingClientRect().bottom)) : 0;
+    };
+
+    // The string: swags of wire hung across the top edge, a bulb every so often along each one. The
+    // positions come straight from the view size, so a resize needs no bookkeeping.
+    function drawLights(ctx, light) {
+      const u = unit();
+      const colours = LIGHT_COLOURS[light ? 'light' : 'dark'];
+      const arcs = Math.max(2, Math.round(view.w / Math.max(160 * u, 120)));
+      const arcWidth = view.w / arcs;
+      const sag = Math.min(view.h * 0.1, 30 * u + 8);
+      const top = (view.lightsTop ?? headerBottom()) + Math.max(1, 2 * u);
+      const spacing = Math.max(7, 40 * u);
+      const radius = Math.max(1.4, 4 * u);
+      const glow = radius * 4.5;
+      let index = 0;
+      const bulbs = [];
+
+      ctx.lineWidth = Math.max(0.6, 1.4 * u);
+      ctx.strokeStyle = light ? 'rgba(30, 36, 58, 0.45)' : 'rgba(210, 220, 245, 0.22)';
+      for (let a = 0; a < arcs; a++) {
+        const x0 = a * arcWidth;
+        const x1 = x0 + arcWidth;
+        ctx.beginPath();
+        ctx.moveTo(x0, top);
+        ctx.quadraticCurveTo((x0 + x1) / 2, top + sag * 2, x1, top);
+        ctx.stroke();
+        const count = Math.max(2, Math.round(arcWidth / spacing));
+        for (let i = 1; i < count; i++) {
+          const t = i / count;
+          const px = (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * ((x0 + x1) / 2) + t * t * x1;
+          const py = (1 - t) * (1 - t) * top + 2 * (1 - t) * t * (top + sag * 2) + t * t * top;
+          bulbs.push([px, py + radius * 1.4, index++]);
+        }
+      }
+
+      ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
+      bulbs.forEach(([x, y, i]) => {
+        const colour = colours[i % colours.length];
+        // slow, smooth swell and fade: a bulb takes several seconds to go from bright to dim
+        const level = 0.6 + 0.4 * Math.sin(clock * (0.7 + (i % 5) * 0.17) + i * 2.4);
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, glow);
+        grad.addColorStop(0, colour);
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.globalAlpha = (light ? 0.3 : 0.42) * level;
+        ctx.fillStyle = grad;
+        ctx.fillRect(x - glow, y - glow, glow * 2, glow * 2);
+      });
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+      bulbs.forEach(([x, y, i]) => {
+        const level = 0.6 + 0.4 * Math.sin(clock * (0.7 + (i % 5) * 0.17) + i * 2.4);
+        ctx.fillStyle = colours[i % colours.length];
+        ctx.globalAlpha = 0.55 + 0.45 * level;
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, TAU);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function draw(ctx) {
+      const light = isLight();
+      drawLights(ctx, light);
+
+      const rgb = SPARKLE_COLOURS[light ? 'light' : 'dark'];
+      sparkles.forEach(p => {
+        const fade = Math.sin(Math.PI * Math.min(1, p.age / p.life));
+        const twinkle = 0.55 + 0.45 * Math.sin(clock * p.twinkle * 2 + p.phase);
+        ctx.fillStyle = `rgba(${rgb}, ${(fade * twinkle * (light ? 0.8 : 0.95)).toFixed(3)})`;
+        star(ctx, p.x + Math.sin(clock * p.swaySpeed + p.phase) * p.sway, p.y, p.size * (0.7 + 0.3 * twinkle));
+      });
+    }
+
+    // One frame for reduced motion: the lights part-way through their glow and sparkles scattered about.
+    function still() {
+      sparkles = [];
+      fill(true);
+      clock = 3;
+    }
+
+    fill(true);
+
+    function resize(oldW, oldH) {
+      if (!oldW || !oldH) return;
+      sparkles.forEach(p => { p.x = (p.x / oldW) * view.w; p.y = (p.y / oldH) * view.h; });
+    }
+
+    return { step, draw, still, resize };
+  }
+
   /* ---------- Halloween ---------- */
 
   const EMBER_COLOURS = { dark: '255, 150, 50', light: '214, 100, 20' };
@@ -582,7 +727,7 @@
     return { step, draw, still, resize };
   }
 
-  const EFFECTS = { fireworks: createFireworks, christmas: createSnow, halloween: createHalloween, friday13: createFriday13 };
+  const EFFECTS = { fireworks: createFireworks, snowfall: createSnow, christmas: createChristmas, halloween: createHalloween, friday13: createFriday13 };
 
   /* ---------- Running ---------- */
 
@@ -691,7 +836,7 @@
      reduced motion it never moves. Looks after itself; returns nothing. */
   window.mountSeasonPreview = (previewCanvas, season) => {
     const pctx = previewCanvas.getContext('2d');
-    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, embers: 7 };
+    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, embers: 7, sparkles: 6, lightsTop: 0 };
     let peffect = null;
     let pframe = 0;
     let plast = 0;
@@ -719,7 +864,7 @@
     // The same picture every time (seeded), so it never changes behind the person's back: not when they
     // choose a card, and not when the pointer leaves again.
     function showStill() {
-      random = seeded({ fireworks: 11, christmas: 5, halloween: 31, friday13: 13 }[season] || 5);
+      random = seeded({ fireworks: 11, snowfall: 5, christmas: 25, halloween: 31, friday13: 13 }[season] || 5);
       try {
         peffect = EFFECTS[season](pview);
         peffect.still();
