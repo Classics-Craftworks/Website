@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.6.1 — 2026-11-07
+
+### Added
+- Seasonal theme calendar as Automatic theme preview
+- Name of next seasonal theme to Automatic option
+
+### Changed
+- Improved how dates are listed on seasonal theme settings
+- Updated Halloween theme to appear between 16 October - 1 November
+- Changed Friday 13th theme description from "distant lightning" to "lightning bolts"
+
 ## v4.6.0 — 2026-11-07
 
 ### Added
@@ -11,7 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
   - Friday 13th: Drifting mist, floating 13s and lightning bolts
     - Automatically enabled every Friday 13th, unless another theme is already active
   - Halloween: Bats, a hazy moon and rising embers
-    - Automatically enabled between 16 October - 1 November
+    - Automatically enabled between 25 - 31 October
 - New Christmas theme, with twinkling lights, decorated pine trees and falling sparkles
     - Automatically enabled between 18 - 27 December
 - Placeholder for "Late Autumn/Fall" theme, coming soon
