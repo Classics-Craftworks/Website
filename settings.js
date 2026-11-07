@@ -126,11 +126,11 @@ const SEASONS = {
   },
   halloween: {
     name: 'Halloween', blurb: 'Bats, a hazy moon and rising embers.',
-    when: '25 to 31 October.',
-    on: (month, day) => month === 10 && day >= 25
+    when: '16 October to 1 November.',
+    on: (month, day) => (month === 10 && day >= 16) || (month === 11 && day === 1)
   },
   friday13: {
-    name: 'Friday 13th', blurb: 'Drifting mist, floating 13s and distant lightning.',
+    name: 'Friday 13th', blurb: 'Drifting mist, floating 13s and lightning bolts.',
     when: 'every Friday 13th, unless another theme is already set for that day.',
     on: (month, day, region, weekday) => day === 13 && weekday === 5
   }
