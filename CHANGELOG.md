@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.6.0 — 2026-11-07
+
+### Added
+- More seasonal themes:
+  - Friday 13th: Drifting mist, floating 13s and lightning bolts
+    - Automatically enabled every Friday 13th, unless another theme is already active
+  - Halloween: Bats, a hazy moon and rising embers
+    - Automatically enabled between 16 October - 1 November
+- New Christmas theme, with twinkling lights, decorated pine trees and falling sparkles
+    - Automatically enabled between 18 - 27 December
+- Placeholder for "Late Autumn/Fall" theme, coming soon
+
+### Changed
+- Renamed old Christmas theme to "Snowfall"
+  - Now automatically enabled between 1 - 17 December and 28 - 30 December
+- On desktop, the Fireworks theme is now more likely to spawn fireworks in the margins where they're visible
+
 ## v4.5.0 — 2026-11-06
 
 ### Added
