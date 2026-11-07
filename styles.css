@@ -2496,6 +2496,10 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 }
 
 /* Seasonal theme placeholders ("Coming Soon"): visible but not selectable. */
+/* Seasonal theme card: when it is set automatically (clock icon + short dates, one per line). */
+.choice-when { display: grid; grid-template-columns: auto 1fr; column-gap: var(--s-2); align-items: start; margin-top: var(--s-1); color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); font-variant-numeric: tabular-nums; }
+.choice-when-icon { grid-row: 1 / span 4; display: inline-flex; align-items: center; height: var(--lh-xs); color: var(--accent); }
+.choice-when-date { grid-column: 2; color: var(--text); }
 .choice.is-soon { cursor: default; opacity: 0.6; }
 @media (hover: hover) { .choice.is-soon:hover { border-color: var(--border); } }
 .season-preview-soon { background: repeating-linear-gradient(135deg, var(--bg) 0 8px, var(--surface-2) 8px 16px); border-style: dashed; }

@@ -115,6 +115,29 @@ function seasonPreview(value) {
   return tile;
 }
 
+// "When it's automatic", on its own line under the blurb: a clock icon and short date labels. The text
+// is read out in full ("Automatic on: ...") rather than as an unlabelled icon.
+const CLOCK_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.25"/><path d="M8 4.5V8l2.25 1.5"/></svg>';
+function seasonDates(dates, live) {
+  const icon = el('span', { class: 'choice-when-icon', attrs: { 'aria-hidden': 'true' } });
+  icon.innerHTML = CLOCK_ICON; // fixed markup above, nothing from outside
+  return el('span', { class: 'choice-when' }, [
+    icon,
+    live ? null : el('span', { class: 'visually-hidden', text: 'Automatic on: ' }),
+    ...dates.map(d => el('span', { class: 'choice-when-date', text: d }))
+  ]);
+}
+
+// The Automatic card's line: today's theme from the calendar ("Today: Halloween", or "Today: None").
+// It follows the calendar whichever card is selected, and is re-read whenever the settings are synced.
+function seasonToday() {
+  const line = seasonDates(['Today: None'], true);
+  const text = line.querySelector('.choice-when-date');
+  line.setAttribute('role', 'status');
+  syncers.push(() => { text.textContent = `Today: ${SEASON_NAMES[automaticSeason()] || 'None'}`; });
+  return line;
+}
+
 const SEASON_OPTIONS = [
   { value: 'auto', name: 'Automatic', note: 'Each theme is set automatically on specific dates.' },
   // Calendar order. Names that aren't in SEASONS are placeholders for themes still to come: shown greyed
@@ -122,7 +145,7 @@ const SEASON_OPTIONS = [
   ...['fireworks', 'April Fools', 'Easter', 'friday13', 'halloween', 'Late Autumn/Fall', 'snowfall', 'christmas'].map(key => {
     const season = SEASONS[key];
     return season
-      ? { value: key, name: season.name, note: `${season.blurb} Automatically enabled on ${season.when}` }
+      ? { value: key, name: season.name, note: season.blurb, dates: season.dates }
       : { value: 'soon-' + key, name: key, soon: true, note: 'Not available yet.' };
   }),
   { value: 'off', name: 'Off', note: 'No seasonal theme, and none set automatically.' }
@@ -142,25 +165,16 @@ const SEASON_OPTIONS = [
       input,
       seasonPreview(o.value),
       el('span', { class: 'choice-head' }, [el('span', { class: 'choice-name', text: o.name }), radioMark()]),
-      el('span', { class: 'choice-note', text: o.note })
+      el('span', { class: 'choice-note', text: o.note }),
+      (o.value === 'auto' ? seasonToday() : o.dates && seasonDates(o.dates))
     ]);
   }
 }));
 
 function seasonalRow() {
-  const status = el('span', { class: 'setting-status', attrs: { role: 'status' } });
-  syncers.push(() => {
-    const choice = getSettings().seasonal;
-    const name = SEASON_NAMES[effectiveSeason()];
-    status.textContent =
-      choice === 'off' ? 'Seasonal themes are off, including automatic ones.'
-      : choice === 'auto' ? (name ? `${name} is on today.` : 'No seasonal theme is active today.')
-      : `${name} is on until you change this.`;
-  });
   return choiceRow({
     key: 'seasonal', title: 'Seasonal theme', groupClass: 'choices-season', options: SEASON_OPTIONS,
-    description: 'Festive looks for certain times of the year. Choosing one yourself overrides Automatic, and works at any time of year. With reduced motion on, they show as a still picture.',
-    extra: el('div', { class: 'setting-extra' }, [status])
+    description: 'Festive looks for certain times of the year. Choosing one yourself overrides Automatic, and works at any time of year. With reduced motion on, they show as a still picture.'
   });
 }
 
