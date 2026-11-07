@@ -16,7 +16,7 @@
      data-density        compact               (absent = comfortable spacing)
      data-sidebar        left                  (absent = side panels on the right)
      data-newtab         off                   (absent = external links open in a new tab)
-     data-season         fireworks | christmas (absent = no seasonal theme; drawn by seasonal.js)
+     data-season         fireworks | christmas | halloween | friday13 (absent = no seasonal theme; drawn by seasonal.js)
 
    High contrast and reduced motion follow the device setting until the visitor changes them
    (stored as null = "follow the device"). */
@@ -32,8 +32,8 @@ const SETTING_CHOICES = {
   textSize: ['small', 'default', 'large'],
   density: ['compact', 'comfortable', 'spacious'],
   // auto = follow the calendar (see automaticSeason), off = never set one automatically.
-  // Fireworks or Christmas chosen here stay on all year and override the automatic one.
-  seasonal: ['auto', 'fireworks', 'christmas', 'off']
+  // A theme chosen here stays on all year and overrides the automatic one.
+  seasonal: ['auto', 'fireworks', 'christmas', 'halloween', 'friday13', 'off']
 };
 
 const SETTING_DEFAULTS = Object.freeze({
@@ -102,8 +102,10 @@ function effectiveTheme(s = getSettings()) {
    add its name to SETTING_CHOICES.seasonal). The Settings page builds its cards from this list.
      name, blurb        shown on the theme's card (its preview is the effect itself, from seasonal.js)
      when               the dates it is set automatically, in words, shown on its card
-     on(month, day, region)  true on a date it is set automatically (the visitor's local date;
-                             region is "US", "GB" or ""). The first theme that matches wins. */
+     on(month, day, region, weekday)  true on a date it is set automatically (the visitor's local date;
+                             region is "US", "GB" or ""; weekday is 0 = Sunday to 6 = Saturday).
+                             The first theme that matches wins, so the order here is the priority: a theme
+                             that should give way to the others (Friday 13th) goes last. */
 const SEASONS = {
   fireworks: {
     name: 'Fireworks', blurb: 'Rockets and sparks.',
@@ -116,6 +118,17 @@ const SEASONS = {
     name: 'Christmas', blurb: 'Falling snow.',
     when: '1 to 27 December.',
     on: (month, day) => month === 12 && day <= 27
+  },
+  halloween: {
+    name: 'Halloween', blurb: 'Bats, a hazy moon and rising embers.',
+    when: '16 October to 1 November.',
+    on: (month, day) =>
+      (month === 10 && day >= 16) || (month === 11 && day === 1)
+  },
+  friday13: {
+    name: 'Friday 13th', blurb: 'Drifting mist, floating 13s and lightning bolts.',
+    when: 'every Friday 13th, unless another theme is already set for that day.',
+    on: (month, day, region, weekday) => day === 13 && weekday === 5
   }
 };
 const SEASON_NAMES = Object.fromEntries(Object.entries(SEASONS).map(([key, season]) => [key, season.name]));
@@ -156,7 +169,8 @@ function visitorRegion() {
 function automaticSeason(date = new Date(), region = visitorRegion()) {
   const month = date.getMonth() + 1;
   const day = date.getDate();
-  return Object.keys(SEASONS).find(key => SEASONS[key].on(month, day, region)) || '';
+  const weekday = date.getDay();
+  return Object.keys(SEASONS).find(key => SEASONS[key].on(month, day, region, weekday)) || '';
 }
 
 function effectiveSeason(s = getSettings()) {

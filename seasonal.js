@@ -1,11 +1,15 @@
 /* Seasonal themes: the moving (or, with reduced motion, still) picture behind the page.
 
    settings.js decides which theme is in effect and puts it on <html> as data-season
-   ("fireworks" or "christmas", absent = none). This file only draws it:
+   ("fireworks", "christmas", "halloween" or "friday13", absent = none). This file only draws it:
    a fixed, click-through <canvas> behind everything (styles.css: .season-canvas).
 
    - Fireworks: rockets rise and burst into sparks.
    - Christmas: snow drifts down.
+   - Halloween: bats flap across a hazy moon while embers rise from a warm glow at the bottom.
+   - Friday 13th: mist drifts across, faint "13"s float up and fade, and every several seconds a
+     branching lightning bolt strikes down from the top and fades with a soft glow (one smooth
+     strike, never a flicker).
    - Reduced motion (the device setting or the Settings page): one still frame, nothing moves.
    - Nothing runs while the tab is hidden (requestAnimationFrame pauses) and nothing is drawn
      when there is no seasonal theme: the canvas is removed.
@@ -210,7 +214,375 @@
     return { step, draw, still, resize };
   }
 
-  const EFFECTS = { fireworks: createFireworks, christmas: createSnow };
+  /* ---------- Friday 13th ---------- */
+
+  // Mist and lightning colours as "r, g, b"; the light theme needs darker, duller ones to show at all.
+  const MIST_COLOURS = { dark: '150, 110, 225', light: '88, 60, 150' };
+  const GLYPH_COLOURS = { dark: '205, 185, 255', light: '70, 45, 130' };
+  const FLASH_COLOURS = { dark: '190, 170, 255', light: '70, 50, 130' };
+  const FLASH_TIME = 1.6; // seconds for a whole strike: a quick swell, then a slow fade
+  const STRIKE_TIME = 0.16; // seconds the bolt takes to reach the ground
+
+  function createFriday13(view) {
+    let mist = [];
+    let glyphs = [];
+    let clock = 0;
+    let untilFlash = 3;   // the first one comes soon, so a new choice is seen to do something
+    let flashAge = FLASH_TIME; // = no flash showing
+    let flashX = 0.5;
+    let bolt = []; // the strike showing now: paths of points, each starting after a short delay
+
+    const unit = () => view.scale ?? Math.min(1.25, Math.max(0.6, Math.min(view.w, view.h) / 760));
+    const wantedMist = () => view.mist ?? 6;
+    const wantedGlyphs = () => view.glyphs ?? Math.round(Math.min(18, Math.max(5, (view.w * view.h) / 70000)));
+
+    function wisp() {
+      return {
+        x: rand(0, view.w), y: rand(view.h * 0.2, view.h * 1.05),
+        r: Math.max(view.w, view.h) * rand(0.22, 0.4),
+        vx: rand(5, 14) * unit() * (random() < 0.5 ? -1 : 1),
+        alpha: rand(0.07, 0.13), swaySpeed: rand(0.15, 0.4), phase: rand(0, TAU)
+      };
+    }
+
+    function glyph(anywhere) {
+      const life = rand(7, 12);
+      return {
+        x: rand(view.w * 0.04, view.w * 0.96), y: anywhere ? rand(view.h * 0.1, view.h) : rand(view.h * 0.7, view.h + 20),
+        size: rand(16, 40) * unit(), rise: rand(8, 20) * unit(),
+        sway: rand(4, 14), swaySpeed: rand(0.3, 0.8), phase: rand(0, TAU),
+        tilt: rand(-0.35, 0.35), age: anywhere ? rand(0, life) : 0, life, peak: rand(0.18, 0.38)
+      };
+    }
+
+    // A jagged path from (x, y) heading down to endY, wandering sideways; lean pushes it one way.
+    function jagged(x, y, endY, lean, segment) {
+      const pts = [[x, y]];
+      while (y < endY) {
+        y = Math.min(endY, y + segment * rand(0.6, 1.4));
+        x += rand(-1, 1) * segment * 0.7 + lean * segment * 0.25;
+        pts.push([x, y]);
+      }
+      return pts;
+    }
+
+    // A bolt from the top edge with a few side branches that start a moment after the point they split from.
+    function makeBolt(x) {
+      const segment = Math.max(6, view.h / 20);
+      const main = jagged(x, -4, view.h * rand(0.5, 0.85), rand(-0.6, 0.6), segment);
+      const paths = [{ pts: main, delay: 0, width: 1 }];
+      const branches = Math.round(rand(2, 4));
+      for (let i = 0; i < branches; i++) {
+        const at = Math.floor(rand(2, main.length - 2));
+        const [bx, by] = main[at];
+        const pts = jagged(bx, by, Math.min(view.h, by + view.h * rand(0.15, 0.3)), (random() < 0.5 ? -1 : 1) * rand(0.8, 1.6), segment * 0.8);
+        paths.push({ pts, delay: (at / (main.length - 1)) * STRIKE_TIME, width: 0.55 });
+      }
+      return paths;
+    }
+
+    function fill(anywhere) {
+      while (mist.length < wantedMist()) mist.push(wisp());
+      if (mist.length > wantedMist()) mist.length = wantedMist();
+      while (glyphs.length < wantedGlyphs()) glyphs.push(glyph(anywhere));
+      if (glyphs.length > wantedGlyphs()) glyphs.length = wantedGlyphs();
+    }
+
+    function step(dt) {
+      clock += dt;
+      fill(false);
+      mist.forEach(m => {
+        m.x += m.vx * dt;
+        if (m.vx > 0 && m.x - m.r > view.w) m.x = -m.r;
+        else if (m.vx < 0 && m.x + m.r < 0) m.x = view.w + m.r;
+      });
+      for (let i = 0; i < glyphs.length; i++) {
+        const g = glyphs[i];
+        g.age += dt;
+        g.y -= g.rise * dt;
+        if (g.age >= g.life) glyphs[i] = glyph(false);
+      }
+      untilFlash -= dt;
+      if (untilFlash <= 0) { flashAge = 0; flashX = rand(0.15, 0.85); bolt = makeBolt(view.w * flashX); untilFlash = rand(8, 15); }
+      if (flashAge < FLASH_TIME) flashAge += dt;
+    }
+
+    // 0 to 1: up in a quarter of a second, then down slowly. Gentle on purpose (no strobing).
+    const flashLevel = () => {
+      if (flashAge >= FLASH_TIME) return 0;
+      const t = flashAge / FLASH_TIME;
+      return t < 0.15 ? t / 0.15 : Math.pow(1 - (t - 0.15) / 0.85, 2);
+    };
+
+    // Draws the part of each path the strike has reached so far, as a wide soft glow under a thin bright core.
+    function drawBolt(ctx, light, level) {
+      if (!bolt.length) return;
+      const rgb = FLASH_COLOURS[light ? 'light' : 'dark'];
+      const core = light ? '56, 36, 112' : '245, 238, 255';
+      const unitLine = view.line ?? 1;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
+      [[11, rgb, 0.3], [3, core, 0.95]].forEach(([width, colour, alpha]) => {
+        ctx.strokeStyle = `rgba(${colour}, ${(alpha * level).toFixed(3)})`;
+        bolt.forEach(path => {
+          const reached = Math.min(1, Math.max(0, (flashAge - path.delay) / STRIKE_TIME));
+          if (reached <= 0) return;
+          const last = (path.pts.length - 1) * reached;
+          ctx.lineWidth = Math.max(0.6, width * path.width * unitLine * (view.scale ? 1 : 0.9));
+          ctx.beginPath();
+          ctx.moveTo(path.pts[0][0], path.pts[0][1]);
+          for (let i = 1; i <= Math.floor(last); i++) ctx.lineTo(path.pts[i][0], path.pts[i][1]);
+          const whole = Math.floor(last);
+          if (whole < path.pts.length - 1) {
+            const a = path.pts[whole];
+            const b = path.pts[whole + 1];
+            const f = last - whole;
+            ctx.lineTo(a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f);
+          }
+          ctx.stroke();
+        });
+      });
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function draw(ctx) {
+      const light = isLight();
+
+      const mistRgb = MIST_COLOURS[light ? 'light' : 'dark'];
+      mist.forEach(m => {
+        const y = m.y + Math.sin(clock * m.swaySpeed + m.phase) * m.r * 0.12;
+        const grad = ctx.createRadialGradient(m.x, y, 0, m.x, y, m.r);
+        grad.addColorStop(0, `rgba(${mistRgb}, ${m.alpha * (light ? 0.8 : 1)})`);
+        grad.addColorStop(1, `rgba(${mistRgb}, 0)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(m.x - m.r, y - m.r, m.r * 2, m.r * 2);
+      });
+
+      const glyphRgb = GLYPH_COLOURS[light ? 'light' : 'dark'];
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      glyphs.forEach(g => {
+        const fade = Math.sin(Math.PI * Math.min(1, g.age / g.life)); // in, then out
+        if (fade <= 0.01) return;
+        ctx.save();
+        ctx.translate(g.x + Math.sin(clock * g.swaySpeed + g.phase) * g.sway, g.y);
+        ctx.rotate(g.tilt);
+        ctx.font = `700 ${g.size.toFixed(1)}px Minercraftory, Inter, sans-serif`;
+        ctx.fillStyle = `rgba(${glyphRgb}, ${(g.peak * fade * (light ? 0.8 : 1)).toFixed(3)})`;
+        ctx.fillText('13', 0, 0);
+        ctx.restore();
+      });
+
+      const level = flashLevel();
+      if (level > 0) {
+        drawBolt(ctx, light, level);
+        const flashRgb = FLASH_COLOURS[light ? 'light' : 'dark'];
+        const reach = Math.max(view.w, view.h) * 0.9;
+        const x = view.w * flashX;
+        const grad = ctx.createRadialGradient(x, 0, 0, x, 0, reach);
+        grad.addColorStop(0, `rgba(${flashRgb}, ${(0.2 * level).toFixed(3)})`);
+        grad.addColorStop(1, `rgba(${flashRgb}, 0)`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, view.w, view.h);
+      }
+    }
+
+    // One frame for reduced motion: mist and a scatter of 13s, no lightning.
+    function still() {
+      mist = []; glyphs = [];
+      fill(true);
+      glyphs.forEach(g => { g.age = g.life * rand(0.3, 0.7); });
+      flashX = 0.68;
+      bolt = makeBolt(view.w * flashX);
+      flashAge = 0.35; // reduced motion still gets the picture, caught as it fades
+      untilFlash = Infinity;
+    }
+
+    fill(true);
+
+    // A resized window keeps its mist and numbers, spread over the new size.
+    function resize(oldW, oldH) {
+      if (!oldW || !oldH) return;
+      mist.forEach(m => { m.x = (m.x / oldW) * view.w; m.y = (m.y / oldH) * view.h; m.r = Math.max(view.w, view.h) * (m.r / Math.max(oldW, oldH)); });
+      glyphs.forEach(g => { g.x = (g.x / oldW) * view.w; g.y = (g.y / oldH) * view.h; });
+    }
+
+    return { step, draw, still, resize };
+  }
+
+  /* ---------- Halloween ---------- */
+
+  const EMBER_COLOURS = { dark: '255, 150, 50', light: '214, 100, 20' };
+
+  function createHalloween(view) {
+    let bats = [];
+    let embers = [];
+    let clock = 0;
+
+    const unit = () => view.scale ?? Math.min(1.25, Math.max(0.6, Math.min(view.w, view.h) / 760));
+    const wantedBats = () => view.bats ?? Math.round(Math.min(6, Math.max(2, view.w / 260)));
+    const wantedEmbers = () => view.embers ?? Math.round(Math.min(60, Math.max(14, (view.w * view.h) / 14000)));
+
+    function bat(anywhere) {
+      const dir = random() < 0.5 ? -1 : 1;
+      const size = rand(20, 38) * unit();
+      return {
+        dir, size,
+        x: anywhere ? rand(0, view.w) : (dir > 0 ? -size * 2 : view.w + size * 2),
+        y: rand(view.h * 0.08, view.h * 0.6),
+        speed: rand(55, 120) * unit(),
+        bob: rand(10, 30) * unit(), bobSpeed: rand(0.8, 1.8), phase: rand(0, TAU),
+        flapSpeed: rand(14, 20), // radians a second: about 2 to 3 flaps a second, never a flicker
+        base: 0
+      };
+    }
+
+    function ember(anywhere) {
+      const life = rand(5, 9);
+      return {
+        x: rand(0, view.w), y: anywhere ? rand(view.h * 0.2, view.h) : view.h + 6,
+        size: rand(0.9, 2.4) * (view.line ?? 1), rise: rand(14, 34) * unit(),
+        sway: rand(6, 18), swaySpeed: rand(0.4, 1), phase: rand(0, TAU),
+        age: anywhere ? rand(0, life) : 0, life, peak: rand(0.4, 0.9)
+      };
+    }
+
+    function fill(anywhere) {
+      while (bats.length < wantedBats()) bats.push(bat(anywhere));
+      if (bats.length > wantedBats()) bats.length = wantedBats();
+      while (embers.length < wantedEmbers()) embers.push(ember(anywhere));
+      if (embers.length > wantedEmbers()) embers.length = wantedEmbers();
+    }
+
+    function step(dt) {
+      clock += dt;
+      fill(false);
+      for (let i = 0; i < bats.length; i++) {
+        const b = bats[i];
+        b.x += b.dir * b.speed * dt;
+        b.base = Math.sin(clock * b.bobSpeed + b.phase) * b.bob;
+        if ((b.dir > 0 && b.x > view.w + b.size * 2) || (b.dir < 0 && b.x < -b.size * 2)) bats[i] = bat(false);
+      }
+      for (let i = 0; i < embers.length; i++) {
+        const e = embers[i];
+        e.age += dt;
+        e.y -= e.rise * dt;
+        if (e.age >= e.life || e.y < -6) embers[i] = ember(false);
+      }
+    }
+
+    // One bat, facing the way it flies; flap runs from -1 (wings down) to 1 (wings up). Every part is filled on
+    // its own: parts drawn as one path cancel each other out where they overlap and leave holes.
+    function drawBat(ctx, x, y, s, flap) {
+      const tipY = -0.1 * s - 0.55 * s * flap;
+      const baseY = 0.1 * s - 0.12 * s * flap;
+
+      [-1, 1].forEach(side => {
+        const tip = [side * s, tipY];
+        const a = [side * 0.68 * s, baseY + 0.05 * s];
+        const b = [side * 0.4 * s, baseY + 0.13 * s];
+        const c = [side * 0.08 * s, 0.26 * s];
+        // each scallop dips in towards the wing: its control point is lifted above the straight line
+        const scallop = (from, to) => ctx.quadraticCurveTo((from[0] + to[0]) / 2, (from[1] + to[1]) / 2 - 0.1 * s, to[0], to[1]);
+        ctx.beginPath();
+        ctx.moveTo(side * 0.06 * s, -0.12 * s);
+        ctx.quadraticCurveTo(side * 0.5 * s, -0.5 * s - 0.35 * s * flap, tip[0], tip[1]);
+        scallop(tip, a);
+        scallop(a, b);
+        scallop(b, c);
+        ctx.closePath();
+        ctx.fill();
+      });
+
+      // body, head and ears
+      ctx.beginPath();
+      ctx.ellipse(0, 0.06 * s, 0.12 * s, 0.26 * s, 0, 0, TAU);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, -0.22 * s, 0.11 * s, 0, TAU);
+      ctx.fill();
+      [-1, 1].forEach(side => {
+        ctx.beginPath();
+        ctx.moveTo(side * 0.11 * s, -0.24 * s);
+        ctx.lineTo(side * 0.09 * s, -0.44 * s);
+        ctx.lineTo(side * 0.0 * s, -0.31 * s);
+        ctx.closePath();
+        ctx.fill();
+      });
+    }
+
+    function draw(ctx) {
+      const light = isLight();
+      const glowRgb = EMBER_COLOURS[light ? 'light' : 'dark'];
+
+      // The moon, large and hazy, high on the right (bats cross in front of it): a pale disc with faint
+      // craters inside a soft glow of the same colour.
+      const mx = view.w * 0.8;
+      const my = view.h * 0.22;
+      const mr = Math.min(view.w, view.h) * 0.13 + 6;
+      const haloRgb = light ? '222, 196, 130' : '255, 243, 210';
+      const halo = ctx.createRadialGradient(mx, my, mr * 0.4, mx, my, mr * 3.2);
+      halo.addColorStop(0, `rgba(${haloRgb}, ${light ? 0.34 : 0.2})`);
+      halo.addColorStop(1, `rgba(${haloRgb}, 0)`);
+      ctx.fillStyle = halo;
+      ctx.fillRect(mx - mr * 3.2, my - mr * 3.2, mr * 6.4, mr * 6.4);
+      ctx.fillStyle = light ? 'rgba(206, 190, 148, 0.55)' : 'rgba(238, 234, 218, 0.3)';
+      ctx.beginPath();
+      ctx.arc(mx, my, mr, 0, TAU);
+      ctx.fill();
+      ctx.fillStyle = light ? 'rgba(120, 100, 60, 0.12)' : 'rgba(60, 64, 90, 0.2)';
+      [[-0.32, -0.28, 0.2], [0.28, -0.05, 0.14], [-0.1, 0.38, 0.17], [0.38, 0.4, 0.09]].forEach(([dx, dy, r]) => {
+        ctx.beginPath();
+        ctx.arc(mx + dx * mr, my + dy * mr, r * mr, 0, TAU);
+        ctx.fill();
+      });
+
+      // A warm glow along the bottom edge, where the embers come from.
+      const ground = ctx.createLinearGradient(0, view.h, 0, view.h * 0.55);
+      ground.addColorStop(0, `rgba(${glowRgb}, ${light ? 0.16 : 0.2})`);
+      ground.addColorStop(1, `rgba(${glowRgb}, 0)`);
+      ctx.fillStyle = ground;
+      ctx.fillRect(0, view.h * 0.55, view.w, view.h * 0.45);
+
+      embers.forEach(e => {
+        const fade = Math.sin(Math.PI * Math.min(1, e.age / e.life));
+        const twinkle = 0.75 + 0.25 * Math.sin(clock * 5 + e.phase);
+        ctx.fillStyle = `rgba(${glowRgb}, ${(e.peak * fade * twinkle * (light ? 0.8 : 1)).toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(e.x + Math.sin(clock * e.swaySpeed + e.phase) * e.sway, e.y, e.size, 0, TAU);
+        ctx.fill();
+      });
+
+      ctx.fillStyle = light ? 'rgba(42, 26, 64, 0.8)' : 'rgb(58, 38, 88)';
+      bats.forEach(b => {
+        ctx.save();
+        ctx.translate(b.x, b.y + b.base);
+        ctx.scale(b.dir, 1);
+        const flap = b.flap ?? Math.sin(clock * b.flapSpeed + b.phase);
+        drawBat(ctx, 0, 0, b.size, flap);
+        ctx.restore();
+      });
+    }
+
+    // One frame for reduced motion: bats caught mid-flight, wings at assorted angles.
+    function still() {
+      bats = []; embers = [];
+      fill(true);
+      bats.forEach((b, i) => { b.flap = [0.7, -0.4, 0.3, -0.8, 0.5, 0][i % 6]; b.base = 0; });
+    }
+
+    fill(true);
+
+    function resize(oldW, oldH) {
+      if (!oldW || !oldH) return;
+      [...bats, ...embers].forEach(o => { o.x = (o.x / oldW) * view.w; o.y = (o.y / oldH) * view.h; });
+    }
+
+    return { step, draw, still, resize };
+  }
+
+  const EFFECTS = { fireworks: createFireworks, christmas: createSnow, halloween: createHalloween, friday13: createFriday13 };
 
   /* ---------- Running ---------- */
 
@@ -319,7 +691,7 @@
      reduced motion it never moves. Looks after itself; returns nothing. */
   window.mountSeasonPreview = (previewCanvas, season) => {
     const pctx = previewCanvas.getContext('2d');
-    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14 };
+    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, embers: 7 };
     let peffect = null;
     let pframe = 0;
     let plast = 0;
@@ -347,7 +719,7 @@
     // The same picture every time (seeded), so it never changes behind the person's back: not when they
     // choose a card, and not when the pointer leaves again.
     function showStill() {
-      random = seeded(season === 'fireworks' ? 11 : 5);
+      random = seeded({ fireworks: 11, christmas: 5, halloween: 31, friday13: 13 }[season] || 5);
       try {
         peffect = EFFECTS[season](pview);
         peffect.still();
