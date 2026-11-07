@@ -104,7 +104,7 @@ function systemSwitch(key, query, mainInput, effectiveValue) {
 // month outlined. Built from SEASONS' own rules (so it can never disagree with them): every day is tested,
 // in both fireworks regions, and runs of days become bars. Friday 13th depends on the weekday, so it is
 // checked against the current year's calendar.
-const SEASON_COLORS = { fireworks: '#fbbf24', snowfall: '#7dd3fc', christmas: '#f87171', halloween: '#fb923c', friday13: '#a78bfa' };
+const SEASON_COLORS = { fireworks: '#4ade80', snowfall: '#7dd3fc', christmas: '#f87171', halloween: '#fb923c', friday13: '#a78bfa' };
 const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // a plain year: 29 Feb has no theme
 
