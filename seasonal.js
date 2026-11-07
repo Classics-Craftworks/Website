@@ -707,6 +707,7 @@
       fill(false);
       for (let i = 0; i < bats.length; i++) {
         const b = bats[i];
+        b.flap = null; // a still frame fixes the wings; once anything moves they go back to flapping
         b.x += b.dir * b.speed * dt;
         b.base = Math.sin(clock * b.bobSpeed + b.phase) * b.bob;
         if ((b.dir > 0 && b.x > view.w + b.size * 2) || (b.dir < 0 && b.x < -b.size * 2)) bats[i] = bat(false);
