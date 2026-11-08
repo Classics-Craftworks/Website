@@ -2308,6 +2308,8 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .choices-font { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .choices-density { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .choices-season { grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); } /* grows with the number of themes */
+.choices-season.is-collapsed { grid-template-columns: repeat(2, minmax(0, 1fr)); } /* the four cards: 2 x 2, or in a row when wide */
+@media (min-width: 1000px) { .choices-season.is-collapsed { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .choices-size { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .choices-date { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-2) var(--s-3); }
 .choices-accent { display: flex; flex-wrap: wrap; gap: var(--s-2); }
@@ -2537,6 +2539,13 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .choice.is-soon { cursor: default; opacity: 0.6; }
 @media (hover: hover) { .choice.is-soon:hover { border-color: var(--border); } }
 .season-preview-soon { background: repeating-linear-gradient(135deg, var(--bg) 0 8px, var(--surface-2) 8px 16px); border-style: dashed; }
+.choice[hidden] { display: none; }
+.season-more { display: flex; }
+.season-toggle { width: 100%; }
+.season-toggle .season-chevron { margin: -3px 0 0 var(--s-1); }
+.season-toggle[aria-expanded="true"] .season-chevron { margin-top: 3px; transform: rotate(225deg); }
+.choice-tag { position: absolute; z-index: 1; top: calc(var(--s-3) + var(--s-2)); left: calc(var(--s-3) + var(--s-2)); max-width: calc(100% - 2 * (var(--s-3) + var(--s-2))); overflow: hidden; padding: 1px var(--s-2); border: 1px solid var(--accent); border-radius: var(--r-pill); background: color-mix(in srgb, var(--bg) 85%, transparent); color: var(--accent); font-size: var(--text-xs); line-height: var(--lh-xs); font-weight: 600; white-space: nowrap; text-overflow: ellipsis; pointer-events: none; }
+.choice-tag[hidden] { display: none; }
 .choice-name-group { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-2); min-width: 0; }
 .soon-pill {
   flex: none;

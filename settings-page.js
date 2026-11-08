@@ -43,7 +43,7 @@ function switchRow({ key, title, description, extra, system }) {
 }
 
 // A row with a group of radio options beneath its text.
-function choiceRow({ key, title, description, groupClass, options, fallback, extra }) {
+function choiceRow({ key, title, description, groupClass, options, fallback, extra, footer, onBuilt }) {
   const id = controlId('group');
   const group = el('div', {
     class: 'choices ' + groupClass,
@@ -65,14 +65,17 @@ function choiceRow({ key, title, description, groupClass, options, fallback, ext
     inputs.forEach(input => { input.checked = input.value === shown; });
   });
 
-  return el('div', { class: 'setting setting-wide', attrs: { id: 'setting-' + key } }, [
+  const row = el('div', { class: 'setting setting-wide', attrs: { id: 'setting-' + key } }, [
     settingText(
       el('div', { class: 'setting-title', text: title, attrs: { id: id + '-title' } }),
       settingDescription(id + '-desc', description),
       extra
     ),
-    group
+    group,
+    footer
   ]);
+  if (onBuilt) onBuilt(group, options.map((option, i) => ({ value: option.value, card: group.children[i] })));
+  return row;
 }
 
 const radioMark = () => el('span', { class: 'choice-mark', attrs: { 'aria-hidden': 'true' } });
@@ -269,6 +272,8 @@ const SEASON_OPTIONS = [
     return el('label', { class: 'choice' }, [
       input,
       seasonPreview(o.value),
+      // Over the corner of the preview (the preview itself is hidden from screen readers; the tag is not).
+      el('span', { class: 'choice-tag', attrs: { hidden: '' } }),
       el('span', { class: 'choice-head' }, [el('span', { class: 'choice-name', text: o.name }), radioMark()]),
       el('span', { class: 'choice-note', text: o.note }),
       (o.value === 'auto' ? seasonToday() : o.dates && seasonDates(o.dates))
@@ -276,10 +281,86 @@ const SEASON_OPTIONS = [
   }
 }));
 
+// The themes the calendar will set, soonest first: [{ key, days }], days = 0 for the one on today. Each
+// theme appears once (its next run).
+function upcomingSeasons() {
+  const now = new Date();
+  const list = [];
+  let previous = '';
+  for (let i = 0; i <= 366; i++) {
+    const key = automaticSeason(new Date(now.getFullYear(), now.getMonth(), now.getDate() + i));
+    if (key && key !== previous && !list.some(item => item.key === key)) list.push({ key, days: i });
+    previous = key;
+  }
+  return list;
+}
+
+// Collapsed, the setting shows four cards: Automatic, the theme chosen (or today's, or the next one coming),
+// the next one after that, and Off. "Show all themes" opens the full grid. The four are picked when the row
+// is built and again each time it is collapsed, so choosing a card never makes the cards move under the pointer.
 function seasonalRow() {
+  const toggleLabel = el('span');
+  const toggle = el('button', { class: 'settings-btn season-toggle', attrs: { type: 'button', 'aria-expanded': 'false' } }, [
+    toggleLabel,
+    el('span', { class: 'nav-chevron season-chevron', attrs: { 'aria-hidden': 'true' } })
+  ]);
+  const total = Object.keys(SEASONS).length;
+  let expanded = false;
+  let visible = new Set();
+  let cards = [];
+  let group = null;
+
+  function layout() {
+    const chosen = SEASONS[getSettings().seasonal] ? getSettings().seasonal : '';
+    const upcoming = upcomingSeasons();
+    const second = chosen || (upcoming[0] ? upcoming[0].key : '');
+    const third = (upcoming.find(item => item.key !== second) || {}).key || '';
+    const order = ['auto', second, third, 'off'].filter(Boolean);
+    visible = new Set(order);
+    cards.forEach(({ value, card }) => {
+      card.hidden = !expanded && !visible.has(value);
+      card.style.order = expanded ? '' : String(order.indexOf(value));
+    });
+    group.classList.toggle('is-collapsed', !expanded);
+    toggleLabel.textContent = expanded ? 'Show fewer themes' : `Show all themes (${total})`;
+    toggle.setAttribute('aria-expanded', String(expanded));
+  }
+
+  // "Today", "Next · in 5 days" and "After · in 15 days" (the one following the next) on the cards, wherever they are in the list.
+  function tags() {
+    const today = automaticSeason();
+    const [next, after] = upcomingSeasons().filter(item => item.days > 0);
+    cards.forEach(({ value, card }) => {
+      const tag = card.querySelector('.choice-tag');
+      if (!tag || !SEASONS[value]) return;
+      let text = '';
+      if (value === today) text = 'Today';
+      else if (next && value === next.key) text = `Next · in ${next.days} ${next.days === 1 ? 'day' : 'days'}`;
+      else if (after && value === after.key) text = `After · in ${after.days} ${after.days === 1 ? 'day' : 'days'}`;
+      tag.textContent = text;
+      tag.hidden = !text;
+    });
+  }
+
+  toggle.addEventListener('click', () => { expanded = !expanded; layout(); });
+
   return choiceRow({
     key: 'seasonal', title: 'Seasonal theme', groupClass: 'choices-season', options: SEASON_OPTIONS,
-    description: 'Festive looks for certain times of the year. Choosing one yourself overrides Automatic, and works at any time of year. With reduced motion on, they show as a still picture.'
+    description: 'Festive looks for certain times of the year. Choosing one yourself overrides Automatic, and works at any time of year. With reduced motion on, they show as a still picture.',
+    footer: el('div', { class: 'season-more' }, [toggle]),
+    onBuilt(groupNode, built) {
+      group = groupNode;
+      group.id = 'season-choices';
+      toggle.setAttribute('aria-controls', groupNode.id);
+      cards = built;
+      layout();
+      tags();
+      syncers.push(() => {
+        tags();
+        // Changed elsewhere (another tab, the header menu) to a theme that is not among the four shown.
+        if (!expanded && !visible.has(getSettings().seasonal)) layout();
+      });
+    }
   });
 }
 
