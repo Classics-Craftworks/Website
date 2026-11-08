@@ -1279,6 +1279,22 @@
     }
   }
 
+  // Tell the stylesheet where the footer's top edge is on screen, so the canvas can fade out behind it.
+  let footerFrame = 0;
+  function trackFooter() {
+    footerFrame = 0;
+    const footer = document.querySelector('.site-footer');
+    const root = document.documentElement.style;
+    if (!footer) { root.removeProperty('--footer-top'); return; }
+    root.setProperty('--footer-top', Math.round(footer.getBoundingClientRect().top) + 'px');
+  }
+  function queueFooter() { if (!footerFrame) footerFrame = requestAnimationFrame(trackFooter); }
+  window.addEventListener('scroll', queueFooter, { passive: true });
+  window.addEventListener('resize', queueFooter);
+  window.addEventListener('load', queueFooter);
+  if (typeof ResizeObserver === 'function') new ResizeObserver(queueFooter).observe(document.documentElement);
+  queueFooter();
+
   if (document.body) update();
   else document.addEventListener('DOMContentLoaded', update);
   document.addEventListener(SETTINGS_EVENT, update);
