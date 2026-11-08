@@ -16,7 +16,7 @@
      data-density        compact               (absent = comfortable spacing)
      data-sidebar        left                  (absent = side panels on the right)
      data-newtab         off                   (absent = external links open in a new tab)
-     data-season         fireworks | snowfall | christmas | halloween | friday13 (absent = no seasonal theme; drawn by seasonal.js)
+     data-season         fireworks | aurora | snowfall | christmas | halloween | leaves | friday13 (absent = no seasonal theme; drawn by seasonal.js)
 
    High contrast and reduced motion follow the device setting until the visitor changes them
    (stored as null = "follow the device"). */
@@ -33,7 +33,7 @@ const SETTING_CHOICES = {
   density: ['compact', 'comfortable', 'spacious'],
   // auto = follow the calendar (see automaticSeason), off = never set one automatically.
   // A theme chosen here stays on all year and overrides the automatic one.
-  seasonal: ['auto', 'fireworks', 'snowfall', 'christmas', 'halloween', 'friday13', 'off']
+  seasonal: ['auto', 'fireworks', 'aurora', 'snowfall', 'christmas', 'halloween', 'leaves', 'friday13', 'off']
 };
 
 const SETTING_DEFAULTS = Object.freeze({
@@ -116,6 +116,16 @@ const SEASONS = {
     on: (month, day, region) =>
       (month === 12 && day === 31) || (month === 1 && day === 1) ||
       (month === 7 && day === 4 && region === 'US') || (month === 11 && day === 5 && region === 'GB')
+  },
+  aurora: {
+    name: 'Aurora', blurb: 'Northern lights.',
+    dates: [{ from: [1, 28], to: [2, 4] }],
+    on: (month, day) => (month === 1 && day >= 28) || (month === 2 && day <= 4)
+  },
+  leaves: {
+    name: 'Falling Leaves', blurb: 'Brown autumn leaves drifting down.',
+    dates: [{ from: [11, 23], to: [11, 30] }],
+    on: (month, day) => month === 11 && day >= 23 && day <= 30
   },
   snowfall: {
     name: 'Snowfall', blurb: 'Falling snow.',

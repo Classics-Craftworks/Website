@@ -1,10 +1,12 @@
 /* Seasonal themes: the moving (or, with reduced motion, still) picture behind the page.
 
    settings.js decides which theme is in effect and puts it on <html> as data-season
-   ("fireworks", "snowfall", "christmas", "halloween" or "friday13", absent = none). This file only draws it:
+   ("fireworks", "aurora", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
    a fixed, click-through <canvas> behind everything (styles.css: .season-canvas).
 
    - Fireworks: rockets rise and burst into sparks.
+   - Aurora: slow green, teal and violet northern-lights curtains sway across the upper sky.
+   - Falling Leaves: brown autumn leaves tumble and drift down.
    - Snowfall: snow drifts down.
    - Christmas: a string of fairy lights twinkles along the top, golden sparkles drift down and a treeline of
      pines with small lights stands along the bottom.
@@ -830,7 +832,169 @@
     return { step, draw, still, resize };
   }
 
-  const EFFECTS = { fireworks: createFireworks, snowfall: createSnow, christmas: createChristmas, halloween: createHalloween, friday13: createFriday13 };
+  /* ---------- Falling Leaves ---------- */
+
+  // Browns for the leaves; the light theme needs deeper ones to stand out against a pale page.
+  const LEAF_COLOURS = {
+    dark:  ['#a8672f', '#8f4f22', '#c9863f', '#74401a', '#b9722c', '#96592a'],
+    light: ['#8a4a1a', '#6e3811', '#a35a1b', '#5b2d0d', '#94521a', '#7a4118']
+  };
+
+  function createLeaves(view) {
+    let leaves = [];
+    let clock = 0;
+
+    const unit = () => view.scale !== undefined ? view.scale * 1.6 : Math.min(1.25, Math.max(0.6, Math.min(view.w, view.h) / 760));
+    const wanted = () => view.leaves ?? Math.round(Math.min(48, Math.max(14, (view.w * view.h) / 24000)));
+
+    function leaf(anywhere) {
+      const size = rand(7, 13) * unit();
+      return {
+        x: rand(0, view.w), y: anywhere ? rand(0, view.h) : rand(-30, -4),
+        size, colour: pick(LEAF_COLOURS.dark.map((_, i) => i)),
+        fall: rand(28, 52) * unit() + 10, // a leaf drifts down more slowly than rain, a little faster when larger
+        sway: rand(14, 40) * unit(), swaySpeed: rand(0.35, 0.9), phase: rand(0, TAU),
+        angle: rand(0, TAU), spin: rand(-1.2, 1.2),
+        tumble: rand(0.8, 2.2), alpha: rand(0.65, 0.95)
+      };
+    }
+
+    function fill(anywhere) {
+      const count = wanted();
+      while (leaves.length < count) leaves.push(leaf(anywhere));
+      if (leaves.length > count) leaves.length = count;
+    }
+
+    function step(dt) {
+      clock += dt;
+      fill(false);
+      leaves.forEach(l => {
+        l.y += l.fall * dt;
+        l.x += Math.sin(clock * l.swaySpeed + l.phase) * l.sway * dt;
+        l.angle += l.spin * dt;
+        if (l.y > view.h + l.size * 2) { Object.assign(l, leaf(false)); }
+        if (l.x < -20) l.x = view.w + 20; else if (l.x > view.w + 20) l.x = -20;
+      });
+    }
+
+    function draw(ctx) {
+      const palette = LEAF_COLOURS[isLight() ? 'light' : 'dark'];
+      ctx.lineCap = 'round';
+      leaves.forEach(l => {
+        const s = l.size;
+        // Turning over as it falls: the leaf narrows to an edge and widens again.
+        const flip = Math.cos(clock * l.tumble + l.phase);
+        ctx.save();
+        ctx.translate(l.x, l.y);
+        ctx.rotate(l.angle);
+        ctx.scale(0.25 + 0.75 * Math.abs(flip), 1);
+        ctx.globalAlpha = l.alpha;
+        ctx.fillStyle = palette[l.colour % palette.length];
+        ctx.beginPath();
+        ctx.moveTo(0, -s);
+        ctx.bezierCurveTo(s * 0.95, -s * 0.5, s * 0.8, s * 0.55, 0, s);
+        ctx.bezierCurveTo(-s * 0.8, s * 0.55, -s * 0.95, -s * 0.5, 0, -s);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(40, 18, 5, 0.45)';
+        ctx.lineWidth = Math.max(0.5, s * 0.08);
+        ctx.beginPath();
+        ctx.moveTo(0, -s);
+        ctx.lineTo(0, s * 1.25);
+        ctx.stroke();
+        ctx.restore();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function still() { leaves = []; fill(true); }
+
+    fill(true);
+
+    function resize(oldW, oldH) {
+      if (!oldW || !oldH) return;
+      leaves.forEach(l => { l.x = (l.x / oldW) * view.w; l.y = (l.y / oldH) * view.h; });
+    }
+
+    return { step, draw, still, resize };
+  }
+
+  /* ---------- Aurora ---------- */
+
+  // Curtain colours as "r, g, b". On dark pages they are added to the sky (so they glow); on the light
+  // theme they are laid on top, darker and fainter.
+  const AURORA_BANDS = {
+    dark: [
+      { rgb: '70, 255, 170', y: 0.30, len: 0.30, alpha: 0.42, drift: 0.11 },
+      { rgb: '60, 200, 235', y: 0.40, len: 0.26, alpha: 0.30, drift: -0.08 },
+      { rgb: '175, 115, 255', y: 0.22, len: 0.24, alpha: 0.26, drift: 0.07 }
+    ],
+    light: [
+      { rgb: '20, 150, 95', y: 0.30, len: 0.30, alpha: 0.26, drift: 0.11 },
+      { rgb: '20, 125, 175', y: 0.40, len: 0.26, alpha: 0.20, drift: -0.08 },
+      { rgb: '110, 60, 190', y: 0.22, len: 0.24, alpha: 0.17, drift: 0.07 }
+    ]
+  };
+
+  function createAurora(view) {
+    let clock = 0;
+    const sprites = new Map(); // one thin gradient strip per colour, stretched to each ray
+
+    // A ray: clear at the top, building up and ending in a bright, fairly sharp lower edge.
+    function sprite(rgb) {
+      let strip = sprites.get(rgb);
+      if (!strip) {
+        strip = document.createElement('canvas');
+        strip.width = 4; // wide enough that stretching a middle slice never blends in the transparent edge
+        strip.height = 128;
+        const g = strip.getContext('2d');
+        const grad = g.createLinearGradient(0, 0, 0, 128);
+        grad.addColorStop(0, `rgba(${rgb}, 0)`);
+        grad.addColorStop(0.55, `rgba(${rgb}, 0.22)`);
+        grad.addColorStop(0.88, `rgba(${rgb}, 0.85)`);
+        grad.addColorStop(1, `rgba(${rgb}, 0)`);
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 4, 128);
+        sprites.set(rgb, strip);
+      }
+      return strip;
+    }
+
+    function step(dt) { clock += dt; }
+
+    function draw(ctx) {
+      const light = isLight();
+      const bands = AURORA_BANDS[light ? 'light' : 'dark'];
+      const stepX = Math.max(2, Math.min(6, Math.round(view.w / 200)));
+      ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
+
+      bands.forEach((b, bi) => {
+        const strip = sprite(b.rgb);
+        const t = clock * 0.35 + bi * 11;
+        const dpr = view.dpr || 1;
+        const snap = v => Math.round(v * dpr) / dpr; // device-pixel edges, so neighbouring rays meet exactly
+        for (let x = -stepX; x < view.w + stepX; x += stepX) {
+          const u = x / view.w;
+          // The curtain's lower edge undulates slowly; its height and brightness shimmer along its length.
+          const edge = view.h * (b.y + 0.07 * Math.sin(u * 5.2 + t * b.drift * 4 + bi) + 0.035 * Math.sin(u * 11 - t * 0.5 + bi * 2));
+          const len = view.h * b.len * (0.65 + 0.35 * Math.sin(u * 7.5 + t * 0.6 + bi * 3));
+          const glow = 0.55 + 0.45 * Math.sin(u * 17 + t * 1.1 + bi * 5) * Math.sin(u * 3.1 + t * 0.3);
+          ctx.globalAlpha = Math.max(0, b.alpha * glow);
+          const left = snap(x);
+          // No overlap and no gap between rays: an overlap doubles up when added to the sky and shows as a line.
+          ctx.drawImage(strip, 1, 0, 2, 128, left, edge - len, snap(x + stepX) - left, len);
+        }
+      });
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    // One frame for reduced motion: the curtains caught mid-sway.
+    function still() { clock = 9; }
+
+    return { step, draw, still, resize() {} };
+  }
+
+  const EFFECTS = { fireworks: createFireworks, aurora: createAurora, friday13: createFriday13, halloween: createHalloween, leaves: createLeaves, snowfall: createSnow, christmas: createChristmas };
 
   /* ---------- Running ---------- */
 
@@ -967,7 +1131,7 @@
     // The same picture every time (seeded), so it never changes behind the person's back: not when they
     // choose a card, and not when the pointer leaves again.
     function showStill() {
-      random = seeded({ fireworks: 11, snowfall: 5, christmas: 25, halloween: 31, friday13: 13 }[season] || 5);
+      random = seeded({ fireworks: 11, aurora: 7, snowfall: 5, christmas: 25, halloween: 31, leaves: 23, friday13: 13 }[season] || 5);
       try {
         peffect = EFFECTS[season](pview);
         peffect.still();
