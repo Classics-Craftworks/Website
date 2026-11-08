@@ -142,8 +142,8 @@ function initSearch() {
   ]);
   menu.appendChild(wrap);
 
-  // The Settings link (built with the nav) sits to the right of the search box.
-  const settingsLink = document.querySelector('.nav-settings');
+  // The Settings menu (built with the nav) sits to the right of the search box.
+  const settingsLink = document.querySelector('.nav-settings-menu');
   if (settingsLink) menu.appendChild(settingsLink);
 
   let options = [];

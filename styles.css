@@ -2278,6 +2278,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
   .nav-search { flex-basis: 140px; min-width: 96px; }
 }
 @media (max-width: 900px) {
+  .nav-settings-menu { order: 3; }
   .nav-settings[data-tooltip]::before, .nav-settings[data-tooltip]::after { display: none; }
 }
 
@@ -2501,6 +2502,31 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
     grid-template-areas: "search toolbar" "filters feed" "extra feed";
   }
   html[data-sidebar="left"] .news-layout.no-filters { grid-template-areas: "search toolbar" "extra feed"; }
+}
+
+/* Header Settings dropdown: quick toggles. */
+.nav-settings-chevron { display: none; }
+.nav-settings-menu .nav-dropdown-menu { left: auto; right: 0; transform: none; min-width: 264px; }
+@media (min-width: 901px) {
+  .nav-settings-menu .nav-dropdown-menu::before { left: auto; right: 17px; transform: rotate(45deg); }
+  .nav-settings-menu.is-open > .nav-settings { background: var(--surface-2); color: var(--text); }
+  .nav-settings-menu.is-open > .nav-settings[data-tooltip]::before,
+  .nav-settings-menu.is-open > .nav-settings[data-tooltip]::after { display: none; }
+}
+.quick-setting { display: flex; align-items: center; gap: var(--s-3); min-height: var(--control-h); padding: var(--s-1) var(--s-3); border-radius: var(--r-1); color: var(--text); font-size: var(--text-sm); line-height: var(--lh-sm); font-weight: 500; cursor: pointer; transition: background-color var(--ease); }
+.quick-setting[hidden] { display: none; }
+@media (hover: hover) { .quick-setting:hover { background: var(--surface-2); } }
+.quick-setting > .icon { color: var(--text-soft); }
+.quick-setting-text { display: flex; flex: 1 1 auto; flex-direction: column; min-width: 0; }
+.quick-setting-note { color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); font-weight: 400; }
+.quick-setting-note[hidden] { display: none; }
+.quick-settings-divider { height: 1px; margin: var(--s-1) var(--s-2); border: 0; background: var(--border); }
+.quick-settings-link { justify-content: flex-start; }
+@media (max-width: 900px) {
+  .nav-settings-chevron { display: block; }
+  .nav-settings-menu .nav-dropdown-menu { right: auto; min-width: 0; }
+  .nav-settings-menu .nav-settings { width: 100%; }
+  .quick-setting { min-height: 48px; padding-inline: var(--s-4); font-size: var(--text-md); line-height: var(--lh-md); }
 }
 
 /* Seasonal theme placeholders ("Coming Soon"): visible but not selectable. */

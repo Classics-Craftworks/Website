@@ -637,6 +637,126 @@ function navBadgeDot(count, noun = ['update', 'updates']) {
   ]);
 }
 
+// Settings dropdown (header): quick toggles for dark mode and the seasonal theme, plus a link to the
+// full Settings page. Popover on desktop, accordion in the mobile menu. search.js moves it to the end
+// of the header (.nav-settings-menu).
+const SEASON_PREV_KEY = 'seasonal-prev';
+
+function buildSettingsMenu(settingsPage, currentUrl, mobile) {
+  const menuId = 'settings-menu';
+  let uid = 0;
+
+  const trigger = el('button', {
+    class: 'nav-link nav-settings' + (currentUrl === settingsPage.url ? ' is-current' : ''),
+    attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': menuId, 'aria-haspopup': 'true', 'data-tooltip': settingsPage.label }
+  }, [
+    icon(settingsPage.icon, 'icon-sm'),
+    el('span', { text: settingsPage.label }),
+    el('span', { class: 'nav-chevron nav-settings-chevron', attrs: { 'aria-hidden': 'true' } })
+  ]);
+
+  function toggleRow(iconName, label) {
+    const id = `quick-switch-${++uid}`;
+    const input = el('input', { attrs: { type: 'checkbox', role: 'switch', id, 'aria-labelledby': id + '-label' } });
+    const text = el('span', { class: 'quick-setting-text' }, [
+      el('span', { class: 'quick-setting-label', text: label, attrs: { id: id + '-label' } })
+    ]);
+    const row = el('label', { class: 'quick-setting', attrs: { for: id } }, [
+      icon(iconName, 'icon-sm'),
+      text,
+      el('span', { class: 'switch' }, [input, el('span', { class: 'switch-track', attrs: { 'aria-hidden': 'true' } })])
+    ]);
+    return { row, input, text };
+  }
+
+  const dark = toggleRow('moon', 'Dark mode');
+  const season = toggleRow('snowflake', 'Seasonal theme');
+  const seasonName = el('span', { class: 'quick-setting-note' });
+  season.text.appendChild(seasonName);
+
+  // The dark variant to return to (the OLED theme if that is what the visitor had).
+  let lastDark = 'dark';
+  dark.input.addEventListener('change', () => {
+    updateSettings({ theme: dark.input.checked ? lastDark : 'light' });
+  });
+
+  const readPrev = () => { try { return sessionStorage.getItem(SEASON_PREV_KEY); } catch { return null; } };
+  const writePrev = value => { try { sessionStorage.setItem(SEASON_PREV_KEY, value); } catch { /* this view only */ } };
+  const validPrev = () => { const v = readPrev(); return v && v !== 'off' && SETTING_CHOICES.seasonal.includes(v) ? v : 'auto'; };
+
+  season.input.addEventListener('change', () => {
+    if (season.input.checked) {
+      updateSettings({ seasonal: validPrev() });
+    } else {
+      writePrev(getSettings().seasonal);
+      updateSettings({ seasonal: 'off' });
+    }
+  });
+
+  const settingsLink = internalLink('nav-dropdown-item quick-settings-link', settingsPage.url, [
+    icon('settings', 'icon-sm'),
+    el('span', { text: 'All settings' })
+  ]);
+  if (currentUrl === settingsPage.url) {
+    settingsLink.classList.add('is-current');
+    settingsLink.setAttribute('aria-current', 'page');
+  }
+
+  const menu = el('div', { class: 'nav-dropdown-menu quick-settings', attrs: { id: menuId, hidden: '' } }, [
+    dark.row, season.row, el('hr', { class: 'quick-settings-divider' }), settingsLink
+  ]);
+  const wrap = el('div', { class: 'nav-dropdown nav-settings-menu' }, [trigger, menu]);
+
+  // Keeps the switches in step with the settings, whoever changed them.
+  function sync() {
+    const s = getSettings();
+    const theme = effectiveTheme(s);
+    dark.input.checked = theme !== 'light';
+    if (theme === 'oled') lastDark = 'oled';
+    else if (theme === 'dark') lastDark = 'dark';
+
+    const active = effectiveSeason(s);
+    // Still shown right after being switched off here, so it can be switched back on.
+    const canRestore = s.seasonal === 'off' && (automaticSeason() || validPrev() !== 'auto');
+    season.row.hidden = !(active || canRestore);
+    season.input.checked = !!active;
+    const name = SEASON_NAMES[active || (s.seasonal === 'off' ? (automaticSeason() || (validPrev() !== 'auto' ? validPrev() : '')) : '')] || '';
+    seasonName.textContent = name;
+    seasonName.hidden = !name;
+  }
+  sync();
+  document.addEventListener(SETTINGS_EVENT, sync);
+
+  const setOpen = (open, opts = {}) => {
+    menu.hidden = !open;
+    trigger.setAttribute('aria-expanded', String(open));
+    wrap.classList.toggle('is-open', open);
+    if (open) sync();
+    if (!open && opts.refocus) trigger.focus();
+  };
+  trigger.addEventListener('click', () => setOpen(menu.hidden));
+  trigger.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowDown') return;
+    e.preventDefault();
+    setOpen(true);
+    dark.input.focus();
+  });
+  wrap.addEventListener('keydown', e => {
+    if (e.key !== 'Escape' || menu.hidden) return;
+    e.preventDefault(); // stops the mobile menu folding as well
+    setOpen(false, { refocus: true });
+  });
+  wrap.addEventListener('focusout', e => {
+    // Clicking a label leaves no focused element (relatedTarget is null), so only a real move elsewhere closes it.
+    if (!mobile.matches && e.relatedTarget && !wrap.contains(e.relatedTarget)) setOpen(false);
+  });
+  document.addEventListener('pointerdown', e => {
+    if (!mobile.matches && !wrap.contains(e.target)) setOpen(false);
+  });
+  mobile.addEventListener('change', () => setOpen(false));
+  return wrap;
+}
+
 // Keep in sync with the 900px breakpoint in styles.css.
 const MOBILE_NAV_QUERY = '(max-width: 900px)';
 
@@ -759,12 +879,7 @@ function renderSiteHeader(pages, currentUrl) {
     nav.appendChild(newsLink);
   }
   if (about) nav.appendChild(pageLink(about, 'nav-link'));
-  if (settingsPage) {
-    // Icon only beside the other links on wide screens (the label returns in the mobile menu).
-    const settingsLink = pageLink(settingsPage, 'nav-link nav-settings');
-    settingsLink.setAttribute('data-tooltip', settingsPage.label);
-    nav.appendChild(settingsLink);
-  }
+  if (settingsPage) nav.appendChild(buildSettingsMenu(settingsPage, currentUrl, mobile));
 
   // Mobile menu button; its pill totals every project page.
   const toggle = el('button', {
