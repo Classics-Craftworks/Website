@@ -683,7 +683,8 @@ main:focus, #catalog:focus { outline: none; }
   height: var(--control-h);
   -webkit-appearance: none;
   appearance: none;
-  padding: 0 var(--s-6) 0 var(--s-6);
+  /* Left padding clears the 16px icon (placed at --s-3) plus a gap, so it holds at every spacing setting. */
+  padding: 0 var(--s-6) 0 calc(var(--s-3) + 16px + var(--s-2));
   border: 1px solid var(--border);
   border-radius: var(--r-1);
   background: var(--surface);
