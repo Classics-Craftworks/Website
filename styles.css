@@ -414,6 +414,7 @@ main:focus, #catalog:focus { outline: none; }
   cursor: pointer;
   transition: background-color var(--ease), border-color var(--ease), color var(--ease);
 }
+.splash-btn-ghost, .settings-btn { background: var(--bg); }
 @media (hover: hover) {
   .top-link:hover, .news-btn:hover, .news-show-more:hover, .news-sort-trigger:hover,
   .splash-btn-ghost:hover, .settings-btn:hover, .site-error button:hover {
