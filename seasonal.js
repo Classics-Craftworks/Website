@@ -313,7 +313,7 @@
         if (g.age >= g.life) glyphs[i] = glyph(false);
       }
       untilFlash -= dt;
-      if (untilFlash <= 0) { flashAge = 0; flashX = marginX(0.8, 0.3, 0.7); bolt = makeBolt(view.w * flashX); untilFlash = rand(5, 10); }
+      if (untilFlash <= 0) { flashAge = 0; flashX = marginX(0.8, 0.3, 0.7); bolt = makeBolt(view.w * flashX); untilFlash = view.flashEvery ? rand(...view.flashEvery) : rand(5, 10); }
       if (flashAge < FLASH_TIME) flashAge += dt;
     }
 
@@ -406,7 +406,9 @@
       flashX = 0.68;
       bolt = makeBolt(view.w * flashX);
       flashAge = 0.35; // reduced motion still gets the picture, caught as it fades
-      untilFlash = Infinity;
+      // The Settings card carries on from this picture when hovered, so it needs a bolt coming soon;
+      // the page itself never moves after a still.
+      untilFlash = view.flashEvery ? 0.4 : Infinity;
     }
 
     fill(true);
@@ -1289,7 +1291,7 @@
      reduced motion it never moves. Looks after itself; returns nothing. */
   window.mountSeasonPreview = (previewCanvas, season) => {
     const pctx = previewCanvas.getContext('2d');
-    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, flies: 8, embers: 7, sparkles: 6, lightsTop: 0 };
+    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, flies: 8, embers: 7, sparkles: 6, lightsTop: 0, flashEvery: [2.0, 3.5] }; // flashEvery: Friday 13th's bolts, far more often than on the page
     let peffect = null;
     let pframe = 0;
     let plast = 0;
