@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.7.0 — 2026-11-08
+
+### Added
+- Dropdown to the Settings icon in the header, for easier access to the dark mode toggle and a seasonal theme toggle when one is active
+- More seasonal themes:
+  - Aurora: The Northern Lights
+    - Automatically enabled between 28 January - 4 February
+  - Cherry Blossom: Drifting cherry-blossom petals
+    - Automatically enabled between 24 - 31 March
+  - Fireflies: Fireflies blinking under a twilight sky
+    - Automatically enabled between 18 - 24 June
+  - Falling Leaves: Brown leaves falling down the page
+    - Automatically enabled between 23 - 30 November
+- Added tags to seasonal theme options (e.g. "Today", "Next: in 5 days" or "After: in 15 days"), so you can see which automatic themes are up next
+
+### Changed
+- Improved the seasonal themes settings section - it now shows four options by default: Automatic, your chosen theme (or today’s, or the next automatic one), the following automatic theme, and Off. "Show all themes" opens the full list
+- Updated the Automatic seasonal theme calendar preview to only show the previous month, current month and 2 upcoming months, rather than the whole year
+- Improved Friday 13th theme preview by adding more lightning bolts
+- The Snowfall theme now runs from 1 - 12 December (the 28 - 30 December run is unchanged)
+- The Christmas theme now runs from 13 - 27 December
+
+### Fixed
+- Fixed dates in seasonal theme options not respecting the user's chosen date format
+
 ## v4.6.1 — 2026-11-07
 
 ### Added
