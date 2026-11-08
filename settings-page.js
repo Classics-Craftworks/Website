@@ -100,7 +100,7 @@ function systemSwitch(key, query, mainInput, effectiveValue) {
    others are always on and override it; Off never sets one. */
 // The picture on each card: Automatic shows every theme side by side (like the System colour theme),
 // each theme runs its own effect, and Off is a plain page. The effects are seasonal.js's own.
-// Automatic's picture: twelve little months, each with its themes' dates in their own colours, and this
+// Automatic's picture: four little months (last, this and the next two), each with its themes' dates in their own colours, and this
 // month outlined. Built from SEASONS' own rules (so it can never disagree with them): every day is tested,
 // in both fireworks regions, and runs of days become bars. Friday 13th depends on the weekday, so it is
 // checked against the current year's calendar.
@@ -113,11 +113,14 @@ function previewSeason(month, day, weekday) {
   return Object.keys(SEASONS).find(key => ['US', 'GB'].some(region => SEASONS[key].on(month, day, region, weekday))) || '';
 }
 
+// Shows four months: last month, this month and the next two (across the year end, so December
+// is followed by January and February). Redrawn if the month changes while the page is open.
 function calendarPreview(tile) {
   tile.classList.add('season-preview-calendar');
-  const year = new Date().getFullYear();
   const grid = el('span', { class: 'sp-grid' });
-  const cells = MONTH_ABBR.map((abbr, m) => {
+  tile.appendChild(grid);
+
+  function monthCell(year, m, isNow) {
     const track = el('span', { class: 'sp-mt' });
     let from = 0;
     let current = '';
@@ -134,14 +137,23 @@ function calendarPreview(tile) {
       current = key;
       from = d;
     }
-    const cell = el('span', { class: 'sp-cell' }, [el('span', { class: 'sp-label', text: abbr }), track]);
-    grid.appendChild(cell);
-    return cell;
-  });
-  const markNow = () => cells.forEach((cell, m) => cell.classList.toggle('is-now', m === new Date().getMonth()));
-  markNow();
-  syncers.push(markNow);
-  tile.appendChild(grid);
+    return el('span', { class: 'sp-cell' + (isNow ? ' is-now' : '') }, [el('span', { class: 'sp-label', text: MONTH_ABBR[m] }), track]);
+  }
+
+  let shown = '';
+  const draw = () => {
+    const now = new Date();
+    const stamp = `${now.getFullYear()}-${now.getMonth()}`;
+    if (stamp === shown) return;
+    shown = stamp;
+    grid.textContent = '';
+    for (let offset = -1; offset <= 2; offset++) {
+      const date = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+      grid.appendChild(monthCell(date.getFullYear(), date.getMonth(), offset === 0));
+    }
+  };
+  draw();
+  syncers.push(draw);
 }
 
 function seasonPreview(value) {
