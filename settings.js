@@ -101,8 +101,10 @@ function effectiveTheme(s = getSettings()) {
 /* Every seasonal theme lives here. To add one: add an entry (and draw it in seasonal.js's EFFECTS, and
    add its name to SETTING_CHOICES.seasonal). The Settings page builds its cards from this list.
      name, blurb        shown on the theme's card (its preview is the effect itself, from seasonal.js)
-     dates              the dates it is set automatically, as short labels, shown on its card (one line each
-                        on the Settings page, with a clock icon)
+     dates              the dates it is set automatically, shown on its card (one line each on the Settings page,
+                        with a clock icon). Each is { from: [month, day], to: [month, day] (omit for one day),
+                        note: "US" (optional, shown in brackets) }, written in the visitor's date format, or a
+                        plain string for text that isn't a date ("Every Friday 13th")
      on(month, day, region, weekday)  true on a date it is set automatically (the visitor's local date;
                              region is "US", "GB" or ""; weekday is 0 = Sunday to 6 = Saturday).
                              The first theme that matches wins, so the order here is the priority: a theme
@@ -110,24 +112,24 @@ function effectiveTheme(s = getSettings()) {
 const SEASONS = {
   fireworks: {
     name: 'Fireworks', blurb: 'Rockets and sparks.',
-    dates: ['31 Dec – 1 Jan', '4 Jul (US)', '5 Nov (UK)'],
+    dates: [{ from: [12, 31], to: [1, 1] }, { from: [7, 4], note: 'US' }, { from: [11, 5], note: 'UK' }],
     on: (month, day, region) =>
       (month === 12 && day === 31) || (month === 1 && day === 1) ||
       (month === 7 && day === 4 && region === 'US') || (month === 11 && day === 5 && region === 'GB')
   },
   snowfall: {
     name: 'Snowfall', blurb: 'Falling snow.',
-    dates: ['1 – 17 Dec', '28 – 30 Dec'],
+    dates: [{ from: [12, 1], to: [12, 17] }, { from: [12, 28], to: [12, 30] }],
     on: (month, day) => month === 12 && (day <= 17 || (day >= 28 && day <= 30))
   },
   christmas: {
     name: 'Christmas', blurb: 'Twinkling fairy lights, pine trees and drifting sparkles.',
-    dates: ['18 – 27 Dec'],
+    dates: [{ from: [12, 18], to: [12, 27] }],
     on: (month, day) => month === 12 && day >= 18 && day <= 27
   },
   halloween: {
     name: 'Halloween', blurb: 'Bats, a hazy moon and rising embers.',
-    dates: ['16 Oct – 1 Nov'],
+    dates: [{ from: [10, 16], to: [11, 1] }],
     on: (month, day) => (month === 10 && day >= 16) || (month === 11 && day === 1)
   },
   friday13: {

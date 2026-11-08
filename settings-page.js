@@ -175,13 +175,43 @@ function seasonPreview(value) {
 // "When it's automatic", on its own line under the blurb: a clock icon and short date labels. The text
 // is read out in full ("Automatic on: ...") rather than as an unlabelled icon.
 const CLOCK_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6.25"/><path d="M8 4.5V8l2.25 1.5"/></svg>';
+// A season's date entry (see SEASONS in settings.js) as a label in the visitor's date format. Plain strings
+// pass through. Ranges within one month are shortened where the format allows ("1 – 17 Dec", "Dec 1 – 17").
+const LABEL_YEAR = 2001; // any non-leap year: only the day and month are shown
+function seasonDateLabel(entry, format = getSettings().dateFormat) {
+  if (typeof entry === 'string') return entry;
+  const iso = ([m, d]) => `${LABEL_YEAR}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  const note = entry.note ? ` (${entry.note})` : '';
+  const start = displayDate(iso(entry.from), 'short', format);
+  if (!entry.to) return start + note;
+  let end = displayDate(iso(entry.to), 'short', format);
+  let first = start;
+
+  // Textual formats name the month: say it once when both days are in the same month.
+  if (entry.from[0] === entry.to[0] && !['dmy', 'mdy', 'iso'].includes(format)) {
+    const locale = format === 'system' ? undefined : format === 'us-text' ? 'en-US' : 'en-GB';
+    const parts = date => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', timeZone: 'UTC' })
+      .formatToParts(new Date(iso(date) + 'T00:00:00Z'));
+    const withoutMonth = list => list.filter(p => p.type === 'day').map(p => p.value).join('');
+    const monthFirst = parts(entry.from)[0].type === 'month';
+    if (withoutMonth(parts(entry.from)) && withoutMonth(parts(entry.to))) {
+      if (monthFirst) end = withoutMonth(parts(entry.to));
+      else first = withoutMonth(parts(entry.from));
+    }
+  }
+  return `${first} – ${end}${note}`;
+}
+
 function seasonDates(dates, live) {
   const icon = el('span', { class: 'choice-when-icon', attrs: { 'aria-hidden': 'true' } });
   icon.innerHTML = CLOCK_ICON; // fixed markup above, nothing from outside
+  const lines = dates.map(d => el('span', { class: 'choice-when-date', text: seasonDateLabel(d) }));
+  // Redrawn when the date format changes.
+  if (!live) syncers.push(() => lines.forEach((line, i) => { line.textContent = seasonDateLabel(dates[i]); }));
   return el('span', { class: 'choice-when' }, [
     icon,
     live ? null : el('span', { class: 'visually-hidden', text: 'Automatic on: ' }),
-    ...dates.map(d => el('span', { class: 'choice-when-date', text: d }))
+    ...lines
   ]);
 }
 
