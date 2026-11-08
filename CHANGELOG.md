@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.7.1 — 2026-11-08
+
+### Changed
+- Seasonal theme tags now only appear when "Automatic" is selected
+- Moved seasonal theme tags to the bottom right of the preview, and made them smaller
+
+### Fixed
+- Fixed footer text being hard to read when a seasonal theme that changes the lower section of the page is active - there is now a smooth transition between the theme background and footer when the footer is on screen
+- Fixed search icons being too close to the text in search bars when using Compact mode
+- Fixed "Latest news" button on the home page & "Reset all settings" button on the settings page being transparent and showing seasonal themes through them
+
 ## v4.7.0 — 2026-11-08
 
 ### Added
@@ -15,7 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
     - Automatically enabled between 24 - 31 March
   - Fireflies: Fireflies blinking under a twilight sky
     - Automatically enabled between 18 - 24 June
-  - Falling Leaves: Brown leaves falling down the page
+  - Falling Leaves (formerly "Late Autumn/Fall"): Brown leaves falling down the page
     - Automatically enabled between 23 - 30 November
 - Added tags to seasonal theme options (e.g. "Today", "Next: in 5 days" or "After: in 15 days"), so you can see which automatic themes are up next
 
