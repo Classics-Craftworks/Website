@@ -1,11 +1,12 @@
 /* Seasonal themes: the moving (or, with reduced motion, still) picture behind the page.
 
    settings.js decides which theme is in effect and puts it on <html> as data-season
-   ("fireworks", "aurora", "blossom", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
+   ("fireworks", "aurora", "blossom", "fireflies", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
    a fixed, click-through <canvas> behind everything (styles.css: .season-canvas).
 
    - Fireworks: rockets rise and burst into sparks.
    - Aurora: slow green, teal and violet northern-lights curtains sway across the upper sky.
+   - Fireflies: fireflies wander and blink under a blue-to-rose twilight sky.
    - Cherry Blossom: pink petals drift and flutter down on a light breeze.
    - Falling Leaves: brown autumn leaves tumble and drift down.
    - Snowfall: snow drifts down.
@@ -1000,6 +1001,109 @@
     return { step, draw, still, resize };
   }
 
+  /* ---------- Fireflies ---------- */
+
+  // Glow colours as "r, g, b": a yellow-green on dark pages, a deeper amber on the light theme.
+  const FIREFLY_COLOURS = { dark: '215, 255, 110', light: '190, 120, 10' };
+  // The twilight sky, top to bottom: dusky blue, violet, then a rose-pink horizon. Nothing orange, so it stays
+  // apart from Halloween's warm glow, and kept soft and fairly light so it reads as dusk rather than night.
+  const TWILIGHT = {
+    dark: [
+      [0, '85, 95, 205', 0.16], [0.5, '150, 105, 205', 0.14], [0.8, '210, 120, 185', 0.2], [1, '235, 140, 175', 0.26]
+    ],
+    light: [
+      [0, '110, 120, 215', 0.12], [0.5, '165, 125, 215', 0.1], [0.8, '225, 140, 190', 0.15], [1, '240, 155, 185', 0.2]
+    ]
+  };
+
+  function createFireflies(view) {
+    let flies = [];
+    let clock = 0;
+    let held = false; // reduced motion: every firefly shown part-lit
+
+    const unit = () => view.scale !== undefined ? view.scale * 1.6 : Math.min(1.25, Math.max(0.6, Math.min(view.w, view.h) / 760));
+    const wanted = () => view.flies ?? Math.round(Math.min(55, Math.max(20, (view.w * view.h) / 18000)));
+
+    function fly() {
+      return {
+        x: rand(0, view.w), y: rand(view.h * 0.3, view.h * 0.98),
+        heading: rand(0, TAU), turn: rand(0.4, 1.1), turnPhase: rand(0, TAU),
+        speed: rand(10, 26) * unit(),
+        size: rand(2.2, 3.8) * unit(),
+        period: rand(2.6, 5.2), phase: rand(0, TAU) // seconds per blink
+      };
+    }
+
+    function fill() {
+      const count = wanted();
+      while (flies.length < count) flies.push(fly());
+      if (flies.length > count) flies.length = count;
+    }
+
+    // 0 (dark) to 1 (fully lit): a slow swell, then a long pause, like the real thing.
+    function glow(f) {
+      const wave = Math.sin(clock * TAU / f.period + f.phase);
+      if (held) return 0.55 + 0.45 * wave;
+      return Math.pow(Math.max(0, wave), 2);
+    }
+
+    function step(dt) {
+      clock += dt;
+      fill();
+      flies.forEach(f => {
+        // A lazy, wandering path: the heading sways instead of jumping.
+        f.heading += Math.sin(clock * f.turn + f.turnPhase) * 1.3 * dt;
+        f.x += Math.cos(f.heading) * f.speed * dt;
+        f.y += Math.sin(f.heading) * f.speed * dt * 0.6 - 2 * dt;
+        if (f.x < -10) f.x = view.w + 10; else if (f.x > view.w + 10) f.x = -10;
+        if (f.y < view.h * 0.2) f.heading = Math.abs(f.heading % TAU) < Math.PI ? f.heading : -f.heading; // stay low
+        if (f.y < view.h * 0.2) f.y = view.h * 0.2;
+        if (f.y > view.h + 6) f.y = view.h + 6;
+      });
+    }
+
+    function draw(ctx) {
+      const light = isLight();
+      // Twilight: the whole sky, dusky blue at the top shading through violet to a rose-pink horizon.
+      const sky = ctx.createLinearGradient(0, 0, 0, view.h);
+      TWILIGHT[light ? 'light' : 'dark'].forEach(([at, rgb, alpha]) => sky.addColorStop(at, `rgba(${rgb}, ${alpha})`));
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, view.w, view.h);
+
+      const rgb = FIREFLY_COLOURS[light ? 'light' : 'dark'];
+      ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
+      flies.forEach(f => {
+        const g = glow(f);
+        if (g < 0.02) return;
+        const radius = f.size * 8;
+        const halo = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, radius);
+        halo.addColorStop(0, `rgba(${rgb}, ${0.55 * g * (light ? 0.8 : 1)})`);
+        halo.addColorStop(0.35, `rgba(${rgb}, ${0.16 * g})`);
+        halo.addColorStop(1, `rgba(${rgb}, 0)`);
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, radius, 0, TAU);
+        ctx.fill();
+        ctx.fillStyle = light ? `rgba(${rgb}, ${0.95 * g})` : `rgba(255, 255, 200, ${0.95 * g})`;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.size, 0, TAU);
+        ctx.fill();
+      });
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    function still() { flies = []; held = true; clock = 1; fill(); }
+
+    fill();
+
+    function resize(oldW, oldH) {
+      if (!oldW || !oldH) return;
+      flies.forEach(f => { f.x = (f.x / oldW) * view.w; f.y = (f.y / oldH) * view.h; });
+    }
+
+    return { step, draw, still, resize };
+  }
+
   /* ---------- Aurora ---------- */
 
   // Curtain colours as "r, g, b". On dark pages they are added to the sky (so they glow); on the light
@@ -1076,7 +1180,7 @@
     return { step, draw, still, resize() {} };
   }
 
-  const EFFECTS = { fireworks: createFireworks, aurora: createAurora, blossom: createBlossom, friday13: createFriday13, halloween: createHalloween, leaves: createLeaves, snowfall: createSnow, christmas: createChristmas };
+  const EFFECTS = { fireworks: createFireworks, aurora: createAurora, blossom: createBlossom, fireflies: createFireflies, friday13: createFriday13, halloween: createHalloween, leaves: createLeaves, snowfall: createSnow, christmas: createChristmas };
 
   /* ---------- Running ---------- */
 
@@ -1185,7 +1289,7 @@
      reduced motion it never moves. Looks after itself; returns nothing. */
   window.mountSeasonPreview = (previewCanvas, season) => {
     const pctx = previewCanvas.getContext('2d');
-    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, embers: 7, sparkles: 6, lightsTop: 0 };
+    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, flies: 8, embers: 7, sparkles: 6, lightsTop: 0 };
     let peffect = null;
     let pframe = 0;
     let plast = 0;
@@ -1213,7 +1317,7 @@
     // The same picture every time (seeded), so it never changes behind the person's back: not when they
     // choose a card, and not when the pointer leaves again.
     function showStill() {
-      random = seeded({ fireworks: 11, aurora: 7, blossom: 3, snowfall: 5, christmas: 25, halloween: 31, leaves: 23, friday13: 13 }[season] || 5);
+      random = seeded({ fireworks: 11, aurora: 7, blossom: 3, fireflies: 18, snowfall: 5, christmas: 25, halloween: 31, leaves: 23, friday13: 13 }[season] || 5);
       try {
         peffect = EFFECTS[season](pview);
         peffect.still();

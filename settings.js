@@ -16,7 +16,7 @@
      data-density        compact               (absent = comfortable spacing)
      data-sidebar        left                  (absent = side panels on the right)
      data-newtab         off                   (absent = external links open in a new tab)
-     data-season         fireworks | aurora | blossom | snowfall | christmas | halloween | leaves | friday13 (absent = no seasonal theme; drawn by seasonal.js)
+     data-season         fireworks | aurora | blossom | fireflies | snowfall | christmas | halloween | leaves | friday13 (absent = no seasonal theme; drawn by seasonal.js)
 
    High contrast and reduced motion follow the device setting until the visitor changes them
    (stored as null = "follow the device"). */
@@ -33,7 +33,7 @@ const SETTING_CHOICES = {
   density: ['compact', 'comfortable', 'spacious'],
   // auto = follow the calendar (see automaticSeason), off = never set one automatically.
   // A theme chosen here stays on all year and overrides the automatic one.
-  seasonal: ['auto', 'fireworks', 'aurora', 'blossom', 'snowfall', 'christmas', 'halloween', 'leaves', 'friday13', 'off']
+  seasonal: ['auto', 'fireworks', 'aurora', 'blossom', 'fireflies', 'snowfall', 'christmas', 'halloween', 'leaves', 'friday13', 'off']
 };
 
 const SETTING_DEFAULTS = Object.freeze({
@@ -126,6 +126,11 @@ const SEASONS = {
     name: 'Cherry Blossom', blurb: 'Drifting cherry-blossom petals.',
     dates: [{ from: [3, 24], to: [3, 31] }],
     on: (month, day) => month === 3 && day >= 24
+  },
+  fireflies: {
+    name: 'Fireflies', blurb: 'Fireflies blinking under a twilight sky.',
+    dates: [{ from: [6, 18], to: [6, 24] }],
+    on: (month, day) => month === 6 && day >= 18 && day <= 24
   },
   leaves: {
     name: 'Falling Leaves', blurb: 'Brown autumn leaves drifting down.',
