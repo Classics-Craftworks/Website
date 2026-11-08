@@ -139,13 +139,13 @@ const SEASONS = {
   },
   snowfall: {
     name: 'Snowfall', blurb: 'Falling snow.',
-    dates: [{ from: [12, 1], to: [12, 17] }, { from: [12, 28], to: [12, 30] }],
-    on: (month, day) => month === 12 && (day <= 17 || (day >= 28 && day <= 30))
+    dates: [{ from: [12, 1], to: [12, 12] }, { from: [12, 28], to: [12, 30] }],
+    on: (month, day) => month === 12 && (day <= 12 || (day >= 28 && day <= 30))
   },
   christmas: {
     name: 'Christmas', blurb: 'Twinkling fairy lights, pine trees and drifting sparkles.',
-    dates: [{ from: [12, 18], to: [12, 27] }],
-    on: (month, day) => month === 12 && day >= 18 && day <= 27
+    dates: [{ from: [12, 13], to: [12, 27] }],
+    on: (month, day) => month === 12 && day >= 13 && day <= 27
   },
   halloween: {
     name: 'Halloween', blurb: 'Bats, a hazy moon and rising embers.',
