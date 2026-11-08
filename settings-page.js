@@ -272,7 +272,7 @@ const SEASON_OPTIONS = [
     return el('label', { class: 'choice' }, [
       input,
       seasonPreview(o.value),
-      // Over the corner of the preview (the preview itself is hidden from screen readers; the tag is not).
+      // Over the bottom right corner of the preview (the preview itself is hidden from screen readers; the tag is not).
       el('span', { class: 'choice-tag', attrs: { hidden: '' } }),
       el('span', { class: 'choice-head' }, [el('span', { class: 'choice-name', text: o.name }), radioMark()]),
       el('span', { class: 'choice-note', text: o.note }),
@@ -328,13 +328,15 @@ function seasonalRow() {
 
   // "Today", "Next · in 5 days" and "After · in 15 days" (the one following the next) on the cards, wherever they are in the list.
   function tags() {
+    const automatic = getSettings().seasonal === 'auto'; // the tags describe the calendar, so only show them while it is in charge
     const today = automaticSeason();
     const [next, after] = upcomingSeasons().filter(item => item.days > 0);
     cards.forEach(({ value, card }) => {
       const tag = card.querySelector('.choice-tag');
       if (!tag || !SEASONS[value]) return;
       let text = '';
-      if (value === today) text = 'Today';
+      if (!automatic) text = '';
+      else if (value === today) text = 'Today';
       else if (next && value === next.key) text = `Next · in ${next.days} ${next.days === 1 ? 'day' : 'days'}`;
       else if (after && value === after.key) text = `After · in ${after.days} ${after.days === 1 ? 'day' : 'days'}`;
       tag.textContent = text;

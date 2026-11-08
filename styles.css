@@ -2552,7 +2552,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .season-toggle { width: 100%; }
 .season-toggle .season-chevron { margin: -3px 0 0 var(--s-1); }
 .season-toggle[aria-expanded="true"] .season-chevron { margin-top: 3px; transform: rotate(225deg); }
-.choice-tag { position: absolute; z-index: 1; top: calc(var(--s-3) + var(--s-2)); left: calc(var(--s-3) + var(--s-2)); max-width: calc(100% - 2 * (var(--s-3) + var(--s-2))); overflow: hidden; padding: 1px var(--s-2); border: 1px solid var(--accent); border-radius: var(--r-pill); background: color-mix(in srgb, var(--bg) 85%, transparent); color: var(--accent); font-size: var(--text-xs); line-height: var(--lh-xs); font-weight: 600; white-space: nowrap; text-overflow: ellipsis; pointer-events: none; }
+.choice-tag { position: absolute; z-index: 1; top: calc(1px + var(--s-3) + 64px - var(--s-2)); right: calc(1px + var(--s-3) + var(--s-1)); transform: translateY(-100%); max-width: calc(100% - 2 * (var(--s-3) + var(--s-2))); overflow: hidden; padding: 0 6px; border: 1px solid var(--accent); border-radius: var(--r-pill); background: color-mix(in srgb, var(--bg) 85%, transparent); color: var(--accent); font-size: 11px; line-height: 16px; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; pointer-events: none; }
 .choice-tag[hidden] { display: none; }
 .choice-name-group { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-2); min-width: 0; }
 .soon-pill {
