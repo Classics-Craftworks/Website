@@ -1,11 +1,12 @@
 /* Seasonal themes: the moving (or, with reduced motion, still) picture behind the page.
 
    settings.js decides which theme is in effect and puts it on <html> as data-season
-   ("fireworks", "aurora", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
+   ("fireworks", "aurora", "blossom", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
    a fixed, click-through <canvas> behind everything (styles.css: .season-canvas).
 
    - Fireworks: rockets rise and burst into sparks.
    - Aurora: slow green, teal and violet northern-lights curtains sway across the upper sky.
+   - Cherry Blossom: pink petals drift and flutter down on a light breeze.
    - Falling Leaves: brown autumn leaves tumble and drift down.
    - Snowfall: snow drifts down.
    - Christmas: a string of fairy lights twinkles along the top, golden sparkles drift down and a treeline of
@@ -918,6 +919,87 @@
     return { step, draw, still, resize };
   }
 
+  /* ---------- Cherry Blossom ---------- */
+
+  // Petal pinks; the light theme needs deeper ones to show against a pale page.
+  const PETAL_COLOURS = {
+    dark:  ['#ffc2d6', '#ffb0c8', '#ffd6e4', '#f79ab8', '#ffe3ec'],
+    light: ['#e8749c', '#d95a86', '#ee8fb0', '#cc4a78', '#f2a3bf']
+  };
+
+  function createBlossom(view) {
+    let petals = [];
+    let clock = 0;
+
+    const unit = () => view.scale !== undefined ? view.scale * 1.6 : Math.min(1.25, Math.max(0.6, Math.min(view.w, view.h) / 760));
+    const wanted = () => view.petals ?? Math.round(Math.min(70, Math.max(22, (view.w * view.h) / 14000)));
+
+    function petal(anywhere) {
+      return {
+        x: rand(-20, view.w + 20), y: anywhere ? rand(0, view.h) : rand(-30, -4),
+        size: rand(6, 11) * unit(), colour: Math.floor(random() * PETAL_COLOURS.dark.length),
+        fall: rand(18, 36) * unit() + 8, // slower than leaves: petals float
+        drift: rand(6, 16) * unit(),       // a steady push to one side, like a light breeze
+        sway: rand(14, 34) * unit(), swaySpeed: rand(0.3, 0.8), phase: rand(0, TAU),
+        angle: rand(0, TAU), spin: rand(-1.6, 1.6),
+        tumble: rand(1, 2.6), alpha: rand(0.7, 0.95)
+      };
+    }
+
+    function fill(anywhere) {
+      const count = wanted();
+      while (petals.length < count) petals.push(petal(anywhere));
+      if (petals.length > count) petals.length = count;
+    }
+
+    function step(dt) {
+      clock += dt;
+      fill(false);
+      petals.forEach(p => {
+        p.y += p.fall * dt;
+        p.x += (p.drift + Math.sin(clock * p.swaySpeed + p.phase) * p.sway) * dt;
+        p.angle += p.spin * dt;
+        if (p.y > view.h + p.size * 2) Object.assign(p, petal(false));
+        if (p.x > view.w + 24) p.x = -24; else if (p.x < -24) p.x = view.w + 24;
+      });
+    }
+
+    function draw(ctx) {
+      const palette = PETAL_COLOURS[isLight() ? 'light' : 'dark'];
+      petals.forEach(p => {
+        const s = p.size;
+        const flip = Math.cos(clock * p.tumble + p.phase);
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.scale(0.3 + 0.7 * Math.abs(flip), 1);
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = palette[p.colour % palette.length];
+        // A rounded petal with a small notch at the tip, narrowing to the base.
+        ctx.beginPath();
+        ctx.moveTo(0, s * 1.1);
+        ctx.bezierCurveTo(s * 1.15, s * 0.5, s * 1.0, -s * 0.9, s * 0.28, -s);
+        ctx.lineTo(0, -s * 0.7);
+        ctx.lineTo(-s * 0.28, -s);
+        ctx.bezierCurveTo(-s * 1.0, -s * 0.9, -s * 1.15, s * 0.5, 0, s * 1.1);
+        ctx.fill();
+        ctx.restore();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function still() { petals = []; fill(true); }
+
+    fill(true);
+
+    function resize(oldW, oldH) {
+      if (!oldW || !oldH) return;
+      petals.forEach(p => { p.x = (p.x / oldW) * view.w; p.y = (p.y / oldH) * view.h; });
+    }
+
+    return { step, draw, still, resize };
+  }
+
   /* ---------- Aurora ---------- */
 
   // Curtain colours as "r, g, b". On dark pages they are added to the sky (so they glow); on the light
@@ -994,7 +1076,7 @@
     return { step, draw, still, resize() {} };
   }
 
-  const EFFECTS = { fireworks: createFireworks, aurora: createAurora, friday13: createFriday13, halloween: createHalloween, leaves: createLeaves, snowfall: createSnow, christmas: createChristmas };
+  const EFFECTS = { fireworks: createFireworks, aurora: createAurora, blossom: createBlossom, friday13: createFriday13, halloween: createHalloween, leaves: createLeaves, snowfall: createSnow, christmas: createChristmas };
 
   /* ---------- Running ---------- */
 
@@ -1131,7 +1213,7 @@
     // The same picture every time (seeded), so it never changes behind the person's back: not when they
     // choose a card, and not when the pointer leaves again.
     function showStill() {
-      random = seeded({ fireworks: 11, aurora: 7, snowfall: 5, christmas: 25, halloween: 31, leaves: 23, friday13: 13 }[season] || 5);
+      random = seeded({ fireworks: 11, aurora: 7, blossom: 3, snowfall: 5, christmas: 25, halloween: 31, leaves: 23, friday13: 13 }[season] || 5);
       try {
         peffect = EFFECTS[season](pview);
         peffect.still();
