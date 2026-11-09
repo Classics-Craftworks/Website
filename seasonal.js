@@ -1,12 +1,13 @@
 /* Seasonal themes: the moving (or, with reduced motion, still) picture behind the page.
 
    settings.js decides which theme is in effect and puts it on <html> as data-season
-   ("fireworks", "aurora", "blossom", "easter", "fireflies", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
+   ("fireworks", "aurora", "anniversary", "blossom", "easter", "fireflies", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
    a fixed, click-through <canvas> behind everything (styles.css: .season-canvas).
 
    - Fireworks: rockets rise and burst into sparks.
    - Aurora: slow green, teal and violet northern-lights curtains sway across the upper sky.
-   - Easter: pastel decorated eggs rock gently as they drift down among a few little daisies.
+   - Anniversary: bright confetti falls while party balloons float up the page.
+  - Easter: pastel decorated eggs rock gently as they drift down among a few little daisies.
   - Fireflies: fireflies wander and blink under a blue-to-rose twilight sky.
    - Cherry Blossom: pink petals drift and flutter down on a light breeze.
    - Falling Leaves: brown autumn leaves tumble and drift down.
@@ -1162,6 +1163,151 @@
     return { step, draw, still, resize };
   }
 
+  /* ---------- Anniversary ---------- */
+
+  // Bright party colours; deeper on the light theme so they read against a pale page.
+  const FOOL_COLOURS = {
+    dark:  ['#ff5d9e', '#ffd23f', '#3fe0ff', '#a56bff', '#5ef08a', '#ff8a3d'],
+    light: ['#d81b6a', '#c99700', '#0a8fb5', '#7a3fe0', '#1b9a4a', '#e0661a']
+  };
+
+  // A party: confetti falls while the balloons float up the page.
+  function createAnniversary(view) {
+    let bits = [];
+    let balloons = [];
+    let clock = 0;
+
+    const unit = () => view.scale !== undefined ? view.scale * 1.6 : Math.min(1.25, Math.max(0.6, Math.min(view.w, view.h) / 760));
+    const wantedBits = () => view.confetti ?? Math.round(Math.min(80, Math.max(28, (view.w * view.h) / 12000)));
+    const wantedBalloons = () => view.balloons ?? Math.round(Math.min(9, Math.max(4, view.w / 170)));
+
+    function bit(anywhere) {
+      return {
+        x: rand(-10, view.w + 10), y: anywhere ? rand(0, view.h) : rand(-20, -4),
+        size: rand(4, 8) * unit(), colour: Math.floor(random() * FOOL_COLOURS.dark.length),
+        shape: Math.floor(random() * 4),
+        fall: rand(45, 95) * unit() + 15,
+        sway: rand(8, 24) * unit(), swaySpeed: rand(0.6, 1.6), phase: rand(0, TAU),
+        angle: rand(0, TAU), spin: rand(-3, 3), tumble: rand(2, 5)
+      };
+    }
+
+    function balloon(anywhere) {
+      const r = rand(13, 20) * unit();
+      return {
+        x: view.w * marginX(0.65), y: anywhere ? rand(0, view.h) : view.h + r * 4,
+        r, colour: Math.floor(random() * FOOL_COLOURS.dark.length),
+        rise: rand(26, 46) * unit() + 12,
+        sway: rand(10, 22) * unit(), swaySpeed: rand(0.4, 0.8), phase: rand(0, TAU)
+      };
+    }
+
+    function fill(anywhere) {
+      const nb = wantedBits();
+      while (bits.length < nb) bits.push(bit(anywhere));
+      if (bits.length > nb) bits.length = nb;
+      const nl = wantedBalloons();
+      while (balloons.length < nl) balloons.push(balloon(anywhere));
+      if (balloons.length > nl) balloons.length = nl;
+    }
+
+    const swayX = (p, base) => base + Math.sin(clock * p.swaySpeed + p.phase) * p.sway;
+
+    function step(dt) {
+      clock += dt;
+      fill(false);
+      bits.forEach(p => {
+        p.y += p.fall * dt;
+        p.angle += p.spin * dt;
+        if (p.y > view.h + 12) Object.assign(p, bit(false));
+      });
+      balloons.forEach(b => {
+        b.y -= b.rise * dt;
+        if (b.y < -b.r * 5) Object.assign(b, balloon(false));
+      });
+    }
+
+    function drawBit(ctx, p, palette) {
+      const s = p.size;
+      ctx.save();
+      ctx.translate(swayX(p, p.x), p.y);
+      ctx.rotate(p.angle);
+      ctx.scale(0.25 + 0.75 * Math.abs(Math.cos(clock * p.tumble + p.phase)), 1);
+      ctx.fillStyle = ctx.strokeStyle = palette[p.colour % palette.length];
+      if (p.shape === 0) {
+        ctx.fillRect(-s * 0.5, -s, s, s * 2);
+      } else if (p.shape === 1) { // a harlequin diamond
+        ctx.beginPath();
+        ctx.moveTo(0, -s * 1.2); ctx.lineTo(s * 0.8, 0); ctx.lineTo(0, s * 1.2); ctx.lineTo(-s * 0.8, 0);
+        ctx.closePath(); ctx.fill();
+      } else if (p.shape === 2) {
+        ctx.beginPath(); ctx.arc(0, 0, s * 0.6, 0, TAU); ctx.fill();
+      } else { // a squiggle
+        ctx.lineWidth = Math.max(1, s * 0.35);
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        for (let t = -1; t <= 1.001; t += 0.25) {
+          const x = Math.sin(t * 3.2) * s * 0.7, y = t * s * 1.4;
+          if (t === -1) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawBalloon(ctx, b, palette, light) {
+      const x = swayX(b, b.x);
+      const rx = b.r * 0.82;
+      const ry = b.r;
+      ctx.save();
+      ctx.translate(x, b.y);
+      // String: trails below, waving a little.
+      ctx.strokeStyle = light ? 'rgba(40, 50, 80, 0.55)' : 'rgba(255, 255, 255, 0.5)';
+      ctx.lineWidth = Math.max(0.6, b.r * 0.06);
+      ctx.beginPath();
+      ctx.moveTo(0, ry + b.r * 0.2);
+      ctx.bezierCurveTo(b.r * 0.4 * Math.sin(clock * 1.3 + b.phase), ry + b.r * 1.0, -b.r * 0.4 * Math.sin(clock * 1.1 + b.phase), ry + b.r * 1.8, 0, ry + b.r * 2.6);
+      ctx.stroke();
+      // Body and knot.
+      ctx.fillStyle = palette[b.colour % palette.length];
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, 0, TAU);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(0, ry - 0.5); ctx.lineTo(-b.r * 0.16, ry + b.r * 0.22); ctx.lineTo(b.r * 0.16, ry + b.r * 0.22);
+      ctx.closePath(); ctx.fill();
+      // Shine.
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(-rx * 0.38, -ry * 0.4, rx * 0.16, ry * 0.28, 0.4, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function draw(ctx) {
+      const light = isLight();
+      const palette = FOOL_COLOURS[light ? 'light' : 'dark'];
+      ctx.globalAlpha = 0.9;
+      bits.forEach(p => drawBit(ctx, p, palette));
+      ctx.globalAlpha = 1;
+      balloons.forEach(b => drawBalloon(ctx, b, palette, light));
+    }
+
+    function still() { bits = []; balloons = []; clock = 1; fill(true); }
+
+    fill(true);
+
+    function resize(oldW, oldH) {
+      if (!oldW || !oldH) return;
+      const fix = p => { p.x = (p.x / oldW) * view.w; p.y = (p.y / oldH) * view.h; };
+      bits.forEach(fix); balloons.forEach(fix);
+    }
+
+    return { step, draw, still, resize };
+  }
+
   /* ---------- Fireflies ---------- */
 
   // Glow colours as "r, g, b": a yellow-green on dark pages, a deeper amber on the light theme.
@@ -1341,7 +1487,7 @@
     return { step, draw, still, resize() {} };
   }
 
-  const EFFECTS = { fireworks: createFireworks, aurora: createAurora, blossom: createBlossom, easter: createEaster, fireflies: createFireflies, friday13: createFriday13, halloween: createHalloween, leaves: createLeaves, snowfall: createSnow, christmas: createChristmas };
+  const EFFECTS = { fireworks: createFireworks, aurora: createAurora, anniversary: createAnniversary, blossom: createBlossom, easter: createEaster, fireflies: createFireflies, friday13: createFriday13, halloween: createHalloween, leaves: createLeaves, snowfall: createSnow, christmas: createChristmas };
 
   /* ---------- Running ---------- */
 
@@ -1466,7 +1612,7 @@
      reduced motion it never moves. Looks after itself; returns nothing. */
   window.mountSeasonPreview = (previewCanvas, season) => {
     const pctx = previewCanvas.getContext('2d');
-    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, flies: 8, eggs: 13, embers: 7, sparkles: 6, lightsTop: 0, flashEvery: [2.0, 3.5] }; // flashEvery: Friday 13th's bolts, far more often than on the page
+    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, flies: 8, eggs: 13, confetti: 22, balloons: 5, embers: 7, sparkles: 6, lightsTop: 0, flashEvery: [2.0, 3.5] }; // flashEvery: Friday 13th's bolts, far more often than on the page
     let peffect = null;
     let pframe = 0;
     let plast = 0;
@@ -1494,7 +1640,7 @@
     // The same picture every time (seeded), so it never changes behind the person's back: not when they
     // choose a card, and not when the pointer leaves again.
     function showStill() {
-      random = seeded({ fireworks: 11, aurora: 7, blossom: 3, easter: 9, fireflies: 18, snowfall: 5, christmas: 25, halloween: 31, leaves: 23, friday13: 13 }[season] || 5);
+      random = seeded({ fireworks: 11, aurora: 7, blossom: 3, anniversary: 4, easter: 9, fireflies: 18, snowfall: 5, christmas: 25, halloween: 31, leaves: 23, friday13: 13 }[season] || 5);
       try {
         peffect = EFFECTS[season](pview);
         peffect.still();

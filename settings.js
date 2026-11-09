@@ -16,7 +16,7 @@
      data-density        compact               (absent = comfortable spacing)
      data-sidebar        left                  (absent = side panels on the right)
      data-newtab         off                   (absent = external links open in a new tab)
-     data-season         fireworks | aurora | blossom | easter | fireflies | snowfall | christmas | halloween | leaves | friday13 (absent = no seasonal theme; drawn by seasonal.js)
+     data-season         fireworks | aurora | anniversary | blossom | easter | fireflies | snowfall | christmas | halloween | leaves | friday13 (absent = no seasonal theme; drawn by seasonal.js)
 
    High contrast and reduced motion follow the device setting until the visitor changes them
    (stored as null = "follow the device"). */
@@ -33,7 +33,7 @@ const SETTING_CHOICES = {
   density: ['compact', 'comfortable', 'spacious'],
   // auto = follow the calendar (see automaticSeason), off = never set one automatically.
   // A theme chosen here stays on all year and overrides the automatic one.
-  seasonal: ['auto', 'fireworks', 'aurora', 'blossom', 'easter', 'fireflies', 'snowfall', 'christmas', 'halloween', 'leaves', 'friday13', 'off']
+  seasonal: ['auto', 'fireworks', 'aurora', 'anniversary', 'blossom', 'easter', 'fireflies', 'snowfall', 'christmas', 'halloween', 'leaves', 'friday13', 'off']
 };
 
 const SETTING_DEFAULTS = Object.freeze({
@@ -158,7 +158,7 @@ const SEASONS = {
     dates: [{ from: [1, 28], to: [2, 4] }],
     on: (month, day) => (month === 1 && day >= 28) || (month === 2 && day <= 4)
   },
-  // Before Cherry Blossom (whose last week it can overlap), so Easter takes those days.
+  // Easter comes before Cherry Blossom (whose last week it can overlap), so Easter takes those days.
   easter: {
     name: 'Easter', blurb: 'Pastel eggs and drifting daisies.',
     dates: [() => nextEasterWeekend()],
@@ -172,6 +172,11 @@ const SEASONS = {
     name: 'Cherry Blossom', blurb: 'Drifting cherry-blossom petals.',
     dates: [{ from: [3, 24], to: [3, 31] }],
     on: (month, day) => month === 3 && day >= 24
+  },
+  anniversary: {
+    name: 'Anniversary', blurb: 'Confetti falls and party balloons float up.',
+    dates: [{ from: [5, 17] }],
+    on: (month, day) => month === 5 && day === 17
   },
   fireflies: {
     name: 'Fireflies', blurb: 'Fireflies blinking under a twilight sky.',
