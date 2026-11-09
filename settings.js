@@ -134,8 +134,8 @@ const SEASONS = {
   },
   leaves: {
     name: 'Falling Leaves', blurb: 'Brown autumn leaves drifting down.',
-    dates: [{ from: [11, 23], to: [11, 30] }],
-    on: (month, day) => month === 11 && day >= 23 && day <= 30
+    dates: [{ from: [11, 22], to: [11, 30] }],
+    on: (month, day) => month === 11 && day >= 22 && day <= 30
   },
   snowfall: {
     name: 'Snowfall', blurb: 'Falling snow.',
