@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.8.1 — 2026-11-09
+
+### Changed
+- The Snowfall theme now also runs from 2 - 5 January (the December runs are unchanged)
+- Included "for Minecraft's anniversary" in the Anniversary theme description
+
 ## v4.8.0.2 — 2026-11-09
 
 ### Changed
