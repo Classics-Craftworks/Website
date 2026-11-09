@@ -196,8 +196,8 @@ const SEASONS = {
   },
   snowfall: {
     name: 'Snowfall', blurb: 'Falling snow.',
-    dates: [{ from: [12, 1], to: [12, 12] }, { from: [12, 28], to: [12, 30] }],
-    on: (month, day) => month === 12 && (day <= 12 || (day >= 28 && day <= 30))
+    dates: [{ from: [12, 1], to: [12, 12] }, { from: [12, 28], to: [12, 30] }, { from: [1, 2], to: [1, 5] }],
+    on: (month, day) => (month === 12 && (day <= 12 || (day >= 28 && day <= 30))) || (month === 1 && day >= 2 && day <= 5)
   },
   christmas: {
     name: 'Christmas', blurb: 'Twinkling fairy lights, pine trees and drifting sparkles.',
