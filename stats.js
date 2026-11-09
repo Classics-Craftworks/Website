@@ -10,9 +10,9 @@ const STATS_DATA = {
       tooltip: "Download stats combine totals from Modrinth and SpigotMC, fetched daily from the Modrinth API and Spiget and rounded down to the nearest 1000." },
     { icon: "heart", label: "Followers", value: "400+",
       tooltip: "Followers across all Modrinth projects, fetched daily from the Modrinth API and rounded down to the nearest 10." },
-    { icon: "clock", label: "Hours Played", value: "560+",
+    { icon: "clock", label: "Hours Played", value: "580+",
       tooltip: "Playtime stats are tracked by Modrinth via the Modrinth App only. Updated manually and rounded down to the nearest 10." }
   ],
 
-  lastUpdated: "2026-11-05"
+  lastUpdated: "2026-11-09"
 };
