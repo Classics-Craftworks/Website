@@ -16,7 +16,7 @@
      data-density        compact               (absent = comfortable spacing)
      data-sidebar        left                  (absent = side panels on the right)
      data-newtab         off                   (absent = external links open in a new tab)
-     data-season         fireworks | aurora | anniversary | blossom | easter | fireflies | snowfall | christmas | halloween | leaves | friday13 (absent = no seasonal theme; drawn by seasonal.js)
+     data-season         fireworks | aprilfools | aurora | anniversary | blossom | easter | fireflies | snowfall | christmas | halloween | leaves | friday13 (absent = no seasonal theme; drawn by seasonal.js)
 
    High contrast and reduced motion follow the device setting until the visitor changes them
    (stored as null = "follow the device"). */
@@ -33,7 +33,7 @@ const SETTING_CHOICES = {
   density: ['compact', 'comfortable', 'spacious'],
   // auto = follow the calendar (see automaticSeason), off = never set one automatically.
   // A theme chosen here stays on all year and overrides the automatic one.
-  seasonal: ['auto', 'fireworks', 'aurora', 'anniversary', 'blossom', 'easter', 'fireflies', 'snowfall', 'christmas', 'halloween', 'leaves', 'friday13', 'off']
+  seasonal: ['auto', 'fireworks', 'aprilfools', 'aurora', 'anniversary', 'blossom', 'easter', 'fireflies', 'snowfall', 'christmas', 'halloween', 'leaves', 'friday13', 'off']
 };
 
 const SETTING_DEFAULTS = Object.freeze({
@@ -158,7 +158,13 @@ const SEASONS = {
     dates: [{ from: [1, 28], to: [2, 4] }],
     on: (month, day) => (month === 1 && day >= 28) || (month === 2 && day <= 4)
   },
-  // Easter comes before Cherry Blossom (whose last week it can overlap), so Easter takes those days.
+  // April Fools comes before Easter (the Easter weekend can include 1 April), and Easter before Cherry
+  // Blossom (whose last week it can overlap), so each takes the days it shares with the ones after it.
+  aprilfools: {
+    name: 'April Fools', blurb: 'The site becomes "Classic\'s Mudworks", in mud brown.',
+    dates: [{ from: [4, 1] }],
+    on: (month, day) => month === 4 && day === 1
+  },
   easter: {
     name: 'Easter', blurb: 'Pastel eggs and drifting daisies.',
     dates: [() => nextEasterWeekend()],

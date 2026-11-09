@@ -227,6 +227,36 @@
 :root[data-contrast="high"][data-theme="light"][data-accent="green"] { --accent: #335705; --accent-rgb: 51, 87, 5; }
 :root[data-contrast="high"][data-theme="light"][data-accent="teal"] { --accent: #04504a; --accent-rgb: 4, 80, 74; }
 
+/* April Fools (settings.js: SEASONS.aprilfools): the site becomes "Classic's Mudworks", dressed in mud brown.
+   Done entirely with tokens, so every page follows it: a mud-brown accent and warm brown surfaces (dark theme)
+   or parchment ones (light). OLED keeps its black and only takes the accent. Fonts, spacing and shapes are the
+   site's own; only the name in the header and footer is swapped. Placed after the accent and contrast rules
+   above so it wins over them. */
+:root[data-season="aprilfools"] {
+  --accent: #d19a66; --accent-rgb: 209, 154, 102; --on-accent: #1a110a;
+}
+:root[data-season="aprilfools"][data-theme="dark"] {
+  --bg: #1b1511; --surface: #2a211a; --surface-2: #362b22; --border: #46392d; --border-2: #5c4b3a;
+  --text: #f4ece3; --text-soft: #bcab98;
+}
+:root[data-season="aprilfools"][data-theme="light"] {
+  --bg: #f7f0e6; --surface: #fffaf3; --surface-2: #eee3d3; --border: #ddcdb6; --border-2: #c2ab8b;
+  --text: #2a1c10; --text-soft: #6a5642;
+  --accent: #7b4a22; --accent-rgb: 123, 74, 34; --on-accent: #ffffff;
+}
+:root[data-season="aprilfools"][data-contrast="high"][data-theme="dark"] { --text: #ffffff; --text-soft: #e2d6c8; --border: #9a8268; --border-2: #d2bfa6; }
+:root[data-season="aprilfools"][data-contrast="high"][data-theme="light"] {
+  --text: #000000; --text-soft: #3a2a1b; --border: #6b5236; --border-2: #3a2a18; --accent: #5a3414; --accent-rgb: 90, 52, 20;
+}
+/* The name is swapped by laying the new one over the old one's exact box (the old text stays, invisible, so
+   layout, size and letter-spacing don't change and screen readers still read the real name). */
+:root[data-season="aprilfools"] .brand-name,
+:root[data-season="aprilfools"] .footer-brand-name { position: relative; color: transparent; }
+:root[data-season="aprilfools"] .brand-name::after,
+:root[data-season="aprilfools"] .footer-brand-name::after {
+  content: "CLASSIC'S MUDWORKS"; position: absolute; top: 0; left: 0; color: var(--text); white-space: nowrap;
+}
+
 :root[data-contrast="high"] :focus-visible { outline-width: 3px; }
 :root[data-contrast="high"] .footer-link,
 :root[data-contrast="high"] .news-link { text-decoration: underline; text-underline-offset: 3px; }
@@ -2372,6 +2402,14 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .season-preview-off { flex-direction: column; gap: 6px; padding: 8px; }
 .sp-bar { height: 4px; width: 28%; border-radius: 2px; background: var(--text-soft); opacity: 0.6; }
 .sp-card { flex: 1; border: 1px solid var(--border-2); border-radius: 4px; background: var(--surface-2); }
+
+/* April Fools' card: a tiny page in the theme's own colours (it has no canvas). */
+.season-preview-mud { flex-direction: column; border-color: #46392d; background: #1b1511; }
+.sp-mhead { position: relative; height: 12px; border-bottom: 1px solid #46392d; }
+.sp-mhead::before { content: ''; position: absolute; top: 4px; left: 7px; width: 16px; height: 4px; border-radius: 2px; background: #d19a66; }
+.sp-mrow { flex: 1; display: flex; gap: 5px; padding: 6px; }
+.sp-mcard { position: relative; flex: 1; border-radius: 5px; background: #2a211a; }
+.sp-mcard::after { content: ''; position: absolute; left: 5px; bottom: 5px; width: 14px; height: 5px; border-radius: 3px; background: #d19a66; }
 
 /* Theme previews: a tiny page drawn in each theme's own colours. */
 .theme-preview { display: flex; height: 64px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--r-1); }

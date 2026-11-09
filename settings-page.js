@@ -107,7 +107,7 @@ function systemSwitch(key, query, mainInput, effectiveValue) {
 // month outlined. Built from SEASONS' own rules (so it can never disagree with them): every day is tested,
 // in both fireworks regions, and runs of days become bars. Friday 13th depends on the weekday, so it is
 // checked against the current year's calendar.
-const SEASON_COLORS = { fireworks: '#4ade80', snowfall: '#7dd3fc', christmas: '#f87171', halloween: '#fb923c', friday13: '#a78bfa', aurora: '#2dd4bf', blossom: '#f9a8d4', easter: '#c4b5fd', anniversary: '#e879f9', fireflies: '#facc15', leaves: '#c08a52' };
+const SEASON_COLORS = { fireworks: '#4ade80', snowfall: '#7dd3fc', christmas: '#f87171', halloween: '#fb923c', friday13: '#a78bfa', aurora: '#2dd4bf', blossom: '#f9a8d4', easter: '#c4b5fd', anniversary: '#e879f9', aprilfools: '#d19a66', fireflies: '#facc15', leaves: '#c08a52' };
 const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // a plain year: 29 Feb has no theme
 
@@ -165,6 +165,11 @@ function seasonPreview(value) {
   if (value === 'off') {
     tile.classList.add('season-preview-off');
     tile.append(el('span', { class: 'sp-bar' }), el('span', { class: 'sp-card' }));
+    return tile;
+  }
+  if (value === 'aprilfools') { // a re-skin of the page, not an effect: no canvas
+    tile.classList.add('season-preview-mud');
+    tile.append(el('span', { class: 'sp-mhead' }), el('span', { class: 'sp-mrow' }, [1, 2, 3].map(() => el('span', { class: 'sp-mcard' }))));
     return tile;
   }
   (value === 'auto' ? Object.keys(SEASONS) : [value]).forEach(season => {
@@ -251,7 +256,7 @@ const SEASON_OPTIONS = [
   { value: 'auto', name: 'Automatic', note: 'Each theme is set automatically on specific dates.' },
   // Calendar order. Names that aren't in SEASONS are placeholders for themes still to come: shown greyed
   // out, not selectable and not saved as a setting.
-  ...['fireworks', 'aurora', 'blossom', 'April Fools', 'easter', 'anniversary', 'fireflies', 'friday13', 'halloween', 'leaves', 'snowfall', 'christmas'].map(key => {
+  ...['fireworks', 'aurora', 'blossom', 'aprilfools', 'easter', 'anniversary', 'fireflies', 'friday13', 'halloween', 'leaves', 'snowfall', 'christmas'].map(key => {
     const season = SEASONS[key];
     return season
       ? { value: key, name: season.name, note: season.blurb, dates: season.dates }

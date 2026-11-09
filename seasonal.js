@@ -18,6 +18,8 @@
    - Friday 13th: mist drifts across, faint "13"s float up and fade, and every few seconds, mostly near the
      side margins, a branching lightning bolt strikes down from the top and fades with a soft glow (one smooth
      strike, never a flicker).
+   - April Fools ("aprilfools") has no canvas: it is a mud-brown re-skin of the whole site ("Classic's Mudworks") done in styles.css, so
+     it is not in EFFECTS below and nothing is drawn.
    - Reduced motion (the device setting or the Settings page): one still frame, nothing moves.
    - Nothing runs while the tab is hidden (requestAnimationFrame pauses) and nothing is drawn
      when there is no seasonal theme: the canvas is removed.
