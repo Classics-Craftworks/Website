@@ -107,13 +107,13 @@ function systemSwitch(key, query, mainInput, effectiveValue) {
 // month outlined. Built from SEASONS' own rules (so it can never disagree with them): every day is tested,
 // in both fireworks regions, and runs of days become bars. Friday 13th depends on the weekday, so it is
 // checked against the current year's calendar.
-const SEASON_COLORS = { fireworks: '#4ade80', snowfall: '#7dd3fc', christmas: '#f87171', halloween: '#fb923c', friday13: '#a78bfa', aurora: '#2dd4bf', blossom: '#f9a8d4', fireflies: '#facc15', leaves: '#c08a52' };
+const SEASON_COLORS = { fireworks: '#4ade80', snowfall: '#7dd3fc', christmas: '#f87171', halloween: '#fb923c', friday13: '#a78bfa', aurora: '#2dd4bf', blossom: '#f9a8d4', easter: '#c4b5fd', fireflies: '#facc15', leaves: '#c08a52' };
 const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // a plain year: 29 Feb has no theme
 
 // The theme a day gets in this picture ("" for none): the same first-match order as automaticSeason.
-function previewSeason(month, day, weekday) {
-  return Object.keys(SEASONS).find(key => ['US', 'GB'].some(region => SEASONS[key].on(month, day, region, weekday))) || '';
+function previewSeason(month, day, weekday, year) {
+  return Object.keys(SEASONS).find(key => ['US', 'GB'].some(region => SEASONS[key].on(month, day, region, weekday, year))) || '';
 }
 
 // Shows four months: last month, this month and the next two (across the year end, so December
@@ -128,7 +128,7 @@ function calendarPreview(tile) {
     let from = 0;
     let current = '';
     for (let d = 1; d <= MONTH_LENGTHS[m] + 1; d++) {
-      const key = d <= MONTH_LENGTHS[m] ? previewSeason(m + 1, d, new Date(year, m, d).getDay()) : '';
+      const key = d <= MONTH_LENGTHS[m] ? previewSeason(m + 1, d, new Date(year, m, d).getDay(), year) : '';
       if (key === current) continue;
       if (current) {
         const bar = el('span', { class: 'sp-run' });
@@ -182,6 +182,7 @@ const CLOCK_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" 
 // pass through. Ranges within one month are shortened where the format allows ("1 – 17 Dec", "Dec 1 – 17").
 const LABEL_YEAR = 2001; // any non-leap year: only the day and month are shown
 function seasonDateLabel(entry, format = getSettings().dateFormat) {
+  if (typeof entry === 'function') entry = entry(); // dates that move (Easter) are worked out when shown
   if (typeof entry === 'string') return entry;
   const iso = ([m, d]) => `${LABEL_YEAR}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
   const note = entry.note ? ` (${entry.note})` : '';
@@ -219,11 +220,11 @@ function seasonDates(dates, live) {
 }
 
 // The next theme the calendar will set, and how many days away its first day is: the first later day
-// whose theme is not today's. { name, days } or null (a theme is never more than a year away).
+// whose theme is not today's. { name, days } or null (Easter can be over a year away: its dates move).
 function nextSeason() {
   const now = new Date();
   const today = automaticSeason(now);
-  for (let i = 1; i <= 366; i++) {
+  for (let i = 1; i <= 400; i++) {
     const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
     const key = automaticSeason(date);
     if (key && key !== today) return { name: SEASON_NAMES[key], days: i };
@@ -250,7 +251,7 @@ const SEASON_OPTIONS = [
   { value: 'auto', name: 'Automatic', note: 'Each theme is set automatically on specific dates.' },
   // Calendar order. Names that aren't in SEASONS are placeholders for themes still to come: shown greyed
   // out, not selectable and not saved as a setting.
-  ...['fireworks', 'aurora', 'blossom', 'April Fools', 'Easter', 'fireflies', 'friday13', 'halloween', 'leaves', 'snowfall', 'christmas'].map(key => {
+  ...['fireworks', 'aurora', 'blossom', 'April Fools', 'easter', 'fireflies', 'friday13', 'halloween', 'leaves', 'snowfall', 'christmas'].map(key => {
     const season = SEASONS[key];
     return season
       ? { value: key, name: season.name, note: season.blurb, dates: season.dates }
@@ -287,7 +288,7 @@ function upcomingSeasons() {
   const now = new Date();
   const list = [];
   let previous = '';
-  for (let i = 0; i <= 366; i++) {
+  for (let i = 0; i <= 400; i++) {
     const key = automaticSeason(new Date(now.getFullYear(), now.getMonth(), now.getDate() + i));
     if (key && key !== previous && !list.some(item => item.key === key)) list.push({ key, days: i });
     previous = key;

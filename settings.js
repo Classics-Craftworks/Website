@@ -16,7 +16,7 @@
      data-density        compact               (absent = comfortable spacing)
      data-sidebar        left                  (absent = side panels on the right)
      data-newtab         off                   (absent = external links open in a new tab)
-     data-season         fireworks | aurora | blossom | fireflies | snowfall | christmas | halloween | leaves | friday13 (absent = no seasonal theme; drawn by seasonal.js)
+     data-season         fireworks | aurora | blossom | easter | fireflies | snowfall | christmas | halloween | leaves | friday13 (absent = no seasonal theme; drawn by seasonal.js)
 
    High contrast and reduced motion follow the device setting until the visitor changes them
    (stored as null = "follow the device"). */
@@ -33,7 +33,7 @@ const SETTING_CHOICES = {
   density: ['compact', 'comfortable', 'spacious'],
   // auto = follow the calendar (see automaticSeason), off = never set one automatically.
   // A theme chosen here stays on all year and overrides the automatic one.
-  seasonal: ['auto', 'fireworks', 'aurora', 'blossom', 'fireflies', 'snowfall', 'christmas', 'halloween', 'leaves', 'friday13', 'off']
+  seasonal: ['auto', 'fireworks', 'aurora', 'blossom', 'easter', 'fireflies', 'snowfall', 'christmas', 'halloween', 'leaves', 'friday13', 'off']
 };
 
 const SETTING_DEFAULTS = Object.freeze({
@@ -103,12 +103,48 @@ function effectiveTheme(s = getSettings()) {
      name, blurb        shown on the theme's card (its preview is the effect itself, from seasonal.js)
      dates              the dates it is set automatically, shown on its card (one line each on the Settings page,
                         with a clock icon). Each is { from: [month, day], to: [month, day] (omit for one day),
-                        note: "US" (optional, shown in brackets) }, written in the visitor's date format, or a
-                        plain string for text that isn't a date ("Every Friday 13th")
-     on(month, day, region, weekday)  true on a date it is set automatically (the visitor's local date;
+                        note: "US" (optional, shown in brackets) }, written in the visitor's date format, a
+                        plain string for text that isn't a date ("Every Friday 13th"), or a function returning
+                        either (for dates that move: Easter's)
+     on(month, day, region, weekday, year)  true on a date it is set automatically (the visitor's local date;
                              region is "US", "GB" or ""; weekday is 0 = Sunday to 6 = Saturday).
                              The first theme that matches wins, so the order here is the priority: a theme
                              that should give way to the others (Friday 13th) goes last. */
+/* Western (Gregorian) Easter Sunday as [month, day] for a year (the anonymous Gregorian algorithm).
+   Orthodox churches use a different date and are not covered. */
+function easterSunday(year) {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return [month, day];
+}
+
+// Good Friday (two days before Easter Sunday) to Easter Monday (the day after), as { from, to } in [month, day].
+function easterWeekend(year) {
+  const [month, day] = easterSunday(year);
+  const at = offset => { const date = new Date(year, month - 1, day + offset); return [date.getMonth() + 1, date.getDate()]; };
+  return { from: at(-2), to: at(1) };
+}
+
+// The Easter weekend still to come, this year's until it has finished (the visitor's local date), then next year's.
+function nextEasterWeekend(now = new Date()) {
+  const thisYear = easterWeekend(now.getFullYear());
+  const [month, day] = thisYear.to;
+  const finished = now.getMonth() + 1 > month || (now.getMonth() + 1 === month && now.getDate() > day);
+  return finished ? easterWeekend(now.getFullYear() + 1) : thisYear;
+}
+
 const SEASONS = {
   fireworks: {
     name: 'Fireworks', blurb: 'Rockets and sparks.',
@@ -121,6 +157,16 @@ const SEASONS = {
     name: 'Aurora', blurb: 'Northern lights.',
     dates: [{ from: [1, 28], to: [2, 4] }],
     on: (month, day) => (month === 1 && day >= 28) || (month === 2 && day <= 4)
+  },
+  // Before Cherry Blossom (whose last week it can overlap), so Easter takes those days.
+  easter: {
+    name: 'Easter', blurb: 'Pastel eggs and drifting daisies.',
+    dates: [() => nextEasterWeekend()],
+    on: (month, day, region, weekday, year) => {
+      const { from, to } = easterWeekend(year);
+      const at = (m, d) => m * 100 + d;
+      return at(month, day) >= at(...from) && at(month, day) <= at(...to);
+    }
   },
   blossom: {
     name: 'Cherry Blossom', blurb: 'Drifting cherry-blossom petals.',
@@ -197,7 +243,8 @@ function automaticSeason(date = new Date(), region = visitorRegion()) {
   const month = date.getMonth() + 1;
   const day = date.getDate();
   const weekday = date.getDay();
-  return Object.keys(SEASONS).find(key => SEASONS[key].on(month, day, region, weekday)) || '';
+  const year = date.getFullYear();
+  return Object.keys(SEASONS).find(key => SEASONS[key].on(month, day, region, weekday, year)) || '';
 }
 
 function effectiveSeason(s = getSettings()) {

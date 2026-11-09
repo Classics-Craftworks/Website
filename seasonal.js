@@ -1,12 +1,13 @@
 /* Seasonal themes: the moving (or, with reduced motion, still) picture behind the page.
 
    settings.js decides which theme is in effect and puts it on <html> as data-season
-   ("fireworks", "aurora", "blossom", "fireflies", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
+   ("fireworks", "aurora", "blossom", "easter", "fireflies", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
    a fixed, click-through <canvas> behind everything (styles.css: .season-canvas).
 
    - Fireworks: rockets rise and burst into sparks.
    - Aurora: slow green, teal and violet northern-lights curtains sway across the upper sky.
-   - Fireflies: fireflies wander and blink under a blue-to-rose twilight sky.
+   - Easter: pastel decorated eggs rock gently as they drift down among a few little daisies.
+  - Fireflies: fireflies wander and blink under a blue-to-rose twilight sky.
    - Cherry Blossom: pink petals drift and flutter down on a light breeze.
    - Falling Leaves: brown autumn leaves tumble and drift down.
    - Snowfall: snow drifts down.
@@ -1003,6 +1004,164 @@
     return { step, draw, still, resize };
   }
 
+  /* ---------- Easter ---------- */
+
+  // Each egg is [base, decoration]. Soft pastels on dark pages; deeper ones on the light theme so they still show.
+  const EGG_COLOURS = {
+    dark: [
+      ['#ffb3c7', '#fff3b0'], ['#b9e4ff', '#ffffff'], ['#c9b6ff', '#ffe0f0'],
+      ['#b8f0c8', '#fff8c4'], ['#ffd3a1', '#ffffff'], ['#fff1a8', '#ffc2d9']
+    ],
+    light: [
+      ['#e8749c', '#fff1f6'], ['#4aa3df', '#e8f5ff'], ['#8c6be0', '#efe9ff'],
+      ['#3fae6a', '#e6f8ec'], ['#e08a3c', '#fff1e0'], ['#d1a400', '#fff7cc']
+    ]
+  };
+  // Daisies among the eggs: [petals, centre].
+  const DAISY_COLOURS = { dark: ['#ffffff', '#ffd54a'], light: ['#ee8fb0', '#d89a00'] };
+
+  function createEaster(view) {
+    let items = [];
+    let clock = 0;
+
+    const unit = () => view.scale !== undefined ? view.scale * 1.6 : Math.min(1.25, Math.max(0.6, Math.min(view.w, view.h) / 760));
+    const wanted = () => view.eggs ?? Math.round(Math.min(34, Math.max(12, (view.w * view.h) / 30000)));
+
+    function item(anywhere) {
+      const daisy = random() < 0.3;
+      return {
+        daisy,
+        x: rand(-20, view.w + 20), y: anywhere ? rand(0, view.h) : rand(-40, -10),
+        size: (daisy ? rand(6, 9) : rand(11, 16)) * unit(),
+        colour: Math.floor(random() * EGG_COLOURS.dark.length),
+        pattern: Math.floor(random() * 4),
+        fall: rand(16, 32) * unit() + 8, // eggs drift down gently, like the petals
+        drift: rand(-5, 9) * unit(),
+        sway: rand(10, 26) * unit(), swaySpeed: rand(0.3, 0.7), phase: rand(0, TAU),
+        angle: rand(0, TAU), spin: rand(-1.2, 1.2), // daisies turn; eggs rock instead
+        rock: rand(0.5, 1.1), tumble: rand(0.8, 1.8), alpha: rand(0.78, 0.95)
+      };
+    }
+
+    function fill(anywhere) {
+      const count = wanted();
+      while (items.length < count) items.push(item(anywhere));
+      if (items.length > count) items.length = count;
+    }
+
+    function step(dt) {
+      clock += dt;
+      fill(false);
+      items.forEach(p => {
+        p.y += p.fall * dt;
+        p.x += (p.drift + Math.sin(clock * p.swaySpeed + p.phase) * p.sway) * dt;
+        p.angle += p.spin * dt;
+        if (p.y > view.h + p.size * 2) Object.assign(p, item(false));
+        if (p.x > view.w + 30) p.x = -30; else if (p.x < -30) p.x = view.w + 30;
+      });
+    }
+
+    // An egg lying with its narrow end up, half-height s.
+    function eggPath(ctx, s) {
+      ctx.beginPath();
+      for (let i = 0; i <= 28; i++) {
+        const t = (i / 28) * TAU;
+        const x = s * 0.78 * Math.sin(t) * (1 - 0.17 * Math.cos(t));
+        const y = -s * Math.cos(t);
+        if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
+      }
+      ctx.closePath();
+    }
+
+    function drawEgg(ctx, p, palette) {
+      const s = p.size;
+      const [base, trim] = palette[p.colour % palette.length];
+      ctx.rotate(Math.sin(clock * p.rock + p.phase) * 0.5);
+      eggPath(ctx, s);
+      ctx.fillStyle = base;
+      ctx.fill();
+      ctx.save();
+      ctx.clip();
+      ctx.fillStyle = trim;
+      ctx.strokeStyle = trim;
+      ctx.lineWidth = s * 0.15;
+      ctx.lineJoin = 'round';
+      if (p.pattern === 0) { // two bands
+        ctx.fillRect(-s, -s * 0.38, s * 2, s * 0.26);
+        ctx.fillRect(-s, s * 0.14, s * 2, s * 0.2);
+      } else if (p.pattern === 1) { // a zigzag
+        ctx.beginPath();
+        for (let x = -s, i = 0; x <= s * 1.1; x += s * 0.34, i++) {
+          if (i) ctx.lineTo(x, i % 2 ? s * 0.14 : -s * 0.14); else ctx.moveTo(x, -s * 0.14);
+        }
+        ctx.stroke();
+      } else if (p.pattern === 2) { // dots
+        [[-0.3, -0.45], [0.32, -0.3], [0, 0], [-0.4, 0.4], [0.3, 0.5]].forEach(([dx, dy]) => {
+          ctx.beginPath();
+          ctx.arc(dx * s, dy * s, s * 0.12, 0, TAU);
+          ctx.fill();
+        });
+      } else { // a wave
+        ctx.beginPath();
+        for (let x = -s; x <= s; x += s * 0.1) {
+          const y = s * 0.05 + Math.sin(x / s * 5) * s * 0.14;
+          if (x === -s) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+      // A soft shine on the upper left.
+      ctx.globalAlpha *= 0.35;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(-s * 0.3, -s * 0.38, s * 0.12, s * 0.26, 0.5, 0, TAU);
+      ctx.fill();
+    }
+
+    function drawDaisy(ctx, p, palette) {
+      const s = p.size;
+      const [petal, centre] = palette;
+      ctx.rotate(p.angle);
+      ctx.scale(0.35 + 0.65 * Math.abs(Math.cos(clock * p.tumble + p.phase)), 1);
+      ctx.fillStyle = petal;
+      for (let i = 0; i < 6; i++) {
+        ctx.save();
+        ctx.rotate((i / 6) * TAU);
+        ctx.beginPath();
+        ctx.ellipse(0, -s * 0.62, s * 0.26, s * 0.5, 0, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.fillStyle = centre;
+      ctx.beginPath();
+      ctx.arc(0, 0, s * 0.3, 0, TAU);
+      ctx.fill();
+    }
+
+    function draw(ctx) {
+      const mode = isLight() ? 'light' : 'dark';
+      items.forEach(p => {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.globalAlpha = p.alpha;
+        if (p.daisy) drawDaisy(ctx, p, DAISY_COLOURS[mode]); else drawEgg(ctx, p, EGG_COLOURS[mode]);
+        ctx.restore();
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function still() { items = []; clock = 2; fill(true); }
+
+    fill(true);
+
+    function resize(oldW, oldH) {
+      if (!oldW || !oldH) return;
+      items.forEach(p => { p.x = (p.x / oldW) * view.w; p.y = (p.y / oldH) * view.h; });
+    }
+
+    return { step, draw, still, resize };
+  }
+
   /* ---------- Fireflies ---------- */
 
   // Glow colours as "r, g, b": a yellow-green on dark pages, a deeper amber on the light theme.
@@ -1182,7 +1341,7 @@
     return { step, draw, still, resize() {} };
   }
 
-  const EFFECTS = { fireworks: createFireworks, aurora: createAurora, blossom: createBlossom, fireflies: createFireflies, friday13: createFriday13, halloween: createHalloween, leaves: createLeaves, snowfall: createSnow, christmas: createChristmas };
+  const EFFECTS = { fireworks: createFireworks, aurora: createAurora, blossom: createBlossom, easter: createEaster, fireflies: createFireflies, friday13: createFriday13, halloween: createHalloween, leaves: createLeaves, snowfall: createSnow, christmas: createChristmas };
 
   /* ---------- Running ---------- */
 
@@ -1307,7 +1466,7 @@
      reduced motion it never moves. Looks after itself; returns nothing. */
   window.mountSeasonPreview = (previewCanvas, season) => {
     const pctx = previewCanvas.getContext('2d');
-    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, flies: 8, embers: 7, sparkles: 6, lightsTop: 0, flashEvery: [2.0, 3.5] }; // flashEvery: Friday 13th's bolts, far more often than on the page
+    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, flies: 8, eggs: 13, embers: 7, sparkles: 6, lightsTop: 0, flashEvery: [2.0, 3.5] }; // flashEvery: Friday 13th's bolts, far more often than on the page
     let peffect = null;
     let pframe = 0;
     let plast = 0;
@@ -1335,7 +1494,7 @@
     // The same picture every time (seeded), so it never changes behind the person's back: not when they
     // choose a card, and not when the pointer leaves again.
     function showStill() {
-      random = seeded({ fireworks: 11, aurora: 7, blossom: 3, fireflies: 18, snowfall: 5, christmas: 25, halloween: 31, leaves: 23, friday13: 13 }[season] || 5);
+      random = seeded({ fireworks: 11, aurora: 7, blossom: 3, easter: 9, fireflies: 18, snowfall: 5, christmas: 25, halloween: 31, leaves: 23, friday13: 13 }[season] || 5);
       try {
         peffect = EFFECTS[season](pview);
         peffect.still();
