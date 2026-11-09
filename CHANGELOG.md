@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.8.0 — 2026-11-09
+
+### Added
+- More seasonal themes:
+  - Easter: Pastel eggs and falling daisies
+    - Automatically enabled between Good Friday - Easter Monday every year
+    - Takes priority over the Cherry Blossom theme if they fall on the same dates
+  - Anniversary: Confetti falls and party balloons float up for Minecraft's anniversary
+    - Automatically enabled on 17 May
+  - April Fools: Site becomes "Classic's Mudworks" and turns mud-brown
+    - Automatically enabled on 1 April
+    - Takes priority over the Easter theme if they fall on the same date
+
+### Changed
+- The Falling Leaves theme now runs from 22 - 30 November
+
 ## v4.7.1 — 2026-11-08
 
 ### Changed
@@ -48,7 +64,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 ### Changed
 - Improved how dates are listed on seasonal theme settings
-- Updated Halloween theme to appear between 16 October - 1 November
+- The Halloween theme now runs from 16 October - 1 November
 - Changed Friday 13th theme description from "distant lightning" to "lightning bolts"
 
 ## v4.6.0 — 2026-11-07
