@@ -180,7 +180,7 @@ const SEASONS = {
     on: (month, day) => month === 3 && day >= 24
   },
   anniversary: {
-    name: 'Anniversary', blurb: 'Confetti falls and party balloons float up.',
+    name: 'Anniversary', blurb: 'Confetti falls and party balloons float up for Minecraft\'s anniversary.',
     dates: [{ from: [5, 17] }],
     on: (month, day) => month === 5 && day === 17
   },
