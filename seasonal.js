@@ -76,7 +76,7 @@
     [[5, 2], [7, 2], [7, 4], [5, 4]],
     [[3, 4], [5, 4], [5, 5], [6, 5], [6, 8], [5, 8], [5, 7], [3, 7], [3, 8], [2, 8], [2, 5], [3, 5]]
   ];
-  const CREEPER_SPACING = 0.5; // distance between particles along the outline, in grid cells
+  const CREEPER_SPACING = 0.6; // distance between particles along the outline, in grid cells
   const CREEPER_CHANCE = 0.09; // roughly one burst in eleven
   const SHAPES = [['small', 35], ['large', 25], ['star', 22], ['burst', 18]];
 
@@ -137,7 +137,7 @@
           out.push([Math.cos(a) * r * power, y * power]);
         }
       } else if (shape === 'star') {
-        const points = 5, perEdge = 7, turn = rand(0, TAU);
+        const points = 5, perEdge = 3, turn = rand(0, TAU);
         const vertex = k => {
           const a = turn - Math.PI / 2 + (k / (points * 2)) * TAU;
           const r = k % 2 ? 0.42 : 1;
