@@ -10,8 +10,8 @@
   - Easter: pastel decorated eggs rock gently as they drift down among a few little daisies.
   - Fireflies: square fireflies, each with a soft glow, wander and blink under a blue-to-rose twilight sky.
    - Cherry Blossom: Minecraft-style pink square cherry leaves spin down on a light breeze.
-   - Falling Leaves: brown autumn leaves tumble and drift down.
-   - Snowfall: snow drifts down.
+   - Falling Leaves: brown Minecraft-style leaves spin and drift down.
+   - Snowfall: tiny Minecraft-style white snow particles (3x3 pixel shapes with some pixels missing) drift down.
    - Christmas: a string of fairy lights twinkles along the top, golden sparkles drift down and a treeline of
      pines with small lights stands along the bottom.
    - Halloween: bats flap across a hazy moon while embers rise from a warm glow at the bottom.
@@ -306,20 +306,44 @@
 
   /* ---------- Snowfall ---------- */
 
+  /* Minecraft-style snow: tiny white particles on a 3x3 pixel grid, in the four shapes the game uses: a plus,
+     an X, a plus with its middle missing, and a single pixel. They never overlap and only tip slightly to and fro with the wind: each is one flat
+     shape, drawn with smoothing off so its pixels stay sharp. # is a lit pixel. */
+  const SNOW_SHAPES = [
+    ['.#.', '###', '.#.'],   // plus
+    ['#.#', '.#.', '#.#'],   // X
+    ['.#.', '#.#', '.#.'],   // plus, middle missing
+    ['...', '.#.', '...']    // a single pixel
+  ];
+  const snowTextures = {};
+  function snowTexture(mode, shape) {
+    const key = mode + shape;
+    if (snowTextures[key]) return snowTextures[key];
+    const c = document.createElement('canvas');
+    c.width = c.height = 3;
+    const g = c.getContext('2d');
+    g.fillStyle = `rgb(${SNOW_COLOURS[mode]})`;
+    SNOW_SHAPES[shape].forEach((row, y) => {
+      for (let x = 0; x < 3; x++) if (row[x] === '#') g.fillRect(x, y, 1, 1);
+    });
+    return (snowTextures[key] = c);
+  }
+
   function createSnow(view) {
     let flakes = [];
 
     const wanted = () => view.flakes ?? Math.round(Math.min(150, Math.max(36, (view.w * view.h) / 11000)));
 
     function flake(anywhere) {
-      const size = rand(1.2, 3.6) * (view.line ?? 1);
+      const pixel = Math.max(1, Math.round(rand(1.7, 4.6) * (view.line ?? 1))); // screen pixels per grid pixel
       return {
         x: rand(0, view.w),
         y: anywhere ? rand(0, view.h) : rand(-20, -2),
-        size,
-        fall: rand(22, 38) + size * 9, // bigger flakes are nearer, so they fall faster
+        pixel, shape: Math.floor(random() * SNOW_SHAPES.length),
+        fall: rand(22, 38) + pixel * 9, // bigger flakes are nearer, so they fall faster
         sway: rand(6, 22), swaySpeed: rand(0.4, 1.1), phase: rand(0, TAU),
-        alpha: rand(0.45, 0.9)
+        alpha: rand(0.65, 1),
+        lean: rand(0.15, 0.45) // how far the wind tips it over, in radians
       };
     }
 
@@ -342,13 +366,19 @@
     }
 
     function draw(ctx) {
-      const rgb = SNOW_COLOURS[isLight() ? 'light' : 'dark'];
+      const mode = isLight() ? 'light' : 'dark';
+      ctx.imageSmoothingEnabled = false;
       flakes.forEach(f => {
-        ctx.fillStyle = `rgba(${rgb}, ${f.alpha})`;
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, f.size, 0, TAU);
-        ctx.fill();
+        const size = f.pixel * 3;
+        ctx.globalAlpha = f.alpha;
+        // Pushed by the wind: it tips one way as it is carried that way, and back as the gust turns.
+        ctx.save();
+        ctx.translate(Math.round(f.x), Math.round(f.y));
+        ctx.rotate(Math.cos(clock * f.swaySpeed + f.phase) * f.lean);
+        ctx.drawImage(snowTexture(mode, f.shape), -size / 2, -size / 2, size, size);
+        ctx.restore();
       });
+      ctx.globalAlpha = 1;
     }
 
     function still() { flakes = []; fill(true); }
@@ -978,12 +1008,34 @@
     return { step, draw, still, resize };
   }
 
+  /* ---------- Minecraft-style leaf texture (Falling Leaves and Cherry Blossom) ---------- */
+
+  /* Two flat squares, each a 2x2 grid of pixels, that share one pixel where their corners meet. Together
+     they make a 3x3 texture: the first square is the top-left 2x2, the second the bottom-right 2x2, they
+     overlap in the middle, and the bottom-right pixel (opposite the overlap on the second square) is a touch
+     darker. Drawn with smoothing off so the edges stay crisp as it spins. colours = { base, dark }. */
+  const pixelLeafCache = {};
+  function pixelLeaf(colours) {
+    const key = colours.base + colours.dark;
+    if (pixelLeafCache[key]) return pixelLeafCache[key];
+    const c = document.createElement('canvas');
+    c.width = c.height = 3;
+    const g = c.getContext('2d');
+    g.fillStyle = colours.base;
+    g.fillRect(0, 0, 2, 2);
+    g.fillRect(1, 1, 2, 2);
+    g.fillStyle = colours.dark;
+    g.fillRect(2, 2, 1, 1);
+    return (pixelLeafCache[key] = c);
+  }
+
   /* ---------- Falling Leaves ---------- */
 
-  // Browns for the leaves; the light theme needs deeper ones to stand out against a pale page.
-  const LEAF_COLOURS = {
-    dark:  ['#a8672f', '#8f4f22', '#c9863f', '#74401a', '#b9722c', '#96592a'],
-    light: ['#8a4a1a', '#6e3811', '#a35a1b', '#5b2d0d', '#94521a', '#7a4118']
+  /* The same leaf as Cherry Blossom's, in browns: a lighter, more common one and a slightly darker one
+     that appears about one time in five. The light theme needs deeper browns to stand out against a pale page. */
+  const AUTUMN_BROWNS = {
+    dark:  [{ base: '#b9722c', dark: '#9a5821' }, { base: '#9a5a26', dark: '#7a4217' }],
+    light: [{ base: '#9a5a1f', dark: '#7a4113' }, { base: '#7c4519', dark: '#5d300e' }]
   };
 
   function createLeaves(view) {
@@ -994,14 +1046,14 @@
     const wanted = () => view.leaves ?? Math.round(Math.min(48, Math.max(14, (view.w * view.h) / 24000)));
 
     function leaf(anywhere) {
-      const size = rand(7, 13) * unit();
+      const size = rand(14, 26) * unit();
       return {
         x: rand(0, view.w), y: anywhere ? rand(0, view.h) : rand(-30, -4),
-        size, colour: pick(LEAF_COLOURS.dark.map((_, i) => i)),
+        size, deep: random() < DEEP_LEAF_CHANCE,
         fall: rand(28, 52) * unit() + 10, // a leaf drifts down more slowly than rain, a little faster when larger
         sway: rand(14, 40) * unit(), swaySpeed: rand(0.35, 0.9), phase: rand(0, TAU),
         angle: rand(0, TAU), spin: rand(-1.2, 1.2),
-        tumble: rand(0.8, 2.2), alpha: rand(0.65, 0.95)
+        alpha: 1
       };
     }
 
@@ -1024,29 +1076,15 @@
     }
 
     function draw(ctx) {
-      const palette = LEAF_COLOURS[isLight() ? 'light' : 'dark'];
-      ctx.lineCap = 'round';
+      const palette = AUTUMN_BROWNS[isLight() ? 'light' : 'dark'];
+      ctx.imageSmoothingEnabled = false;
       leaves.forEach(l => {
         const s = l.size;
-        // Turning over as it falls: the leaf narrows to an edge and widens again.
-        const flip = Math.cos(clock * l.tumble + l.phase);
         ctx.save();
         ctx.translate(l.x, l.y);
         ctx.rotate(l.angle);
-        ctx.scale(0.25 + 0.75 * Math.abs(flip), 1);
         ctx.globalAlpha = l.alpha;
-        ctx.fillStyle = palette[l.colour % palette.length];
-        ctx.beginPath();
-        ctx.moveTo(0, -s);
-        ctx.bezierCurveTo(s * 0.95, -s * 0.5, s * 0.8, s * 0.55, 0, s);
-        ctx.bezierCurveTo(-s * 0.8, s * 0.55, -s * 0.95, -s * 0.5, 0, -s);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(40, 18, 5, 0.45)';
-        ctx.lineWidth = Math.max(0.5, s * 0.08);
-        ctx.beginPath();
-        ctx.moveTo(0, -s);
-        ctx.lineTo(0, s * 1.25);
-        ctx.stroke();
+        ctx.drawImage(pixelLeaf(palette[l.deep ? 1 : 0]), -s / 2, -s / 2, s, s);
         ctx.restore();
       });
       ctx.globalAlpha = 1;
@@ -1066,32 +1104,13 @@
 
   /* ---------- Cherry Blossom ---------- */
 
-  /* Minecraft's cherry-leaf particle: two flat pink squares, each a 2x2 grid of pixels, that share one pixel
-     where their corners meet. Together they make a 3x3 texture: the first square is the top-left 2x2, the
-     second the bottom-right 2x2, they overlap in the middle, and the bottom-right pixel (opposite the overlap
-     on the second square) is a touch darker. Drawn with smoothing off so the edges stay crisp as it spins.
-     About one leaf in five is a slightly darker pink. The light theme uses deeper pinks. */
+  /* Minecraft's cherry-leaf particle: see pixelLeaf above for the shape. Pink, spinning as it falls. About one
+     leaf in five is a slightly darker pink. The light theme uses deeper pinks. */
   const LEAF_PINKS = {
     dark:  [{ base: '#f2b4d6', dark: '#e18ab8' }, { base: '#e49ac3', dark: '#d070a6' }],
     light: [{ base: '#e0709a', dark: '#c04c7c' }, { base: '#cc5483', dark: '#ae3868' }]
   };
   const DEEP_LEAF_CHANCE = 0.2; // the second, slightly darker leaf is the rarer one
-  const leafSprites = {};
-
-  function leafTexture(mode, deep) {
-    const key = mode + (deep ? '-deep' : '');
-    if (leafSprites[key]) return leafSprites[key];
-    const pinks = LEAF_PINKS[mode][deep ? 1 : 0];
-    const c = document.createElement('canvas');
-    c.width = c.height = 3;
-    const g = c.getContext('2d');
-    g.fillStyle = pinks.base;
-    g.fillRect(0, 0, 2, 2);
-    g.fillRect(1, 1, 2, 2);
-    g.fillStyle = pinks.dark;
-    g.fillRect(2, 2, 1, 1);
-    return (leafSprites[key] = c);
-  }
 
   function createBlossom(view) {
     let petals = [];
@@ -1131,7 +1150,7 @@
     }
 
     function draw(ctx) {
-      const mode = isLight() ? 'light' : 'dark';
+      const palette = LEAF_PINKS[isLight() ? 'light' : 'dark'];
       ctx.imageSmoothingEnabled = false;
       petals.forEach(p => {
         const s = p.size;
@@ -1139,7 +1158,7 @@
         ctx.translate(p.x, p.y);
         ctx.rotate(p.angle);
         ctx.globalAlpha = p.alpha;
-        ctx.drawImage(leafTexture(mode, p.deep), -s / 2, -s / 2, s, s);
+        ctx.drawImage(pixelLeaf(palette[p.deep ? 1 : 0]), -s / 2, -s / 2, s, s);
         ctx.restore();
       });
       ctx.globalAlpha = 1;
