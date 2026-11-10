@@ -4,10 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.11.0 — 2026-11-10
+
+### Added
+- A new pink accent colour option
+
+### Changed
+- Renamed the existing pink accent colour option to "Magenta"
+- Improved layout of accent colour options on the Settings page
+- Improved the Friday 13th and Fireworks theme previews by moving their effects closer to the centre of the preview box
+- Reduced the number of particles in the Fireworks theme's star-shaped firework
+- Slightly increased the spacing between particles in the Fireworks theme's Creeper-shaped firework
+- Improved the spruce tree row on the Christmas theme
+
+### Fixed
+- Fixed the April Fools theme not respecting the user's chosen accent colour
+- Fixed jittery animations in some seasonal themes
+
 ## v4.10.0 — 2026-11-10
 
 ### Added
-- Added an Automatic accent colour option that matches the active seasonal theme, and made it the default
+- Automatic accent colour option that matches the active seasonal theme, and made it the default
 
 ### Changed
 - Redesigned the following seasonal themes to be more Minecraft-y (some other themes will be updated in the near future):
