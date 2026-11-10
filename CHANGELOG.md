@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.10.0 — 2026-11-10
+
+### Added
+- Added an Automatic accent colour option that matches the active seasonal theme, and made it the default
+
+### Changed
+- Redesigned the following seasonal themes to be more Minecraft-y (some other themes will be updated in the near future):
+  - Easter
+  - Anniversary
+- Changed the design of the Creeper firework to better match the one in-game
+
 ## v4.9.0.1 — 2026-11-10
 
 ### Changed
