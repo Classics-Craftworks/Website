@@ -58,7 +58,7 @@
   /* Minecraft-style fireworks. Everything is built from small square pixels (no circles, no
      streaks): sparks are tiny four-point sparkles, the rocket leaves a little flame trail, and it bursts into one of the firework-star
      shapes (small ball, large ball, star, burst). Now and then (CREEPER_CHANCE) it bursts into a Creeper
-     face instead: an 8x8 head of green squares with the face left as gaps. */
+     face instead: the eyes and mouth traced in green sparkles, as the game's Creeper firework does. */
 
   const FIREWORK_COLOURS = {
     dark:  ['#ff5555', '#ffaa00', '#ffff55', '#55ff55', '#55ffff', '#7a85ff', '#ff55ff', '#b45dff', '#ffffff'],
@@ -68,17 +68,15 @@
     dark:  ['#8dff7a', '#6dff5c', '#55ff55', '#4fe04a'],
     light: ['#2e8a2a', '#27761f', '#1f6b1b', '#1a5e17']
   };
-  // The Creeper's face; # is a firework particle (the eyes and mouth), . is empty.
-  const CREEPER_FACE = [
-    '........',
-    '........',
-    '.##..##.',
-    '.##..##.',
-    '...##...',
-    '..####..',
-    '..####..',
-    '..#..#..'
+  // The Creeper's face as the game draws it with a firework: not filled in, but traced. Each outline is a closed path
+  // on an 8x8 grid (corner points, not cells): the two eyes, and the mouth, whose top is the bar between the eyes
+  // with the 4-wide jaw and the two legs beneath it. Particles are spread along the paths.
+  const CREEPER_OUTLINES = [
+    [[1, 2], [3, 2], [3, 4], [1, 4]],
+    [[5, 2], [7, 2], [7, 4], [5, 4]],
+    [[3, 4], [5, 4], [5, 5], [6, 5], [6, 8], [5, 8], [5, 7], [3, 7], [3, 8], [2, 8], [2, 5], [3, 5]]
   ];
+  const CREEPER_SPACING = 0.5; // distance between particles along the outline, in grid cells
   const CREEPER_CHANCE = 0.09; // roughly one burst in eleven
   const SHAPES = [['small', 35], ['large', 25], ['star', 22], ['burst', 18]];
 
@@ -183,13 +181,15 @@
       const mode = isLight() ? 'light' : 'dark';
       const greens = CREEPER_GREENS[mode].map(hexRgb);
       const cells = [];
-      CREEPER_FACE.forEach((row, r) => {
-        for (let c = 0; c < 8; c++) {
-          if (row[c] !== '#') continue; // only the eyes and mouth are firework; the rest of the head is empty sky
+      CREEPER_OUTLINES.forEach(path => path.forEach((from, i) => {
+        const to = path[(i + 1) % path.length];
+        const n = Math.max(1, Math.round(Math.hypot(to[0] - from[0], to[1] - from[1]) / CREEPER_SPACING));
+        for (let k = 0; k < n; k++) {
+          const t = k / n;
           // Particles drop out one by one near the end, so the face crumbles instead of fading as one.
-          cells.push({ ox: c - 3.5, oy: r - 4.5, colour: pick(greens), gone: rand(0.62, 1), phase: rand(0, TAU) });
+          cells.push({ ox: from[0] + (to[0] - from[0]) * t - 4, oy: from[1] + (to[1] - from[1]) * t - 4, colour: pick(greens), gone: rand(0.62, 1), phase: rand(0, TAU) });
         }
-      });
+      }));
       heads.push({ x, y, vy: -18 * scale(), age: 0, life: 2.4, cells, sway: rand(0, TAU) });
       // A small puff of green sparks as it appears.
       if (quiet) return;
@@ -249,7 +249,7 @@
       const light = isLight();
       const u = unit();
 
-      // The Creeper's face: sparkles laid out on its eyes and mouth.
+      // The Creeper's face: sparkles laid along the outlines of its eyes and mouth.
       heads.forEach(h => {
         const cell = headCell();
         const u = unit();
