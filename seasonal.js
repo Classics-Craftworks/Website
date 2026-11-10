@@ -102,7 +102,7 @@
     }
 
     function launch() {
-      const x = view.w * marginX(0.7);
+      const x = view.w * (view.centred ? rand(0.2, 0.8) : marginX(0.7)); // previews have no content to keep clear of
       const targetY = rand(view.h * 0.14, view.h * 0.5);
       const riseTime = rand(0.9, 1.3); // seconds from the bottom edge to the burst
       rockets.push({
@@ -290,14 +290,16 @@
 
     // One frame for reduced motion: a few bursts caught partway through, with a Creeper among them.
     function still() {
-      const spots = [[0.1, 0.28, 'large'], [0.9, 0.22, 'star'], [0.5, 0.16, 'small'], [0.05, 0.56, 'burst']];
+      const spots = view.centred
+        ? [[0.27, 0.3, 'large'], [0.72, 0.28, 'star'], [0.5, 0.14, 'small'], [0.38, 0.58, 'burst']]
+        : [[0.1, 0.28, 'large'], [0.9, 0.22, 'star'], [0.5, 0.16, 'small'], [0.05, 0.56, 'burst']];
       spots.forEach(([fx, fy, kind]) => burst(view.w * fx, view.h * fy, kind));
       sparks.forEach(p => {
         p.age = p.life * 0.25;
         p.x += p.vx * 0.3; p.y += p.vy * 0.3;
         p.vx = p.vx * 0.6; p.vy = p.vy * 0.6;
       });
-      creeper(view.w * 0.93, view.h * 0.52, true);
+      creeper(view.w * (view.centred ? 0.76 : 0.93), view.h * 0.52, true);
       heads.forEach(h => { h.age = 0.9; });
     }
 
@@ -485,7 +487,7 @@
         if (g.age >= g.life) glyphs[i] = glyph(false);
       }
       untilFlash -= dt;
-      if (untilFlash <= 0) { flashAge = 0; flashX = marginX(0.8, 0.3, 0.7); bolt = makeBolt(view.w * flashX); untilFlash = view.flashEvery ? rand(...view.flashEvery) : rand(5, 10); }
+      if (untilFlash <= 0) { flashAge = 0; flashX = view.centred ? rand(0.3, 0.7) : marginX(0.8, 0.3, 0.7); bolt = makeBolt(view.w * flashX); untilFlash = view.flashEvery ? rand(...view.flashEvery) : rand(5, 10); }
       if (flashAge < FLASH_TIME) flashAge += dt;
     }
 
@@ -1902,7 +1904,7 @@
      reduced motion it never moves. Looks after itself; returns nothing. */
   window.mountSeasonPreview = (previewCanvas, season) => {
     const pctx = previewCanvas.getContext('2d');
-    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, flies: 8, eggs: 13, confetti: 22, balloons: 5, embers: 7, sparkles: 6, lightsTop: 0, flashEvery: [2.0, 3.5] }; // flashEvery: Friday 13th's bolts, far more often than on the page
+    const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, flies: 8, eggs: 13, confetti: 22, balloons: 5, embers: 7, sparkles: 6, lightsTop: 0, flashEvery: [2.0, 3.5], centred: true }; // centred: fireworks and bolts anywhere in the card, not pushed to its side margins; flashEvery: Friday 13th's bolts, far more often than on the page
     let peffect = null;
     let pframe = 0;
     let plast = 0;
