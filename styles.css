@@ -267,9 +267,9 @@
 /* April Fools (settings.js: SEASONS.aprilfools): the site becomes "Classic's Mudworks", dressed in mud brown.
    Done entirely with tokens, so every page follows it: a mud-brown accent and warm brown surfaces (dark theme)
    or parchment ones (light). OLED keeps its black and only takes the accent. Fonts, spacing and shapes are the
-   site's own; only the name in the header and footer is swapped. Placed after the accent and contrast rules
-   above so it wins over them. */
-:root[data-season="aprilfools"] {
+   site's own; only the name in the header and footer is swapped. The mud-brown accent only applies with the
+   "Automatic" accent setting, like every other seasonal theme; a colour the visitor picked is left alone. */
+:root[data-accent="auto"][data-season="aprilfools"] {
   --accent: #d19a66; --accent-rgb: 209, 154, 102; --on-accent: #1a110a;
 }
 :root[data-season="aprilfools"][data-theme="dark"] {
@@ -279,12 +279,15 @@
 :root[data-season="aprilfools"][data-theme="light"] {
   --bg: #f7f0e6; --surface: #fffaf3; --surface-2: #eee3d3; --border: #ddcdb6; --border-2: #c2ab8b;
   --text: #2a1c10; --text-soft: #6a5642;
+}
+:root[data-accent="auto"][data-season="aprilfools"][data-theme="light"] {
   --accent: #7b4a22; --accent-rgb: 123, 74, 34; --on-accent: #ffffff;
 }
 :root[data-season="aprilfools"][data-contrast="high"][data-theme="dark"] { --text: #ffffff; --text-soft: #e2d6c8; --border: #9a8268; --border-2: #d2bfa6; }
 :root[data-season="aprilfools"][data-contrast="high"][data-theme="light"] {
-  --text: #000000; --text-soft: #3a2a1b; --border: #6b5236; --border-2: #3a2a18; --accent: #5a3414; --accent-rgb: 90, 52, 20;
+  --text: #000000; --text-soft: #3a2a1b; --border: #6b5236; --border-2: #3a2a18;
 }
+:root[data-accent="auto"][data-season="aprilfools"][data-contrast="high"][data-theme="light"] { --accent: #5a3414; --accent-rgb: 90, 52, 20; }
 /* The name is swapped by laying the new one over the old one's exact box (the old text stays, invisible, so
    layout, size and letter-spacing don't change and screen readers still read the real name). */
 :root[data-season="aprilfools"] .brand-name,
