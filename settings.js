@@ -8,7 +8,7 @@
 
    Attributes set on <html> (styles.css keys off these):
      data-theme          dark | light | oled   ("auto" is resolved to light or dark here)
-     data-accent         purple | pink | ... | auto   (absent = blue; auto = the seasonal theme's own colour, set in styles.css, blue with none)
+     data-accent         purple | magenta | pink | ... | auto   (absent = blue; auto = the seasonal theme's own colour, set in styles.css, blue with none)
      data-contrast       high                  (absent = normal)
      data-motion         reduce                (absent = full motion)
      data-heading-font   plain                 (absent = pixel font)
@@ -27,7 +27,7 @@ const SETTINGS_EVENT = 'ccw:settings'; // fired on document after every change; 
 const SETTING_CHOICES = {
   theme: ['auto', 'dark', 'oled', 'light'],
   // auto = a colour made to suit the active seasonal theme (styles.css), blue when none is active.
-  accent: ['auto', 'red', 'orange', 'gold', 'green', 'teal', 'blue', 'purple', 'pink'],
+  accent: ['auto', 'red', 'orange', 'gold', 'green', 'teal', 'blue', 'purple', 'magenta', 'pink'],
   dateFormat: ['system', 'text', 'us-text', 'dmy', 'mdy', 'iso'],
   headingFont: ['pixel', 'plain'],
   textSize: ['small', 'default', 'large'],
@@ -66,7 +66,7 @@ const deviceQueries = {
 function sanitizeSettings(raw) {
   const out = { ...SETTING_DEFAULTS };
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return out;
-  const renamed = { violet: 'purple', fuchsia: 'pink' }; // earlier names
+  const renamed = { violet: 'purple', fuchsia: 'magenta' }; // earlier names
   if (renamed[raw.accent]) raw = { ...raw, accent: renamed[raw.accent] };
   // Earlier versions stored "relative dates" as a date format called "auto".
   if (raw.dateFormat === 'auto') raw = { ...raw, dateFormat: 'system', relativeDates: true };
@@ -86,6 +86,9 @@ function getSettings() {
   if (!settingsCache) {
     let raw = null;
     try { raw = JSON.parse(localStorage.getItem(SETTINGS_KEY)); } catch { /* unavailable or corrupt */ }
+    // "Pink" used to be the purple-leaning pink, which is now "Magenta" ("Pink" is the new rose-leaning one). Settings saved
+    // before the rename have no accentNames marker (updateSettings adds it), so their "pink" is moved to "magenta" once.
+    if (raw && typeof raw === 'object' && raw.accentNames !== 2 && raw.accent === 'pink') raw = { ...raw, accent: 'magenta' };
     settingsCache = sanitizeSettings(raw);
   }
   return settingsCache;
@@ -308,7 +311,7 @@ function announceSettings() {
 // Saves a partial update, applies it and returns the new settings.
 function updateSettings(patch) {
   settingsCache = sanitizeSettings({ ...getSettings(), ...patch });
-  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settingsCache)); } catch { /* kept for this page view only */ }
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify({ ...settingsCache, accentNames: 2 })); } catch { /* kept for this page view only */ }
   applySettings();
   announceSettings();
   return settingsCache;
