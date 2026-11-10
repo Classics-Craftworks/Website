@@ -394,7 +394,7 @@ const ACCENT_OPTIONS = SETTING_CHOICES.accent.map(accent => ({
   render: input => el('label', { class: 'swatch', attrs: { 'data-accent': accent } }, [
     input,
     el('span', { class: 'swatch-dot', attrs: { 'aria-hidden': 'true' } }),
-    el('span', { text: capitalise(accent) })
+    el('span', { text: accent === 'auto' ? 'Automatic' : capitalise(accent) })
   ])
 }));
 
@@ -561,7 +561,7 @@ function renderSettings() {
     seasonalRow(),
     choiceRow({
       key: 'accent', title: 'Accent colour', groupClass: 'choices-accent', options: ACCENT_OPTIONS,
-      description: 'Used for links, highlights and buttons. Project release channels (stable, beta, alpha) always keep their own colours.'
+      description: 'Used for links, highlights and buttons. Automatic uses a colour to suit the seasonal theme when one is active, and blue otherwise. Project release channels (stable, beta, alpha) always keep their own colours.'
     }),
     choiceRow({
       key: 'headingFont', title: 'Heading font', groupClass: 'choices-font', options: FONT_OPTIONS,

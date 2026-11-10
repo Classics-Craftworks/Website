@@ -227,6 +227,43 @@
 :root[data-contrast="high"][data-theme="light"][data-accent="green"] { --accent: #335705; --accent-rgb: 51, 87, 5; }
 :root[data-contrast="high"][data-theme="light"][data-accent="teal"] { --accent: #04504a; --accent-rgb: 4, 80, 74; }
 
+/* Automatic accent (Settings > Accent colour > Automatic): a colour made to suit each seasonal theme, chosen from the
+   theme's own look. Dark and OLED use the bright value, light a darker one, and high contrast on light a darker one
+   again, as the fixed accents do. April Fools has its own below and a day with no theme keeps the usual blue. */
+:root[data-accent="auto"][data-season="fireworks"] { --accent: #ffd23f; --accent-rgb: 255, 210, 63; --on-accent: #0d111a; }
+:root[data-accent="auto"][data-season="aurora"] { --accent: #5cf2b0; --accent-rgb: 92, 242, 176; --on-accent: #0d111a; }
+:root[data-accent="auto"][data-season="easter"] { --accent: #c4a8ff; --accent-rgb: 196, 168, 255; --on-accent: #0d111a; }
+:root[data-accent="auto"][data-season="blossom"] { --accent: #ffa8c8; --accent-rgb: 255, 168, 200; --on-accent: #0d111a; }
+:root[data-accent="auto"][data-season="anniversary"] { --accent: #ff5fd0; --accent-rgb: 255, 95, 208; --on-accent: #0d111a; }
+:root[data-accent="auto"][data-season="fireflies"] { --accent: #d7ff6e; --accent-rgb: 215, 255, 110; --on-accent: #0d111a; }
+:root[data-accent="auto"][data-season="leaves"] { --accent: #dca24a; --accent-rgb: 220, 162, 74; --on-accent: #0d111a; }
+:root[data-accent="auto"][data-season="snowfall"] { --accent: #a8e8ff; --accent-rgb: 168, 232, 255; --on-accent: #0d111a; }
+:root[data-accent="auto"][data-season="christmas"] { --accent: #ff5f6d; --accent-rgb: 255, 95, 109; --on-accent: #0d111a; }
+:root[data-accent="auto"][data-season="halloween"] { --accent: #ff9a2e; --accent-rgb: 255, 154, 46; --on-accent: #0d111a; }
+:root[data-accent="auto"][data-season="friday13"] { --accent: #8f9bff; --accent-rgb: 143, 155, 255; --on-accent: #0d111a; }
+:root[data-theme="light"][data-accent="auto"][data-season="fireworks"] { --accent: #8a5f00; --accent-rgb: 138, 95, 0; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="auto"][data-season="aurora"] { --accent: #0c7a52; --accent-rgb: 12, 122, 82; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="auto"][data-season="easter"] { --accent: #6a3fc0; --accent-rgb: 106, 63, 192; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="auto"][data-season="blossom"] { --accent: #b02a63; --accent-rgb: 176, 42, 99; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="auto"][data-season="anniversary"] { --accent: #a8168f; --accent-rgb: 168, 22, 143; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="auto"][data-season="fireflies"] { --accent: #5f7a00; --accent-rgb: 95, 122, 0; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="auto"][data-season="leaves"] { --accent: #85570a; --accent-rgb: 133, 87, 10; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="auto"][data-season="snowfall"] { --accent: #1f7a99; --accent-rgb: 31, 122, 153; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="auto"][data-season="christmas"] { --accent: #b3202f; --accent-rgb: 179, 32, 47; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="auto"][data-season="halloween"] { --accent: #a84a00; --accent-rgb: 168, 74, 0; --on-accent: #ffffff; }
+:root[data-theme="light"][data-accent="auto"][data-season="friday13"] { --accent: #3f4bc0; --accent-rgb: 63, 75, 192; --on-accent: #ffffff; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="fireworks"] { --accent: #654500; --accent-rgb: 101, 69, 0; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="aurora"] { --accent: #075a3b; --accent-rgb: 7, 90, 59; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="easter"] { --accent: #4d2a96; --accent-rgb: 77, 42, 150; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="blossom"] { --accent: #82174a; --accent-rgb: 130, 23, 74; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="anniversary"] { --accent: #7d0f6a; --accent-rgb: 125, 15, 106; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="fireflies"] { --accent: #455a00; --accent-rgb: 69, 90, 0; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="leaves"] { --accent: #633f05; --accent-rgb: 99, 63, 5; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="snowfall"] { --accent: #145a73; --accent-rgb: 20, 90, 115; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="christmas"] { --accent: #85141f; --accent-rgb: 133, 20, 31; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="halloween"] { --accent: #7d3600; --accent-rgb: 125, 54, 0; }
+:root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="friday13"] { --accent: #2d3894; --accent-rgb: 45, 56, 148; }
+
 /* April Fools (settings.js: SEASONS.aprilfools): the site becomes "Classic's Mudworks", dressed in mud brown.
    Done entirely with tokens, so every page follows it: a mud-brown accent and warm brown surfaces (dark theme)
    or parchment ones (light). OLED keeps its black and only takes the accent. Fonts, spacing and shapes are the
@@ -2423,6 +2460,8 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .pv-card::after { content: ''; position: absolute; bottom: 5px; left: 6px; width: 22px; height: 6px; border-radius: 3px; background: var(--accent); }
 
 /* Accent swatches */
+.swatch[data-accent="auto"] { --sw: conic-gradient(#ff9494, #ffa75a, #f2c244, #a3e35d, #3ed8c6, #74c4e7, #bb9dff, #ec8ff7, #ff9494); }
+:root[data-theme="light"] .swatch[data-accent="auto"] { --sw: conic-gradient(#c42b2b, #b0470a, #8a5a00, #477509, #0a7268, #0b6a9a, #7a3fe0, #a61fb8, #c42b2b); }
 .swatch[data-accent="blue"] { --sw: #74c4e7; }
 .swatch[data-accent="purple"] { --sw: #bb9dff; }
 .swatch[data-accent="pink"] { --sw: #ec8ff7; }

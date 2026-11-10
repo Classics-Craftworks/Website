@@ -8,7 +8,7 @@
 
    Attributes set on <html> (styles.css keys off these):
      data-theme          dark | light | oled   ("auto" is resolved to light or dark here)
-     data-accent         purple | pink | ...   (absent = blue)
+     data-accent         purple | pink | ... | auto   (absent = blue; auto = the seasonal theme's own colour, set in styles.css, blue with none)
      data-contrast       high                  (absent = normal)
      data-motion         reduce                (absent = full motion)
      data-heading-font   plain                 (absent = pixel font)
@@ -26,7 +26,8 @@ const SETTINGS_EVENT = 'ccw:settings'; // fired on document after every change; 
 
 const SETTING_CHOICES = {
   theme: ['auto', 'dark', 'oled', 'light'],
-  accent: ['red', 'orange', 'gold', 'green', 'teal', 'blue', 'purple', 'pink'],
+  // auto = a colour made to suit the active seasonal theme (styles.css), blue when none is active.
+  accent: ['auto', 'red', 'orange', 'gold', 'green', 'teal', 'blue', 'purple', 'pink'],
   dateFormat: ['system', 'text', 'us-text', 'dmy', 'mdy', 'iso'],
   headingFont: ['pixel', 'plain'],
   textSize: ['small', 'default', 'large'],
@@ -100,6 +101,8 @@ function effectiveTheme(s = getSettings()) {
 
 /* Every seasonal theme lives here. To add one: add an entry (and draw it in seasonal.js's EFFECTS, and
    add its name to SETTING_CHOICES.seasonal). The Settings page builds its cards from this list.
+     (accent colour)    the "Automatic" accent setting gives each theme its own colour, defined in styles.css under
+                        "Automatic accent" (add a rule there for a new theme; without one the usual blue is used)
      name, blurb        shown on the theme's card (its preview is the effect itself, from seasonal.js)
      dates              the dates it is set automatically, shown on its card (one line each on the Settings page,
                         with a clock icon). Each is { from: [month, day], to: [month, day] (omit for one day),
