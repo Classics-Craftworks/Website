@@ -80,7 +80,7 @@
     [[5, 2], [7, 2], [7, 4], [5, 4]],
     [[3, 4], [5, 4], [5, 5], [6, 5], [6, 8], [5, 8], [5, 7], [3, 7], [3, 8], [2, 8], [2, 5], [3, 5]]
   ];
-  const CREEPER_SPACING = 0.6; // distance between particles along the outline, in grid cells
+  const CREEPER_SPACING = 0.5; // distance between particles along the outline, in grid cells
   const CREEPER_CHANCE = 0.09; // roughly one burst in eleven
   const SHAPES = [['small', 35], ['large', 25], ['star', 22], ['burst', 18]];
 
@@ -141,7 +141,7 @@
           out.push([Math.cos(a) * r * power, y * power]);
         }
       } else if (shape === 'star') {
-        const points = 5, perEdge = 3, turn = rand(0, TAU);
+        const points = 5, perEdge = 4, turn = rand(0, TAU);
         const vertex = k => {
           const a = turn - Math.PI / 2 + (k / (points * 2)) * TAU;
           const r = k % 2 ? 0.42 : 1;
@@ -623,29 +623,30 @@
   const SPRUCE_COLS = SPRUCE[0].length;
   const SPRUCE_ROWS = SPRUCE.length;
   // Flat, fully opaque colours, no texture: the old pine treeline's teal for the leaves (the light theme's are the old
-  // see-through colours worked out against a pale page) and a muted brown for the trunk. The
-  // back row is a shade apart so the rows read separately.
+  // see-through colours worked out against a pale page) and a muted brown for the trunk. There are two tiers: the back
+  // row is dimmer (darker on the dark themes, paler on the light one) than the front row, so it reads as a quiet
+  // backdrop behind it.
   const SPRUCE_COLOURS = {
     dark: {
       front: { leaf: 'rgb(22, 44, 54)', trunk: 'rgb(38, 26, 19)' },
-      back:  { leaf: 'rgb(18, 30, 42)', trunk: 'rgb(25, 19, 17)' }
+      far:   { leaf: 'rgb(13, 25, 35)', trunk: 'rgb(22, 17, 15)' }
     },
     light: {
       front: { leaf: 'rgb(80, 103, 110)', trunk: 'rgb(74, 52, 37)' },
-      back:  { leaf: 'rgb(158, 173, 179)', trunk: 'rgb(150, 130, 115)' }
+      far:   { leaf: 'rgb(142, 160, 167)', trunk: 'rgb(134, 113, 98)' }
     }
   };
   const spruceTextures = {};
   // One spruce as a flat silhouette, a single pixel per block, scaled up with smoothing off so the edges
-  // stay square.
-  function spruceTexture(mode, back) {
-    const key = mode + (back ? 'b' : 'f');
+  // stay square. tier is 'front' or 'far'.
+  function spruceTexture(mode, tier) {
+    const key = mode + tier;
     if (spruceTextures[key]) return spruceTextures[key];
     const c = document.createElement('canvas');
     c.width = SPRUCE_COLS;
     c.height = SPRUCE_ROWS;
     const g = c.getContext('2d');
-    const palette = SPRUCE_COLOURS[mode][back ? 'back' : 'front'];
+    const palette = SPRUCE_COLOURS[mode][tier];
     SPRUCE.forEach((row, r) => {
       for (let col = 0; col < SPRUCE_COLS; col++) {
         if (row[col] === '.') continue;
@@ -723,10 +724,13 @@
       ctx.fillRect(cx - Math.floor(s / 2), cy - Math.floor(s / 2), s, s);
     }
 
-    /* The treeline: two rows of Minecraft spruces along the bottom edge, taller towards the side margins and low in the
-       middle, so the middle of the page stays clear. Laid out once per window size from a fixed seed (so the
-       trees stand in the same places every time, whatever Math.random is doing), with a few small square lights on
-       each front tree. A tree is a whole number of pixels per block, so its squares stay sharp. */
+    /* The treeline: two rows of Minecraft spruces along the bottom edge, a front row and a dimmer back row. Both are
+       taller towards the side margins and low in the middle, so the middle of the page stays clear, and the back row
+       is thickest at the sides, where it makes a backdrop of dim trees between and behind the front ones. Laid out once per window size from a fixed
+       seed (so the trees stand in the same places every time, whatever Math.random is doing), with a few small
+       square lights on each front tree. A tree is a whole number of pixels per block, so its squares stay sharp.
+       A back tree is only kept if enough of its leaves show past the trees in front of it, so none is left as a
+       trunk poking out from behind or hidden altogether. */
     let trees = null;
     let treesFor = '';
 
@@ -737,49 +741,29 @@
       const rng = seeded(25);
       const between = (a, b) => a + rng() * (b - a);
       const u = unit();
-      const rows = [{ back: true, scale: 0.68, shift: 0.5, gap: [1.3, 2.3] }, { back: false, scale: 1, shift: 0, gap: [1.0, 1.9] }];
-      trees = rows.map(row => {
-        const list = [];
-        let x = -20 * u + row.shift * 30 * u;
-        while (x < view.w + 20) {
-          const edge = Math.abs(x / view.w - 0.5) * 2; // 0 in the middle, 1 at the sides
-          const wanted = view.h * (0.06 + 0.23 * Math.pow(edge, 1.7)) * between(0.8, 1.2) * row.scale;
-          const block = Math.max(1, Math.round(wanted / SPRUCE_ROWS));
-          const height = block * SPRUCE_ROWS;
-          const width = block * SPRUCE_COLS;
-          const tree = { x, block, height, width, bulbs: [] };
-          if (!row.back && height > 30) { // trees too small to carry lights (the preview tiles) go without
-            const count = Math.min(SPRUCE_LEAF_CELLS.length, Math.max(2, Math.round(height / (20 * u + 8))));
-            const free = SPRUCE_LEAF_CELLS.slice();
-            for (let i = 0; i < count; i++) {
-              const [r, col] = free.splice(Math.floor(rng() * free.length), 1)[0];
-              tree.bulbs.push({
-                dx: (col + 0.5 - SPRUCE_COLS / 2) * block,   // the middle of that block of leaves
-                dy: -(SPRUCE_ROWS - r - 0.5) * block,
-                i: list.length * 7 + i
-              });
-            }
-          }
-          list.push(tree);
-          x += width * between(row.gap[0], row.gap[1]);
-        }
-        return { back: row.back, list };
-      });
-
-      // Drop any tree that is mostly hidden: one that other trees drawn over it (the next ones along its row, and
-      // for the back row the whole front row) cover more than a third of. A tree is judged block by block.
       const baseY = Math.round(view.h) + 2;
+      // Nearest first. scale: size against the front row. space: the clear gap between neighbours in a row, in tree
+      // widths (neighbours in a row never overlap, whatever their sizes). reach: how far in from the sides the row
+      // starts (0 = the whole width; the back rows leave the very middle bare). minSeen: the share of a back tree's
+      // leaves that must show past the trees in front of it.
+      const rows = [
+        { tier: 'front', scale: 1,    space: [0, 0.9],   reach: 0,    minSeen: 0.67 },
+        { tier: 'far',   scale: 1,    space: [0.1, 0.6],  reach: 0.2,  minSeen: 0.65, shift: 0.25 }
+      ];
+
       const left = t => Math.round(t.x - t.width / 2);
       const covers = (o, px, py) => {
         const col = Math.floor((px - left(o)) / o.block);
         const r = Math.floor((py - (baseY - o.height)) / o.block);
         return col >= 0 && col < SPRUCE_COLS && r >= 0 && r < SPRUCE_ROWS && SPRUCE[r][col] !== '.';
       };
-      const visible = (t, over) => {
+      // How much of a tree shows past the trees in `over`, block by block (only the leaves when leavesOnly: a trunk
+      // alone is no use).
+      const visible = (t, over, leavesOnly) => {
         let seen = 0, total = 0;
         SPRUCE.forEach((line, r) => {
           for (let col = 0; col < SPRUCE_COLS; col++) {
-            if (line[col] === '.') continue;
+            if (line[col] === '.' || (leavesOnly && line[col] !== 'L')) continue;
             total++;
             const px = left(t) + (col + 0.5) * t.block;
             const py = baseY - t.height + (r + 0.5) * t.block;
@@ -788,14 +772,85 @@
         });
         return seen / total;
       };
-      const front = trees[1].list;
-      for (let i = 0; i < front.length; i++) {
-        if (visible(front[i], front.slice(i + 1)) < 0.67) { front.splice(i, 1); i--; }
-      }
-      const back = trees[0].list;
-      for (let i = 0; i < back.length; i++) {
-        if (visible(back[i], back.slice(i + 1).concat(front)) < 0.67) { back.splice(i, 1); i--; }
-      }
+      const sizeAt = (x, row) => {
+        const edge = Math.abs(x / view.w - 0.5) * 2; // 0 in the middle, 1 at the sides
+        // The biggest are capped, so a tree at the very edge never towers over the page.
+        const wanted = Math.min(view.h * 0.3, view.h * (0.06 + 0.23 * Math.pow(edge, 1.7)) * between(0.85, 1.25)) * row.scale;
+        const block = Math.max(1, Math.round(wanted / SPRUCE_ROWS));
+        return { edge, block, height: block * SPRUCE_ROWS, width: block * SPRUCE_COLS };
+      };
+
+      const built = [];
+      let inFront = [];
+      rows.forEach((row, rowIndex) => {
+        const list = [];
+        if (rowIndex === 0) {
+          // The front row: evenly spread, left to right, each one's own width apart from the last.
+          let cursor = -50 * u;
+          while (cursor < view.w + 20) {
+            const { block, height, width } = sizeAt(cursor + 12 * u, row);
+            const x = cursor + width / 2;
+            const tree = { x, block, height, width, bulbs: [] };
+            if (height > 30) { // trees too small to carry lights (the preview tiles) go without
+              // Lights are scattered, not evenly spread: each tree gets its own number (never more than a handful, and
+              // some are sparse), they land on random leaves but never bunch up (none within a block and a half of
+              // another), and each is nudged off the middle of its block and given its own size.
+              const wantedCount = Math.min(SPRUCE_LEAF_CELLS.length, Math.max(1, Math.round(height / (20 * u + 8) * between(0.4, 1.0))));
+              const free = SPRUCE_LEAF_CELLS.slice();
+              const placed = [];
+              for (let tries = 0; placed.length < wantedCount && free.length && tries < 40; tries++) {
+                const at = Math.floor(rng() * free.length);
+                const [r, col] = free[at];
+                free.splice(at, 1);
+                if (placed.some(q => Math.hypot(q[0] - r, q[1] - col) < 1.5)) continue;
+                placed.push([r, col]);
+                tree.bulbs.push({
+                  dx: (col + 0.5 - SPRUCE_COLS / 2 + between(-0.3, 0.3)) * block,
+                  dy: -(SPRUCE_ROWS - r - 0.5 + between(-0.3, 0.3)) * block,
+                  size: between(0.75, 1.3),
+                  i: list.length * 7 + placed.length
+                });
+              }
+            }
+            // (one with hardly any of itself on screen would only show as a stray sliver at the edge)
+            const onScreen = Math.min(view.w, x + width / 2) - Math.max(0, x - width / 2);
+            if (onScreen >= width * 0.4) list.push(tree);
+            cursor = x + width / 2 + width * between(row.space[0], row.space[1]);
+          }
+          // Drop a front tree that the next ones along cover too much of (rare now that they don't overlap).
+          for (let i = list.length - 1; i >= 0; i--) {
+            if (visible(list[i], list.slice(i + 1), false) < row.minSeen) list.splice(i, 1);
+          }
+        } else {
+          // A back row: sweep along the width and plant a tree wherever one fits, i.e. clear of its neighbour in
+          // this row and with enough leaves showing past the trees in front. That puts the back trees in the gaps
+          // and above the front trees, so they read as a backdrop and none is a smudge behind another.
+          let x = -30 * u + row.shift * 40 * u;
+          const step = Math.max(2, Math.round(3 * u));
+          let lastRight = -Infinity;
+          while (x < view.w + 30) {
+            const base = sizeAt(x, row);
+            // A full-size tree if one fits here; failing that a smaller one, so a gap too narrow for a full-size
+            // tree gets a smaller one rather than staying empty.
+            for (const shrink of [1, 0.8, 0.64]) {
+              const block = Math.max(1, Math.round(base.block * shrink));
+              const width = block * SPRUCE_COLS;
+              // (a tree must be mostly on screen: one hanging off the edge would show as a stray sliver)
+              if (base.edge < row.reach || x - width / 2 < lastRight || x < width * 0.3 || x > view.w - width * 0.3) continue;
+              const tree = { x, block, height: block * SPRUCE_ROWS, width, bulbs: [] };
+              if (visible(tree, inFront, true) >= row.minSeen) {
+                list.push(tree);
+                lastRight = x + width / 2 + width * between(row.space[0], row.space[1]);
+                break;
+              }
+            }
+            x += step;
+          }
+        }
+        inFront = inFront.concat(list);
+        built.push({ tier: row.tier, back: rowIndex > 0, list });
+      });
+      trees = built.reverse(); // drawn furthest first
     }
 
     function drawTrees(ctx, light) {
@@ -806,17 +861,20 @@
       ctx.imageSmoothingEnabled = false;
       trees.forEach(row => {
         row.list.forEach(t => {
-          ctx.drawImage(spruceTexture(mode, row.back), Math.round(t.x - t.width / 2), baseY - t.height, t.width, t.height);
+          ctx.drawImage(spruceTexture(mode, row.tier), Math.round(t.x - t.width / 2), baseY - t.height, t.width, t.height);
         });
       });
 
-      // the square lights on the front row
-      const side = Math.max(2, Math.round(3.5 * unit()));
+      // the square lights on the front row: bigger on the bigger (closer) trees, and each twinkling on its own
+      // irregular rhythm (two waves of different speeds added together), not in a steady pulse.
       ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
-      trees[1].list.forEach(t => {
+      trees[trees.length - 1].list.forEach(t => {
+        const side = 2 + t.block * 0.18; // the tree's block size already follows the window size
         t.bulbs.forEach(b => {
-          const level = 0.6 + 0.4 * Math.sin(clock * (0.6 + (b.i % 5) * 0.2) + b.i * 2.1);
-          bulb(ctx, t.x + b.dx, baseY + b.dy, side, side * 3, colours[b.i % colours.length], level, light);
+          const wave = Math.sin(clock * (0.6 + (b.i % 5) * 0.2) + b.i * 2.1) * 0.3 + Math.sin(clock * (1.3 + (b.i % 7) * 0.17) + b.i * 5.3) * 0.25;
+          const level = Math.min(1, Math.max(0.15, 0.6 + wave));
+          const size = side * b.size;
+          bulb(ctx, t.x + b.dx, baseY + b.dy, size, size * 3, colours[b.i % colours.length], level, light);
         });
       });
       ctx.globalAlpha = 1;
