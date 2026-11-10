@@ -7,7 +7,7 @@
    - Fireworks: Minecraft-style rockets rise and burst into small square-pixel sparkles, now and then a Creeper face.
    - Aurora: slow green, teal and violet northern-lights curtains sway across the upper sky.
    - Anniversary: bright confetti falls while party balloons float up the page.
-  - Easter: pastel decorated eggs rock gently as they drift down among a few little daisies.
+  - Easter: pastel Minecraft-style eggs rock gently as they drift down among a few little square pixel daisies.
   - Fireflies: square fireflies, each with a soft glow, wander and blink under a blue-to-rose twilight sky.
    - Cherry Blossom: Minecraft-style pink square cherry leaves spin down on a light breeze.
    - Falling Leaves: brown Minecraft-style leaves spin and drift down.
@@ -1317,90 +1317,108 @@
       });
     }
 
-    // An egg lying with its narrow end up, half-height s.
-    function eggPath(ctx, s) {
-      ctx.beginPath();
-      for (let i = 0; i <= 28; i++) {
-        const t = (i / 28) * TAU;
-        const x = s * 0.78 * Math.sin(t) * (1 - 0.17 * Math.cos(t));
-        const y = -s * Math.cos(t);
-        if (i) ctx.lineTo(x, y); else ctx.moveTo(x, y);
-      }
-      ctx.closePath();
+    /* Pixel art, drawn small and scaled up with smoothing off (as the snow and leaves are) so every pixel is a crisp
+       square. The egg is Minecraft's: 10 pixels wide and 12 tall, narrow at the top and widest low down, with a darker
+       edge, a lit patch at the upper left, a shaded lower right and the decoration in its second colour. # is the egg,
+       . is empty. */
+    const EGG_SHAPE = [
+      '..........',
+      '...####...',
+      '..######..',
+      '.########.',
+      '.########.',
+      '##########',
+      '##########',
+      '##########',
+      '##########',
+      '##########',
+      '.########.',
+      '..######..'
+    ];
+    const EGG_W = EGG_SHAPE[0].length, EGG_H = EGG_SHAPE.length;
+    const EGG_SHINE = [[3, 2], [2, 3], [3, 3]];
+    // The decoration of each pattern, as [x, y] pixels inside the egg.
+    const EGG_PATTERNS = [
+      [[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [2, 8], [3, 8], [4, 8], [5, 8], [6, 8], [7, 8]],  // two bands
+      [[2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [2, 6], [3, 7], [4, 6], [5, 7], [6, 6], [7, 7]],  // a band over a zigzag
+      [[5, 3], [3, 5], [6, 5], [4, 7], [7, 7], [5, 9]],                                                  // dots
+      [[2, 6], [3, 5], [4, 5], [5, 6], [6, 6], [7, 5], [3, 9], [4, 9], [5, 9], [6, 9]]                   // a wave
+    ];
+    const eggSprites = {};
+    function eggSprite(mode, colour, pattern) {
+      const key = mode + colour + pattern;
+      if (eggSprites[key]) return eggSprites[key];
+      const [base, trim] = EGG_COLOURS[mode][colour % EGG_COLOURS[mode].length];
+      const c = document.createElement('canvas');
+      c.width = EGG_W;
+      c.height = EGG_H;
+      const g = c.getContext('2d');
+      const solid = (x, y) => !!EGG_SHAPE[y] && EGG_SHAPE[y][x] === '#';
+      const edge = (x, y) => !(solid(x - 1, y) && solid(x + 1, y) && solid(x, y - 1) && solid(x, y + 1));
+      const baseRgb = hexRgb(base);
+      const outline = mixRgb(baseRgb, [0, 0, 0], 0.3);
+      const shade = mixRgb(baseRgb, [0, 0, 0], 0.12);
+      EGG_SHAPE.forEach((row, y) => {
+        for (let x = 0; x < EGG_W; x++) {
+          if (!solid(x, y)) continue;
+          g.fillStyle = edge(x, y) ? outline : (x + y >= 15 ? shade : base);
+          g.fillRect(x, y, 1, 1);
+        }
+      });
+      g.fillStyle = trim;
+      EGG_PATTERNS[pattern % EGG_PATTERNS.length].forEach(([x, y]) => g.fillRect(x, y, 1, 1));
+      g.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      EGG_SHINE.forEach(([x, y]) => g.fillRect(x, y, 1, 1));
+      return (eggSprites[key] = c);
     }
 
-    function drawEgg(ctx, p, palette) {
-      const s = p.size;
-      const [base, trim] = palette[p.colour % palette.length];
+    // The daisy: a plus of square petals with a ring of square petals between and a yellow centre, 5 pixels across.
+    const DAISY_SHAPE = [
+      '..P..',
+      '.PPP.',
+      'PPCPP',
+      '.PPP.',
+      '..P..'
+    ];
+    const daisySprites = {};
+    function daisySprite(mode) {
+      if (daisySprites[mode]) return daisySprites[mode];
+      const [petal, centre] = DAISY_COLOURS[mode];
+      const c = document.createElement('canvas');
+      c.width = c.height = 5;
+      const g = c.getContext('2d');
+      DAISY_SHAPE.forEach((row, y) => {
+        for (let x = 0; x < 5; x++) {
+          if (row[x] === '.') continue;
+          g.fillStyle = row[x] === 'C' ? centre : petal;
+          g.fillRect(x, y, 1, 1);
+        }
+      });
+      return (daisySprites[mode] = c);
+    }
+
+    // An egg rocks as it falls. p.size is its half-height, so a pixel of the egg is a sixth of that.
+    function drawEgg(ctx, p, mode) {
+      const px = Math.max(1, Math.round(p.size / 6));
       ctx.rotate(Math.sin(clock * p.rock + p.phase) * 0.5);
-      eggPath(ctx, s);
-      ctx.fillStyle = base;
-      ctx.fill();
-      ctx.save();
-      ctx.clip();
-      ctx.fillStyle = trim;
-      ctx.strokeStyle = trim;
-      ctx.lineWidth = s * 0.15;
-      ctx.lineJoin = 'round';
-      if (p.pattern === 0) { // two bands
-        ctx.fillRect(-s, -s * 0.38, s * 2, s * 0.26);
-        ctx.fillRect(-s, s * 0.14, s * 2, s * 0.2);
-      } else if (p.pattern === 1) { // a zigzag
-        ctx.beginPath();
-        for (let x = -s, i = 0; x <= s * 1.1; x += s * 0.34, i++) {
-          if (i) ctx.lineTo(x, i % 2 ? s * 0.14 : -s * 0.14); else ctx.moveTo(x, -s * 0.14);
-        }
-        ctx.stroke();
-      } else if (p.pattern === 2) { // dots
-        [[-0.3, -0.45], [0.32, -0.3], [0, 0], [-0.4, 0.4], [0.3, 0.5]].forEach(([dx, dy]) => {
-          ctx.beginPath();
-          ctx.arc(dx * s, dy * s, s * 0.12, 0, TAU);
-          ctx.fill();
-        });
-      } else { // a wave
-        ctx.beginPath();
-        for (let x = -s; x <= s; x += s * 0.1) {
-          const y = s * 0.05 + Math.sin(x / s * 5) * s * 0.14;
-          if (x === -s) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-      }
-      ctx.restore();
-      // A soft shine on the upper left.
-      ctx.globalAlpha *= 0.35;
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.ellipse(-s * 0.3, -s * 0.38, s * 0.12, s * 0.26, 0.5, 0, TAU);
-      ctx.fill();
+      ctx.drawImage(eggSprite(mode, p.colour, p.pattern), -EGG_W / 2 * px, -EGG_H / 2 * px, EGG_W * px, EGG_H * px);
     }
 
-    function drawDaisy(ctx, p, palette) {
-      const s = p.size;
-      const [petal, centre] = palette;
+    // A daisy just turns, with no squashing. p.size is its half-width, so a pixel of the daisy is two fifths of that.
+    function drawDaisy(ctx, p, mode) {
+      const px = Math.max(1, Math.round(p.size * 0.4));
       ctx.rotate(p.angle);
-      ctx.scale(0.35 + 0.65 * Math.abs(Math.cos(clock * p.tumble + p.phase)), 1);
-      ctx.fillStyle = petal;
-      for (let i = 0; i < 6; i++) {
-        ctx.save();
-        ctx.rotate((i / 6) * TAU);
-        ctx.beginPath();
-        ctx.ellipse(0, -s * 0.62, s * 0.26, s * 0.5, 0, 0, TAU);
-        ctx.fill();
-        ctx.restore();
-      }
-      ctx.fillStyle = centre;
-      ctx.beginPath();
-      ctx.arc(0, 0, s * 0.3, 0, TAU);
-      ctx.fill();
+      ctx.drawImage(daisySprite(mode), -2.5 * px, -2.5 * px, 5 * px, 5 * px);
     }
 
     function draw(ctx) {
       const mode = isLight() ? 'light' : 'dark';
+      ctx.imageSmoothingEnabled = false;
       items.forEach(p => {
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.globalAlpha = p.alpha;
-        if (p.daisy) drawDaisy(ctx, p, DAISY_COLOURS[mode]); else drawEgg(ctx, p, EGG_COLOURS[mode]);
+        if (p.daisy) drawDaisy(ctx, p, mode); else drawEgg(ctx, p, mode);
         ctx.restore();
       });
       ctx.globalAlpha = 1;
