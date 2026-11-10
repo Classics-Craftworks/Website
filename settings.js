@@ -39,7 +39,7 @@ const SETTING_CHOICES = {
 
 const SETTING_DEFAULTS = Object.freeze({
   theme: 'dark',
-  accent: 'blue',
+  accent: 'auto',
   highContrast: null,   // null = follow the device
   reduceMotion: null,   // null = follow the device
   dateFormat: 'system',

@@ -129,7 +129,7 @@
 
 /* ---------- Themes, accent colours and contrast (Settings) ----------
    settings.js puts the visitor's choices on <html> as data-theme, data-accent, data-contrast,
-   data-motion, data-heading-font and data-newtab. The defaults (dark, blue, normal contrast,
+   data-motion, data-heading-font and data-newtab. The defaults (dark, automatic accent / blue, normal contrast,
    pixel headings) are the :root tokens above and need no attribute.
    - Order matters: themes, then accents, then high contrast; later rules at equal specificity win.
    - Accent text must stay readable on every surface: dark themes use the bright accent, the light
