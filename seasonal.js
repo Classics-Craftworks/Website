@@ -9,7 +9,7 @@
    - Anniversary: bright confetti falls while party balloons float up the page.
   - Easter: pastel decorated eggs rock gently as they drift down among a few little daisies.
   - Fireflies: fireflies wander and blink under a blue-to-rose twilight sky.
-   - Cherry Blossom: pink petals drift and flutter down on a light breeze.
+   - Cherry Blossom: Minecraft-style pink square cherry leaves spin down on a light breeze.
    - Falling Leaves: brown autumn leaves tumble and drift down.
    - Snowfall: snow drifts down.
    - Christmas: a string of fairy lights twinkles along the top, golden sparkles drift down and a treeline of
@@ -1066,11 +1066,32 @@
 
   /* ---------- Cherry Blossom ---------- */
 
-  // Petal pinks; the light theme needs deeper ones to show against a pale page.
-  const PETAL_COLOURS = {
-    dark:  ['#ffc2d6', '#ffb0c8', '#ffd6e4', '#f79ab8', '#ffe3ec'],
-    light: ['#e8749c', '#d95a86', '#ee8fb0', '#cc4a78', '#f2a3bf']
+  /* Minecraft's cherry-leaf particle: two flat pink squares, each a 2x2 grid of pixels, that share one pixel
+     where their corners meet. Together they make a 3x3 texture: the first square is the top-left 2x2, the
+     second the bottom-right 2x2, they overlap in the middle, and the bottom-right pixel (opposite the overlap
+     on the second square) is a touch darker. Drawn with smoothing off so the edges stay crisp as it spins.
+     About one leaf in five is a slightly darker pink. The light theme uses deeper pinks. */
+  const LEAF_PINKS = {
+    dark:  [{ base: '#f2b4d6', dark: '#e18ab8' }, { base: '#e49ac3', dark: '#d070a6' }],
+    light: [{ base: '#e0709a', dark: '#c04c7c' }, { base: '#cc5483', dark: '#ae3868' }]
   };
+  const DEEP_LEAF_CHANCE = 0.2; // the second, slightly darker leaf is the rarer one
+  const leafSprites = {};
+
+  function leafTexture(mode, deep) {
+    const key = mode + (deep ? '-deep' : '');
+    if (leafSprites[key]) return leafSprites[key];
+    const pinks = LEAF_PINKS[mode][deep ? 1 : 0];
+    const c = document.createElement('canvas');
+    c.width = c.height = 3;
+    const g = c.getContext('2d');
+    g.fillStyle = pinks.base;
+    g.fillRect(0, 0, 2, 2);
+    g.fillRect(1, 1, 2, 2);
+    g.fillStyle = pinks.dark;
+    g.fillRect(2, 2, 1, 1);
+    return (leafSprites[key] = c);
+  }
 
   function createBlossom(view) {
     let petals = [];
@@ -1082,12 +1103,12 @@
     function petal(anywhere) {
       return {
         x: rand(-20, view.w + 20), y: anywhere ? rand(0, view.h) : rand(-30, -4),
-        size: rand(6, 11) * unit(), colour: Math.floor(random() * PETAL_COLOURS.dark.length),
+        size: rand(14, 26) * unit(),
         fall: rand(18, 36) * unit() + 8, // slower than leaves: petals float
         drift: rand(6, 16) * unit(),       // a steady push to one side, like a light breeze
         sway: rand(14, 34) * unit(), swaySpeed: rand(0.3, 0.8), phase: rand(0, TAU),
         angle: rand(0, TAU), spin: rand(-1.6, 1.6),
-        tumble: rand(1, 2.6), alpha: rand(0.7, 0.95)
+        alpha: 1, deep: random() < DEEP_LEAF_CHANCE
       };
     }
 
@@ -1110,24 +1131,15 @@
     }
 
     function draw(ctx) {
-      const palette = PETAL_COLOURS[isLight() ? 'light' : 'dark'];
+      const mode = isLight() ? 'light' : 'dark';
+      ctx.imageSmoothingEnabled = false;
       petals.forEach(p => {
         const s = p.size;
-        const flip = Math.cos(clock * p.tumble + p.phase);
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.angle);
-        ctx.scale(0.3 + 0.7 * Math.abs(flip), 1);
         ctx.globalAlpha = p.alpha;
-        ctx.fillStyle = palette[p.colour % palette.length];
-        // A rounded petal with a small notch at the tip, narrowing to the base.
-        ctx.beginPath();
-        ctx.moveTo(0, s * 1.1);
-        ctx.bezierCurveTo(s * 1.15, s * 0.5, s * 1.0, -s * 0.9, s * 0.28, -s);
-        ctx.lineTo(0, -s * 0.7);
-        ctx.lineTo(-s * 0.28, -s);
-        ctx.bezierCurveTo(-s * 1.0, -s * 0.9, -s * 1.15, s * 0.5, 0, s * 1.1);
-        ctx.fill();
+        ctx.drawImage(leafTexture(mode, p.deep), -s / 2, -s / 2, s, s);
         ctx.restore();
       });
       ctx.globalAlpha = 1;

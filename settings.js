@@ -175,7 +175,7 @@ const SEASONS = {
     }
   },
   blossom: {
-    name: 'Cherry Blossom', blurb: 'Drifting cherry-blossom petals.',
+    name: 'Cherry Blossom', blurb: 'Drifting cherry leaves.',
     dates: [{ from: [3, 24], to: [3, 31] }],
     on: (month, day) => month === 3 && day >= 24
   },
