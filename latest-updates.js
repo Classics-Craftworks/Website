@@ -54,11 +54,11 @@ const LATEST_UPDATES = {
     latestReleases: {
       heading: "Latest releases",
       releases: [
+        { project: "Classic's Tweaks", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.1.0-beta.2", version: "v3.1.0-beta.2", channel: "beta", date: "2026-11-10" },
+        { project: "Classic's Note Block Tweaks", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v1.0.0-beta.3", version: "v1.0.0-beta.3", channel: "beta", date: "2026-11-10" },
+        { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-pre.1", version: "v5.1.0-pre.1", channel: "beta", date: "2026-11-10" },
+        { project: "Better Craftables", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-pre.1", version: "v8.1.0-pre.1", channel: "beta", date: "2026-11-10" },
         { project: "Classic's Tweaks", url: "https://modrinth.com/resourcepack/classics-tweaks/version/v3.1.0-beta.1", version: "v3.1.0-beta.1", channel: "beta", date: "2026-11-03" },
-        { project: "Classic's Note Block Tweaks", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v1.0.0-beta.2", version: "v1.0.0-beta.2", channel: "beta", date: "2026-11-03" },
-        { project: "Better Unpackables", url: "https://modrinth.com/datapack/better-unpackables/version/v5.1.0-beta.8", version: "v5.1.0-beta.8", channel: "beta", date: "2026-11-03" },
-        { project: "Better Craftables", url: "https://modrinth.com/datapack/better-craftables/version/v8.1.0-beta.5", version: "v8.1.0-beta.5", channel: "beta", date: "2026-11-03" },
-        { project: "Classic's Note Block Tweaks", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks/version/v1.0.0-beta.1", version: "v1.0.0-beta.1", channel: "beta", date: "2026-10-27" },
       ]
     },
 
@@ -88,7 +88,21 @@ const LATEST_UPDATES = {
 
   entries: [
     {
-      pinned: true,
+      announce: true,
+      date: "2026-11-10",
+      title: "26.4 Snapshot 8",
+      text: "New betas have been released for Java 26.4-snapshot-8.",
+      tags: ["snapshot", "beta"],
+      mc: "26.4",
+      image: "images/icons/snapshot.svg",
+      projects: [
+        { id: "better-craftables", version: "v8.1.0-pre.1" },
+        { id: "better-unpackables", version: "v5.1.0-pre.1" },
+        { id: "classics-tweaks", version: "v3.0.0-beta.2" },
+        { id: "classics-note-block-tweaks", version: "v1.0.0-beta.3" }
+      ]
+    },
+    {
       date: "2026-11-03",
       title: "Classic's Tweaks v3.1.0-beta.1",
       text: "This beta adds a new texture to Disc Tweaks for the new \"flurry\" music disc, as well as support for the 26.4 snapshots.",
@@ -100,7 +114,6 @@ const LATEST_UPDATES = {
       linkText: "View update on Modrinth"
     },
     {
-      announce: true,
       date: "2026-11-03",
       title: "26.4 Snapshot 7",
       text: "New betas have been released for Java 26.4-snapshot-7.",

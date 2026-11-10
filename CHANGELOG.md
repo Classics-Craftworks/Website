@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.9.0.1 — 2026-11-10
+
+### Changed
+- Updated for Java 26.4-snapshot-8 and new betas
+
 ## v4.9.0 — 2026-11-10
 
 ### Changed
