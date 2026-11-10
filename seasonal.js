@@ -4,7 +4,7 @@
    ("fireworks", "aurora", "anniversary", "blossom", "easter", "fireflies", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
    a fixed, click-through <canvas> behind everything (styles.css: .season-canvas).
 
-   - Fireworks: rockets rise and burst into sparks.
+   - Fireworks: Minecraft-style rockets rise and burst into small square-pixel sparkles, now and then a Creeper face.
    - Aurora: slow green, teal and violet northern-lights curtains sway across the upper sky.
    - Anniversary: bright confetti falls while party balloons float up the page.
   - Easter: pastel decorated eggs rock gently as they drift down among a few little daisies.
@@ -55,13 +55,53 @@
 
   /* ---------- Fireworks ---------- */
 
+  /* Minecraft-style fireworks. Everything is built from small square pixels (no circles, no
+     streaks): sparks are tiny four-point sparkles, the rocket leaves a little flame trail, and it bursts into one of the firework-star
+     shapes (small ball, large ball, star, burst). Now and then (CREEPER_CHANCE) it bursts into a Creeper
+     face instead: an 8x8 head of green squares with the face left as gaps. */
+
+  const FIREWORK_COLOURS = {
+    dark:  ['#ff5555', '#ffaa00', '#ffff55', '#55ff55', '#55ffff', '#7a85ff', '#ff55ff', '#b45dff', '#ffffff'],
+    light: ['#c4202a', '#c06a00', '#a88600', '#1f9a2a', '#0a8f9c', '#3341cc', '#b4239e', '#7a2fc4', '#1b2540']
+  };
+  const CREEPER_GREENS = {
+    dark:  ['#8dff7a', '#6dff5c', '#55ff55', '#4fe04a'],
+    light: ['#2e8a2a', '#27761f', '#1f6b1b', '#1a5e17']
+  };
+  // The Creeper's face; # is a firework particle (the eyes and mouth), . is empty.
+  const CREEPER_FACE = [
+    '........',
+    '........',
+    '.##..##.',
+    '.##..##.',
+    '...##...',
+    '..####..',
+    '..####..',
+    '..#..#..'
+  ];
+  const CREEPER_CHANCE = 0.09; // roughly one burst in eleven
+  const SHAPES = [['small', 35], ['large', 25], ['star', 22], ['burst', 18]];
+
+  const hexRgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  const mixRgb = (a, b, t) => 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * t) + ',' + Math.round(a[1] + (b[1] - a[1]) * t) + ',' + Math.round(a[2] + (b[2] - a[2]) * t) + ')';
+
   function createFireworks(view) {
     const rockets = [];
     const sparks = [];
+    const heads = []; // Creeper faces
     let untilLaunch = 0.2; // the first rocket goes almost at once so a new choice is seen straight away
 
     const scale = () => view.scale ?? Math.min(1.25, Math.max(0.6, Math.min(view.w, view.h) / 760));
-    const line = () => view.line ?? 1; // thinner strokes on the small preview tiles
+    const unit = () => Math.max(1, Math.round(2.2 * scale()));       // one square pixel of a spark
+    const headCell = () => Math.max(4, Math.round(14 * scale()));    // spacing of the Creeper's face particles
+    // A spark is a little four-point sparkle made of square pixels (a plus), like Minecraft's firework
+    // particles; near the end of its life it shrinks to a single pixel.
+    function sparkle(ctx, x, y, u, small) {
+      x = Math.round(x); y = Math.round(y);
+      if (small) { ctx.fillRect(x - u / 2, y - u / 2, u, u); return; }
+      ctx.fillRect(x - u * 1.5, y - u / 2, u * 3, u);
+      ctx.fillRect(x - u / 2, y - u * 1.5, u, u * 3);
+    }
 
     function launch() {
       const x = view.w * marginX(0.7);
@@ -73,22 +113,90 @@
       });
     }
 
-    function burst(x, y) {
-      const colours = SPARK_COLOURS[isLight() ? 'light' : 'dark'];
-      const main = pick(colours);
-      const second = random() < 0.4 ? pick(colours) : main;
-      const count = Math.round(rand(46, 70));
-      const power = rand(110, 190) * scale();
-      const ring = random() < 0.3; // some bursts are a clean ring instead of a ball
-      for (let i = 0; i < count; i++) {
-        const angle = (i / count) * TAU + rand(-0.04, 0.04);
-        const speed = ring ? power : power * Math.sqrt(random());
-        sparks.push({
-          x, y, px: x, py: y,
-          vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
-          age: 0, life: rand(1.1, 1.8),
-          colour: i % 2 ? main : second
-        });
+    function spark(x, y, vx, vy, life, from, to, extra) {
+      sparks.push(Object.assign({
+        x, y, vx, vy, age: 0, life, from, to, grow: 1, gravity: 1, twinkle: false, phase: rand(0, TAU)
+      }, extra));
+    }
+
+    function pickShape() {
+      let roll = random() * SHAPES.reduce((sum, s) => sum + s[1], 0);
+      for (const [name, weight] of SHAPES) { if ((roll -= weight) < 0) return name; }
+      return 'small';
+    }
+
+    // Where the sparks of each shape start out, as velocities (they all fly outwards and slow down, so the
+    // shape holds): a ball is a sphere seen from the side (so crowded at its edge), a star is a five-pointed outline.
+    function shapeVelocities(shape, power) {
+      const out = [];
+      if (shape === 'small' || shape === 'large') {
+        const count = shape === 'small' ? Math.round(rand(44, 60)) : Math.round(rand(84, 112));
+        const turn = rand(0, TAU);
+        for (let i = 0; i < count; i++) {
+          const y = 1 - (i + 0.5) / count * 2;                  // evenly down a sphere...
+          const r = Math.sqrt(1 - y * y);
+          const a = i * 2.399963 + turn;                        // ...by the golden angle
+          out.push([Math.cos(a) * r * power, y * power]);
+        }
+      } else if (shape === 'star') {
+        const points = 5, perEdge = 7, turn = rand(0, TAU);
+        const vertex = k => {
+          const a = turn - Math.PI / 2 + (k / (points * 2)) * TAU;
+          const r = k % 2 ? 0.42 : 1;
+          return [Math.cos(a) * r, Math.sin(a) * r];
+        };
+        for (let k = 0; k < points * 2; k++) {
+          const [ax, ay] = vertex(k), [bx, by] = vertex(k + 1);
+          for (let j = 0; j < perEdge; j++) {
+            const t = j / perEdge;
+            out.push([(ax + (bx - ax) * t) * power, (ay + (by - ay) * t) * power]);
+          }
+        }
+      } else { // burst: a scatter
+        const count = Math.round(rand(48, 66));
+        for (let i = 0; i < count; i++) {
+          const a = rand(0, TAU), s = power * Math.sqrt(random());
+          out.push([Math.cos(a) * s, Math.sin(a) * s]);
+        }
+      }
+      return out;
+    }
+
+    function burst(x, y, kind) {
+      const mode = isLight() ? 'light' : 'dark';
+      if (kind === 'creeper' || (!kind && random() < CREEPER_CHANCE)) { creeper(x, y); return; }
+
+      const colours = FIREWORK_COLOURS[mode];
+      const main = hexRgb(pick(colours));
+      const second = random() < 0.4 ? hexRgb(pick(colours)) : main;
+      const fade = random() < 0.6 ? hexRgb(pick(colours)) : null; // sparks can shift to another colour as they go
+      const shape = kind || pickShape();
+      const power = (shape === 'large' ? rand(150, 200) : rand(100, 140)) * scale();
+      const twinkle = random() < 0.3;
+      shapeVelocities(shape, power).forEach(([vx, vy], i) => {
+        const from = i % 2 ? main : second;
+        spark(x, y, vx, vy, rand(1.3, 2.0), from, fade || from, { twinkle });
+      });
+    }
+
+    function creeper(x, y, quiet) {
+      const mode = isLight() ? 'light' : 'dark';
+      const greens = CREEPER_GREENS[mode].map(hexRgb);
+      const cells = [];
+      CREEPER_FACE.forEach((row, r) => {
+        for (let c = 0; c < 8; c++) {
+          if (row[c] !== '#') continue; // only the eyes and mouth are firework; the rest of the head is empty sky
+          // Particles drop out one by one near the end, so the face crumbles instead of fading as one.
+          cells.push({ ox: c - 3.5, oy: r - 4.5, colour: pick(greens), gone: rand(0.62, 1), phase: rand(0, TAU) });
+        }
+      });
+      heads.push({ x, y, vy: -18 * scale(), age: 0, life: 2.4, cells, sway: rand(0, TAU) });
+      // A small puff of green sparks as it appears.
+      if (quiet) return;
+      const puff = hexRgb(CREEPER_GREENS[mode][0]);
+      for (let i = 0; i < 18; i++) {
+        const a = rand(0, TAU), s = rand(30, 80) * scale();
+        spark(x, y, Math.cos(a) * s, Math.sin(a) * s, rand(0.5, 0.9), puff, puff, { tiny: true });
       }
     }
 
@@ -99,11 +207,17 @@
         untilLaunch = rand(0.45, 1.1);
       }
 
+      const light = isLight();
+      const flame = light ? [184, 116, 0] : [255, 233, 176];
       for (let i = rockets.length - 1; i >= 0; i--) {
         const r = rockets[i];
         r.px = r.x; r.py = r.y;
         r.x += r.vx * dt;
         r.y += r.vy * dt;
+        // Flame sparks falling off the back of the rocket.
+        if (sparks.length < 900) {
+          spark(r.x + rand(-1, 1), r.y + unit() * 2, rand(-8, 8) * scale(), rand(10, 34) * scale(), rand(0.35, 0.6), flame, [120, 120, 120], { gravity: 0.15, tiny: true });
+        }
         if (r.y <= r.targetY) {
           burst(r.x, r.y);
           rockets.splice(i, 1);
@@ -111,56 +225,80 @@
       }
 
       const drag = Math.pow(0.97, dt * 60);
+      const gravity = (view.scale ? 55 * view.scale : 55);
       for (let i = sparks.length - 1; i >= 0; i--) {
         const p = sparks[i];
         p.age += dt;
         if (p.age >= p.life) { sparks.splice(i, 1); continue; }
-        p.px = p.x; p.py = p.y;
         p.vx *= drag;
-        p.vy = p.vy * drag + (view.scale ? 70 * view.scale : 70) * dt; // gravity
+        p.vy = p.vy * drag + gravity * p.gravity * dt;
         p.x += p.vx * dt;
         p.y += p.vy * dt;
+      }
+
+      for (let i = heads.length - 1; i >= 0; i--) {
+        const h = heads[i];
+        h.age += dt;
+        if (h.age >= h.life) { heads.splice(i, 1); continue; }
+        h.vy += 26 * scale() * dt; // floats up a touch, then sinks
+        h.y += h.vy * dt;
       }
     }
 
     function draw(ctx) {
       const light = isLight();
-      ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
-      ctx.lineCap = 'round';
+      const u = unit();
 
-      ctx.lineWidth = 2.5 * line();
-      ctx.strokeStyle = light ? '#b87400' : '#ffe9b0';
-      ctx.globalAlpha = 0.9;
-      rockets.forEach(r => {
-        ctx.beginPath();
-        ctx.moveTo(r.px - r.vx * 0.04, r.py - r.vy * 0.04);
-        ctx.lineTo(r.x, r.y);
-        ctx.stroke();
+      // The Creeper's face: sparkles laid out on its eyes and mouth.
+      heads.forEach(h => {
+        const cell = headCell();
+        const u = unit();
+        const form = Math.min(1, h.age / 0.35);
+        const spread = 1 - Math.pow(1 - form, 3);   // flies out from the centre into the face
+        const centreX = Math.round(h.x + Math.sin(h.age * 2.2 + h.sway) * 3 * scale());
+        const centreY = Math.round(h.y);
+        const t = h.age / h.life;
+        h.cells.forEach(c => {
+          if (t > c.gone) return;
+          let alpha = Math.min(1, form * 2) * Math.min(1, (1 - t) * 2.5);
+          if (Math.sin(h.age * 30 + c.phase) < -0.6) alpha *= 0.45; // a little twinkle
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = 'rgb(' + c.colour.join(',') + ')';
+          sparkle(ctx, centreX + c.ox * cell * spread, centreY + c.oy * cell * spread, u, t > 0.75);
+        });
       });
 
-      ctx.lineWidth = 2 * line();
+      ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
+
+      // Rockets: a sparkle head.
+      ctx.globalAlpha = 0.95;
+      ctx.fillStyle = light ? '#b87400' : '#ffe9b0';
+      rockets.forEach(r => sparkle(ctx, r.x, r.y, u, false));
+
+      // Sparks: little sparkles, shrinking and fading (and shifting colour) towards the end.
       sparks.forEach(p => {
-        const left = 1 - p.age / p.life;
-        ctx.globalAlpha = Math.min(1, left * 1.6) * (light ? 0.85 : 1);
-        ctx.strokeStyle = p.colour;
-        ctx.beginPath();
-        ctx.moveTo(p.x - p.vx * 0.035, p.y - p.vy * 0.035);
-        ctx.lineTo(p.x, p.y);
-        ctx.stroke();
+        const t = p.age / p.life;
+        let alpha = Math.min(1, (1 - t) * 1.8) * (light ? 0.9 : 1);
+        if (p.twinkle && Math.sin(p.age * 38 + p.phase) < -0.15) alpha *= 0.25; // blinking sparks
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = mixRgb(p.from, p.to, Math.min(1, t * 1.4));
+        sparkle(ctx, p.x, p.y, u, t > 0.7 || p.tiny);
       });
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = 'source-over';
     }
 
-    // One frame for reduced motion: a few bursts caught partway through.
+    // One frame for reduced motion: a few bursts caught partway through, with a Creeper among them.
     function still() {
-      const spots = [[0.1, 0.28], [0.9, 0.22], [0.5, 0.16], [0.05, 0.56], [0.95, 0.5]];
-      spots.forEach(([fx, fy]) => burst(view.w * fx, view.h * fy));
+      const spots = [[0.1, 0.28, 'large'], [0.9, 0.22, 'star'], [0.5, 0.16, 'small'], [0.05, 0.56, 'burst']];
+      spots.forEach(([fx, fy, kind]) => burst(view.w * fx, view.h * fy, kind));
       sparks.forEach(p => {
         p.age = p.life * 0.25;
         p.x += p.vx * 0.3; p.y += p.vy * 0.3;
         p.vx = p.vx * 0.6; p.vy = p.vy * 0.6;
       });
+      creeper(view.w * 0.93, view.h * 0.52, true);
+      heads.forEach(h => { h.age = 0.9; });
     }
 
     return { step, draw, still, resize() {} };

@@ -147,7 +147,7 @@ function nextEasterWeekend(now = new Date()) {
 
 const SEASONS = {
   fireworks: {
-    name: 'Fireworks', blurb: 'Rockets and sparks.',
+    name: 'Fireworks', blurb: 'Firework explosions, with an occasional Creeper face.',
     dates: [{ from: [12, 31], to: [1, 1] }, { from: [7, 4], note: 'US' }, { from: [11, 5], note: 'UK' }],
     on: (month, day, region) =>
       (month === 12 && day === 31) || (month === 1 && day === 1) ||
