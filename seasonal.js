@@ -14,7 +14,7 @@
    - Snowfall: tiny Minecraft-style white snow particles (3x3 pixel shapes with some pixels missing) drift down.
    - Christmas: a string of square fairy lights twinkles along the top, golden plus-shaped sparkles drift down and a
      treeline of opaque Minecraft spruce trees with small lights stands along the bottom.
-   - Halloween: bats flap across a hazy moon while embers rise from a warm glow at the bottom.
+   - Halloween: pixelated bats flap across a hazy square moon (with a round glow) while square embers rise from a warm glow at the bottom.
    - Friday 13th: mist drifts across, faint "13"s float up and fade, and every few seconds, mostly near the
      side margins, a branching lightning bolt strikes down from the top and fades with a soft glow (one smooth
      strike, never a flicker).
@@ -960,9 +960,10 @@
       }
     }
 
-    // One bat, facing the way it flies; flap runs from -1 (wings down) to 1 (wings up). Every part is filled on
-    // its own: parts drawn as one path cancel each other out where they overlap and leave holes.
-    function drawBat(ctx, x, y, s, flap) {
+    // The bat's shape: the same wings, body, head and ears as ever, drawn smooth at the origin. flap runs from -1
+    // (wings down) to 1 (wings up). Every part is filled on its own: parts drawn as one path cancel each other out
+    // where they overlap and leave holes.
+    function batShape(ctx, s, flap) {
       const tipY = -0.1 * s - 0.55 * s * flap;
       const baseY = 0.1 * s - 0.12 * s * flap;
 
@@ -987,28 +988,55 @@
       ctx.beginPath();
       ctx.ellipse(0, 0.06 * s, 0.12 * s, 0.26 * s, 0, 0, TAU);
       ctx.fill();
-      ctx.beginPath();
-      ctx.arc(0, -0.22 * s, 0.11 * s, 0, TAU);
-      ctx.fill();
-      [-1, 1].forEach(side => {
-        ctx.beginPath();
-        ctx.moveTo(side * 0.11 * s, -0.24 * s);
-        ctx.lineTo(side * 0.09 * s, -0.44 * s);
-        ctx.lineTo(side * 0.0 * s, -0.31 * s);
-        ctx.closePath();
-        ctx.fill();
-      });
+      // The head is a small square and each ear a short square column on its top corners, so that at pixel size
+      // they read as a head with ears (a round head and pointed ears would make a plus). Measured in 1/14 of s.
+      const q = s / 14;
+      ctx.fillRect(-2 * q, -5 * q, 4 * q, 3 * q);
+      ctx.fillRect(-2 * q, -7 * q, q, 2 * q);
+      ctx.fillRect(q, -7 * q, q, 2 * q);
+    }
+
+    /* Drawn pixelated: the shape above is drawn small onto a tiny canvas, every part-covered pixel is made fully
+       solid (and the rest fully clear, so there is no soft edge), and that is scaled up with smoothing off so each
+       pixel shows as a crisp square. Flap is rounded to a few steps, so the wings move in jumps like the game's, and
+       each step is made once per colour and kept. */
+    const BAT_GRID = 14;                  // half the wingspan, in bat pixels
+    const BAT_W = BAT_GRID * 2 + 4, BAT_H = BAT_GRID * 2 - 4;
+    const batSprites = {};
+    function batSprite(colour, step) {
+      const key = colour + '|' + step;
+      if (batSprites[key]) return batSprites[key];
+      const c = document.createElement('canvas');
+      c.width = BAT_W;
+      c.height = BAT_H;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.fillStyle = colour;
+      g.translate(BAT_W / 2, BAT_H / 2);
+      batShape(g, BAT_GRID, step / 4);
+      const img = g.getImageData(0, 0, BAT_W, BAT_H);
+      for (let i = 3; i < img.data.length; i += 4) img.data[i] = img.data[i] >= 110 ? 255 : 0;
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.putImageData(img, 0, 0);
+      return (batSprites[key] = c);
+    }
+
+    // s is the bat's half-wingspan on screen; the bat is centred on (x, y).
+    function drawBat(ctx, x, y, s, flap, colour) {
+      const u = Math.max(1, Math.round(s / BAT_GRID));  // screen pixels per bat pixel
+      const step = Math.max(-4, Math.min(4, Math.round(flap * 4)));
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(batSprite(colour, step), Math.round(x) - Math.floor(BAT_W / 2) * u, Math.round(y) - Math.floor(BAT_H / 2) * u, BAT_W * u, BAT_H * u);
     }
 
     function draw(ctx) {
       const light = isLight();
       const glowRgb = EMBER_COLOURS[light ? 'light' : 'dark'];
 
-      // The moon, large and hazy, high on the right (bats cross in front of it): a pale disc with faint
-      // craters inside a soft glow of the same colour.
-      const mx = view.w * 0.8;
-      const my = view.h * 0.22;
-      const mr = Math.min(view.w, view.h) * 0.13 + 6;
+      // The moon, large and hazy, high on the right (bats cross in front of it): a pale square with faint
+      // square craters inside a soft round glow of the same colour.
+      const mr = Math.round(Math.min(view.w, view.h) * 0.13 + 6);
+      const mx = Math.round(view.w * 0.8);
+      const my = Math.round(view.h * 0.22);
       const haloRgb = light ? '222, 196, 130' : '255, 243, 210';
       const halo = ctx.createRadialGradient(mx, my, mr * 0.4, mx, my, mr * 3.2);
       halo.addColorStop(0, `rgba(${haloRgb}, ${light ? 0.34 : 0.2})`);
@@ -1016,14 +1044,11 @@
       ctx.fillStyle = halo;
       ctx.fillRect(mx - mr * 3.2, my - mr * 3.2, mr * 6.4, mr * 6.4);
       ctx.fillStyle = light ? 'rgba(206, 190, 148, 0.55)' : 'rgba(238, 234, 218, 0.3)';
-      ctx.beginPath();
-      ctx.arc(mx, my, mr, 0, TAU);
-      ctx.fill();
+      ctx.fillRect(mx - mr, my - mr, mr * 2, mr * 2);
       ctx.fillStyle = light ? 'rgba(120, 100, 60, 0.12)' : 'rgba(60, 64, 90, 0.2)';
       [[-0.32, -0.28, 0.2], [0.28, -0.05, 0.14], [-0.1, 0.38, 0.17], [0.38, 0.4, 0.09]].forEach(([dx, dy, r]) => {
-        ctx.beginPath();
-        ctx.arc(mx + dx * mr, my + dy * mr, r * mr, 0, TAU);
-        ctx.fill();
+        const side = Math.max(1, Math.round(r * mr * 2));
+        ctx.fillRect(Math.round(mx + dx * mr - side / 2), Math.round(my + dy * mr - side / 2), side, side);
       });
 
       // A warm glow along the bottom edge, where the embers come from.
@@ -1037,19 +1062,16 @@
         const fade = Math.sin(Math.PI * Math.min(1, e.age / e.life));
         const twinkle = 0.75 + 0.25 * Math.sin(clock * 5 + e.phase);
         ctx.fillStyle = `rgba(${glowRgb}, ${(e.peak * fade * twinkle * (light ? 0.8 : 1)).toFixed(3)})`;
-        ctx.beginPath();
-        ctx.arc(e.x + Math.sin(clock * e.swaySpeed + e.phase) * e.sway, e.y, e.size, 0, TAU);
-        ctx.fill();
+        const side = Math.max(1, Math.round(e.size * 2));
+        ctx.fillRect(Math.round(e.x + Math.sin(clock * e.swaySpeed + e.phase) * e.sway - side / 2), Math.round(e.y - side / 2), side, side);
       });
 
-      ctx.fillStyle = light ? 'rgba(42, 26, 64, 0.8)' : 'rgb(58, 38, 88)';
+      // Solid colours only (the sprite is made once per colour); the light theme's is the old 0.8-alpha purple
+      // worked out against a pale page.
+      const batColour = light ? 'rgb(82, 70, 101)' : 'rgb(58, 38, 88)';
       bats.forEach(b => {
-        ctx.save();
-        ctx.translate(b.x, b.y + b.base);
-        ctx.scale(b.dir, 1);
         const flap = b.flap ?? Math.sin(clock * b.flapSpeed + b.phase);
-        drawBat(ctx, 0, 0, b.size, flap);
-        ctx.restore();
+        drawBat(ctx, b.x, b.y + b.base, b.size, flap, batColour);
       });
     }
 
