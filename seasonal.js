@@ -12,8 +12,8 @@
    - Cherry Blossom: Minecraft-style pink square cherry leaves spin down on a light breeze.
    - Falling Leaves: brown Minecraft-style leaves spin and drift down.
    - Snowfall: tiny Minecraft-style white snow particles (3x3 pixel shapes with some pixels missing) drift down.
-   - Christmas: a string of fairy lights twinkles along the top, golden sparkles drift down and a treeline of
-     pines with small lights stands along the bottom.
+   - Christmas: a string of square fairy lights twinkles along the top, golden plus-shaped sparkles drift down and a
+     treeline of opaque Minecraft spruce trees with small lights stands along the bottom.
    - Halloween: bats flap across a hazy moon while embers rise from a warm glow at the bottom.
    - Friday 13th: mist drifts across, faint "13"s float up and fade, and every few seconds, mostly near the
      side margins, a branching lightning bolt strikes down from the top and fades with a soft glow (one smooth
@@ -600,6 +600,63 @@
   const LIGHT_COLOURS = { dark: SPARK_COLOURS.dark.slice(0, 4), light: SPARK_COLOURS.light.slice(0, 4) };
   const SPARKLE_COLOURS = { dark: '255, 236, 170', light: '201, 138, 0' };
 
+  /* A Minecraft spruce tree seen from the side, one character per block: L is leaves, T is trunk, . is empty.
+     A small cap, a plus-shaped layer, a bare gap of trunk, two more layers, a narrower one, the widest layer and then
+     a long bare trunk. Each tree is drawn from this as one flat, opaque silhouette. */
+  const SPRUCE = [
+    '..L..',
+    '.LLL.',
+    '..T..',
+    '.LLL.',
+    'LLLLL',
+    '.LLL.',
+    'LLLLL',
+    '..T..',
+    '..T..'
+  ];
+  const SPRUCE_COLS = SPRUCE[0].length;
+  const SPRUCE_ROWS = SPRUCE.length;
+  // Flat, fully opaque colours, no texture: the old pine treeline's teal for the leaves (the light theme's are the old
+  // see-through colours worked out against a pale page) and a muted brown for the trunk. The
+  // back row is a shade apart so the rows read separately.
+  const SPRUCE_COLOURS = {
+    dark: {
+      front: { leaf: 'rgb(22, 44, 54)', trunk: 'rgb(38, 26, 19)' },
+      back:  { leaf: 'rgb(18, 30, 42)', trunk: 'rgb(25, 19, 17)' }
+    },
+    light: {
+      front: { leaf: 'rgb(80, 103, 110)', trunk: 'rgb(74, 52, 37)' },
+      back:  { leaf: 'rgb(158, 173, 179)', trunk: 'rgb(150, 130, 115)' }
+    }
+  };
+  const spruceTextures = {};
+  // One spruce as a flat silhouette, a single pixel per block, scaled up with smoothing off so the edges
+  // stay square.
+  function spruceTexture(mode, back) {
+    const key = mode + (back ? 'b' : 'f');
+    if (spruceTextures[key]) return spruceTextures[key];
+    const c = document.createElement('canvas');
+    c.width = SPRUCE_COLS;
+    c.height = SPRUCE_ROWS;
+    const g = c.getContext('2d');
+    const palette = SPRUCE_COLOURS[mode][back ? 'back' : 'front'];
+    SPRUCE.forEach((row, r) => {
+      for (let col = 0; col < SPRUCE_COLS; col++) {
+        if (row[col] === '.') continue;
+        g.fillStyle = row[col] === 'T' ? palette.trunk : palette.leaf;
+        g.fillRect(col, r, 1, 1);
+      }
+    });
+    return (spruceTextures[key] = c);
+  }
+
+  // The block positions of leaves that can carry a light (not the single cap on top).
+  const SPRUCE_LEAF_CELLS = [];
+  SPRUCE.forEach((row, r) => {
+    if (r === 0) return;
+    for (let col = 0; col < SPRUCE_COLS; col++) if (row[col] === 'L') SPRUCE_LEAF_CELLS.push([r, col]);
+  });
+
   function createChristmas(view) {
     let sparkles = [];
     let clock = 0;
@@ -633,21 +690,35 @@
       }
     }
 
-    // A four-pointed star, drawn as four curves pinched in to the middle.
-    function star(ctx, x, y, r) {
-      ctx.beginPath();
-      ctx.moveTo(x, y - r);
-      ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.quadraticCurveTo(x, y, x, y + r);
-      ctx.quadraticCurveTo(x, y, x - r, y);
-      ctx.quadraticCurveTo(x, y, x, y - r);
-      ctx.fill();
+    // A plus made of square pixels, like the snowfall theme's: three pixels across and three down, `pixel` screen
+    // pixels each, centred on (x, y). Whole pixels only, so the edges stay sharp.
+    function plus(ctx, x, y, pixel) {
+      const p = Math.max(1, Math.round(pixel));
+      const left = Math.round(x - p * 1.5);
+      const top = Math.round(y - p * 1.5);
+      ctx.fillRect(left + p, top, p, p * 3);
+      ctx.fillRect(left, top + p, p * 3, p);
     }
 
-    /* The treeline: two rows of pines along the bottom edge, taller towards the side margins and low in the
+    // A bulb: a soft round glow with a solid square at its centre. haloRadius is how far the glow reaches.
+    function bulb(ctx, x, y, side, haloRadius, colour, level, light) {
+      const cx = Math.round(x), cy = Math.round(y);
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, haloRadius);
+      grad.addColorStop(0, colour);
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.globalAlpha = (light ? 0.3 : 0.42) * level;
+      ctx.fillStyle = grad;
+      ctx.fillRect(x - haloRadius, y - haloRadius, haloRadius * 2, haloRadius * 2);
+      ctx.globalAlpha = 0.55 + 0.45 * level;
+      ctx.fillStyle = colour;
+      const s = Math.max(1, Math.round(side));
+      ctx.fillRect(cx - Math.floor(s / 2), cy - Math.floor(s / 2), s, s);
+    }
+
+    /* The treeline: two rows of Minecraft spruces along the bottom edge, taller towards the side margins and low in the
        middle, so the middle of the page stays clear. Laid out once per window size from a fixed seed (so the
-       trees stand in the same places every time, whatever Math.random is doing), with a few small lights on
-       each front tree and a star on some of the tallest. */
+       trees stand in the same places every time, whatever Math.random is doing), with a few small square lights on
+       each front tree. A tree is a whole number of pixels per block, so its squares stay sharp. */
     let trees = null;
     let treesFor = '';
 
@@ -658,85 +729,90 @@
       const rng = seeded(25);
       const between = (a, b) => a + rng() * (b - a);
       const u = unit();
-      const rows = [{ back: true, scale: 0.68, shift: 0.5 }, { back: false, scale: 1, shift: 0 }];
+      const rows = [{ back: true, scale: 0.68, shift: 0.5, gap: [1.3, 2.3] }, { back: false, scale: 1, shift: 0, gap: [1.0, 1.9] }];
       trees = rows.map(row => {
         const list = [];
         let x = -20 * u + row.shift * 30 * u;
         while (x < view.w + 20) {
           const edge = Math.abs(x / view.w - 0.5) * 2; // 0 in the middle, 1 at the sides
-          const height = view.h * (0.06 + 0.23 * Math.pow(edge, 1.7)) * between(0.8, 1.2) * row.scale;
-          const width = Math.max(6, height * between(0.5, 0.62));
-          const tree = { x, height, width, tiers: height > 70 * u ? 4 : 3, bulbs: [], star: false };
+          const wanted = view.h * (0.06 + 0.23 * Math.pow(edge, 1.7)) * between(0.8, 1.2) * row.scale;
+          const block = Math.max(1, Math.round(wanted / SPRUCE_ROWS));
+          const height = block * SPRUCE_ROWS;
+          const width = block * SPRUCE_COLS;
+          const tree = { x, block, height, width, bulbs: [] };
           if (!row.back && height > 30) { // trees too small to carry lights (the preview tiles) go without
-            const count = Math.max(2, Math.round(height / (20 * u + 8)));
+            const count = Math.min(SPRUCE_LEAF_CELLS.length, Math.max(2, Math.round(height / (20 * u + 8))));
+            const free = SPRUCE_LEAF_CELLS.slice();
             for (let i = 0; i < count; i++) {
-              const t = between(0.25, 0.95); // down the tree
-              tree.bulbs.push({ dx: between(-0.8, 0.8) * t * width / 2, dy: -height * (1 - t), i: list.length * 7 + i });
+              const [r, col] = free.splice(Math.floor(rng() * free.length), 1)[0];
+              tree.bulbs.push({
+                dx: (col + 0.5 - SPRUCE_COLS / 2) * block,   // the middle of that block of leaves
+                dy: -(SPRUCE_ROWS - r - 0.5) * block,
+                i: list.length * 7 + i
+              });
             }
-            tree.star = height > 110 * u && rng() < 0.45;
           }
           list.push(tree);
-          x += width * between(0.5, 0.75);
+          x += width * between(row.gap[0], row.gap[1]);
         }
         return { back: row.back, list };
       });
-    }
 
-    // One tree as a single outline (apex, down the right side in tiers, trunk, back up the left), so that it
-    // fills as one shape.
-    function treePath(ctx, t, baseY) {
-      const apexY = baseY - t.height;
-      const trunk = Math.max(1, t.width * 0.08);
-      const hw = i => (t.width / 2) * (0.38 + 0.62 * (i + 1) / t.tiers);
-      const yb = i => apexY + t.height * 0.92 * (0.3 + 0.7 * (i + 1) / t.tiers);
-      ctx.beginPath();
-      ctx.moveTo(t.x, apexY);
-      for (let i = 0; i < t.tiers; i++) {
-        ctx.lineTo(t.x + hw(i), yb(i));
-        if (i < t.tiers - 1) ctx.lineTo(t.x + hw(i) * 0.5, yb(i));
+      // Drop any tree that is mostly hidden: one that other trees drawn over it (the next ones along its row, and
+      // for the back row the whole front row) cover more than a third of. A tree is judged block by block.
+      const baseY = Math.round(view.h) + 2;
+      const left = t => Math.round(t.x - t.width / 2);
+      const covers = (o, px, py) => {
+        const col = Math.floor((px - left(o)) / o.block);
+        const r = Math.floor((py - (baseY - o.height)) / o.block);
+        return col >= 0 && col < SPRUCE_COLS && r >= 0 && r < SPRUCE_ROWS && SPRUCE[r][col] !== '.';
+      };
+      const visible = (t, over) => {
+        let seen = 0, total = 0;
+        SPRUCE.forEach((line, r) => {
+          for (let col = 0; col < SPRUCE_COLS; col++) {
+            if (line[col] === '.') continue;
+            total++;
+            const px = left(t) + (col + 0.5) * t.block;
+            const py = baseY - t.height + (r + 0.5) * t.block;
+            if (!over.some(o => covers(o, px, py))) seen++;
+          }
+        });
+        return seen / total;
+      };
+      const front = trees[1].list;
+      for (let i = 0; i < front.length; i++) {
+        if (visible(front[i], front.slice(i + 1)) < 0.67) { front.splice(i, 1); i--; }
       }
-      ctx.lineTo(t.x + trunk, yb(t.tiers - 1));
-      ctx.lineTo(t.x + trunk, baseY);
-      ctx.lineTo(t.x - trunk, baseY);
-      ctx.lineTo(t.x - trunk, yb(t.tiers - 1));
-      for (let i = t.tiers - 1; i >= 0; i--) {
-        ctx.lineTo(t.x - hw(i), yb(i));
-        if (i > 0) ctx.lineTo(t.x - hw(i - 1) * 0.5, yb(i - 1));
+      const back = trees[0].list;
+      for (let i = 0; i < back.length; i++) {
+        if (visible(back[i], back.slice(i + 1).concat(front)) < 0.67) { back.splice(i, 1); i--; }
       }
-      ctx.closePath();
     }
 
     function drawTrees(ctx, light) {
       layoutTrees();
-      const colours = LIGHT_COLOURS[light ? 'light' : 'dark'];
-      const baseY = view.h + 2;
+      const mode = light ? 'light' : 'dark';
+      const colours = LIGHT_COLOURS[mode];
+      const baseY = Math.round(view.h) + 2;
+      ctx.imageSmoothingEnabled = false;
       trees.forEach(row => {
-        ctx.fillStyle = row.back
-          ? (light ? 'rgba(52, 84, 92, 0.45)' : 'rgb(18, 30, 42)')
-          : (light ? 'rgba(34, 62, 70, 0.78)' : 'rgb(22, 44, 54)');
-        row.list.forEach(t => { treePath(ctx, t, baseY); ctx.fill(); });
+        row.list.forEach(t => {
+          ctx.drawImage(spruceTexture(mode, row.back), Math.round(t.x - t.width / 2), baseY - t.height, t.width, t.height);
+        });
       });
 
-      // the lights and stars on the front row
-      const front = trees[1].list;
+      // the square lights on the front row
+      const side = Math.max(2, Math.round(3.5 * unit()));
       ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
-      front.forEach(t => {
+      trees[1].list.forEach(t => {
         t.bulbs.forEach(b => {
           const level = 0.6 + 0.4 * Math.sin(clock * (0.6 + (b.i % 5) * 0.2) + b.i * 2.1);
-          const bx = t.x + b.dx;
-          const by = baseY + b.dy;
-          const rad = Math.max(1, 2.2 * unit());
-          ctx.fillStyle = colours[b.i % colours.length];
-          ctx.globalAlpha = (light ? 0.22 : 0.3) * level;
-          ctx.beginPath(); ctx.arc(bx, by, rad * 3, 0, TAU); ctx.fill();
-          ctx.globalAlpha = 0.55 + 0.45 * level;
-          ctx.beginPath(); ctx.arc(bx, by, rad, 0, TAU); ctx.fill();
+          bulb(ctx, t.x + b.dx, baseY + b.dy, side, side * 3, colours[b.i % colours.length], level, light);
         });
       });
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = 'source-over';
-      ctx.fillStyle = `rgb(${SPARKLE_COLOURS[light ? 'light' : 'dark']})`;
-      front.forEach(t => { if (t.star) star(ctx, t.x, baseY - t.height - 2, Math.max(2.5, t.width * 0.11)); });
     }
 
     // The page's sticky header covers the top of the canvas, so the string hangs from just below it (the small
@@ -756,8 +832,7 @@
       const sag = Math.min(view.h * 0.1, 30 * u + 8);
       const top = (view.lightsTop ?? headerBottom()) + Math.max(1, 2 * u);
       const spacing = Math.max(7, 40 * u);
-      const radius = Math.max(1.4, 4 * u);
-      const glow = radius * 4.5;
+      const side = Math.max(2, Math.round(6 * u));
       let index = 0;
       const bulbs = [];
 
@@ -775,33 +850,18 @@
           const t = i / count;
           const px = (1 - t) * (1 - t) * x0 + 2 * (1 - t) * t * ((x0 + x1) / 2) + t * t * x1;
           const py = (1 - t) * (1 - t) * top + 2 * (1 - t) * t * (top + sag * 2) + t * t * top;
-          bulbs.push([px, py + radius * 1.4, index++]);
+          bulbs.push([px, py + side * 0.6, index++]);
         }
       }
 
       ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
       bulbs.forEach(([x, y, i]) => {
-        const colour = colours[i % colours.length];
         // slow, smooth swell and fade: a bulb takes several seconds to go from bright to dim
         const level = 0.6 + 0.4 * Math.sin(clock * (0.7 + (i % 5) * 0.17) + i * 2.4);
-        const grad = ctx.createRadialGradient(x, y, 0, x, y, glow);
-        grad.addColorStop(0, colour);
-        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        ctx.globalAlpha = (light ? 0.3 : 0.42) * level;
-        ctx.fillStyle = grad;
-        ctx.fillRect(x - glow, y - glow, glow * 2, glow * 2);
+        bulb(ctx, x, y, side, side * 3, colours[i % colours.length], level, light);
       });
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = 'source-over';
-      bulbs.forEach(([x, y, i]) => {
-        const level = 0.6 + 0.4 * Math.sin(clock * (0.7 + (i % 5) * 0.17) + i * 2.4);
-        ctx.fillStyle = colours[i % colours.length];
-        ctx.globalAlpha = 0.55 + 0.45 * level;
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, TAU);
-        ctx.fill();
-      });
-      ctx.globalAlpha = 1;
     }
 
     function draw(ctx) {
@@ -813,9 +873,11 @@
       sparkles.forEach(p => {
         const fade = Math.sin(Math.PI * Math.min(1, p.age / p.life));
         const twinkle = 0.55 + 0.45 * Math.sin(clock * p.twinkle * 2 + p.phase);
-        ctx.fillStyle = `rgba(${rgb}, ${(fade * twinkle * (light ? 0.8 : 0.95)).toFixed(3)})`;
-        star(ctx, p.x + Math.sin(clock * p.swaySpeed + p.phase) * p.sway, p.y, p.size * (0.7 + 0.3 * twinkle));
+        ctx.fillStyle = `rgb(${rgb})`;
+        ctx.globalAlpha = Math.max(0, fade * twinkle * (light ? 0.8 : 0.95));
+        plus(ctx, p.x + Math.sin(clock * p.swaySpeed + p.phase) * p.sway, p.y, p.size * 0.55);
       });
+      ctx.globalAlpha = 1;
     }
 
     // One frame for reduced motion: the lights part-way through their glow and sparkles scattered about.
