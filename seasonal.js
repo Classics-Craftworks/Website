@@ -8,7 +8,7 @@
    - Aurora: slow green, teal and violet northern-lights curtains sway across the upper sky.
    - Anniversary: bright confetti falls while party balloons float up the page.
   - Easter: pastel decorated eggs rock gently as they drift down among a few little daisies.
-  - Fireflies: fireflies wander and blink under a blue-to-rose twilight sky.
+  - Fireflies: square fireflies, each with a soft glow, wander and blink under a blue-to-rose twilight sky.
    - Cherry Blossom: Minecraft-style pink square cherry leaves spin down on a light breeze.
    - Falling Leaves: brown autumn leaves tumble and drift down.
    - Snowfall: snow drifts down.
@@ -1534,6 +1534,9 @@
       flies.forEach(f => {
         const g = glow(f);
         if (g < 0.02) return;
+        // The soft round glow, with a square firefly at its centre.
+        const side = Math.max(2, Math.round(f.size * 2));
+        const cx = Math.round(f.x), cy = Math.round(f.y);
         const radius = f.size * 8;
         const halo = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, radius);
         halo.addColorStop(0, `rgba(${rgb}, ${0.55 * g * (light ? 0.8 : 1)})`);
@@ -1544,9 +1547,7 @@
         ctx.arc(f.x, f.y, radius, 0, TAU);
         ctx.fill();
         ctx.fillStyle = light ? `rgba(${rgb}, ${0.95 * g})` : `rgba(255, 255, 200, ${0.95 * g})`;
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, f.size, 0, TAU);
-        ctx.fill();
+        ctx.fillRect(cx - Math.round(side / 2), cy - Math.round(side / 2), side, side);
       });
       ctx.globalCompositeOperation = 'source-over';
     }
