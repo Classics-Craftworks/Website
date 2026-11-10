@@ -6,7 +6,7 @@
 
    - Fireworks: Minecraft-style rockets rise and burst into small square-pixel sparkles, now and then a Creeper face.
    - Aurora: slow green, teal and violet northern-lights curtains sway across the upper sky.
-   - Anniversary: bright confetti falls while party balloons float up the page.
+   - Anniversary: bright square confetti falls while pixel party balloons float up the page.
   - Easter: pastel Minecraft-style eggs rock gently as they drift down among a few little square pixel daisies.
   - Fireflies: square fireflies, each with a soft glow, wander and blink under a blue-to-rose twilight sky.
    - Cherry Blossom: Minecraft-style pink square cherry leaves spin down on a light breeze.
@@ -1500,63 +1500,78 @@
       });
     }
 
+    /* Everything here is built from whole-pixel squares. A confetti piece is a few squares (a bar, a square, two
+       squares on a diagonal, or a stepped squiggle) that turns in quarter turns instead of squashing, so its edges
+       stay sharp. A balloon is a small pixel sprite scaled up with smoothing off, with a pixel string trailing from
+       it. */
     function drawBit(ctx, p, palette) {
-      const s = p.size;
+      const px = Math.max(1, Math.round(p.size * 0.42));
       ctx.save();
-      ctx.translate(swayX(p, p.x), p.y);
-      ctx.rotate(p.angle);
-      ctx.scale(0.25 + 0.75 * Math.abs(Math.cos(clock * p.tumble + p.phase)), 1);
-      ctx.fillStyle = ctx.strokeStyle = palette[p.colour % palette.length];
+      ctx.translate(Math.round(swayX(p, p.x)), Math.round(p.y));
+      ctx.rotate(Math.round(p.angle / (Math.PI / 2)) * Math.PI / 2);
+      ctx.fillStyle = palette[p.colour % palette.length];
+      const cell = (x, y, w, h) => ctx.fillRect(x * px, y * px, w * px, h * px);
       if (p.shape === 0) {
-        ctx.fillRect(-s * 0.5, -s, s, s * 2);
-      } else if (p.shape === 1) { // a harlequin diamond
-        ctx.beginPath();
-        ctx.moveTo(0, -s * 1.2); ctx.lineTo(s * 0.8, 0); ctx.lineTo(0, s * 1.2); ctx.lineTo(-s * 0.8, 0);
-        ctx.closePath(); ctx.fill();
+        cell(-1, -2, 2, 4);
+      } else if (p.shape === 1) {
+        cell(-1, -1, 2, 2);
       } else if (p.shape === 2) {
-        ctx.beginPath(); ctx.arc(0, 0, s * 0.6, 0, TAU); ctx.fill();
-      } else { // a squiggle
-        ctx.lineWidth = Math.max(1, s * 0.35);
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        for (let t = -1; t <= 1.001; t += 0.25) {
-          const x = Math.sin(t * 3.2) * s * 0.7, y = t * s * 1.4;
-          if (t === -1) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
+        cell(-2, -2, 2, 2); cell(0, 0, 2, 2);
+      } else {
+        [[0, -3], [1, -2], [0, -1], [-1, 0], [0, 1], [1, 2]].forEach(([x, y]) => cell(x, y, 1, 1));
       }
       ctx.restore();
     }
 
+    // The balloon: a squared-off round shape with a knot, a darker lower right and a shine at the upper left.
+    const BALLOON_SHAPE = [
+      '.######.',
+      '########',
+      '########',
+      '########',
+      '########',
+      '########',
+      '.######.',
+      '..####..',
+      '...##...'
+    ];
+    const BALLOON_W = 8, BALLOON_H = BALLOON_SHAPE.length;
+    const balloonSprites = {};
+    function balloonSprite(colour) {
+      if (balloonSprites[colour]) return balloonSprites[colour];
+      const c = document.createElement('canvas');
+      c.width = BALLOON_W;
+      c.height = BALLOON_H;
+      const g = c.getContext('2d');
+      const shade = mixRgb(hexRgb(colour), [0, 0, 0], 0.15);
+      BALLOON_SHAPE.forEach((row, y) => {
+        for (let x = 0; x < BALLOON_W; x++) {
+          if (row[x] !== '#') continue;
+          g.fillStyle = x + y >= 10 ? shade : colour;
+          g.fillRect(x, y, 1, 1);
+        }
+      });
+      g.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      g.fillRect(1, 1, 1, 1); g.fillRect(2, 1, 1, 1); g.fillRect(1, 2, 1, 1);
+      return (balloonSprites[colour] = c);
+    }
+
     function drawBalloon(ctx, b, palette, light) {
-      const x = swayX(b, b.x);
-      const rx = b.r * 0.82;
-      const ry = b.r;
-      ctx.save();
-      ctx.translate(x, b.y);
-      // String: trails below, waving a little.
-      ctx.strokeStyle = light ? 'rgba(40, 50, 80, 0.55)' : 'rgba(255, 255, 255, 0.5)';
-      ctx.lineWidth = Math.max(0.6, b.r * 0.06);
-      ctx.beginPath();
-      ctx.moveTo(0, ry + b.r * 0.2);
-      ctx.bezierCurveTo(b.r * 0.4 * Math.sin(clock * 1.3 + b.phase), ry + b.r * 1.0, -b.r * 0.4 * Math.sin(clock * 1.1 + b.phase), ry + b.r * 1.8, 0, ry + b.r * 2.6);
-      ctx.stroke();
-      // Body and knot.
-      ctx.fillStyle = palette[b.colour % palette.length];
+      const px = Math.max(1, Math.round(b.r * 0.22));
+      const x = Math.round(swayX(b, b.x));
+      const top = Math.round(b.y - BALLOON_H * px / 2);
+      const left = x - BALLOON_W / 2 * px;
+      ctx.imageSmoothingEnabled = false;
       ctx.globalAlpha = 0.9;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, rx, ry, 0, 0, TAU);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(0, ry - 0.5); ctx.lineTo(-b.r * 0.16, ry + b.r * 0.22); ctx.lineTo(b.r * 0.16, ry + b.r * 0.22);
-      ctx.closePath(); ctx.fill();
-      // Shine.
-      ctx.globalAlpha = 0.4;
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.ellipse(-rx * 0.38, -ry * 0.4, rx * 0.16, ry * 0.28, 0.4, 0, TAU);
-      ctx.fill();
-      ctx.restore();
+      ctx.drawImage(balloonSprite(palette[b.colour % palette.length]), left, top, BALLOON_W * px, BALLOON_H * px);
+      // The string: a line of single squares that sways a pixel either way as it trails down.
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = light ? 'rgba(40, 50, 80, 0.55)' : 'rgba(255, 255, 255, 0.5)';
+      const links = Math.max(4, Math.round(b.r * 2.4 / px));
+      for (let i = 0; i < links; i++) {
+        const dx = Math.round(1.2 * Math.sin(clock * 1.2 + b.phase + i * 0.7) * Math.min(1, i / 3));
+        ctx.fillRect(x + dx * px - Math.floor(px / 2), top + BALLOON_H * px + i * px, px, px);
+      }
     }
 
     function draw(ctx) {
@@ -1566,6 +1581,7 @@
       bits.forEach(p => drawBit(ctx, p, palette));
       ctx.globalAlpha = 1;
       balloons.forEach(b => drawBalloon(ctx, b, palette, light));
+      ctx.globalAlpha = 1;
     }
 
     function still() { bits = []; balloons = []; clock = 1; fill(true); }
