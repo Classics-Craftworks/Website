@@ -44,6 +44,10 @@
   const marginX = (share, middleMin = 0.12, middleMax = 0.88) =>
     random() < share ? (random() < 0.5 ? rand(0.02, 0.12) : rand(0.88, 0.98)) : rand(middleMin, middleMax);
 
+  // Rounds to a whole device pixel (not a whole CSS pixel), for pixel-art sprites that must stay sharp but drift slowly:
+  // on a high-density screen the steps are half the size, so the motion looks smoother. dpr is 1 when unknown.
+  const snapDevice = (v, dpr) => Math.round(v * (dpr || 1)) / (dpr || 1);
+
   // Sparks need to glow on dark themes and to be dark and saturated enough to read on the light one.
   const SPARK_COLOURS = {
     dark:  ['#ff5d73', '#ffd166', '#7ee081', '#5ec8ff', '#c792ff', '#ff9ee5', '#ffffff'],
@@ -94,8 +98,8 @@
     const headCell = () => Math.max(4, Math.round(14 * scale()));    // spacing of the Creeper's face particles
     // A spark is a little four-point sparkle made of square pixels (a plus), like Minecraft's firework
     // particles; near the end of its life it shrinks to a single pixel.
-    function sparkle(ctx, x, y, u, small) {
-      x = Math.round(x); y = Math.round(y);
+    function sparkle(ctx, x, y, u, small, smooth) {
+      if (!smooth) { x = Math.round(x); y = Math.round(y); } // smooth = for slow movers (the Creeper's face), which would otherwise jump a pixel at a time
       if (small) { ctx.fillRect(x - u / 2, y - u / 2, u, u); return; }
       ctx.fillRect(x - u * 1.5, y - u / 2, u * 3, u);
       ctx.fillRect(x - u / 2, y - u * 1.5, u, u * 3);
@@ -255,8 +259,8 @@
         const u = unit();
         const form = Math.min(1, h.age / 0.35);
         const spread = 1 - Math.pow(1 - form, 3);   // flies out from the centre into the face
-        const centreX = Math.round(h.x + Math.sin(h.age * 2.2 + h.sway) * 3 * scale());
-        const centreY = Math.round(h.y);
+        const centreX = h.x + Math.sin(h.age * 2.2 + h.sway) * 3 * scale();
+        const centreY = h.y;
         const t = h.age / h.life;
         h.cells.forEach(c => {
           if (t > c.gone) return;
@@ -264,7 +268,7 @@
           if (Math.sin(h.age * 30 + c.phase) < -0.6) alpha *= 0.45; // a little twinkle
           ctx.globalAlpha = alpha;
           ctx.fillStyle = 'rgb(' + c.colour.join(',') + ')';
-          sparkle(ctx, centreX + c.ox * cell * spread, centreY + c.oy * cell * spread, u, t > 0.75);
+          sparkle(ctx, centreX + c.ox * cell * spread, centreY + c.oy * cell * spread, u, t > 0.75, true);
         });
       });
 
@@ -375,7 +379,7 @@
         ctx.globalAlpha = f.alpha;
         // Pushed by the wind: it tips one way as it is carried that way, and back as the gust turns.
         ctx.save();
-        ctx.translate(Math.round(f.x), Math.round(f.y));
+        ctx.translate(snapDevice(f.x, view.dpr), snapDevice(f.y, view.dpr));
         ctx.rotate(Math.cos(clock * f.swaySpeed + f.phase) * f.lean);
         ctx.drawImage(snowTexture(mode, f.shape), -size / 2, -size / 2, size, size);
         ctx.restore();
@@ -693,11 +697,13 @@
     }
 
     // A plus made of square pixels, like the snowfall theme's: three pixels across and three down, `pixel` screen
-    // pixels each, centred on (x, y). Whole pixels only, so the edges stay sharp.
+    // pixels each, centred on (x, y). The size is a whole number of pixels (it never changes for a sparkle), but the
+    // position is not rounded: these drift at a few pixels a second, and snapping them to whole pixels made them
+    // sit still for several frames and then jump, which looked like jitter.
     function plus(ctx, x, y, pixel) {
       const p = Math.max(1, Math.round(pixel));
-      const left = Math.round(x - p * 1.5);
-      const top = Math.round(y - p * 1.5);
+      const left = x - p * 1.5;
+      const top = y - p * 1.5;
       ctx.fillRect(left + p, top, p, p * 3);
       ctx.fillRect(left, top + p, p * 3, p);
     }
@@ -1065,7 +1071,7 @@
         const twinkle = 0.75 + 0.25 * Math.sin(clock * 5 + e.phase);
         ctx.fillStyle = `rgba(${glowRgb}, ${(e.peak * fade * twinkle * (light ? 0.8 : 1)).toFixed(3)})`;
         const side = Math.max(1, Math.round(e.size * 2));
-        ctx.fillRect(Math.round(e.x + Math.sin(clock * e.swaySpeed + e.phase) * e.sway - side / 2), Math.round(e.y - side / 2), side, side);
+        ctx.fillRect(e.x + Math.sin(clock * e.swaySpeed + e.phase) * e.sway - side / 2, e.y - side / 2, side, side);
       });
 
       // Solid colours only (the sprite is made once per colour); the light theme's is the old 0.8-alpha purple
@@ -1509,7 +1515,7 @@
     function drawBit(ctx, p, palette) {
       const px = Math.max(1, Math.round(p.size * 0.42));
       ctx.save();
-      ctx.translate(Math.round(swayX(p, p.x)), Math.round(p.y));
+      ctx.translate(swayX(p, p.x), p.y);
       ctx.rotate(Math.round(p.angle / (Math.PI / 2)) * Math.PI / 2);
       ctx.fillStyle = palette[p.colour % palette.length];
       const cell = (x, y, w, h) => ctx.fillRect(x * px, y * px, w * px, h * px);
@@ -1560,8 +1566,8 @@
 
     function drawBalloon(ctx, b, palette, light) {
       const px = Math.max(1, Math.round(b.r * 0.22));
-      const x = Math.round(swayX(b, b.x));
-      const top = Math.round(b.y - BALLOON_H * px / 2);
+      const x = snapDevice(swayX(b, b.x), view.dpr);
+      const top = snapDevice(b.y - BALLOON_H * px / 2, view.dpr);
       const left = x - BALLOON_W / 2 * px;
       ctx.imageSmoothingEnabled = false;
       ctx.globalAlpha = 0.9;
@@ -1675,7 +1681,7 @@
         if (g < 0.02) return;
         // The soft round glow, with a square firefly at its centre.
         const side = Math.max(2, Math.round(f.size * 2));
-        const cx = Math.round(f.x), cy = Math.round(f.y);
+        const cx = f.x, cy = f.y; // not rounded: the soft glow around it moves smoothly, so the square must too
         const radius = f.size * 8;
         const halo = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, radius);
         halo.addColorStop(0, `rgba(${rgb}, ${0.55 * g * (light ? 0.8 : 1)})`);
@@ -1686,7 +1692,7 @@
         ctx.arc(f.x, f.y, radius, 0, TAU);
         ctx.fill();
         ctx.fillStyle = light ? `rgba(${rgb}, ${0.95 * g})` : `rgba(255, 255, 200, ${0.95 * g})`;
-        ctx.fillRect(cx - Math.round(side / 2), cy - Math.round(side / 2), side, side);
+        ctx.fillRect(cx - side / 2, cy - side / 2, side, side);
       });
       ctx.globalCompositeOperation = 'source-over';
     }
