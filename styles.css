@@ -2071,7 +2071,10 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .news-sort-value > .is-hidden { visibility: hidden; }
 .news-sort-dropdown.is-open .nav-chevron { margin-top: 3px; transform: rotate(225deg); }
 .news-sort-dropdown.is-open .news-sort-trigger { border-color: var(--border-2); }
-.news-sort-menu { top: calc(100% + var(--s-2)); left: auto; right: 0; min-width: 100%; }
+/* Same width as the button and directly under it (higher specificity so the mobile nav menu rules don't apply). */
+.news-sort-dropdown .news-sort-menu { position: absolute; top: calc(100% + var(--s-2)); left: 0; right: 0; min-width: 0; margin-top: 0; transform: none; padding: var(--s-2); border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-float); }
+.news-sort-dropdown .news-sort-menu[hidden] { display: none; }
+.news-sort-dropdown .news-sort-item { min-height: var(--control-h); padding: 0 var(--s-3); font-size: var(--text-sm); }
 .news-sort-item { width: 100%; border: 0; background: transparent; font-family: inherit; text-align: left; cursor: pointer; }
 .news-sort-item.is-current { background: var(--surface-2); color: var(--accent); }
 .news-status { min-height: var(--lh-sm); margin-bottom: var(--s-3); color: var(--text-soft); font-size: var(--text-sm); line-height: var(--lh-sm); }
