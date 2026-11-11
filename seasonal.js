@@ -1567,14 +1567,14 @@
     }
 
     /* Everything here is built from whole-pixel squares. A confetti piece is a few squares (a bar, a square, two
-       squares on a diagonal, or a stepped squiggle) that turns in quarter turns instead of squashing, so its edges
-       stay sharp. A balloon is a small pixel sprite scaled up with smoothing off, with a pixel string trailing from
+       squares on a diagonal, or a stepped squiggle) that spins smoothly instead of squashing; its edges soften
+       slightly mid-turn. A balloon is a small pixel sprite scaled up with smoothing off, with a pixel string trailing from
        it. */
     function drawBit(ctx, p, palette) {
       const px = Math.max(1, Math.round(p.size * 0.42));
       ctx.save();
       ctx.translate(swayX(p, p.x), p.y);
-      ctx.rotate(Math.round(p.angle / (Math.PI / 2)) * Math.PI / 2);
+      ctx.rotate(p.angle); // a continuous spin, not quarter-turn steps
       ctx.fillStyle = palette[p.colour % palette.length];
       const cell = (x, y, w, h) => ctx.fillRect(x * px, y * px, w * px, h * px);
       if (p.shape === 0) {
