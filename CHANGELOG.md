@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.12.0 — 2026-11-11
+
+### Added
+- Sorting options for project pages:
+  - Default
+  - Alphabetical (A-Z)
+  - Alphabetical (Z-A)
+  - Latest update
+  - Newest first
+  - Oldest first
+  - Active first
+- Option to hide archived projects on project pages
+
+### Changed
+- Swapped the clock icon for the calendar icon on the seasonal theme buttons
+- Confetti on the Anniversary seasonal theme no longer "snaps" when rotating
+- Improved the spruce tree row on the Christmas theme some more
+
+### Fixed
+- Fixed the misaligned sorting option dropdown on the news page
+
 ## v4.11.0 — 2026-11-10
 
 ### Added
@@ -11,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 
 ### Changed
 - Renamed the existing pink accent colour option to "Magenta"
-- Improved layout of accent colour options on the Settings page
+- Improved the layout of accent colour options on the Settings page
 - Improved the Friday 13th and Fireworks theme previews by moving their effects closer to the centre of the preview box
 - Reduced the number of particles in the Fireworks theme's star-shaped firework
 - Slightly increased the spacing between particles in the Fireworks theme's Creeper-shaped firework
