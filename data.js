@@ -7,10 +7,8 @@
      (and optional "tooltip") if unavailable. Optional `date: "YYYY-MM-DD"` sets the release date shown
      in its cell; without it the date comes from latest-updates.js (matching project and version),
      else the cell shows a "Date TBC" placeholder.
-   - Sorting: project pages have a Sort menu. "Latest update" uses the newest download date; "Active first"
-     puts projects whose channels are all "unsupported" last. For "Newest first" / "Oldest first", add
-     `created: "YYYY-MM-DD"` (when the project was first published) to each project; those two options
-     appear once at least two projects on a page have it, and undated projects sort last.
+   - Sorting: optional `created: "YYYY-MM-DD"` on a project enables "Newest first" / "Oldest first" (once two
+     projects on a page have one). "Latest update" uses download dates.
    - Notes: optional `note: "text"` on a project adds an info panel under its release table.
    - Notifications: `notify: true` on a download puts a dot beside its version and in the navigation until
      the project's page has been opened (a first-time visitor sees none; only releases published after their first visit). The dot

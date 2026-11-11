@@ -985,13 +985,11 @@ function renderFlatSection(section) {
 }
 
 /* ---------- Project sorting ----------
-   A "Sort" dropdown above the project cards. Cards are reordered in place (not re-rendered), and the
-   "Jump to project" panel follows. The choice is remembered per page in localStorage.
-   Options that couldn't change the order on a page (no dates, nothing archived) are left out.
-   Pages with both archived and active projects also get a "Hide archived" switch (remembered too). */
+   A Sort menu (and, where archived projects exist, a "Hide archived" switch) above the cards. Both choices are
+   remembered per page; sort options that couldn't change the order on a page are left out. */
 
 const PROJECT_SORT_KEY = 'project-sort:'; // + page slug
-const PROJECT_HIDE_KEY = 'project-hide-archived:';
+const PROJECT_HIDE_KEY = 'project-hide-archived:'; // + page slug
 
 // Newest release date (ISO) across a project's available downloads; '' if it has none.
 function projectUpdated(p) {
@@ -1003,7 +1001,7 @@ function projectUpdated(p) {
   return latest;
 }
 
-// The optional `created: "YYYY-MM-DD"` on a project in data.js; '' if missing or invalid.
+// A project's optional `created` date ("YYYY-MM-DD"); '' if missing or invalid.
 function projectCreated(p) {
   if (p.created === undefined) return '';
   if (typeof p.created === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(p.created)) return p.created;
@@ -1011,14 +1009,13 @@ function projectCreated(p) {
   return '';
 }
 
-// Every release channel is "unsupported" (archived, merged elsewhere...).
+// Every release channel is "unsupported".
 function projectArchived(p) {
   const channels = p.channels || [];
   return channels.length > 0 && channels.every(ch => (ch.channel || '').toLowerCase() === 'unsupported');
 }
 
-// The sort options that make sense for these projects: [{ key, label, compare }].
-// `compare` gets two { project, index } entries; ties fall back to the default order.
+// Sort options that apply to these projects: [{ key, label, compare }]. Ties keep the default order.
 function projectSortOptions(projects) {
   const meta = new Map(projects.map(({ project }) => [project, {
     updated: projectUpdated(project), created: projectCreated(project), archived: projectArchived(project)
@@ -1027,7 +1024,7 @@ function projectSortOptions(projects) {
   const get = (e, field) => meta.get(e.project)[field];
 
   const byTitle = sign => (a, b) => sign * a.project.title.localeCompare(b.project.title, 'en-GB', { numeric: true, sensitivity: 'base' });
-  // Dated projects first, in the chosen direction; undated ones always last.
+  // Undated projects always last.
   const byDate = (field, newestFirst) => (a, b) => {
     const x = get(a, field), y = get(b, field);
     if (x === y) return 0;
@@ -1051,10 +1048,10 @@ function projectSortOptions(projects) {
   ].filter(Boolean);
 }
 
-// Listbox dropdown styled like the News page's sort control. Returns { node, set(key) }.
+// Listbox sort dropdown, shared with the News page. Returns { node, set(key) }.
 function buildSortDropdown({ options, current, label, menuId, onChange }) {
   let selected = current;
-  // All labels share one grid cell (all but the current hidden), so the button never changes width.
+  // Labels share one grid cell so the button never changes width.
   const values = new Map(options.map(o => [o.key, el('span', { text: o.label })]));
   const trigger = el('button', {
     class: 'news-sort-trigger',
@@ -1123,8 +1120,7 @@ function buildSortDropdown({ options, current, label, menuId, onChange }) {
   };
 }
 
-// Adds the sort control (and, where a page has archived projects, a "Hide archived" switch) to a project
-// list and wires it up. `jump` is the "Jump to project" aside (or null).
+// Adds the sort control and "Hide archived" switch to a project list; `jump` is the jump aside (or null).
 function initProjectSort(section, entries, list, jump) {
   if (entries.length < 2) return;
   const options = projectSortOptions(entries);
@@ -1185,7 +1181,7 @@ function initProjectSort(section, entries, list, jump) {
 
   list.prepend(el('div', { class: 'news-toolbar project-toolbar' }, [count, ...controls, status]));
 
-  // A link to a hidden project (from the URL, or the search box) shows it rather than landing on nothing.
+  // A link to a hidden project shows it.
   const revealLinked = () => {
     const id = decodeURIComponent(location.hash.slice(1));
     if (hidden && archivedIds.has(id)) { hidden = false; hideInput.checked = false; apply(); }

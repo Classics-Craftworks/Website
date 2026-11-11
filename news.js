@@ -477,7 +477,6 @@ function renderNewsPage() {
   const projectButtons = new Map();
   const monthButtons = new Map();
   const mcButtons = new Map();
-  const sortButtons = new Map(); // 'newest' / 'oldest' -> menu item
   const filterRegistries = [[buttons, active], [projectButtons, activeProjects], [mcButtons, activeMc], [monthButtons, activeMonths]];
 
   // Search box, styled like the header search.
@@ -549,11 +548,7 @@ function renderNewsPage() {
       btn.setAttribute('aria-pressed', String(key === '' ? !set.size : set.has(key)));
     }));
     groupUpdaters.forEach(update => update());
-    sortButtons.forEach((item, key) => {
-      item.setAttribute('aria-selected', String(key === sort));
-      item.classList.toggle('is-current', key === sort);
-    });
-    sortValues.forEach((node, key) => node.classList.toggle('is-hidden', key !== sort));
+    sortControl.set(sort);
     clearBtn.hidden = !query;
 
     const onScreen = pinnedShown.length + visible.size;
@@ -708,61 +703,12 @@ function renderNewsPage() {
 
   // Toolbar: "Showing X of Y entries" on the left, sort dropdown on the right.
   const countText = el('p', { class: 'news-count', attrs: { 'aria-live': 'polite' } });
-  // Built like the nav's Projects dropdown.
-  const SORT_OPTIONS = [['newest', 'Newest first'], ['oldest', 'Oldest first']];
-  const sortMenuId = 'news-sort-menu';
-  // Both labels share a grid cell (one hidden), so the button never resizes when the sort changes.
-  const sortValues = new Map(SORT_OPTIONS.map(([key, label]) => [key, el('span', { text: label })]));
-  const sortLabel = el('span', { class: 'news-sort-value' }, [...sortValues.values()]);
-  const sortTrigger = el('button', { class: 'news-sort-trigger', attrs: { type: 'button', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-controls': sortMenuId, 'aria-label': 'Sort news' } }, [
-    sortLabel,
-    el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
-  ]);
-  const sortItems = SORT_OPTIONS.map(([key, label]) => {
-    const item = el('button', { class: 'nav-dropdown-item news-sort-item', text: label, attrs: { type: 'button', role: 'option', 'data-sort': key, 'aria-selected': 'false' } });
-    item.addEventListener('click', () => { sort = key; setSortOpen(false, true); refresh(); });
-    sortButtons.set(key, item);
-    return item;
+  const sortControl = buildSortDropdown({
+    options: [{ key: 'newest', label: 'Newest first' }, { key: 'oldest', label: 'Oldest first' }],
+    current: sort, label: 'Sort news', menuId: 'news-sort-menu',
+    onChange: key => { sort = key; refresh(); }
   });
-  const sortMenu = el('div', { class: 'nav-dropdown-menu news-sort-menu', attrs: { id: sortMenuId, role: 'listbox', 'aria-label': 'Sort news', hidden: '' } }, sortItems);
-  const sortDropdown = el('div', { class: 'nav-dropdown news-sort-dropdown' }, [sortTrigger, sortMenu]);
-
-  function setSortOpen(open, refocus) {
-    sortMenu.hidden = !open;
-    sortTrigger.setAttribute('aria-expanded', String(open));
-    sortDropdown.classList.toggle('is-open', open);
-    if (!open && refocus) sortTrigger.focus();
-  }
-  sortTrigger.addEventListener('click', () => setSortOpen(sortMenu.hidden));
-  sortTrigger.addEventListener('keydown', e => {
-    if (e.key !== 'ArrowDown') return;
-    e.preventDefault();
-    setSortOpen(true);
-    (sortButtons.get(sort) || sortItems[0]).focus();
-  });
-  sortMenu.addEventListener('keydown', e => {
-    const i = sortItems.indexOf(document.activeElement);
-    let next = -1;
-    if (e.key === 'ArrowDown') next = (i + 1) % sortItems.length;
-    else if (e.key === 'ArrowUp') next = (i - 1 + sortItems.length) % sortItems.length;
-    else if (e.key === 'Home') next = 0;
-    else if (e.key === 'End') next = sortItems.length - 1;
-    else if (e.key === 'Escape') { e.preventDefault(); setSortOpen(false, true); return; }
-    if (next < 0) return;
-    e.preventDefault();
-    sortItems[next].focus();
-  });
-  sortDropdown.addEventListener('focusout', e => {
-    if (!sortDropdown.contains(e.relatedTarget)) setSortOpen(false);
-  });
-  document.addEventListener('pointerdown', e => {
-    if (!sortDropdown.contains(e.target)) setSortOpen(false);
-  });
-
-  const sortBox = el('div', { class: 'news-sort' }, [
-    el('span', { class: 'news-sort-label', text: 'Sort', attrs: { 'aria-hidden': 'true' } }),
-    sortDropdown
-  ]);
+  const sortBox = sortControl.node;
   const toolbar = el('div', { class: 'news-toolbar' }, [countText, sortBox]);
 
   const filterBox = (projects.length || tagKeys.length > 1 || mcKeys.length || monthKeys.length > 1) ? buildFilterDropdown() : null;
