@@ -728,7 +728,7 @@
       // reach: how far in from the sides the row starts (0 = full width). minSeen: share of a back tree's leaves
       // that must show past the trees in front.
       const rows = [
-        { tier: 'front', scale: 1,    space: [0, 0.9],   reach: 0,    minSeen: 0.67 },
+        { tier: 'front', scale: 1,    space: [0, 0.7],   reach: 0,    minSeen: 0.67 },
         { tier: 'far',   scale: 1,    space: [0.1, 0.6],  reach: 0.2,  minSeen: 0.65, shift: 0.25 }
       ];
 
@@ -813,7 +813,7 @@
             const base = sizeAt(x, row);
             // A full-size tree if one fits here; failing that a smaller one, so a gap too narrow for a full-size
             // tree gets a smaller one rather than staying empty.
-            for (const shrink of [1, 0.8, 0.64]) {
+            for (const shrink of [1, 0.8, 0.64, 0.5, 0.4]) {
               const block = Math.max(1, Math.round(base.block * shrink));
               const width = block * SPRUCE_COLS;
               // (a tree must be mostly on screen: one hanging off the edge would show as a stray sliver)
@@ -827,6 +827,34 @@
             }
             x += step;
           }
+          // Fill what is left: an empty stretch between trees (nothing drawn there at the height of a tree's leaves)
+          // wide enough for a couple of blocks gets a tree sized to fit it, so no gap is left on the sides.
+          const placed = inFront.concat(list);
+          const emptyAt = (px, ref) => ![0.35, 0.6].some(f => placed.some(o => covers(o, px, baseY - ref * f)));
+          const blockAt = px => {
+            const edge = Math.abs(px / view.w - 0.5) * 2;
+            return Math.max(1, Math.round(Math.min(view.h * 0.3, view.h * (0.06 + 0.23 * Math.pow(edge, 1.7))) * row.scale / SPRUCE_ROWS));
+          };
+          let runStart = null;
+          for (let px = 0; px <= view.w + 1; px++) {
+            const inside = px <= view.w;
+            const block = blockAt(Math.min(px, view.w));
+            const edge = Math.abs(Math.min(px, view.w) / view.w - 0.5) * 2;
+            const empty = inside && edge >= row.reach && emptyAt(px, block * SPRUCE_ROWS);
+            if (empty && runStart === null) runStart = px;
+            if (!empty && runStart !== null) {
+              const runWidth = px - runStart;
+              const mid = runStart + runWidth / 2;
+              const wanted = blockAt(mid);
+              const fitted = Math.min(wanted, Math.floor(runWidth / SPRUCE_COLS));
+              if (runWidth >= 2 * wanted && fitted >= 2) {
+                list.push({ x: mid, block: fitted, height: fitted * SPRUCE_ROWS, width: fitted * SPRUCE_COLS, bulbs: [] });
+                placed.push(list[list.length - 1]);
+              }
+              runStart = null;
+            }
+          }
+          list.sort((p, q) => p.x - q.x);
         }
         inFront = inFront.concat(list);
         built.push({ tier: row.tier, back: rowIndex > 0, list });
