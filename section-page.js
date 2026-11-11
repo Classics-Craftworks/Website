@@ -980,7 +980,177 @@ function renderFlatSection(section) {
 
   const list = el('div', { class: 'project-list' }, ids.projects.map(({ project, id }) => renderProject(project, id)));
   const jump = renderProjectJump(ids.projects);
+  initProjectSort(section, ids.projects, list, jump);
   main.appendChild(el('div', { class: 'catalog-layout' }, [jump, list]));
+}
+
+/* ---------- Project sorting ----------
+   A "Sort" dropdown above the project cards. Cards are reordered in place (not re-rendered), and the
+   "Jump to project" panel follows. The choice is remembered per page in localStorage.
+   Options that couldn't change the order on a page (no dates, nothing archived) are left out. */
+
+const PROJECT_SORT_KEY = 'project-sort:'; // + page slug
+
+// Newest release date (ISO) across a project's available downloads; '' if it has none.
+function projectUpdated(p) {
+  let latest = '';
+  (p.channels || []).forEach(ch => (ch.downloads || []).forEach(d => {
+    const iso = downloadAvailable(d) ? releaseDate(p, d) : '';
+    if (iso > latest) latest = iso;
+  }));
+  return latest;
+}
+
+// The optional `created: "YYYY-MM-DD"` on a project in data.js; '' if missing or invalid.
+function projectCreated(p) {
+  if (p.created === undefined) return '';
+  if (typeof p.created === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(p.created)) return p.created;
+  console.warn(`data.js: ignoring created ${JSON.stringify(p.created)} on ${p.title}; use a quoted "YYYY-MM-DD" string.`);
+  return '';
+}
+
+// Every release channel is "unsupported" (archived, merged elsewhere...).
+function projectArchived(p) {
+  const channels = p.channels || [];
+  return channels.length > 0 && channels.every(ch => (ch.channel || '').toLowerCase() === 'unsupported');
+}
+
+// The sort options that make sense for these projects: [{ key, label, compare }].
+// `compare` gets two { project, index } entries; ties fall back to the default order.
+function projectSortOptions(projects) {
+  const meta = new Map(projects.map(({ project }) => [project, {
+    updated: projectUpdated(project), created: projectCreated(project), archived: projectArchived(project)
+  }]));
+  const count = field => projects.filter(({ project }) => meta.get(project)[field]).length;
+  const get = (e, field) => meta.get(e.project)[field];
+
+  const byTitle = sign => (a, b) => sign * a.project.title.localeCompare(b.project.title, 'en-GB', { numeric: true, sensitivity: 'base' });
+  // Dated projects first, in the chosen direction; undated ones always last.
+  const byDate = (field, newestFirst) => (a, b) => {
+    const x = get(a, field), y = get(b, field);
+    if (x === y) return 0;
+    if (!x) return 1;
+    if (!y) return -1;
+    return (x < y) === newestFirst ? 1 : -1;
+  };
+  const archivedCount = projects.filter(({ project }) => meta.get(project).archived).length;
+
+  return [
+    { key: 'default', label: 'Default', compare: () => 0 },
+    { key: 'az', label: 'Alphabetical (A–Z)', compare: byTitle(1) },
+    { key: 'za', label: 'Alphabetical (Z–A)', compare: byTitle(-1) },
+    count('updated') > 1 && { key: 'updated', label: 'Latest update', compare: byDate('updated', true) },
+    count('created') > 1 && { key: 'newest', label: 'Newest first', compare: byDate('created', true) },
+    count('created') > 1 && { key: 'oldest', label: 'Oldest first', compare: byDate('created', false) },
+    archivedCount > 0 && archivedCount < projects.length && {
+      key: 'active', label: 'Active first',
+      compare: (a, b) => Number(get(a, 'archived')) - Number(get(b, 'archived'))
+    }
+  ].filter(Boolean);
+}
+
+// Listbox dropdown styled like the News page's sort control. Returns { node, set(key) }.
+function buildSortDropdown({ options, current, label, menuId, onChange }) {
+  let selected = current;
+  // All labels share one grid cell (all but the current hidden), so the button never changes width.
+  const values = new Map(options.map(o => [o.key, el('span', { text: o.label })]));
+  const trigger = el('button', {
+    class: 'news-sort-trigger',
+    attrs: { type: 'button', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', 'aria-controls': menuId, 'aria-label': label }
+  }, [
+    el('span', { class: 'news-sort-value' }, [...values.values()]),
+    el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+  ]);
+  const items = new Map(options.map(o => [o.key, el('button', {
+    class: 'nav-dropdown-item news-sort-item',
+    text: o.label,
+    attrs: { type: 'button', role: 'option', 'data-sort': o.key, 'aria-selected': 'false' }
+  })]));
+  const itemList = [...items.values()];
+  const menu = el('div', { class: 'nav-dropdown-menu news-sort-menu', attrs: { id: menuId, role: 'listbox', 'aria-label': label, hidden: '' } }, itemList);
+  const dropdown = el('div', { class: 'nav-dropdown news-sort-dropdown' }, [trigger, menu]);
+
+  function setOpen(open, refocus) {
+    menu.hidden = !open;
+    trigger.setAttribute('aria-expanded', String(open));
+    dropdown.classList.toggle('is-open', open);
+    if (!open && refocus) trigger.focus();
+  }
+  function set(key) {
+    selected = key;
+    values.forEach((node, k) => node.classList.toggle('is-hidden', k !== key));
+    items.forEach((item, k) => {
+      item.setAttribute('aria-selected', String(k === key));
+      item.classList.toggle('is-current', k === key);
+    });
+  }
+
+  items.forEach((item, key) => item.addEventListener('click', () => {
+    setOpen(false, true);
+    if (key !== selected) { set(key); onChange(key); }
+  }));
+  trigger.addEventListener('click', () => setOpen(menu.hidden));
+  trigger.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowDown') return;
+    e.preventDefault();
+    setOpen(true);
+    items.get(selected).focus();
+  });
+  menu.addEventListener('keydown', e => {
+    const i = itemList.indexOf(document.activeElement);
+    let next = -1;
+    if (e.key === 'ArrowDown') next = (i + 1) % itemList.length;
+    else if (e.key === 'ArrowUp') next = (i - 1 + itemList.length) % itemList.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = itemList.length - 1;
+    else if (e.key === 'Escape') { e.preventDefault(); setOpen(false, true); return; }
+    if (next < 0) return;
+    e.preventDefault();
+    itemList[next].focus();
+  });
+  dropdown.addEventListener('focusout', e => { if (!dropdown.contains(e.relatedTarget)) setOpen(false); });
+  document.addEventListener('pointerdown', e => { if (!dropdown.contains(e.target)) setOpen(false); });
+
+  set(current);
+  return {
+    set,
+    node: el('div', { class: 'news-sort' }, [
+      el('span', { class: 'news-sort-label', text: 'Sort', attrs: { 'aria-hidden': 'true' } }),
+      dropdown
+    ])
+  };
+}
+
+// Adds the sort control to a project list and wires it up. `jump` is the "Jump to project" aside (or null).
+function initProjectSort(section, entries, list, jump) {
+  if (entries.length < 2) return;
+  const options = projectSortOptions(entries);
+  const storeKey = PROJECT_SORT_KEY + slugify(section.heading);
+  const saved = storageGet(storeKey);
+  let current = options.some(o => o.key === saved) ? saved : 'default';
+
+  const cards = new Map(entries.map(e => [e.id, list.querySelector(':scope > .project[id="' + CSS.escape(e.id) + '"]')]));
+  const jumpList = jump && jump.querySelector('.jump-list');
+  const jumpItems = new Map(jumpList ? [...jumpList.children].map(li => [li.querySelector('a').getAttribute('href').slice(1), li]) : []);
+  const status = el('p', { class: 'visually-hidden', attrs: { role: 'status' } });
+
+  function apply(key) {
+    const option = options.find(o => o.key === key) || options[0];
+    const ordered = entries.map((e, index) => ({ ...e, index }))
+      .sort((a, b) => option.compare(a, b) || a.index - b.index);
+    ordered.forEach(({ id }) => {
+      if (cards.get(id)) list.appendChild(cards.get(id));
+      if (jumpItems.get(id)) jumpList.appendChild(jumpItems.get(id));
+    });
+    status.textContent = `Sorted by ${option.label}`;
+  }
+
+  const control = buildSortDropdown({
+    options, current, label: 'Sort projects', menuId: 'project-sort-menu',
+    onChange: key => { current = key; storageSet(storeKey, key); apply(key); }
+  });
+  list.prepend(el('div', { class: 'news-toolbar project-toolbar' }, [control.node, status]));
+  if (current !== 'default') apply(current);
 }
 
 // Side panel with a link to each project on the page. Reuses the news page's collapsible panel.

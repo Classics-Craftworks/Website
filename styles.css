@@ -1329,6 +1329,8 @@ main:focus, #catalog:focus { outline: none; }
 .catalog-aside .news-filter-panel { padding-bottom: var(--s-2); }
 
 .project-list { display: flex; flex-direction: column; gap: var(--s-5); }
+/* Sort control above the cards: right-aligned, closer to the first card than the cards are to each other. */
+.project-toolbar { justify-content: flex-end; margin-bottom: calc(var(--s-3) - var(--s-5)); }
 
 /* Number of download-type columns in a card's table. */
 .project { --cols: 2; }

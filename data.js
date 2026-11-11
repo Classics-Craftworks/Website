@@ -7,6 +7,10 @@
      (and optional "tooltip") if unavailable. Optional `date: "YYYY-MM-DD"` sets the release date shown
      in its cell; without it the date comes from latest-updates.js (matching project and version),
      else the cell shows a "Date TBC" placeholder.
+   - Sorting: project pages have a Sort menu. "Latest update" uses the newest download date; "Active first"
+     puts projects whose channels are all "unsupported" last. For "Newest first" / "Oldest first", add
+     `created: "YYYY-MM-DD"` (when the project was first published) to each project; those two options
+     appear once at least two projects on a page have it, and undated projects sort last.
    - Notes: optional `note: "text"` on a project adds an info panel under its release table.
    - Notifications: `notify: true` on a download puts a dot beside its version and in the navigation until
      the project's page has been opened (a first-time visitor sees none; only releases published after their first visit). The dot
@@ -62,6 +66,7 @@ const SITE_DATA = {
           imageAlt: "Better Craftables logo: the letters BC",
           title: "Better Craftables",
           description: "Adds some quality-of-life crafting and smelting recipes to the game.",
+          created: "2023-03-20",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/better-craftables" },
             { label: "SpigotMC", icon: "spigot", url: "https://www.spigotmc.org/resources/better-craftables.108728/" },
@@ -97,6 +102,7 @@ const SITE_DATA = {
           imageAlt: "Better Unpackables logo: the letters BU",
           title: "Better Unpackables",
           description: "Adds some quality-of-life unpacking recipes to the game.",
+          created: "2024-10-17",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/better-unpackables" },
             { label: "SpigotMC", icon: "spigot", url: "https://www.spigotmc.org/resources/better-unpackables.120335/" },
@@ -132,6 +138,7 @@ const SITE_DATA = {
           imageAlt: "Silly Eatables logo: the letters SE",
           title: "Silly Eatables",
           description: "Eat things you shouldn't with these silly food recipes!",
+          created: "2024-03-30",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/silly-eatables" },
             { label: "SpigotMC", icon: "spigot", url: "https://www.spigotmc.org/resources/silly-eatables.116362/" },
@@ -168,6 +175,7 @@ const SITE_DATA = {
           title: "New Sword Blocking",
           description: "Restores and enhances sword blocking in Minecraft 1.21.5 – 1.21.8.",
           note: "This project is no longer supported and will not receive further updates. There are better alternatives available elsewhere.",
+          created: "2025-01-26",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/datapack/new-sword-blocking" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/New-Sword-Blocking" },
@@ -200,6 +208,7 @@ const SITE_DATA = {
           imageAlt: "Classic's Tweaks logo: the letters CT",
           title: "Classic's Tweaks",
           description: "Little details matter: subtle texture tweaks for Minecraft, each one toggleable in-game with Respackopts.",
+          created: "2026-10-16",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-tweaks" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Tweaks" },
@@ -233,6 +242,7 @@ const SITE_DATA = {
           title: "Classic's Disc Tweaks",
           description: "Subtly widens music discs and unifies their design for a more cohesive look.",
           note: "This resource pack has been merged into Classic's Tweaks and is no longer updated. Use Classic's Tweaks instead.",
+          created: "2024-07-02",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-disc-tweaks" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Disc-Tweaks" },
@@ -258,6 +268,7 @@ const SITE_DATA = {
           title: "Classic's Dye Tweaks",
           description: "Tweaks Minecraft's new dye textures and brings them to older versions of the game!",
           note: "This resource pack has been merged into Classic's Tweaks and is no longer updated. Use Classic's Tweaks instead.",
+          created: "2025-07-23",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-dye-tweaks" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Dye-Tweaks" },
@@ -283,6 +294,7 @@ const SITE_DATA = {
           title: "Classic's Lantern Tweaks",
           description: "Adjusts the edges of Soul & Copper Lanterns so they better match the regular Lantern. Little details matter!",
           note: "This resource pack has been merged into Classic's Tweaks and is no longer updated. Use Classic's Tweaks instead.",
+          created: "2025-10-01",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-lantern-tweaks" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Lantern-Tweaks" },
@@ -308,6 +320,7 @@ const SITE_DATA = {
           title: "Classic's Note Block Tweaks",
           description: "Updates Note Blocks to better match new Jukebox textures, and backports them to 1.21.9 - 26.3.",
           note: "This resource pack has been merged into Classic's Tweaks. It will continue to receive updates throughout the 26.4 development cycle, but will be archived after v1.0.0.",
+          created: "2026-10-13",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/classics-note-block-tweaks" },
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Classics-Note-Block-Tweaks" },
@@ -333,6 +346,7 @@ const SITE_DATA = {
           title: "Zisteau Pigmen",
           description: "Zombified Piglins named 'Zisteau' become Zombie Pigmen.",
           note: "This resource pack has been merged into Classic's Tweaks and is no longer updated. Use Classic's Tweaks instead.",
+          created: "2025-05-08",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/resourcepack/zisteau-pigmen" }
           ],
@@ -362,6 +376,7 @@ const SITE_DATA = {
           imageAlt: "CraftHorizon logo over a starry galaxy",
           title: "CraftHorizon",
           description: "Whitelisted Minecraft server, with a focus on vanilla+ Survival and Creative gameplay.",
+          created: "2025-01-15",
           links: [
             { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/server/crafthorizon" },
             { label: "Trello", icon: "document", url: "https://trello.com/b/TK7pofcG/crafthorizon" },
@@ -376,6 +391,7 @@ const SITE_DATA = {
           imageAlt: "Classic's Craftworks CCW emblem",
           title: "Classic's Craftworks Website",
           description: "The hub for all of our projects. You're already here!",
+          created: "2026-09-14",
           links: [
             { label: "GitHub", icon: "github", url: "https://github.com/Classics-Craftworks/Website" }
           ]
