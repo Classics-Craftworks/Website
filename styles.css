@@ -267,11 +267,9 @@
 :root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="halloween"] { --accent: #7d3600; --accent-rgb: 125, 54, 0; }
 :root[data-contrast="high"][data-theme="light"][data-accent="auto"][data-season="friday13"] { --accent: #2d3894; --accent-rgb: 45, 56, 148; }
 
-/* April Fools (settings.js: SEASONS.aprilfools): the site becomes "Classic's Mudworks", dressed in mud brown.
-   Done entirely with tokens, so every page follows it: a mud-brown accent and warm brown surfaces (dark theme)
-   or parchment ones (light). OLED keeps its black and only takes the accent. Fonts, spacing and shapes are the
-   site's own; only the name in the header and footer is swapped. The mud-brown accent only applies with the
-   "Automatic" accent setting, like every other seasonal theme; a colour the visitor picked is left alone. */
+/* April Fools (SEASONS.aprilfools): the site becomes "Classic's Mudworks", done entirely with tokens: a mud-brown
+   accent and brown surfaces (parchment on light). OLED keeps its black and only takes the accent. Only the name
+   in the header and footer is swapped. The accent applies only with the "Automatic" accent setting. */
 :root[data-accent="auto"][data-season="aprilfools"] {
   --accent: #d19a66; --accent-rgb: 209, 154, 102; --on-accent: #1a110a;
 }
@@ -873,7 +871,6 @@ main:focus, #catalog:focus { outline: none; }
 
 .splash { padding: var(--s-8) 0 var(--section-gap); }
 .splash[hidden] { display: none; }
-.splash-bg { display: none; }
 
 .splash-inner {
   display: grid;
@@ -1329,7 +1326,7 @@ main:focus, #catalog:focus { outline: none; }
 .catalog-aside .news-filter-panel { padding-bottom: var(--s-2); }
 
 .project-list { display: flex; flex-direction: column; gap: var(--s-5); }
-/* Sort control above the cards: right-aligned, closer to the first card than the cards are to each other. */
+/* Toolbar above the cards, sitting closer to them than they sit to each other. */
 .project-toolbar { column-gap: var(--s-4); margin-bottom: calc(var(--s-3) - var(--s-5)); }
 .project-count { margin-right: auto; }
 .project-toolbar .news-sort { margin-left: 0; }
@@ -1447,10 +1444,8 @@ main:focus, #catalog:focus { outline: none; }
 @keyframes linked-target { 0% { box-shadow: 0 0 0 2px var(--accent); } 100% { box-shadow: 0 0 0 2px transparent; } }
 
 /* ---------- Release table ---------- */
-/* Rows are channels (Release, Beta), columns are download types (Data Pack, Mod).
-   Wide: label column plus one column per type. Narrower: each cell stacks its contents.
-   Below 656px (the label column plus two stacked cells), the table is one column and
-   each cell carries its own label. */
+/* Release table: one column per channel (Release, Beta), one row per download type. Narrower screens stack each
+   cell's contents; below 656px the table is one column and each cell carries its own label. */
 
 .rt { container: release-table / inline-size; }
 
@@ -2075,7 +2070,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 .news-sort-value > .is-hidden { visibility: hidden; }
 .news-sort-dropdown.is-open .nav-chevron { margin-top: 3px; transform: rotate(225deg); }
 .news-sort-dropdown.is-open .news-sort-trigger { border-color: var(--border-2); }
-/* Same width as the button and directly under it (higher specificity so the mobile nav menu rules don't apply). */
+/* Menu matches the button's width; the extra specificity overrides the mobile nav menu rules. */
 .news-sort-dropdown .news-sort-menu { position: absolute; top: calc(100% + var(--s-2)); left: 0; right: 0; min-width: 0; margin-top: 0; transform: none; padding: var(--s-2); border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-float); }
 .news-sort-dropdown .news-sort-menu[hidden] { display: none; }
 .news-sort-dropdown .news-sort-item { min-height: var(--control-h); padding: 0 var(--s-3); font-size: var(--text-sm); }
@@ -2268,7 +2263,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 }
 
 /* Sidebar */
-.news-panel-heading, .news-card-heading { margin-bottom: var(--s-3); font-family: var(--font-body); font-size: var(--text-lg); line-height: var(--lh-lg); font-weight: 600; letter-spacing: 0; text-transform: none; }
+.news-card-heading { margin-bottom: var(--s-3); font-family: var(--font-body); font-size: var(--text-lg); line-height: var(--lh-lg); font-weight: 600; letter-spacing: 0; text-transform: none; }
 .news-release-body { padding: 0 var(--s-4) var(--s-2); }
 .news-release-body .release-item:first-child::before { display: none; }
 .release-list { margin: 0; padding: 0; }
@@ -2318,7 +2313,6 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 .skel-line { height: var(--s-4); }
 .skel-line + .skel-line { margin-top: var(--s-2); }
-.skel-line.w-40 { width: 40%; }
 .skel-line.w-60 { width: 60%; }
 .skel-line.w-80 { width: 80%; }
 .skel-title { height: var(--s-6); width: 192px; }
@@ -2638,7 +2632,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 }
 
 /* Seasonal theme placeholders ("Coming Soon"): visible but not selectable. */
-/* Seasonal theme card: when it is set automatically (clock icon + short dates, one per line). */
+/* Seasonal theme card: when it is set automatically (calendar icon + short dates, one per line). */
 .choice-when { display: grid; grid-template-columns: auto 1fr; column-gap: var(--s-2); align-items: start; margin-top: var(--s-1); color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); font-variant-numeric: tabular-nums; }
 .choice-when-icon { grid-row: 1 / span 4; display: inline-flex; align-items: center; height: var(--lh-xs); color: var(--accent); }
 .choice-when-date { grid-column: 2; color: var(--text); }

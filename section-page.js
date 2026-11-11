@@ -220,9 +220,9 @@ function renderBrand(brand) {
 }
 
 /* ---------- Project notifications ----------
-   A download with `notify: true` in data.js gets a dot until its page has been opened since its
-   version last changed. On a first visit everything already published counts as seen, so no dots show. The previous
-   visit's state is held for the browser session so reloads don't clear them. */
+   A download with `notify: true` in data.js gets a dot until its page is opened after its version changes.
+   On a first visit everything counts as seen. The previous visit's state is held for the session so reloads
+   don't clear the dots. */
 
 const PROJECTS_SEEN_KEY = 'downloads-seen';
 const PROJECTS_BASELINE_KEY = 'downloads-seen-baseline';

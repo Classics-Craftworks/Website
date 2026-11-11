@@ -1,30 +1,21 @@
 /* Seasonal themes: the moving (or, with reduced motion, still) picture behind the page.
 
-   settings.js decides which theme is in effect and puts it on <html> as data-season
-   ("fireworks", "aurora", "anniversary", "blossom", "easter", "fireflies", "friday13", "halloween", "leaves", "snowfall" or "christmas", absent = none). This file only draws it:
-   a fixed, click-through <canvas> behind everything (styles.css: .season-canvas).
+   settings.js decides which theme is in effect and puts it on <html> as data-season; this file only draws it,
+   on a fixed, click-through <canvas> behind everything (styles.css: .season-canvas).
 
-   - Fireworks: Minecraft-style rockets rise and burst into small square-pixel sparkles, now and then a Creeper face.
-   - Aurora: slow green, teal and violet northern-lights curtains sway across the upper sky.
-   - Anniversary: bright square confetti falls while pixel party balloons float up the page.
-  - Easter: pastel Minecraft-style eggs rock gently as they drift down among a few little square pixel daisies.
-  - Fireflies: square fireflies, each with a soft glow, wander and blink under a blue-to-rose twilight sky.
-   - Cherry Blossom: Minecraft-style pink square cherry leaves spin down on a light breeze.
-   - Falling Leaves: brown Minecraft-style leaves spin and drift down.
-   - Snowfall: tiny Minecraft-style white snow particles (3x3 pixel shapes with some pixels missing) drift down.
-   - Christmas: a string of square fairy lights twinkles along the top, golden plus-shaped sparkles drift down and a
-     treeline of opaque Minecraft spruce trees with small lights stands along the bottom.
-   - Halloween: pixelated bats flap across a hazy square moon (with a round glow) while square embers rise from a warm glow at the bottom.
-   - Friday 13th: mist drifts across, faint "13"s float up and fade, and every few seconds, mostly near the
-     side margins, a branching lightning bolt strikes down from the top and fades with a soft glow (one smooth
-     strike, never a flicker).
-   - April Fools ("aprilfools") has no canvas: it is a mud-brown re-skin of the whole site ("Classic's Mudworks") done in styles.css, so
-     it is not in EFFECTS below and nothing is drawn.
-   - Reduced motion (the device setting or the Settings page): one still frame, nothing moves.
-   - Nothing runs while the tab is hidden (requestAnimationFrame pauses) and nothing is drawn
-     when there is no seasonal theme: the canvas is removed.
+   - Fireworks: rockets burst into square-pixel sparkles, now and then a Creeper face.
+   - Aurora: slow green, teal and violet curtains sway across the upper sky.
+   - Anniversary: square confetti falls while pixel balloons float up the page.
+   - Easter: pastel eggs rock as they drift down among small pixel daisies.
+   - Fireflies: square fireflies with soft glows blink under a blue-to-rose twilight sky.
+   - Cherry Blossom / Falling Leaves / Snowfall: square pixel petals, leaves and flakes drift down.
+   - Christmas: fairy lights along the top, golden sparkles, and a spruce treeline along the bottom.
+   - Halloween: bats flap across a hazy moon while embers rise from a warm glow.
+   - Friday 13th: drifting mist, floating "13"s and the occasional single lightning strike.
+   - April Fools has no canvas: it is a mud-brown re-skin of the site done in styles.css.
 
-   Written as one closure so its names can't clash with the site's other scripts. */
+   With reduced motion it draws one still frame. Nothing runs while the tab is hidden, and with no seasonal
+   theme the canvas is removed. Written as one closure so its names can't clash with other scripts. */
 
 (() => {
   const TAU = Math.PI * 2;
@@ -59,10 +50,9 @@
 
   /* ---------- Fireworks ---------- */
 
-  /* Minecraft-style fireworks. Everything is built from small square pixels (no circles, no
-     streaks): sparks are tiny four-point sparkles, the rocket leaves a little flame trail, and it bursts into one of the firework-star
-     shapes (small ball, large ball, star, burst). Now and then (CREEPER_CHANCE) it bursts into a Creeper
-     face instead: the eyes and mouth traced in green sparkles, as the game's Creeper firework does. */
+  /* Fireworks, all square pixels: tiny four-point sparkles, a flame trail, and bursts shaped like the game's
+     firework stars (small ball, large ball, star, burst). Now and then (CREEPER_CHANCE) a burst traces a
+     Creeper face in green instead. */
 
   const FIREWORK_COLOURS = {
     dark:  ['#ff5555', '#ffaa00', '#ffff55', '#55ff55', '#55ffff', '#7a85ff', '#ff55ff', '#b45dff', '#ffffff'],
@@ -622,10 +612,8 @@
   ];
   const SPRUCE_COLS = SPRUCE[0].length;
   const SPRUCE_ROWS = SPRUCE.length;
-  // Flat, fully opaque colours, no texture: the old pine treeline's teal for the leaves (the light theme's are the old
-  // see-through colours worked out against a pale page) and a muted brown for the trunk. There are two tiers: the back
-  // row is dimmer (darker on the dark themes, paler on the light one) than the front row, so it reads as a quiet
-  // backdrop behind it.
+  // Flat, opaque colours: teal leaves and a muted brown trunk. The back row is dimmer than the front row
+  // (darker on dark themes, paler on light) so it reads as a quiet backdrop.
   const SPRUCE_COLOURS = {
     dark: {
       front: { leaf: 'rgb(22, 44, 54)', trunk: 'rgb(38, 26, 19)' },
@@ -697,10 +685,8 @@
       }
     }
 
-    // A plus made of square pixels, like the snowfall theme's: three pixels across and three down, `pixel` screen
-    // pixels each, centred on (x, y). The size is a whole number of pixels (it never changes for a sparkle), but the
-    // position is not rounded: these drift at a few pixels a second, and snapping them to whole pixels made them
-    // sit still for several frames and then jump, which looked like jitter.
+    // A 3x3-pixel plus centred on (x, y). The size is whole pixels but the position isn't rounded: these drift
+    // slowly, and snapping them made them sit still, then jump.
     function plus(ctx, x, y, pixel) {
       const p = Math.max(1, Math.round(pixel));
       const left = x - p * 1.5;
@@ -724,13 +710,9 @@
       ctx.fillRect(cx - Math.floor(s / 2), cy - Math.floor(s / 2), s, s);
     }
 
-    /* The treeline: two rows of Minecraft spruces along the bottom edge, a front row and a dimmer back row. Both are
-       taller towards the side margins and low in the middle, so the middle of the page stays clear, and the back row
-       is thickest at the sides, where it makes a backdrop of dim trees between and behind the front ones. Laid out once per window size from a fixed
-       seed (so the trees stand in the same places every time, whatever Math.random is doing), with a few small
-       square lights on each front tree. A tree is a whole number of pixels per block, so its squares stay sharp.
-       A back tree is only kept if enough of its leaves show past the trees in front of it, so none is left as a
-       trunk poking out from behind or hidden altogether. */
+    /* The treeline: a front row and a dimmer back row of spruces, taller towards the side margins so the middle of
+       the page stays clear. Laid out once per window size from a fixed seed, so the trees always stand in the same
+       places. A back tree is kept only if enough of its leaves show past the front trees. */
     let trees = null;
     let treesFor = '';
 
@@ -742,10 +724,9 @@
       const between = (a, b) => a + rng() * (b - a);
       const u = unit();
       const baseY = Math.round(view.h) + 2;
-      // Nearest first. scale: size against the front row. space: the clear gap between neighbours in a row, in tree
-      // widths (neighbours in a row never overlap, whatever their sizes). reach: how far in from the sides the row
-      // starts (0 = the whole width; the back rows leave the very middle bare). minSeen: the share of a back tree's
-      // leaves that must show past the trees in front of it.
+      // Nearest first. scale: size against the front row. space: gap between neighbours, in tree widths.
+      // reach: how far in from the sides the row starts (0 = full width). minSeen: share of a back tree's leaves
+      // that must show past the trees in front.
       const rows = [
         { tier: 'front', scale: 1,    space: [0, 0.9],   reach: 0,    minSeen: 0.67 },
         { tier: 'far',   scale: 1,    space: [0.1, 0.6],  reach: 0.2,  minSeen: 0.65, shift: 0.25 }
@@ -1062,10 +1043,8 @@
       ctx.fillRect(q, -7 * q, q, 2 * q);
     }
 
-    /* Drawn pixelated: the shape above is drawn small onto a tiny canvas, every part-covered pixel is made fully
-       solid (and the rest fully clear, so there is no soft edge), and that is scaled up with smoothing off so each
-       pixel shows as a crisp square. Flap is rounded to a few steps, so the wings move in jumps like the game's, and
-       each step is made once per colour and kept. */
+    /* Drawn pixelated: the shape is drawn onto a tiny canvas, part-covered pixels are made solid, and it is scaled
+       up with smoothing off. Flap is rounded to a few steps (like the game's), each made once per colour. */
     const BAT_GRID = 14;                  // half the wingspan, in bat pixels
     const BAT_W = BAT_GRID * 2 + 4, BAT_H = BAT_GRID * 2 - 4;
     const batSprites = {};
@@ -1160,10 +1139,8 @@
 
   /* ---------- Minecraft-style leaf texture (Falling Leaves and Cherry Blossom) ---------- */
 
-  /* Two flat squares, each a 2x2 grid of pixels, that share one pixel where their corners meet. Together
-     they make a 3x3 texture: the first square is the top-left 2x2, the second the bottom-right 2x2, they
-     overlap in the middle, and the bottom-right pixel (opposite the overlap on the second square) is a touch
-     darker. Drawn with smoothing off so the edges stay crisp as it spins. colours = { base, dark }. */
+  /* A 3x3 texture made of two 2x2 squares (top-left and bottom-right) overlapping in the middle, the
+     bottom-right pixel a touch darker. Smoothing is off so edges stay crisp as it spins. colours = { base, dark }. */
   const pixelLeafCache = {};
   function pixelLeaf(colours) {
     const key = colours.base + colours.dark;
@@ -1383,10 +1360,8 @@
       });
     }
 
-    /* Pixel art, drawn small and scaled up with smoothing off (as the snow and leaves are) so every pixel is a crisp
-       square. The egg is Minecraft's: 10 pixels wide and 12 tall, narrow at the top and widest low down, with a darker
-       edge, a lit patch at the upper left, a shaded lower right and the decoration in its second colour. # is the egg,
-       . is empty. */
+    /* Pixel art, scaled up with smoothing off. The egg is 10x12 pixels with a darker edge, a lit upper left,
+       a shaded lower right and its decoration in a second colour. # is the egg, . is empty. */
     const EGG_SHAPE = [
       '..........',
       '...####...',
@@ -1566,10 +1541,8 @@
       });
     }
 
-    /* Everything here is built from whole-pixel squares. A confetti piece is a few squares (a bar, a square, two
-       squares on a diagonal, or a stepped squiggle) that spins smoothly instead of squashing; its edges soften
-       slightly mid-turn. A balloon is a small pixel sprite scaled up with smoothing off, with a pixel string trailing from
-       it. */
+    /* Confetti is a few whole-pixel squares (bar, square, diagonal pair or squiggle) that spin smoothly. A balloon
+       is a small pixel sprite scaled up with smoothing off, with a pixel string trailing from it. */
     function drawBit(ctx, p, palette) {
       const px = Math.max(1, Math.round(p.size * 0.42));
       ctx.save();
@@ -1962,10 +1935,8 @@
 
   /* ---------- Previews on the Settings page ---------- */
 
-  /* Shows one effect, smaller, in a canvas on the Settings page (the cards of the seasonal theme setting).
-     Same code as the page background, so what the card shows is what is switched on. It is a still
-     picture until the pointer is over its card (or the card has keyboard focus), then it moves; with
-     reduced motion it never moves. Looks after itself; returns nothing. */
+  /* Runs one effect, smaller, in a canvas on a Settings theme card, using the same code as the page background.
+     Still until the card is hovered or focused, and never moving with reduced motion. */
   window.mountSeasonPreview = (previewCanvas, season) => {
     const pctx = previewCanvas.getContext('2d');
     const pview = { w: 0, h: 0, dpr: 1, scale: 0.3, line: 0.6, flakes: 14, mist: 3, glyphs: 4, bats: 2, flies: 8, eggs: 13, confetti: 22, balloons: 5, embers: 7, sparkles: 6, lightsTop: 0, flashEvery: [2.0, 3.5], centred: true }; // centred: fireworks and bolts anywhere in the card, not pushed to its side margins; flashEvery: Friday 13th's bolts, far more often than on the page

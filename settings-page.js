@@ -1,8 +1,6 @@
-/* Settings page: builds the controls for the settings kept by settings.js.
-   Every change applies and saves straight away; there is no Save button.
-
-   Each control registers a small function in `syncers`; they all run again whenever a setting
-   changes (here, in another tab, or on the device) so what is shown never drifts from what is stored. */
+/* Settings page: builds the controls for the settings kept by settings.js. Changes apply and save straight away.
+   Each control registers a function in `syncers`; all run again whenever a setting changes (here, in another
+   tab, or on the device) so what is shown never drifts from what is stored. */
 
 const syncers = [];
 const syncControls = () => syncers.forEach(sync => sync());
@@ -101,12 +99,10 @@ function systemSwitch(key, query, mainInput, effectiveValue) {
 
 /* Seasonal theme: Automatic follows the calendar (dates are in settings.js: automaticSeason); the
    others are always on and override it; Off never sets one. */
-// The picture on each card: Automatic shows every theme side by side (like the System colour theme),
-// each theme runs its own effect, and Off is a plain page. The effects are seasonal.js's own.
-// Automatic's picture: four little months (last, this and the next two), each with its themes' dates in their own colours, and this
-// month outlined. Built from SEASONS' own rules (so it can never disagree with them): every day is tested,
-// in both fireworks regions, and runs of days become bars. Friday 13th depends on the weekday, so it is
-// checked against the current year's calendar.
+// The picture on each card: each theme runs its own effect (seasonal.js) and Off is a plain page. Automatic shows
+// four small months (last, this and the next two) with each theme's dates as coloured bars, this month outlined.
+// It is built by testing every day against SEASONS' own rules, in both fireworks regions, so it can't disagree
+// with them; Friday 13th is checked against the current year's calendar.
 const SEASON_COLORS = { fireworks: '#4ade80', snowfall: '#7dd3fc', christmas: '#f87171', halloween: '#fb923c', friday13: '#a78bfa', aurora: '#2dd4bf', blossom: '#f9a8d4', easter: '#c4b5fd', anniversary: '#e879f9', aprilfools: '#d19a66', fireflies: '#facc15', leaves: '#c08a52' };
 const MONTH_ABBR = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const MONTH_LENGTHS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // a plain year: 29 Feb has no theme
@@ -180,8 +176,6 @@ function seasonPreview(value) {
   return tile;
 }
 
-// "When it's automatic", on its own line under the blurb: a calendar icon and short date labels. The text
-// is read out in full ("Automatic on: ...") rather than as an unlabelled icon.
 // A season's date entry (see SEASONS in settings.js) as a label in the visitor's date format. Plain strings
 // pass through. Ranges within one month are shortened where the format allows ("1 – 17 Dec", "Dec 1 – 17").
 const LABEL_YEAR = 2001; // any non-leap year: only the day and month are shown
@@ -210,6 +204,8 @@ function seasonDateLabel(entry, format = getSettings().dateFormat) {
   return `${first} – ${end}${note}`;
 }
 
+// "When it's automatic" line under a card's blurb: a calendar icon and short date labels, read out in full
+// ("Automatic on: ...") rather than as an unlabelled icon.
 function seasonDates(dates, live) {
   const whenIcon = el('span', { class: 'choice-when-icon', attrs: { 'aria-hidden': 'true' } }, [icon('calendar', 'icon-sm')]);
   const lines = dates.map(d => el('span', { class: 'choice-when-date', text: seasonDateLabel(d) }));

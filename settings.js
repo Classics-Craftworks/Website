@@ -1,14 +1,12 @@
 /* Visitor settings: storage, defaults and the helpers the rest of the site reads them through.
 
-   Loaded synchronously in <head> (after js-flag.js) so the saved look is on <html> before first
-   paint. The Settings page itself is settings-page.js.
-
-   Everything lives in one localStorage key as JSON. Anything missing, unreadable or unknown falls
-   back to its default, so a bad value can never break a page.
+   Loaded synchronously in <head> (after js-flag.js) so the saved look is on <html> before first paint. The
+   Settings page itself is settings-page.js. Everything lives in one localStorage key as JSON; anything missing,
+   unreadable or unknown falls back to its default.
 
    Attributes set on <html> (styles.css keys off these):
      data-theme          dark | light | oled   ("auto" is resolved to light or dark here)
-     data-accent         purple | magenta | pink | ... | auto   (absent = blue; auto = the seasonal theme's own colour, set in styles.css, blue with none)
+     data-accent         purple | magenta | pink | ... | auto   (absent = blue; auto = the seasonal theme's colour)
      data-contrast       high                  (absent = normal)
      data-motion         reduce                (absent = full motion)
      data-heading-font   plain                 (absent = pixel font)
@@ -16,7 +14,7 @@
      data-density        compact               (absent = comfortable spacing)
      data-sidebar        left                  (absent = side panels on the right)
      data-newtab         off                   (absent = external links open in a new tab)
-     data-season         fireworks | aprilfools | aurora | anniversary | blossom | easter | fireflies | snowfall | christmas | halloween | leaves | friday13 (absent = no seasonal theme; drawn by seasonal.js)
+     data-season         a key of SEASONS below (absent = no seasonal theme; drawn by seasonal.js)
 
    High contrast and reduced motion follow the device setting until the visitor changes them
    (stored as null = "follow the device"). */
@@ -102,20 +100,16 @@ function effectiveTheme(s = getSettings()) {
 }
 /* ---------- Seasonal themes ---------- */
 
-/* Every seasonal theme lives here. To add one: add an entry (and draw it in seasonal.js's EFFECTS, and
-   add its name to SETTING_CHOICES.seasonal). The Settings page builds its cards from this list.
-     (accent colour)    the "Automatic" accent setting gives each theme its own colour, defined in styles.css under
-                        "Automatic accent" (add a rule there for a new theme; without one the usual blue is used)
-     name, blurb        shown on the theme's card (its preview is the effect itself, from seasonal.js)
-     dates              the dates it is set automatically, shown on its card (one line each on the Settings page,
-                        with a clock icon). Each is { from: [month, day], to: [month, day] (omit for one day),
-                        note: "US" (optional, shown in brackets) }, written in the visitor's date format, a
-                        plain string for text that isn't a date ("Every Friday 13th"), or a function returning
-                        either (for dates that move: Easter's)
-     on(month, day, region, weekday, year)  true on a date it is set automatically (the visitor's local date;
-                             region is "US", "GB" or ""; weekday is 0 = Sunday to 6 = Saturday).
-                             The first theme that matches wins, so the order here is the priority: a theme
-                             that should give way to the others (Friday 13th) goes last. */
+/* Every seasonal theme lives here; the Settings page builds its cards from this list. To add one: add an entry,
+   draw it in seasonal.js's EFFECTS, add its name to SETTING_CHOICES.seasonal, and (optionally) give it an accent
+   colour in styles.css under "Automatic accent" (otherwise blue is used).
+     name, blurb  shown on the theme's card
+     dates        shown on its card, one line each with a calendar icon: { from: [month, day], to: [month, day]
+                  (omit for one day), note: "US" (optional) }, a plain string ("Every Friday 13th"), or a function
+                  returning either (for dates that move, like Easter)
+     on(month, day, region, weekday, year)  true on a date it is set automatically (visitor's local date; region
+                  "US", "GB" or ""; weekday 0 = Sunday). The first match wins, so order is priority: a theme that
+                  should give way to the others (Friday 13th) goes last. */
 /* Western (Gregorian) Easter Sunday as [month, day] for a year (the anonymous Gregorian algorithm).
    Orthodox churches use a different date and are not covered. */
 function easterSunday(year) {
