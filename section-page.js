@@ -987,9 +987,11 @@ function renderFlatSection(section) {
 /* ---------- Project sorting ----------
    A "Sort" dropdown above the project cards. Cards are reordered in place (not re-rendered), and the
    "Jump to project" panel follows. The choice is remembered per page in localStorage.
-   Options that couldn't change the order on a page (no dates, nothing archived) are left out. */
+   Options that couldn't change the order on a page (no dates, nothing archived) are left out.
+   Pages with both archived and active projects also get a "Hide archived" switch (remembered too). */
 
 const PROJECT_SORT_KEY = 'project-sort:'; // + page slug
+const PROJECT_HIDE_KEY = 'project-hide-archived:';
 
 // Newest release date (ISO) across a project's available downloads; '' if it has none.
 function projectUpdated(p) {
@@ -1121,36 +1123,76 @@ function buildSortDropdown({ options, current, label, menuId, onChange }) {
   };
 }
 
-// Adds the sort control to a project list and wires it up. `jump` is the "Jump to project" aside (or null).
+// Adds the sort control (and, where a page has archived projects, a "Hide archived" switch) to a project
+// list and wires it up. `jump` is the "Jump to project" aside (or null).
 function initProjectSort(section, entries, list, jump) {
   if (entries.length < 2) return;
   const options = projectSortOptions(entries);
-  const storeKey = PROJECT_SORT_KEY + slugify(section.heading);
-  const saved = storageGet(storeKey);
+  const pageSlug = slugify(section.heading);
+  const sortKey = PROJECT_SORT_KEY + pageSlug;
+  const hideKey = PROJECT_HIDE_KEY + pageSlug;
+  const saved = storageGet(sortKey);
   let current = options.some(o => o.key === saved) ? saved : 'default';
+
+  const archivedIds = new Set(entries.filter(e => projectArchived(e.project)).map(e => e.id));
+  const canHide = archivedIds.size > 0 && archivedIds.size < entries.length;
+  let hidden = canHide && storageGet(hideKey) === '1';
 
   const cards = new Map(entries.map(e => [e.id, list.querySelector(':scope > .project[id="' + CSS.escape(e.id) + '"]')]));
   const jumpList = jump && jump.querySelector('.jump-list');
   const jumpItems = new Map(jumpList ? [...jumpList.children].map(li => [li.querySelector('a').getAttribute('href').slice(1), li]) : []);
   const status = el('p', { class: 'visually-hidden', attrs: { role: 'status' } });
+  const count = el('p', { class: 'news-count project-count', attrs: { 'aria-hidden': 'true' } });
 
-  function apply(key) {
-    const option = options.find(o => o.key === key) || options[0];
+  function apply() {
+    const option = options.find(o => o.key === current) || options[0];
     const ordered = entries.map((e, index) => ({ ...e, index }))
       .sort((a, b) => option.compare(a, b) || a.index - b.index);
     ordered.forEach(({ id }) => {
       if (cards.get(id)) list.appendChild(cards.get(id));
       if (jumpItems.get(id)) jumpList.appendChild(jumpItems.get(id));
     });
-    status.textContent = `Sorted by ${option.label}`;
+    entries.forEach(({ id }) => {
+      const hide = hidden && archivedIds.has(id);
+      if (cards.get(id)) cards.get(id).hidden = hide;
+      if (jumpItems.get(id)) jumpItems.get(id).hidden = hide;
+    });
+    const shown = entries.length - (hidden ? archivedIds.size : 0);
+    count.replaceChildren('Showing ', el('strong', { text: `${shown} of ${entries.length}` }), ` ${entries.length === 1 ? 'project' : 'projects'}`);
+    status.textContent = `Sorted by ${option.label}` + (hidden ? `. ${archivedIds.size} archived hidden` : '');
   }
 
-  const control = buildSortDropdown({
+  const controls = [];
+  let hideInput = null;
+  if (canHide) {
+    hideInput = el('input', { attrs: { type: 'checkbox', role: 'switch', id: 'project-hide-archived' } });
+    hideInput.checked = hidden;
+    hideInput.addEventListener('change', () => {
+      hidden = hideInput.checked;
+      storageSet(hideKey, hidden ? '1' : '0');
+      apply();
+    });
+    controls.push(el('label', { class: 'project-hide-toggle', attrs: { for: 'project-hide-archived' } }, [
+      el('span', { class: 'news-sort-label', text: 'Hide archived' }),
+      el('span', { class: 'switch' }, [hideInput, el('span', { class: 'switch-track', attrs: { 'aria-hidden': 'true' } })])
+    ]));
+  }
+  const sorter = buildSortDropdown({
     options, current, label: 'Sort projects', menuId: 'project-sort-menu',
-    onChange: key => { current = key; storageSet(storeKey, key); apply(key); }
+    onChange: key => { current = key; storageSet(sortKey, key); apply(); }
   });
-  list.prepend(el('div', { class: 'news-toolbar project-toolbar' }, [control.node, status]));
-  if (current !== 'default') apply(current);
+  controls.push(sorter.node);
+
+  list.prepend(el('div', { class: 'news-toolbar project-toolbar' }, [count, ...controls, status]));
+
+  // A link to a hidden project (from the URL, or the search box) shows it rather than landing on nothing.
+  const revealLinked = () => {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (hidden && archivedIds.has(id)) { hidden = false; hideInput.checked = false; apply(); }
+  };
+  revealLinked();
+  window.addEventListener('hashchange', revealLinked);
+  apply();
 }
 
 // Side panel with a link to each project on the page. Reuses the news page's collapsible panel.

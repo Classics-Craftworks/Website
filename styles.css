@@ -1330,7 +1330,11 @@ main:focus, #catalog:focus { outline: none; }
 
 .project-list { display: flex; flex-direction: column; gap: var(--s-5); }
 /* Sort control above the cards: right-aligned, closer to the first card than the cards are to each other. */
-.project-toolbar { justify-content: flex-end; margin-bottom: calc(var(--s-3) - var(--s-5)); }
+.project-toolbar { column-gap: var(--s-4); margin-bottom: calc(var(--s-3) - var(--s-5)); }
+.project-count { margin-right: auto; }
+.project-toolbar .news-sort { margin-left: 0; }
+.project-hide-toggle { display: flex; align-items: center; gap: var(--s-3); cursor: pointer; }
+.project[hidden] { display: none; }
 
 /* Number of download-type columns in a card's table. */
 .project { --cols: 2; }
