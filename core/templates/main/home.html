@@ -19,14 +19,18 @@
         <div id="stats-grid" class="stats-grid"></div>
         <p id="stats-updated" class="stats-updated"></p>
       </section>
+{{#if hasProjects}}
       <aside id="splash-featured" class="splash-featured" aria-label="Featured project"></aside>
+{{/if}}
     </div>
   </section>
 
+{{#if hasProjects}}
   <section id="projects" class="projects-intro" aria-labelledby="projects-heading">
     <h2 id="projects-heading" class="projects-heading"></h2>
     <p id="projects-subtitle" class="projects-subtitle"></p>
   </section>
+{{/if}}
 
   <main id="catalog" tabindex="-1">
     <div class="skel-grid" data-skeleton aria-hidden="true"><span class="skel skel-card"></span><span class="skel skel-card"></span><span class="skel skel-card"></span></div>

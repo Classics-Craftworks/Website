@@ -246,11 +246,13 @@ function seasonToday() {
   return line;
 }
 
-// A site can reword a season's description for itself with SITE_DATA.seasonBlurbs (e.g. a site that keeps its own
-// name on April Fools); otherwise the shared text from settings.js is used.
+// A site can reword a season's description for itself with SITE_DATA.seasonBlurbs; otherwise the shared text from
+// settings.js is used, and April Fools names the site's SITE_DATA.brand.aprilFoolsName when it has one.
 function seasonBlurb(key, season) {
   const own = typeof SITE_DATA !== 'undefined' && SITE_DATA.seasonBlurbs && SITE_DATA.seasonBlurbs[key];
-  return own || season.blurb;
+  if (own) return own;
+  const foolsName = key === 'aprilfools' && typeof SITE_DATA !== 'undefined' && SITE_DATA.brand && SITE_DATA.brand.aprilFoolsName;
+  return foolsName ? `The site becomes "${foolsName}", in mud brown.` : season.blurb;
 }
 
 const SEASON_OPTIONS = [

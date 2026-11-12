@@ -19,6 +19,12 @@ module.exports = {
 
   cachePrefix: 'ccw',   // service worker cache name: <prefix>-cache-v<core cacheVersion>
 
+  // Optional parts of the shared core this site uses (core/features/<name>/):
+  //   catalog  project pages, release tables, project cards on the home page, header search, download dots
+  //   landing  home-page blocks for a single-purpose site: features, how to join, supported versions
+  // The build checks SITE_DATA matches: sections need "catalog", home.features/join/versions need "landing".
+  features: ['catalog'],
+
   ogImage: { path: 'images/share.jpg', type: 'image/jpeg', width: 1200, height: 630, alt: "Classic's Craftworks logo" },
 
   // Links in the "JavaScript is off" notice.

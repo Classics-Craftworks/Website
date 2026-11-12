@@ -20,7 +20,7 @@
    (stored as null = "follow the device"). */
 
 const SETTINGS_KEY = 'settings';
-const SETTINGS_EVENT = 'ccw:settings'; // fired on document after every change; detail = settings
+const SETTINGS_EVENT = 'site:settings'; // fired on document after every change; detail = settings
 
 const SETTING_CHOICES = {
   theme: ['auto', 'dark', 'oled', 'light'],
@@ -159,7 +159,7 @@ const SEASONS = {
   // April Fools comes before Easter (the Easter weekend can include 1 April), and Easter before Cherry
   // Blossom (whose last week it can overlap), so each takes the days it shares with the ones after it.
   aprilfools: {
-    name: 'April Fools', blurb: 'The site becomes "Classic\'s Mudworks", in mud brown.',
+    name: 'April Fools', blurb: 'The site turns mud brown.',   // settings-page.js adds the site's own April Fools name, if it has one
     dates: [{ from: [4, 1] }],
     on: (month, day) => month === 4 && day === 1
   },

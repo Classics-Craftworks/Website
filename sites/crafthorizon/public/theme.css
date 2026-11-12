@@ -63,11 +63,5 @@
 .pv[data-pv="oled"] { --pv-bg: #000000; --pv-surface: #110c1e; --pv-line: #3c2f63; }
 .pv[data-pv="light"] { --pv-bg: #f8f5fd; --pv-surface: #ffffff; --pv-text: #1a1030; --pv-line: #c3b2e3; }
 
-/* ---------- Logo and April Fools ---------- */
+/* ---------- Logo ---------- */
 .brand-logo, .footer-logo { border-radius: var(--r-1); }
-
-/* April Fools swaps the site name for "Classic's Mudworks"; keep this site's own name instead. */
-:root[data-season="aprilfools"] .brand-name,
-:root[data-season="aprilfools"] .footer-brand-name { color: inherit; }
-:root[data-season="aprilfools"] .brand-name::after,
-:root[data-season="aprilfools"] .footer-brand-name::after { content: none; }

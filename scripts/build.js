@@ -4,12 +4,14 @@
      node scripts/build.js                 build every site in sites/
      node scripts/build.js classic36       build just that one
 
-   A site is made from three layers, later ones winning:
-     1. core/static/            shared code, styles, fonts and icons
-     2. sites/<id>/public/      the site's own data, images and (optional) theme.css; a file with the
-                                same path as a core file replaces it
-     3. generated               HTML pages, manifest.json, sitemap.xml, robots.txt and sw.js, made from
-                                core/templates/ and sites/<id>/site.config.js
+   A site is made from four layers, later ones winning:
+     1. core/shell/            shared code, styles, fonts and icons (what every site needs)
+     2. core/features/<name>/  the features the site lists in `features` in its site.config.js: scripts,
+                               and styles spliced into styles.css (see "Feature styles" below)
+     3. sites/<id>/public/     the site's own data, images and (optional) theme.css; a file with the
+                               same path as a core file replaces it
+     4. generated              HTML pages, manifest.json, sitemap.xml, robots.txt and sw.js, made from
+                               core/templates/ and sites/<id>/site.config.js
 
    No dependencies: plain Node 18+. */
 
@@ -19,6 +21,8 @@ const vm = require('vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const CORE = path.join(ROOT, 'core');
+const SHELL = path.join(CORE, 'shell');
+const FEATURES = path.join(CORE, 'features');
 const SITES = path.join(ROOT, 'sites');
 const DIST = path.join(ROOT, 'dist');
 
@@ -65,9 +69,10 @@ function loadSiteData(file) {
 
 // ---------- page kinds ----------
 
-// Scripts every page loads, in order: [before data] data [home only: stats] latest-updates section-page [extras] search.
+// What each kind of page loads besides the shell. `extras` are the page's own scripts (after the shell's start-up
+// and the features' scripts, so hooks are registered by then); `stats` adds the home page figures.
 const PAGE_KINDS = {
-  home:     { skip: ['#catalog', 'Skip to projects'],  action: 'build its project catalog', backToTop: true,  extras: ['news', 'index'], stats: true },
+  home:     { skip: ['#catalog', 'Skip to projects'],  action: 'build its project catalog', backToTop: true,  extras: ['news', 'home'], stats: true },
   section:  { skip: ['#catalog', 'Skip to projects'],  action: 'build its project catalog', backToTop: true,  extras: [], dataPage: true },
   about:    { skip: ['#about', 'Skip to content'],     action: 'build its pages',           backToTop: false, extras: ['about'] },
   news:     { skip: ['#news-page', 'Skip to content'], action: 'build its pages',           backToTop: true,  extras: ['news'] },
@@ -75,10 +80,53 @@ const PAGE_KINDS = {
   notfound: { skip: null,                              action: null,                        backToTop: false, extras: ['404'] }
 };
 
-function scriptTags(kind) {
+// Feature manifests (core/features/<name>/feature.json). A script runs on `pages` (page kinds; default all) in
+// `phase` "base" (right after the shell, before the page's own scripts: it registers hooks) or "late" (after them).
+function loadFeatures(config) {
+  const names = config.features || [];
+  return names.map(name => {
+    const dir = path.join(FEATURES, name);
+    if (!fs.existsSync(path.join(dir, 'feature.json'))) {
+      const known = fs.existsSync(FEATURES) ? fs.readdirSync(FEATURES).filter(f => fs.existsSync(path.join(FEATURES, f, 'feature.json'))) : [];
+      fail(`site.config.js: unknown feature "${name}". Features: ${known.join(', ') || '(none)'}`);
+    }
+    return { name, dir, ...JSON.parse(read(path.join(dir, 'feature.json'))) };
+  });
+}
+
+// Scripts every page loads, in order: site-error, seasonal, data, [home only: stats], latest-updates, shell,
+// the features' "base" scripts, shell-init, the page's own scripts, the features' "late" scripts.
+function scriptTags(kind, features) {
   const k = PAGE_KINDS[kind];
-  const names = ['site-error', 'seasonal', 'data', ...(k.stats ? ['stats'] : []), 'latest-updates', 'section-page', ...k.extras, 'search'];
+  const forPage = phase => features.flatMap(f => (f.scripts || [])
+    .filter(sc => (sc.phase || 'base') === phase && (!sc.pages || sc.pages.includes(kind)))
+    .map(sc => sc.file.replace(/\.js$/, '')));
+  const names = ['site-error', 'seasonal', 'data', ...(k.stats ? ['stats'] : []), 'latest-updates', 'shell',
+    ...forPage('base'), 'shell-init', ...k.extras, ...forPage('late')];
   return names.map(n => `<script src="/${n}.js" defer></script>`).join('\n');
+}
+
+// Feature styles: core/shell/styles.css has marker lines like /*@include catalog/release-table*/ where a feature's
+// rules (core/features/catalog/css/release-table.css) belong in the cascade. The marker is replaced by the file
+// when the site has that feature and by nothing when it doesn't, so a rule keeps exactly the position it had when
+// everything lived in one stylesheet.
+function buildStyles(features) {
+  const enabled = new Map(features.map(f => [f.name, f]));
+  const used = new Set();
+  const css = read(path.join(SHELL, 'styles.css')).replace(/^([ \t]*)\/\*@include ([\w-]+)\/([\w-]+)\*\/[ \t]*\n/gm, (_, indent, feature, part) => {
+    const file = path.join(FEATURES, feature, 'css', `${part}.css`);
+    if (!fs.existsSync(file)) fail(`core/shell/styles.css: no stylesheet for "@include ${feature}/${part}"`);
+    if (!enabled.has(feature)) return '';
+    used.add(`${feature}/${part}`);
+    return read(file).trimEnd().split('\n').map(line => line ? indent + line : line).join('\n') + '\n';
+  });
+  for (const f of features) {
+    const dir = path.join(f.dir, 'css');
+    for (const file of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
+      if (!used.has(`${f.name}/${file.replace(/\.css$/, '')}`)) fail(`core/features/${f.name}/css/${file} is not included by any marker in core/shell/styles.css`);
+    }
+  }
+  return css;
 }
 
 // ---------- build ----------
@@ -93,8 +141,15 @@ function buildSite(id) {
   const out = path.join(DIST, id);
   fs.rmSync(out, { recursive: true, force: true });
 
-  // Layers 1 and 2.
-  copyDir(path.join(CORE, 'static'), out);
+  const features = loadFeatures(config);
+  const has = name => features.some(f => f.name === name);
+
+  // Layers 1 to 3.
+  copyDir(SHELL, out);
+  for (const f of features) {
+    for (const sc of f.scripts || []) fs.copyFileSync(path.join(f.dir, sc.file), path.join(out, sc.file));
+  }
+  write(path.join(out, 'styles.css'), buildStyles(features));
   copyDir(path.join(siteDir, 'public'), out);
 
   // The nav, brand name and logo come from the site's data.js.
@@ -118,8 +173,14 @@ function buildSite(id) {
     }
   }
 
-  // A site with no project sections (a single-project site) gets no "Projects" footer column and no project wording.
-  const hasProjects = (data.sections || []).some(sec => (sec.projects || []).length > 0);
+  // The data and the features must agree: content for a feature the site didn't enable would silently not show.
+  if (!has('catalog') && (data.sections || []).length) fail(`SITE_DATA.sections is set but site.config.js doesn't list the "catalog" feature`);
+  if (has('catalog') && !(data.sections || []).length) fail(`site.config.js lists the "catalog" feature but SITE_DATA has no sections`);
+  const home = data.home || {};
+  if (!has('landing') && (home.features || home.join || home.versions)) fail(`SITE_DATA.home has features/join/versions blocks but site.config.js doesn't list the "landing" feature`);
+
+  // A site without the catalogue gets no "Projects" footer column, no featured card and no project wording.
+  const hasProjects = has('catalog');
   const hasTheme = fs.existsSync(path.join(out, 'theme.css'));
   const og = config.ogImage;
   const noscriptLinks = config.noscriptLinks
@@ -165,9 +226,9 @@ function buildSite(id) {
       noscriptLinks,
       noscriptFind: hasProjects ? 'find our projects on' : 'find us on',
       logo: esc('/' + data.brand.logo),
-      main: mainTemplate(page.kind),
+      main: render(mainTemplate(page.kind), { hasProjects }, `main/${page.kind}`),
       backToTop: k.backToTop,
-      scripts: scriptTags(page.kind)
+      scripts: scriptTags(page.kind, features)
     }, `page ${file}`);
     write(path.join(out, file), html);
   }

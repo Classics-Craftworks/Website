@@ -19,7 +19,8 @@ const SITE_DATA = {
 
   brand: {
     logo: "images/logo.png",
-    name: "CLASSIC'S CRAFTWORKS"
+    name: "CLASSIC'S CRAFTWORKS",
+    aprilFoolsName: "Classic's Mudworks"   // swapped in for the name on April Fools; leave out to keep the name
   },
 
   version: {

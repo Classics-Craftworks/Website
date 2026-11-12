@@ -1,0 +1,106 @@
+.project-header { display: flex; align-items: center; gap: var(--s-5); padding: var(--s-5); }
+
+.project-image {
+  display: block;
+  flex: none;
+  width: calc(var(--s-8) + var(--s-4));
+  height: calc(var(--s-8) + var(--s-4));
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: var(--r-1);
+  background: var(--surface-2);
+}
+
+.project-info { display: flex; flex-direction: column; gap: var(--s-1); min-width: 0; }
+
+.project-info h2 { padding-right: calc(var(--s-2) + 16px); font-size: var(--text-xl); line-height: var(--lh-xl); }
+
+/* room for the copy-link icon */
+
+.project-description { max-width: var(--measure); color: var(--text-soft); }
+
+.project-body { display: flex; flex-direction: column; gap: var(--s-4); padding: 0 var(--s-5) var(--s-5); }
+
+/* Footer strip: icon links to the project's pages, "Older versions" on the right. */
+
+.project-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-1) var(--s-4);
+  padding: var(--s-2) var(--s-4);
+  border-top: 1px solid var(--border);
+}
+
+.project:not(:has(.project-body)) .project-footer { border-top: 0; padding-top: 0; }
+
+.project-links { display: flex; flex-wrap: wrap; gap: var(--s-1); margin: 0; padding: 0; list-style: none; }
+
+.project-link, .project-older {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--hit);
+  padding: 0 var(--s-3);
+  border-radius: var(--r-1);
+  font-size: var(--text-sm);
+  line-height: var(--lh-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color var(--ease), color var(--ease);
+}
+
+.project-link { color: var(--text); }
+
+.project-older { color: var(--text-soft); }
+
+@media (hover: hover) {
+  .project-link:hover, .project-older:hover { background: var(--surface-2); }
+  .project-older:hover { color: var(--text); }
+}
+
+@media (max-width: 720px) {
+  .project-header { gap: var(--s-4); padding: var(--s-4); }
+  .project-image { width: var(--s-8); height: var(--s-8); }
+  .project-info h2 { font-size: var(--text-lg); line-height: var(--lh-lg); }
+  .project-body { padding: 0 var(--s-4) var(--s-4); }
+}
+
+/* Title doubles as the copy-link button. */
+
+.copy-link-btn {
+  position: relative;
+  padding: 0;
+  border: 0;
+  border-radius: var(--r-1);
+  background: transparent;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.copy-link-btn > span:first-child { transition: color var(--ease); }
+
+.copy-link-btn .icon-sm {
+  /* Takes no line width, so the icon can never wrap onto a line of its own. */
+  margin: 0 calc((var(--s-2) + 16px) * -1) 0 var(--s-2);
+  position: relative;
+  top: -0.1em; /* optically centres the icon on the capitals */
+  vertical-align: middle;
+  color: var(--text-soft);
+  transition: color var(--ease);
+}
+
+@media (hover: hover) {
+  .copy-link-btn:hover > span:first-child, .copy-link-btn:hover .icon-sm { color: var(--accent); }
+}
+
+.copy-link-btn:focus-visible > span:first-child, .copy-link-btn:focus-visible .icon-sm,
+.copy-link-btn.is-copied .icon-sm { color: var(--accent); }
+
+/* The tooltip is a child of a display-face heading; keep it in the body face. */
+
+.copy-link-btn[data-tooltip]::after { font-family: var(--font-body); font-weight: 500; letter-spacing: 0; text-transform: none; }

@@ -1,0 +1,208 @@
+/* ---------- Release table ---------- */
+
+/* Release table: one column per channel (Release, Beta), one row per download type. Narrower screens stack each
+   cell's contents; below 656px the table is one column and each cell carries its own label. */
+
+.rt { container: release-table / inline-size; }
+
+.release-table { border: 1px solid var(--border); border-radius: var(--r-1); }
+
+.rt-row { display: grid; grid-template-columns: minmax(var(--label-w), 0.5fr) repeat(var(--cols), minmax(0, 1fr)); border-top: 1px solid var(--border); }
+
+.rt [data-channel="stable"]      { --channel-color: var(--ch-stable);      --channel-rgb: var(--ch-stable-rgb); }
+
+.rt [data-channel="beta"]        { --channel-color: var(--ch-beta);        --channel-rgb: var(--ch-beta-rgb); }
+
+.rt [data-channel="alpha"]       { --channel-color: var(--ch-alpha);       --channel-rgb: var(--ch-alpha-rgb); }
+
+.rt [data-channel="unsupported"] { --channel-color: var(--ch-unsupported); --channel-rgb: var(--ch-unsupported-rgb); }
+
+.rt-head { border-top: 0; border-radius: calc(var(--r-1) - 1px) calc(var(--r-1) - 1px) 0 0; background: var(--surface-2); }
+
+.rt-colhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1) var(--s-3);
+  min-width: 0;
+  padding: var(--s-3) var(--s-4);
+  border-left: 1px solid var(--border);
+}
+
+.rt-colhead:first-child { border-left: 0; }
+
+/* Row title: the download type. */
+
+.rt-rowhead {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+  padding: var(--s-4) var(--s-3);
+  color: var(--text-soft);
+  font-size: var(--text-xs);
+  line-height: var(--lh-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rt-channel { display: flex; align-items: center; gap: var(--s-2); font-size: var(--text-md); line-height: var(--lh-md); }
+
+.rt-cell-label { display: none; }
+
+.rt-version { display: inline-flex; align-items: center; gap: var(--s-2); }
+
+.rt-version .news-new-dot { flex: none; margin-right: 0; vertical-align: baseline; }
+
+.status-dot { flex: none; width: var(--s-2); height: var(--s-2); background: var(--channel-color); }
+
+.rt [data-channel="stable"] .status-dot { border-radius: 50%; }
+
+.rt [data-channel="beta"] .status-dot { border-radius: 0; transform: rotate(45deg); }
+
+.rt [data-channel="alpha"] .status-dot { border-radius: 0; }
+
+.rt [data-channel="unsupported"] .status-dot { border-radius: var(--r-0); }
+
+.channel-label { color: var(--channel-color); font-weight: 600; }
+
+.rt-java { color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); white-space: nowrap; }
+
+.rt-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  min-width: 0;
+  padding: var(--s-4) var(--s-3);
+  border-left: 1px solid var(--border);
+}
+
+.rt-meta { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-2); }
+
+/* Version pill: a tag, tinted in the channel colour. */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: var(--s-5);
+  padding: 0 var(--s-2);
+  border: 1px solid rgba(var(--channel-rgb), var(--tint-3));
+  border-radius: var(--r-pill);
+  background: rgba(var(--channel-rgb), var(--tint-2));
+  color: var(--channel-color);
+  font-size: var(--text-xs);
+  line-height: var(--lh-xs);
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.rt-date { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--text-soft); font-size: var(--text-sm); line-height: var(--lh-sm); white-space: nowrap; }
+
+.rt-date.is-placeholder { font-style: italic; }
+
+.rt-date.has-tooltip { position: relative; cursor: default; }
+
+/* One width for every version button. The 44px hit area is added without changing the 40px control. */
+
+.download-btn { position: relative; flex: none; width: var(--action-w); min-height: var(--control-h); padding: 0 var(--s-2); }
+
+.download-btn::after { content: ''; position: absolute; inset: calc((var(--control-h) - var(--hit)) / 2) 0; }
+
+.download-btn:focus-visible { outline-color: var(--channel-color); }
+
+/* Every channel's button is filled in its own colour. */
+
+.rt-cell .download-btn { background: var(--channel-color); border-color: var(--channel-color); color: var(--on-accent); }
+
+@media (hover: hover) {
+  .rt-cell .download-btn:hover { background: color-mix(in srgb, var(--channel-color), var(--hover-mix) 16%); border-color: color-mix(in srgb, var(--channel-color), var(--hover-mix) 16%); }
+}
+
+/* A missing build fills its whole cell. */
+
+.rt-cell.is-unavailable { align-items: stretch; }
+
+.download-unavailable {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: var(--control-h);
+  border: 1px dashed var(--border-2);
+  border-radius: var(--r-1);
+  color: var(--text-soft);
+  font-size: var(--text-sm);
+  line-height: var(--lh-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  user-select: none;
+  cursor: not-allowed;
+}
+
+/* Tooltip is centred on the box (the default placement); long text wraps. */
+
+.download-unavailable[data-tooltip]::after { width: max-content; max-width: 224px; white-space: normal; text-align: center; }
+
+/* A one-channel table is one label column plus one cell wide, rather than stretching across the card. */
+
+.release-table[data-cols="1"] { flex: 0 1 calc(var(--label-w) + var(--cell-w)); max-width: calc(var(--label-w) + var(--cell-w)); }
+
+.rt-with-note { display: flex; flex-wrap: wrap; align-items: stretch; gap: var(--s-4); }
+
+.rt-with-note > .release-table { min-width: 0; }
+
+.rt-with-note > .project-note { flex: 1 1 var(--s-9); min-width: calc(var(--s-9) * 2 + var(--s-6)); align-items: center; }
+
+/* Medium: not enough room for details beside the button, so the cell stacks. */
+
+@container release-table (max-width: 803px) {
+  .rt-cell { flex-direction: column; align-items: flex-start; justify-content: center; gap: var(--s-3); }
+  .rt-cell.is-unavailable { align-items: stretch; }
+}
+
+/* Narrow: one column; each cell shows its own channel label. */
+
+@container release-table (max-width: 655px) {
+  .rt-head { display: none; }
+  .rt-head + .rt-row { border-top: 0; }
+  .rt-row { grid-template-columns: minmax(0, 1fr); }
+  .rt-rowhead { padding-bottom: 0; }
+  /* Cell grid: channel + version tag, date at the top right, Java versions below, then the button. */
+  .rt-cell { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--s-2) var(--s-3); border-left: 0; border-top: 0; }
+  .rt-cell + .rt-cell { padding-top: var(--s-2); }
+  .rt-cell-label, .rt-meta { display: contents; }
+  .rt-cell-label > .rt-channel { grid-column: 1; grid-row: 1; }
+  .rt-version { grid-column: 2; grid-row: 1; justify-self: start; }
+  .rt-date { grid-column: 3; grid-row: 1; justify-self: end; }
+  .rt-cell-label > .rt-java { grid-column: 1 / -1; grid-row: 2; }
+  .rt-cell .download-btn, .rt-cell .download-unavailable { grid-column: 1 / -1; width: 100%; }
+}
+
+/* Very narrow: there is no room for the date beside the tag, so it moves down beside the Java versions. */
+
+@container release-table (max-width: 299px) {
+  .rt-date { grid-row: 2; }
+  .rt-cell-label > .rt-java { grid-column: 1 / 3; white-space: normal; }
+}
+
+/* Project note (archived and unsupported projects). */
+
+.project-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border-radius: var(--r-1);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  font-size: var(--text-sm);
+  line-height: var(--lh-sm);
+}
+
+.project-note .icon { margin-top: var(--s-1); flex: none; }

@@ -1,0 +1,3 @@
+.notice-close[data-tooltip]::after { left: auto; right: 0; transform: translateY(-4px); }
+
+.notice-close[data-tooltip]:hover::after, .notice-close[data-tooltip]:focus-visible::after { transform: translateY(-8px); }

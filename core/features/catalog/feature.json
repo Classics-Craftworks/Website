@@ -1,0 +1,8 @@
+{
+  "description": "Project catalogue: section pages with release tables, project cards on the home page, header search, download dots.",
+  "scripts": [
+    { "file": "catalog.js" },
+    { "file": "catalog-home.js", "pages": ["home"] },
+    { "file": "search.js", "phase": "late" }
+  ]
+}

@@ -166,11 +166,6 @@ const SITE_DATA = {
     { label: "DanNPDog Studios", url: "https://dannpdog.co.uk", icon: "newtab" }
   ],
 
-// April Fools turns the site brown but keeps this site's own name (see theme.css).
-  seasonBlurbs: {
-    aprilfools: "The site turns mud brown."
-  },
-
   footer: {
     copyright: "© 2025–2026 CraftHorizon",
     disclaimer: "NOT AN OFFICIAL MINECRAFT PRODUCT OR SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.",

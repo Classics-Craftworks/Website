@@ -16,6 +16,8 @@ module.exports = {
 
   cachePrefix: 'crafthorizon',
 
+  features: ['landing'],   // see sites/classics-craftworks/site.config.js for what each feature is
+
   ogImage: { path: 'images/share.jpg', type: 'image/jpeg', width: 1200, height: 630, alt: 'CraftHorizon logo over a starry galaxy' },
 
   noscriptLinks: [

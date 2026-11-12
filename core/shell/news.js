@@ -1,5 +1,5 @@
 /* News feed: renders LATEST_UPDATES (format documented in latest-updates.js) as the
-   home page preview and the full News page. Needs latest-updates.js, data.js and section-page.js (shared helpers, incl. news date/tag/link builders). */
+   home page preview and the full News page. Needs latest-updates.js, data.js and shell.js (shared helpers, incl. news date/tag/link builders). */
 
 // Tag keys in use: those listed in `tags` first (in that order), then any others.
 function usedTagKeys(entries) {
@@ -34,18 +34,10 @@ function usedMcVersions(entries) {
   return [...used].sort((a, b) => compareMcVersions(b, a));
 }
 
-// Every project on the site, in site order.
+// Every project on the site, in site order: none unless a feature (the catalogue) registered some.
 let allProjectsCache;
 function allProjects() {
-  if (!allProjectsCache) {
-    allProjectsCache = (SITE_DATA.sections || []).flatMap(section =>
-      sectionIds(section).projects.map(({ id, project }) => ({
-        id,
-        title: project.title,
-        image: project.image || null,
-        modrinth: ((project.links || []).find(l => l.label === 'Modrinth') || {}).url || null
-      })));
-  }
+  if (!allProjectsCache) allProjectsCache = SITE_HOOKS.projects();
   return allProjectsCache;
 }
 

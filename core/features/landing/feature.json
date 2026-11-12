@@ -1,0 +1,6 @@
+{
+  "description": "Landing blocks on the home page for a single-purpose site: features, how to join, supported versions.",
+  "scripts": [
+    { "file": "landing.js", "pages": ["home"] }
+  ]
+}
