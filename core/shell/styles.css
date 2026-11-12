@@ -2588,6 +2588,10 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 
 .nav-settings-menu .nav-dropdown-menu { left: auto; right: 0; transform: none; min-width: 264px; }
 
+/* With no search box before it (a site without the catalog feature) Settings is right after the nav links:
+   push it to the right-hand end of the header. With search, the box's own auto margin does that. */
+@media (min-width: 901px) { .site-nav + .nav-settings-menu { margin-left: auto; } }
+
 @media (min-width: 901px) {
   .nav-settings-menu .nav-dropdown-menu::before { left: auto; right: 17px; transform: rotate(45deg); }
   .nav-settings-menu.is-open > .nav-settings { background: var(--surface-2); color: var(--text); }

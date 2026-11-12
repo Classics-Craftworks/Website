@@ -270,7 +270,7 @@ function navBadgeDot(count, noun = ['update', 'updates']) {
 }
 
 // Settings dropdown (header): quick toggles for dark mode and the seasonal theme, plus a link to the
-// full Settings page. Popover on desktop, accordion in the mobile menu. search.js moves it to the end
+// full Settings page. Popover on desktop, accordion in the mobile menu. Added to the menu after the nav; search.js moves it to the end
 // of the header (.nav-settings-menu).
 const SEASON_PREV_KEY = 'seasonal-prev';
 
@@ -521,7 +521,9 @@ function renderSiteHeader(pages, currentUrl) {
   }
   if (about) nav.appendChild(pageLink(about, 'nav-link'));
   externalPages.forEach(page => nav.appendChild(pageLink(page, 'nav-link')));
-  if (settingsPage) nav.appendChild(buildSettingsMenu(settingsPage, currentUrl, mobile));
+  // Settings sits in the menu beside the nav, not inside it: the search box (catalog sites) then takes it to its
+  // right, and on a site without search the stylesheet pushes it to the far right of the header.
+  if (settingsPage) menuWrap.appendChild(buildSettingsMenu(settingsPage, currentUrl, mobile));
 
   // Mobile menu button; its pill totals every project page.
   const toggle = el('button', {
