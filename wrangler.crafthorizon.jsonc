@@ -1,0 +1,8 @@
+{
+  "name": "crafthorizon",
+  "compatibility_date": "2026-11-12",
+  "assets": {
+    "directory": "./dist/crafthorizon",
+    "not_found_handling": "404-page"
+  }
+}
