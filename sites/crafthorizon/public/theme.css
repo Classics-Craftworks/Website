@@ -1,0 +1,66 @@
+/* CraftHorizon theme: purple. Loaded after the shared styles.css, so these override its tokens.
+   The shared file sets the light and OLED themes with more specific selectors, so each is repeated here. */
+
+/* ---------- Dark (default) ---------- */
+:root {
+  --bg:         #0b0716;
+  --surface:    #130d24;
+  --surface-2:  #1b1432;
+  --border:     #2b2148;
+  --border-2:   #43356e;
+  --text-soft:  #a99fc8;
+
+  --accent:      #b78cf5;
+  --accent-rgb:  183, 140, 245;
+  --on-accent:   #0b0716;
+}
+
+:root[data-theme="oled"] {
+  --surface:    #0a0712;
+  --surface-2:  #110c1e;
+  --border:     #281f40;
+  --border-2:   #3c2f63;
+}
+
+/* ---------- Light ---------- */
+:root[data-theme="light"] {
+  --bg:         #f8f5fd;
+  --surface:    #ffffff;
+  --surface-2:  #efe9f9;
+  --border:     #ddd2f0;
+  --border-2:   #c3b2e3;
+  --text:       #1a1030;
+  --text-soft:  #594b79;
+
+  --accent:      #6d28d9;
+  --accent-rgb:  109, 40, 217;
+  --on-accent:   #ffffff;
+}
+
+/* The shared styles invert the logo in the light theme; this one is a full-colour picture. */
+:root[data-theme="light"] .brand-logo,
+:root[data-theme="light"] .footer-logo { filter: none; }
+
+/* ---------- High contrast ---------- */
+:root[data-contrast="high"] {
+  --text-soft: #e2dcf2;
+  --border:    #7b6aab;
+  --border-2:  #b6a6e0;
+}
+:root[data-contrast="high"][data-theme="oled"] { --border: #8271b3; --border-2: #bdaee6; }
+:root[data-contrast="high"][data-theme="light"] {
+  --text-soft:  #2a1f45;
+  --border:     #66558f;
+  --border-2:   #34285a;
+  --accent:     #4c1d95;
+  --accent-rgb: 76, 29, 149;
+}
+
+/* ---------- Logo and April Fools ---------- */
+.brand-logo, .footer-logo { border-radius: var(--r-1); }
+
+/* April Fools swaps the site name for "Classic's Mudworks"; keep this site's own name instead. */
+:root[data-season="aprilfools"] .brand-name,
+:root[data-season="aprilfools"] .footer-brand-name { color: inherit; }
+:root[data-season="aprilfools"] .brand-name::after,
+:root[data-season="aprilfools"] .footer-brand-name::after { content: none; }
