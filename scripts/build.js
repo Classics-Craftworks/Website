@@ -107,6 +107,7 @@ function buildSite(id) {
   // The page list here and the nav in data.js must describe the same pages.
   const bySlug = new Map(config.pages.map(p => [p.slug, p]));
   for (const nav of data.pages || []) {
+    if (/^https?:\/\//i.test(nav.url)) continue;   // an external link (the wiki, say) has no page here
     const slug = nav.url === '/' ? '' : nav.url;
     if (!bySlug.has(slug)) fail(`SITE_DATA.pages has "${nav.url}" but site.config.js has no page with slug "${slug}"`);
   }
@@ -117,6 +118,8 @@ function buildSite(id) {
     }
   }
 
+  // A site with no project sections (a single-project site) gets no "Projects" footer column and no project wording.
+  const hasProjects = (data.sections || []).some(sec => (sec.projects || []).length > 0);
   const hasTheme = fs.existsSync(path.join(out, 'theme.css'));
   const og = config.ogImage;
   const noscriptLinks = config.noscriptLinks
@@ -134,6 +137,8 @@ function buildSite(id) {
     const url = page.slug ? `${config.url}/${page.slug}` : `${config.url}/`;
     const file = page.slug ? `${page.slug}.html` : 'index.html';
     const social = page.social !== false;
+    const kindSkip = page.kind === 'home' && !hasProjects ? ['#catalog', 'Skip to content'] : k.skip;
+    const kindAction = page.kind === 'home' && !hasProjects ? 'show its content' : k.action;
     const html = render(pageTemplate, {
       lang: esc(config.lang),
       canonical: page.kind === 'notfound' ? '' : esc(url),
@@ -151,12 +156,14 @@ function buildSite(id) {
       ogImageHeight: esc(og.height),
       ogImageAlt: esc(og.alt),
       bodyAttrs: k.dataPage ? ` data-page="${esc(page.slug)}"` : '',
-      skipHref: k.skip ? k.skip[0] : '',
-      skipLabel: k.skip ? k.skip[1] : '',
+      skipHref: kindSkip ? kindSkip[0] : '',
+      skipLabel: kindSkip ? kindSkip[1] : '',
+      hasProjects,
       brandName: esc(data.brand.name),
       tagline: esc(page.tagline || config.tagline),
-      noscriptAction: k.action || '',
+      noscriptAction: kindAction || '',
       noscriptLinks,
+      noscriptFind: hasProjects ? 'find our projects on' : 'find us on',
       logo: esc('/' + data.brand.logo),
       main: mainTemplate(page.kind),
       backToTop: k.backToTop,

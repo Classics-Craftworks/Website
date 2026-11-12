@@ -1,8 +1,11 @@
-/* SITE DATA - all site text, links and project lists. The format is documented at the top of
-   sites/classics-craftworks/public/data.js (icons, channels, downloads, notes and so on).
+/* SITE DATA - all site text and links for the CraftHorizon site. This site is a single server, so it has no
+   project catalogue (no "sections"); the home page is built from the blocks below instead.
 
    - Icons: SVGs in core/static/images/icons/, referenced by filename without extension.
-   - New project: copy an existing project block. */
+   - home.splash.actions: the hero buttons ("primary" or "ghost"; an absolute url opens in a new tab).
+   - home.join / home.versions / home.features: the home page blocks, in that order. Text may be a string or an
+     array mixing strings with { link, url } / { bold } / { code } pieces. A block left out is not shown.
+   - Header pages: an absolute url (https://...) is an external link and opens in a new tab. */
 
 const SITE_DATA = {
 
@@ -12,7 +15,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v0.1.0",
+    label: "v0.2.0",
     url: "https://github.com/Classics-Craftworks/Website/blob/main/sites/crafthorizon/CHANGELOG.md"
   },
 
@@ -20,45 +23,112 @@ const SITE_DATA = {
     splash: {
       headline: ["CRAFT YOUR", "OWN HORIZON."],
       subtitle: "A whitelisted Minecraft server with a focus on vanilla+ Survival and Creative gameplay.",
-      featured: [
-        { title: "CraftHorizon", image: "images/featured-CH.webp" }
+      actions: [
+        { label: "How to join", url: "#how-to-join", icon: "compass", style: "primary" }
       ]
     },
 
-    projectsHeading: "Server Details",
-    projectsSubtitle: ""
-  },
+    features: {
+      id: "features",
+      heading: "What to expect",
+      intro: "Vanilla Minecraft at its core, with some extra content that fits right in.",
+      items: [
+        { icon: "compass", title: "Enhanced worlds", text: "New biomes and structures to explore, from Stardust Labs and the Dungeons & Taverns creators." },
+        { icon: "box", title: "Player shops & economy", text: "Build your wealth by trading, or set up a chest shop." },
+        { icon: "wrench", title: "Mechanics & recipes", text: "Quests, duels, Life Grace and extra crafting options that add depth without overwhelming the vanilla feel." },
+        { icon: "calendar", title: "Seasons & events", text: "A full calendar of seasonal changes, plus limited-time events with special content and rewards." },
+        { icon: "brush", title: "Creative tools", text: "Miniature blocks, player heads, custom paintings and WorldEdit for bigger builds." },
+        { icon: "heart", title: "Player-friendly systems", text: "Land claims, homes and teleports, with clear rules and active moderation." }
+      ]
+    },
 
-  // Header pages. Entries with a "section" go in the Projects dropdown and
-  // must match a section heading below; Home ("/"), News, About and Settings get their own links.
-  pages: [
-    { label: "Home", url: "/", icon: "home" },
-    { label: "Server", url: "server", section: "Server", icon: "compass" },
-    { label: "News", url: "news", icon: "news" },
-    { label: "About", url: "about", icon: "about" },
-    { label: "Settings", url: "settings", icon: "settings" }
-  ],
-
-  sections: [
-    {
-      heading: "Server",
-      projects: [
-        // #region ──────── CraftHorizon ────────
+    join: {
+      id: "how-to-join",
+      heading: "How to join",
+      intro: "CraftHorizon is whitelisted, so you need to apply before you can play.",
+      apply: {
+        heading: "Ready to play?",
+        text: "The application is short. You can also open a ticket in our Discord server instead.",
+        button: { label: "Apply to join", url: "https://dyno.gg/form/7270a72e", icon: "heart" },
+        secondary: { label: "Open a ticket on Discord", url: "https://discord.gg/bGsBKqBJXe", icon: "discord" }
+      },
+      steps: [
         {
-          image: "images/crafthorizon.webp",
-          imageAlt: "CraftHorizon logo over a starry galaxy",
-          title: "CraftHorizon",
-          description: "Whitelisted Minecraft server, with a focus on vanilla+ Survival and Creative gameplay.",
-          created: "2025-01-15",
-          links: [
-            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/server/crafthorizon" },
-            { label: "Trello", icon: "document", url: "https://trello.com/b/TK7pofcG/crafthorizon" },
-            { label: "Wiki", icon: "book", url: "https://classicscraftworks.gitbook.io/crafthorizon" }
+          title: "Apply",
+          text: [
+            "Submit the short application, or open a ticket in our Discord. We only accept people who are part of our creators' communities: ",
+            { link: "DanNPDog", url: "https://www.twitch.tv/dannpdog" },
+            " and ",
+            { link: "MinecraftArchitect90", url: "https://www.twitch.tv/minecraftarchitect90" },
+            "."
+          ]
+        },
+        {
+          title: "Wait for the whitelist",
+          text: "If you haven't been whitelisted within 24 hours, assume your application was rejected. You are welcome to re-apply after 7 days."
+        },
+        {
+          title: "Add the server",
+          text: "In Minecraft, go to Multiplayer, then Add Server, and enter the server address below. Bedrock players also enter the port; console players add CraftHorizonMC as an Xbox friend."
+        },
+        {
+          title: "Join and play",
+          text: "Select CraftHorizon in your server list and press Join Server."
+        }
+      ],
+      addresses: [
+        { label: "Java Edition", value: "mc.classicscraftworks.co.uk" },
+        { label: "Bedrock Edition", value: "mc.classicscraftworks.co.uk", port: "19132" }
+      ],
+      footnote: [
+        "mc.dannpdog.co.uk works as an alternative address. Step-by-step guides for Java, Bedrock and consoles are on the ",
+        { link: "wiki", url: "https://classicscraftworks.gitbook.io/crafthorizon/getting-started/how-to-join-the-server" },
+        "."
+      ]
+    },
+
+    versions: {
+      id: "versions",
+      heading: "Supported versions",
+      intro: "Join with any of these versions. The recommended ones give the best experience.",
+      asOf: "2026-11-09",
+      editions: [
+        {
+          name: "Java Edition",
+          icon: "box",
+          versions: [
+            { label: "26.1 – 26.1.2" },
+            { label: "26.2" },
+            { label: "26.3", recommended: true }
+          ]
+        },
+        {
+          name: "Bedrock Edition",
+          icon: "box",
+          versions: [
+            { label: "26.40 – 26.45" },
+            { label: "26.50 – 26.52" },
+            { label: "26.60 – 26.63", recommended: true, note: "26.60+" }
           ]
         }
-        // #endregion CraftHorizon
+      ],
+      footnote: [
+        "Bedrock Edition has some ",
+        { link: "limitations", url: "https://classicscraftworks.gitbook.io/crafthorizon/extra-documentation/bedrock-edition-limitations" },
+        " compared with Java."
       ]
-    }
+    },
+  },
+
+  // Header pages. Home ("/"), News, About and Settings are pages of this site; an entry with an absolute
+  // url (the wiki) links out.
+  pages: [
+    { label: "Home", url: "/", icon: "home" },
+    { label: "News", url: "news", icon: "news" },
+    { label: "Rules", url: "https://classicscraftworks.gitbook.io/crafthorizon/getting-started/server-rules", icon: "document" },
+    { label: "Wiki", url: "https://classicscraftworks.gitbook.io/crafthorizon", icon: "book" },
+    { label: "About", url: "about", icon: "about" },
+    { label: "Settings", url: "settings", icon: "settings" }
   ],
 
   // About page blocks, in order: "paragraph" | { heading } | { list: [] } |
@@ -86,11 +156,20 @@ const SITE_DATA = {
   },
 
   socials: [
+    { label: "X / Twitter", url: "https://x.com/CraftHorizonMC", icon: "x" },
+    { label: "YouTube", url: "https://youtube.com/@CraftHorizonMC", icon: "newtab" },
+    { label: "Twitch", url: "https://twitch.tv/CraftHorizonMC", icon: "newtab" },
+    { label: "Instagram", url: "https://instagram.com/CraftHorizonMC", icon: "newtab" },
     { label: "Modrinth", url: "https://modrinth.com/server/crafthorizon", icon: "modrinth" },
-    { label: "Wiki", url: "https://classicscraftworks.gitbook.io/crafthorizon", icon: "book" },
     { label: "Trello", url: "https://trello.com/b/TK7pofcG/crafthorizon", icon: "document" },
-    { label: "Classic's Craftworks", url: "https://classicscraftworks.co.uk", icon: "link" }
+    { label: "Classic's Craftworks", url: "https://classicscraftworks.co.uk", icon: "newtab" },
+    { label: "DanNPDog Studios", url: "https://dannpdog.co.uk", icon: "newtab" }
   ],
+
+// April Fools turns the site brown but keeps this site's own name (see theme.css).
+  seasonBlurbs: {
+    aprilfools: "The site turns mud brown."
+  },
 
   footer: {
     copyright: "© 2025–2026 CraftHorizon",

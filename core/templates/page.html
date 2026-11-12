@@ -56,7 +56,7 @@
     <p>{{tagline}}</p>
     <p>
       This site needs JavaScript enabled to {{noscriptAction}}.
-      Enable JavaScript to see the full site, or find our projects on
+      Enable JavaScript to see the full site, or {{noscriptFind}}
       {{noscriptLinks}}.
     </p>
   </div>
@@ -94,10 +94,12 @@
         </div>
       </div>
 
+{{#if hasProjects}}
       <nav class="footer-col" aria-label="Footer projects">
         <h2 class="footer-heading">Projects</h2>
         <ul id="footer-projects" class="footer-list"></ul>
       </nav>
+{{/if}}
 
       <div class="footer-col">
         <h2 class="footer-heading">Links</h2>

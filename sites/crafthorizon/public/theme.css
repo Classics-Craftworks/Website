@@ -56,6 +56,13 @@
   --accent-rgb: 76, 29, 149;
 }
 
+/* ---------- Colour theme previews (Settings) ----------
+   The previews draw each theme in its own colours whatever theme is active, so they can't read the live tokens;
+   these are this site's values for each theme (its --bg, --surface-2 and --border-2). */
+.pv { --pv-bg: #0b0716; --pv-surface: #1b1432; --pv-text: #f2f5fa; --pv-line: #43356e; }
+.pv[data-pv="oled"] { --pv-bg: #000000; --pv-surface: #110c1e; --pv-line: #3c2f63; }
+.pv[data-pv="light"] { --pv-bg: #f8f5fd; --pv-surface: #ffffff; --pv-text: #1a1030; --pv-line: #c3b2e3; }
+
 /* ---------- Logo and April Fools ---------- */
 .brand-logo, .footer-logo { border-radius: var(--r-1); }
 

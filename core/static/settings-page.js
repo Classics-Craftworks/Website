@@ -246,6 +246,13 @@ function seasonToday() {
   return line;
 }
 
+// A site can reword a season's description for itself with SITE_DATA.seasonBlurbs (e.g. a site that keeps its own
+// name on April Fools); otherwise the shared text from settings.js is used.
+function seasonBlurb(key, season) {
+  const own = typeof SITE_DATA !== 'undefined' && SITE_DATA.seasonBlurbs && SITE_DATA.seasonBlurbs[key];
+  return own || season.blurb;
+}
+
 const SEASON_OPTIONS = [
   { value: 'auto', name: 'Automatic', note: 'Each theme is set automatically on specific dates.' },
   // Calendar order. Names that aren't in SEASONS are placeholders for themes still to come: shown greyed
@@ -253,7 +260,7 @@ const SEASON_OPTIONS = [
   ...['fireworks', 'aurora', 'blossom', 'aprilfools', 'easter', 'anniversary', 'fireflies', 'friday13', 'halloween', 'leaves', 'snowfall', 'christmas'].map(key => {
     const season = SEASONS[key];
     return season
-      ? { value: key, name: season.name, note: season.blurb, dates: season.dates }
+      ? { value: key, name: season.name, note: seasonBlurb(key, season), dates: season.dates }
       : { value: 'soon-' + key, name: key, soon: true, note: 'Not available yet.' };
   }),
   { value: 'off', name: 'Off', note: 'No seasonal theme, and none set automatically.' }

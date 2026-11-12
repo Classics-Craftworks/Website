@@ -776,6 +776,7 @@ function renderSiteHeader(pages, currentUrl) {
   const newsPage = pages.find(p => p.url === 'news');
   const settingsPage = pages.find(p => p.url === 'settings');
   const projectPages = pages.filter(p => p.section);
+  const externalPages = pages.filter(p => /^https?:\/\//i.test(p.url)); // links out (the wiki), shown after About
 
   // Elements carrying a count pill; syncDots() redraws them at load and on back/forward restore.
   const dotTargets = [];
@@ -797,6 +798,14 @@ function renderSiteHeader(pages, currentUrl) {
   }
 
   function pageLink(page, className) {
+    // An absolute url (the wiki, say) is an external link: it opens in a new tab and says so.
+    if (/^https?:\/\//i.test(page.url)) {
+      return el('a', {
+        href: page.url,
+        class: className + ' nav-external',
+        attrs: { 'aria-label': `${page.label} (opens in a new tab)` }
+      }, [icon(page.icon, 'icon-sm'), el('span', { text: page.label }), icon('newtab', 'icon-sm nav-external-icon')]);
+    }
     const a = internalLink(className, page.url, [icon(page.icon, 'icon-sm'), el('span', { text: page.label })]);
     if (page.url === currentUrl) {
       a.classList.add('is-current');
@@ -879,6 +888,7 @@ function renderSiteHeader(pages, currentUrl) {
     nav.appendChild(newsLink);
   }
   if (about) nav.appendChild(pageLink(about, 'nav-link'));
+  externalPages.forEach(page => nav.appendChild(pageLink(page, 'nav-link')));
   if (settingsPage) nav.appendChild(buildSettingsMenu(settingsPage, currentUrl, mobile));
 
   // Mobile menu button; its pill totals every project page.

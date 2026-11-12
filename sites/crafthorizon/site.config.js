@@ -26,15 +26,9 @@ module.exports = {
   pages: [
     {
       kind: 'home', slug: '',
-      title: 'CraftHorizon | Whitelisted Minecraft Server',
-      description: 'CraftHorizon is a whitelisted Minecraft server with a focus on vanilla+ Survival and Creative gameplay.',
-      lastmod: '2026-11-12'
-    },
-    {
-      kind: 'section', slug: 'server',
-      title: 'Server - CraftHorizon',
-      description: 'The CraftHorizon Minecraft server: links to its wiki, Trello board and Modrinth page.',
-      tagline: 'Whitelisted Minecraft server.',
+      title: 'CraftHorizon | Minecraft Server',
+      description: 'CraftHorizon is a whitelisted Minecraft server with a focus on vanilla+ Survival and Creative gameplay. See how to join, apply for the whitelist and check the supported Java and Bedrock versions.',
+      ogDescription: 'A whitelisted Minecraft server with a focus on vanilla+ Survival and Creative gameplay. Apply to join today.',
       lastmod: '2026-11-12'
     },
     {
