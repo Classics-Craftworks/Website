@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.13.0 — 2026-11-12
+
+### Changed
+- The site is now built from a shared core, with no user-facing changes
+
+### Fixed
+- Fixed the browser's theme colour not following the site's background colour
+
 ## v4.12.0 — 2026-11-11
 
 ### Added
