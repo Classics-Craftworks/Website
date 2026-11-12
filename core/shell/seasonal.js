@@ -1856,6 +1856,10 @@
   let lastTime = 0;
   let mode = ''; // what is running now: season, motion and (for a still frame) theme
   let resizeTimer = 0;
+  // How many Settings previews are animating. While any is, the page's own picture holds still (see hold()):
+  // two full-speed canvas loops compete for the same frames, and a heavy background (Friday 13th's full-screen
+  // mist and flashes, say) made the small preview stutter.
+  let previewsRunning = 0;
 
   function fitCanvas() {
     const oldW = view.w;
@@ -1895,6 +1899,20 @@
     effect.still();
     clear();
     effect.draw(ctx);
+  }
+
+  // Called by a preview as it starts (+1) and stops (-1) animating. The background keeps the frame it was
+  // showing and carries on from there afterwards.
+  function hold(delta) {
+    previewsRunning = Math.max(0, previewsRunning + delta);
+    if (!canvas || !effect || !/\|moving$/.test(mode)) return;
+    if (previewsRunning > 0 && frame) {
+      cancelAnimationFrame(frame);
+      frame = 0;
+    } else if (previewsRunning === 0 && !frame) {
+      lastTime = performance.now();
+      frame = requestAnimationFrame(tick);
+    }
   }
 
   function onResize() {
@@ -1937,7 +1955,8 @@
       // Keep the picture already on screen when only the motion setting changed.
       if (!sameSeason || !effect) effect = EFFECTS[season](view);
       lastTime = performance.now();
-      frame = requestAnimationFrame(tick);
+      if (previewsRunning) { clear(); effect.draw(ctx); } // a preview is moving: show the picture, but don't run it
+      else frame = requestAnimationFrame(tick);
     }
   }
 
@@ -1974,6 +1993,13 @@
     let onScreen = false;
     let active = false; // pointer over, or focus inside, the card
     let bound = false;
+    let holding = false; // has told the page to hold still
+
+    const setHolding = on => {
+      if (holding === on) return;
+      holding = on;
+      hold(on ? 1 : -1);
+    };
 
     function fit() {
       const box = previewCanvas.getBoundingClientRect();
@@ -2014,7 +2040,7 @@
     function run() {
       cancelAnimationFrame(pframe);
       pframe = 0;
-      if (!onScreen || !pview.w) return;
+      if (!onScreen || !pview.w) { setHolding(false); return; }
       const reduced = typeof prefersReducedMotion === 'function' && prefersReducedMotion();
       if (active && !reduced) {
         if (!peffect) showStill(); // carries on from the still picture
@@ -2023,6 +2049,7 @@
       } else {
         showStill();
       }
+      setHolding(!!pframe);
     }
 
     function setActive(on) {
