@@ -1,47 +1,74 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <script src="/js-flag.js"></script>
   <script src="/settings.js"></script>
-  <link rel="canonical" href="https://classicscraftworks.co.uk/settings">
+{{#if canonical}}
+  <link rel="canonical" href="{{canonical}}">
+{{/if}}
   <link rel="icon" href="/images/favicon.png" type="image/png">
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#0d111a">
+  <meta name="theme-color" content="{{themeColor}}">
   <link rel="preload" href="/fonts/Inter-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/minercraftory.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
-  <title>Settings - Classic's Craftworks</title>
-  <meta name="description" content="Theme, accent colour, accessibility and display settings for Classic's Craftworks. Saved in your browser only." />
-  <meta name="robots" content="noindex" />
-</head>
-<body>
+{{#if hasTheme}}
+  <link rel="stylesheet" href="/theme.css">
+{{/if}}
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}" />
+{{#if robots}}
+  <meta name="robots" content="{{robots}}" />
+{{/if}}
+{{#if social}}
 
-<a href="#settings" class="skip-link">Skip to settings</a>
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="{{siteName}}" />
+  <meta property="og:title" content="{{title}}" />
+  <meta property="og:description" content="{{ogDescription}}" />
+  <meta property="og:image" content="{{ogImage}}" />
+  <meta property="og:image:type" content="{{ogImageType}}" />
+  <meta property="og:image:width" content="{{ogImageWidth}}" />
+  <meta property="og:image:height" content="{{ogImageHeight}}" />
+  <meta property="og:image:alt" content="{{ogImageAlt}}" />
+  <meta property="og:url" content="{{canonical}}" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{title}}" />
+  <meta name="twitter:description" content="{{ogDescription}}" />
+  <meta name="twitter:image" content="{{ogImage}}" />
+  <meta name="twitter:image:alt" content="{{ogImageAlt}}" />
+{{/if}}
+</head>
+<body{{bodyAttrs}}>
+
+{{#if skipHref}}
+<a href="{{skipHref}}" class="skip-link">{{skipLabel}}</a>
 
 <!-- Fallback when JavaScript is off. -->
 <noscript>
   <div class="noscript-notice" data-nosnippet>
-    <h1>CLASSIC'S CRAFTWORKS</h1>
-    <p>Minecraft Java Edition data packs, mods &amp; resource packs.</p>
+    <h1>{{brandName}}</h1>
+    <p>{{tagline}}</p>
     <p>
-      This site needs JavaScript enabled to build its pages.
+      This site needs JavaScript enabled to {{noscriptAction}}.
       Enable JavaScript to see the full site, or find our projects on
-      <a href="https://modrinth.com/organization/classics-craftworks">Modrinth</a>
-      or <a href="https://github.com/Classics-Craftworks">GitHub</a>.
+      {{noscriptLinks}}.
     </p>
   </div>
 </noscript>
 
-<!-- Logo and name are repeated here so they show before scripts run; keep in sync with SITE_DATA.brand. -->
+{{/if}}
+<!-- Logo and name are repeated here so they show before scripts run; they come from SITE_DATA.brand in data.js. -->
 <header class="site-header" id="site-header">
   <div class="site-header-inner" id="site-header-inner">
     <a class="brand" href="/">
-      <img id="brand-logo" class="brand-logo" src="/images/logo.png" alt="" width="44" height="44">
-      <span id="brand-name" class="brand-name">CLASSIC'S CRAFTWORKS</span>
+      <img id="brand-logo" class="brand-logo" src="{{logo}}" alt="" width="44" height="44">
+      <span id="brand-name" class="brand-name">{{brandName}}</span>
     </a>
     <div class="site-menu" id="site-menu">
       <nav id="site-nav" class="site-nav" aria-label="Main"></nav>
@@ -51,19 +78,17 @@
 
 <div class="page">
 
-  <main id="settings" class="settings" tabindex="-1">
-    <div data-skeleton aria-hidden="true"><span class="skel skel-title"></span><span class="skel skel-line w-80"></span><span class="skel skel-line"></span><span class="skel skel-line w-60"></span></div>
-  </main>
+{{main}}
 
   <footer class="site-footer">
     <div class="footer-grid">
       <div class="footer-col footer-brand-col">
         <a class="footer-logo-link" href="/" tabindex="-1" aria-hidden="true">
-          <img class="footer-logo" src="/images/logo.png" alt="" width="84" height="84">
+          <img class="footer-logo" src="{{logo}}" alt="" width="84" height="84">
         </a>
         <div class="footer-brand-text">
           <a class="footer-brand" href="/">
-            <span class="footer-brand-name">CLASSIC'S CRAFTWORKS</span>
+            <span class="footer-brand-name">{{brandName}}</span>
           </a>
           <p id="copyright" class="footer-line footer-copyright"></p>
         </div>
@@ -86,17 +111,13 @@
       <p id="site-version" class="footer-version"></p>
     </div>
   </footer>
+{{#if backToTop}}
 
   <button id="back-to-top" class="back-to-top" type="button" aria-label="Back to top" data-tooltip="Back to top"></button>
+{{/if}}
 
 </div>
 
-<script src="/site-error.js" defer></script>
-<script src="/seasonal.js" defer></script>
-<script src="/data.js" defer></script>
-<script src="/latest-updates.js" defer></script>
-<script src="/section-page.js" defer></script>
-<script src="/settings-page.js" defer></script>
-<script src="/search.js" defer></script>
+{{scripts}}
 </body>
 </html>

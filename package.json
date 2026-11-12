@@ -1,0 +1,11 @@
+{
+  "name": "sites",
+  "private": true,
+  "description": "Shared core plus per-site content for the Classic's Craftworks family of sites.",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "dev": "node scripts/dev.js",
+    "new-site": "node scripts/new-site.js"
+  }
+}

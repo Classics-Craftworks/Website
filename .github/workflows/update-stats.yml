@@ -7,6 +7,10 @@ on:
 
 permissions:
   contents: write
+  actions: write          # to start the deploy workflow (see the last step)
+
+env:
+  SITE: classics-craftworks   # the site whose stats this run updates
 
 jobs:
   update:
@@ -18,18 +22,23 @@ jobs:
         with:
           node-version: 24
 
-      - name: Fetch download and follower counts, bump version, update changelog and sitemap
-        run: node .github/scripts/update-stats.mjs
+      - name: Fetch download and follower counts, bump version, update changelog and sitemap date
+        run: node .github/scripts/update-stats.mjs "$SITE"
 
-      - name: Commit changes
+      - name: Commit changes and deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          if git diff --quiet -- stats.js data.js CHANGELOG.md sitemap.xml; then
+          DIR="sites/$SITE"
+          if git diff --quiet -- "$DIR/public/stats.js" "$DIR/public/data.js" "$DIR/CHANGELOG.md" "$DIR/site.config.js"; then
             echo "No changes."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          VERSION=$(grep -oP 'label:\s*"\Kv[^"]+' data.js | head -1)
-          git add stats.js data.js CHANGELOG.md sitemap.xml
+          VERSION=$(grep -oP 'label:\s*"\Kv[^"]+' "$DIR/public/data.js" | head -1)
+          git add "$DIR/public/stats.js" "$DIR/public/data.js" "$DIR/CHANGELOG.md" "$DIR/site.config.js"
           git commit -m "$VERSION: Update site stats"
           git push
+          # A push made with the built-in token doesn't start other workflows, so start the deploy directly.
+          gh workflow run deploy.yml --ref "${GITHUB_REF_NAME}"

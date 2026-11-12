@@ -6,42 +6,15 @@
    - Images: cache first, refreshed in the background at most every IMAGE_REFRESH_MS.
    - Uncached pages fall back to the home page when offline.
 
-   Bump CACHE when the strategy changes. SHELL is only a head start; anything else is
+   Bump cacheVersion in core/core.json when the strategy changes (it applies to every site). SHELL is only a head start; anything else is
    cached on first fetch. */
-const CACHE = 'ccw-cache-v12';
+const CACHE = '{{cache}}';
 const NETWORK_TIMEOUT_MS = 4000;
 const IMAGE_REFRESH_MS = 24 * 60 * 60 * 1000;
 const STAMP = 'x-sw-cached-at'; // header recording when an image was cached
 
 const SHELL = [
-  '/',
-  '/data-packs-mods',
-  '/resource-packs',
-  '/other-projects',
-  '/about',
-  '/news',
-  '/settings',
-  '/styles.css',
-  '/js-flag.js',
-  '/settings.js',
-  '/settings-page.js',
-  '/seasonal.js',
-  '/site-error.js',
-  '/data.js',
-  '/stats.js',
-  '/section-page.js',
-  '/index.js',
-  '/about.js',
-  '/news.js',
-  '/latest-updates.js',
-  '/search.js',
-  '/manifest.json',
-  '/fonts/Inter-Regular.woff2',
-  '/fonts/Inter-Medium.woff2',
-  '/fonts/Inter-SemiBold.woff2',
-  '/fonts/Inter-Bold.woff2',
-  '/fonts/minercraftory.woff2',
-  '/images/logo.png'
+{{shell}}
 ];
 
 self.addEventListener('install', event => {

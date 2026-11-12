@@ -52,8 +52,6 @@ const SETTING_DEFAULTS = Object.freeze({
   externalNewTab: true
 });
 
-// Browser chrome colour per theme; keep in step with --bg in styles.css.
-const THEME_COLORS = { dark: '#0d111a', oled: '#000000', light: '#f4f7fc' };
 
 const deviceQueries = {
   light: window.matchMedia('(prefers-color-scheme: light)'),
@@ -275,6 +273,15 @@ const datesAreRelative = () => getSettings().relativeDates;
 
 /* ---------- Applying ---------- */
 
+// The browser chrome colour follows the page background: it is read from --bg as the current theme
+// defines it (styles.css, plus a site's theme.css), so no colours are listed here. If the stylesheet
+// hasn't loaded yet, the <meta> keeps the value the build wrote from the site's themeColor.
+function applyThemeColor() {
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+  if (meta && bg) meta.content = bg;
+}
+
 function applySettings() {
   const s = getSettings();
   const root = document.documentElement;
@@ -292,8 +299,7 @@ function applySettings() {
   toggle('data-density', s.density !== 'comfortable', s.density);
   toggle('data-season', effectiveSeason(s), effectiveSeason(s));
 
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = THEME_COLORS[theme] || THEME_COLORS.dark;
+  applyThemeColor();
 
   if (document.body) applyLinkTargets();
 }
@@ -402,3 +408,5 @@ document.addEventListener('DOMContentLoaded', () => {
     mutations.forEach(m => m.addedNodes.forEach(node => { if (node.nodeType === 1) applyLinkTargets(node); }));
   }).observe(document.body, { childList: true, subtree: true });
 });
+
+window.addEventListener('load', applyThemeColor); // in case the stylesheet finished after DOMContentLoaded

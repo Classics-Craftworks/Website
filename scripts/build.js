@@ -1,0 +1,223 @@
+#!/usr/bin/env node
+/* Builds one or more sites into dist/<site-id>/.
+
+     node scripts/build.js                 build every site in sites/
+     node scripts/build.js classic36       build just that one
+
+   A site is made from three layers, later ones winning:
+     1. core/static/            shared code, styles, fonts and icons
+     2. sites/<id>/public/      the site's own data, images and (optional) theme.css; a file with the
+                                same path as a core file replaces it
+     3. generated               HTML pages, manifest.json, sitemap.xml, robots.txt and sw.js, made from
+                                core/templates/ and sites/<id>/site.config.js
+
+   No dependencies: plain Node 18+. */
+
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+
+const ROOT = path.resolve(__dirname, '..');
+const CORE = path.join(ROOT, 'core');
+const SITES = path.join(ROOT, 'sites');
+const DIST = path.join(ROOT, 'dist');
+
+// ---------- helpers ----------
+
+const read = file => fs.readFileSync(file, 'utf8');
+const write = (file, text) => { fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, text); };
+const fail = msg => { throw new Error(msg); };
+
+// Escapes what HTML needs and nothing more (apostrophes stay as they are).
+const esc = text => String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const jsonEsc = text => JSON.stringify(String(text)).slice(1, -1);
+
+/* Tiny template engine: {{name}} inserts a value as given (callers escape it), and
+   {{#if name}} ... {{/if}} keeps its lines only when the value is truthy. The tag lines
+   of an #if block are removed entirely, so they leave no blank line behind. */
+function render(template, vars, file = 'template') {
+  let out = template;
+  out = out.replace(/^[ \t]*\{\{#if (\w+)\}\}\n([\s\S]*?)^[ \t]*\{\{\/if\}\}\n/gm, (_, key, body) => vars[key] ? body : '');
+  out = out.replace(/\{\{(\w+)\}\}/g, (_, key) => {
+    if (!(key in vars)) fail(`${file}: no value for {{${key}}}`);
+    return vars[key];
+  });
+  return out;
+}
+
+function copyDir(from, to) {
+  if (fs.existsSync(from)) fs.cpSync(from, to, { recursive: true });
+}
+
+// Every file under dir, as paths relative to it with forward slashes.
+function listFiles(dir, base = dir) {
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+    const full = path.join(dir, entry.name);
+    return entry.isDirectory() ? listFiles(full, base) : [path.relative(base, full).split(path.sep).join('/')];
+  });
+}
+
+// data.js is a browser script (`const SITE_DATA = {...}`); evaluate it in a sandbox to read the nav and brand.
+function loadSiteData(file) {
+  try { return vm.runInNewContext(read(file) + '\n;SITE_DATA', {}, { filename: file, timeout: 2000 }); }
+  catch (err) { return fail(`could not read SITE_DATA from ${file}: ${err.message}`); }
+}
+
+// ---------- page kinds ----------
+
+// Scripts every page loads, in order: [before data] data [home only: stats] latest-updates section-page [extras] search.
+const PAGE_KINDS = {
+  home:     { skip: ['#catalog', 'Skip to projects'],  action: 'build its project catalog', backToTop: true,  extras: ['news', 'index'], stats: true },
+  section:  { skip: ['#catalog', 'Skip to projects'],  action: 'build its project catalog', backToTop: true,  extras: [], dataPage: true },
+  about:    { skip: ['#about', 'Skip to content'],     action: 'build its pages',           backToTop: false, extras: ['about'] },
+  news:     { skip: ['#news-page', 'Skip to content'], action: 'build its pages',           backToTop: true,  extras: ['news'] },
+  settings: { skip: ['#settings', 'Skip to settings'], action: 'build its pages',           backToTop: true,  extras: ['settings-page'] },
+  notfound: { skip: null,                              action: null,                        backToTop: false, extras: ['404'] }
+};
+
+function scriptTags(kind) {
+  const k = PAGE_KINDS[kind];
+  const names = ['site-error', 'seasonal', 'data', ...(k.stats ? ['stats'] : []), 'latest-updates', 'section-page', ...k.extras, 'search'];
+  return names.map(n => `<script src="/${n}.js" defer></script>`).join('\n');
+}
+
+// ---------- build ----------
+
+function buildSite(id) {
+  const siteDir = path.join(SITES, id);
+  const configFile = path.join(siteDir, 'site.config.js');
+  if (!fs.existsSync(configFile)) fail(`sites/${id}/site.config.js not found`);
+  const config = require(configFile);
+  if (config.id !== id) fail(`sites/${id}/site.config.js: id is "${config.id}" but the folder is "${id}"`);
+
+  const out = path.join(DIST, id);
+  fs.rmSync(out, { recursive: true, force: true });
+
+  // Layers 1 and 2.
+  copyDir(path.join(CORE, 'static'), out);
+  copyDir(path.join(siteDir, 'public'), out);
+
+  // The nav, brand name and logo come from the site's data.js.
+  const dataFile = path.join(out, 'data.js');
+  if (!fs.existsSync(dataFile)) fail(`sites/${id}/public/data.js not found`);
+  const data = loadSiteData(dataFile);
+  if (!data.brand || !data.brand.name || !data.brand.logo) fail('SITE_DATA.brand needs a name and a logo');
+  if (!fs.existsSync(path.join(out, data.brand.logo))) fail(`brand logo "${data.brand.logo}" is not in the site's files`);
+
+  // The page list here and the nav in data.js must describe the same pages.
+  const bySlug = new Map(config.pages.map(p => [p.slug, p]));
+  for (const nav of data.pages || []) {
+    const slug = nav.url === '/' ? '' : nav.url;
+    if (!bySlug.has(slug)) fail(`SITE_DATA.pages has "${nav.url}" but site.config.js has no page with slug "${slug}"`);
+  }
+  for (const page of config.pages) {
+    if (!PAGE_KINDS[page.kind]) fail(`page "${page.slug}": unknown kind "${page.kind}"`);
+    if (page.kind !== 'notfound' && !(data.pages || []).some(n => (n.url === '/' ? '' : n.url) === page.slug)) {
+      fail(`site.config.js has page "${page.slug}" but SITE_DATA.pages does not link to it`);
+    }
+  }
+
+  const hasTheme = fs.existsSync(path.join(out, 'theme.css'));
+  const og = config.ogImage;
+  const noscriptLinks = config.noscriptLinks
+    .map(l => `<a href="${esc(l.url)}">${esc(l.label)}</a>`)
+    .join('\n      or ');
+  const pageTemplate = read(path.join(CORE, 'templates', 'page.html'));
+  const mainTemplate = kind => {
+    const name = kind === 'notfound' ? '404' : kind;
+    return read(path.join(CORE, 'templates', 'main', `${name}.html`)).trimEnd();
+  };
+
+  // Layer 3: pages.
+  for (const page of config.pages) {
+    const k = PAGE_KINDS[page.kind];
+    const url = page.slug ? `${config.url}/${page.slug}` : `${config.url}/`;
+    const file = page.slug ? `${page.slug}.html` : 'index.html';
+    const social = page.social !== false;
+    const html = render(pageTemplate, {
+      lang: esc(config.lang),
+      canonical: page.kind === 'notfound' ? '' : esc(url),
+      themeColor: esc(config.themeColor),
+      hasTheme,
+      title: esc(page.title),
+      description: esc(page.description),
+      robots: page.robots ? esc(page.robots) : '',
+      social,
+      siteName: esc(config.name),
+      ogDescription: esc(page.ogDescription || page.description),
+      ogImage: esc(`${config.url}/${og.path}`),
+      ogImageType: esc(og.type),
+      ogImageWidth: esc(og.width),
+      ogImageHeight: esc(og.height),
+      ogImageAlt: esc(og.alt),
+      bodyAttrs: k.dataPage ? ` data-page="${esc(page.slug)}"` : '',
+      skipHref: k.skip ? k.skip[0] : '',
+      skipLabel: k.skip ? k.skip[1] : '',
+      brandName: esc(data.brand.name),
+      tagline: esc(page.tagline || config.tagline),
+      noscriptAction: k.action || '',
+      noscriptLinks,
+      logo: esc('/' + data.brand.logo),
+      main: mainTemplate(page.kind),
+      backToTop: k.backToTop,
+      scripts: scriptTags(page.kind)
+    }, `page ${file}`);
+    write(path.join(out, file), html);
+  }
+
+  // manifest.json
+  write(path.join(out, 'manifest.json'), render(read(path.join(CORE, 'templates', 'manifest.json')), {
+    name: jsonEsc(config.name),
+    shortName: jsonEsc(config.shortName),
+    description: jsonEsc(config.description),
+    lang: jsonEsc(config.lang),
+    backgroundColor: jsonEsc(config.backgroundColor),
+    themeColor: jsonEsc(config.themeColor)
+  }, 'manifest.json'));
+
+  // sitemap.xml and robots.txt
+  const urls = config.pages.filter(p => p.sitemap !== false).map(p => {
+    const loc = p.slug ? `${config.url}/${p.slug}` : `${config.url}/`;
+    return `  <url>\n    <loc>${esc(loc)}</loc>\n${p.lastmod ? `    <lastmod>${esc(p.lastmod)}</lastmod>\n` : ''}  </url>`;
+  });
+  write(path.join(out, 'sitemap.xml'),
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`);
+  write(path.join(out, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${config.url}/sitemap.xml\n`);
+
+  // sw.js: the shell list is every page plus the scripts, styles, manifest, fonts and logo this site ships.
+  const files = listFiles(out);
+  const shell = [
+    '/',
+    ...config.pages.filter(p => p.slug && p.kind !== 'notfound').map(p => `/${p.slug}`),
+    ...files.filter(f => !f.includes('/') && /\.(css|js)$/.test(f) && f !== 'sw.js' && f !== '404.js').sort().map(f => `/${f}`),
+    '/manifest.json',
+    ...files.filter(f => /^fonts\/.*\.woff2$/.test(f)).sort().map(f => `/${f}`),
+    '/' + data.brand.logo
+  ];
+  const { cacheVersion } = JSON.parse(read(path.join(CORE, 'core.json')));
+  write(path.join(out, 'sw.js'), render(read(path.join(CORE, 'sw.template.js')), {
+    cache: `${config.cachePrefix}-cache-v${cacheVersion}`,
+    shell: shell.map((f, i) => `  '${f}'${i < shell.length - 1 ? ',' : ''}`).join('\n')
+  }, 'sw.js'));
+
+  return { out, pages: config.pages.length, files: listFiles(out).length };
+}
+
+// ---------- main ----------
+
+const all = fs.readdirSync(SITES, { withFileTypes: true }).filter(e => e.isDirectory() && !e.name.startsWith('_')).map(e => e.name);
+const wanted = process.argv.slice(2);
+const targets = wanted.length ? wanted : all;
+for (const id of targets) if (!all.includes(id)) { console.error(`No site "${id}". Sites: ${all.join(', ')}`); process.exit(1); }
+
+let failed = false;
+for (const id of targets) {
+  try {
+    const r = buildSite(id);
+    console.log(`built ${id}: ${r.pages} pages, ${r.files} files -> ${path.relative(ROOT, r.out)}/`);
+  } catch (err) {
+    failed = true;
+    console.error(`FAILED ${id}: ${err.message}`);
+  }
+}
+process.exit(failed ? 1 : 0);
