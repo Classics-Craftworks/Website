@@ -1785,57 +1785,107 @@
     ]
   };
 
+  /* Aurora is worked out as a soft glow field on a small grid and then scaled up with smoothing, rather than
+     drawn as rows of narrow strips: there are no strip edges, so nothing can show as a vertical line. Each curtain
+     is brightest along a slowly undulating lower edge and fades upward; its height and brightness drift along its
+     length. Nothing here is random, so a preview's still frame is the same every time. */
+
+  const smooth01 = (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
+
   function createAurora(view) {
     let clock = 0;
-    const sprites = new Map(); // one thin gradient strip per colour, stretched to each ray
+    let grid = null; // the small canvas the glow is worked out on, and its pixels
+    let gridCtx = null;
+    let pixels = null;
+    let gw = 0;
+    let gh = 0;
+    const cols = AURORA_BANDS.dark.map(() => ({ edge: new Float32Array(0), len: new Float32Array(0), amp: new Float32Array(0) }));
+    const rgbCache = new Map();
+    const rgbOf = rgb => { let v = rgbCache.get(rgb); if (!v) { v = rgb.split(',').map(Number); rgbCache.set(rgb, v); } return v; };
 
-    // A ray: clear at the top, building up and ending in a bright, fairly sharp lower edge.
-    function sprite(rgb) {
-      let strip = sprites.get(rgb);
-      if (!strip) {
-        strip = document.createElement('canvas');
-        strip.width = 4; // wide enough that stretching a middle slice never blends in the transparent edge
-        strip.height = 128;
-        const g = strip.getContext('2d');
-        const grad = g.createLinearGradient(0, 0, 0, 128);
-        grad.addColorStop(0, `rgba(${rgb}, 0)`);
-        grad.addColorStop(0.55, `rgba(${rgb}, 0.22)`);
-        grad.addColorStop(0.88, `rgba(${rgb}, 0.85)`);
-        grad.addColorStop(1, `rgba(${rgb}, 0)`);
-        g.fillStyle = grad;
-        g.fillRect(0, 0, 4, 128);
-        sprites.set(rgb, strip);
-      }
-      return strip;
+    // In a card only a few dozen pixels tall the curtains would fill just a thin strip along the top, so they
+    // sit lower and stand taller there, the way they fill the page.
+    const small = () => view.h < 200;
+
+    function ensureGrid() {
+      // Enough cells that the curtains' lower edges stay soft rather than blocky, few enough to be cheap every frame.
+      // A small view (a Settings card, 64 px tall) gets a cell per pixel so it isn't a blurry smear.
+      const w = small() ? Math.min(480, Math.max(48, Math.round(view.w))) : Math.min(240, Math.max(48, Math.round(view.w / 6)));
+      const h = small() ? Math.min(120, Math.max(24, Math.round(view.h))) : Math.min(200, Math.max(24, Math.round(view.h / 4)));
+      if (grid && w === gw && h === gh) return;
+      gw = w; gh = h;
+      grid = document.createElement('canvas');
+      grid.width = gw; grid.height = gh;
+      gridCtx = grid.getContext('2d');
+      pixels = gridCtx.createImageData(gw, gh);
+      cols.forEach(c => { c.edge = new Float32Array(gw); c.len = new Float32Array(gw); c.amp = new Float32Array(gw); });
     }
 
     function step(dt) { clock += dt; }
 
     function draw(ctx) {
-      const light = isLight();
-      const bands = AURORA_BANDS[light ? 'light' : 'dark'];
-      const stepX = Math.max(2, Math.min(6, Math.round(view.w / 200)));
-      ctx.globalCompositeOperation = light ? 'source-over' : 'lighter';
+      ensureGrid();
+      if (!gridCtx) return;
+      const bands = AURORA_BANDS[isLight() ? 'light' : 'dark'];
+      const data = pixels.data;
+      const lift = small() ? 0.22 : 0;
+      const stretch = small() ? 1.35 : 1;
 
+      // Per band and per column: where the lower edge is, how tall the curtain is, how bright.
       bands.forEach((b, bi) => {
-        const strip = sprite(b.rgb);
         const t = clock * 0.35 + bi * 11;
-        const dpr = view.dpr || 1;
-        const snap = v => Math.round(v * dpr) / dpr; // device-pixel edges, so neighbouring rays meet exactly
-        for (let x = -stepX; x < view.w + stepX; x += stepX) {
-          const u = x / view.w;
-          // The curtain's lower edge undulates slowly; its height and brightness shimmer along its length.
-          const edge = view.h * (b.y + 0.07 * Math.sin(u * 5.2 + t * b.drift * 4 + bi) + 0.035 * Math.sin(u * 11 - t * 0.5 + bi * 2));
-          const len = view.h * b.len * (0.65 + 0.35 * Math.sin(u * 7.5 + t * 0.6 + bi * 3));
-          const glow = 0.55 + 0.45 * Math.sin(u * 17 + t * 1.1 + bi * 5) * Math.sin(u * 3.1 + t * 0.3);
-          ctx.globalAlpha = Math.max(0, b.alpha * glow);
-          const left = snap(x);
-          // No overlap and no gap between rays: an overlap doubles up when added to the sky and shows as a line.
-          ctx.drawImage(strip, 1, 0, 2, 128, left, edge - len, snap(x + stepX) - left, len);
+        const c = cols[bi];
+        for (let x = 0; x < gw; x++) {
+          const u = (x + 0.5) / gw;
+          c.edge[x] = view.h * (b.y + lift + 0.07 * Math.sin(u * 5.2 + t * b.drift * 4 + bi) + 0.035 * Math.sin(u * 11 - t * 0.5 + bi * 2));
+          c.len[x] = view.h * b.len * stretch * (0.65 + 0.35 * Math.sin(u * 7.5 + t * 0.6 + bi * 3));
+          c.amp[x] = Math.max(0, b.alpha * (0.55 + 0.45 * Math.sin(u * 9 + t * 1.1 + bi * 5) * Math.sin(u * 3.1 + t * 0.3)));
         }
       });
-      ctx.globalAlpha = 1;
-      ctx.globalCompositeOperation = 'source-over';
+
+      const rgbs = bands.map(b => rgbOf(b.rgb));
+      const cellH = view.h / gh;
+      // The lower edge of a curtain is bright and falls off quickly, and sampling a steep edge once per cell
+      // turns a slanting edge into stair-steps. In a small card each cell is the average of several samples
+      // down its height instead, which keeps the edge as sharp as it was but smooth.
+      const samples = small() ? 4 : 1;
+      for (let y = 0; y < gh; y++) {
+        for (let x = 0; x < gw; x++) {
+          let sumR = 0, sumG = 0, sumB = 0, sumA = 0;
+          for (let sIdx = 0; sIdx < samples; sIdx++) {
+            const py = (y + (sIdx + 0.5) / samples) * cellH;
+            let keep = 1; // how much of the sky still shows through
+            let r = 0, g = 0, bl = 0, weight = 0;
+            for (let bi = 0; bi < bands.length; bi++) {
+              const c = cols[bi];
+              const p = 1 - (c.edge[x] - py) / c.len[x]; // 0 at the top of the curtain, 1 at its lower edge, past 1 below it
+              if (p <= 0 || p >= 1.05) continue;
+              let a = smooth01(0, 1, p);
+              a *= a;
+              a *= 1 - smooth01(0.9, 1.05, p); // bright lower edge, then a short soft fade below it
+              a *= c.amp[x];
+              if (a <= 0) continue;
+              const rgb = rgbs[bi];
+              r += rgb[0] * a; g += rgb[1] * a; bl += rgb[2] * a; weight += a;
+              keep *= 1 - a;
+            }
+            if (!weight) continue;
+            const alpha = 1 - keep;
+            sumR += (r / weight) * alpha; sumG += (g / weight) * alpha; sumB += (bl / weight) * alpha; sumA += alpha;
+          }
+          const i = (y * gw + x) * 4;
+          if (!sumA) { data[i + 3] = 0; continue; }
+          // A fixed, tiny dither so the slow ramps don't band into rings on 8-bit screens.
+          const dither = (((i * 2654435761) >>> 24) / 255 - 0.5) * 0.9;
+          data[i] = sumR / sumA; data[i + 1] = sumG / sumA; data[i + 2] = sumB / sumA;
+          data[i + 3] = Math.min(255, Math.max(0, (sumA / samples) * 255 + dither));
+        }
+      }
+      gridCtx.putImageData(pixels, 0, 0);
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(grid, 0, 0, gw, gh, 0, 0, view.w, view.h);
     }
 
     // One frame for reduced motion: the curtains caught mid-sway.
