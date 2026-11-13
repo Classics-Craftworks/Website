@@ -39,6 +39,12 @@ function changelogGroup(group) {
 // "v4.13.1" -> "v4.13.1", usable as an element id and in the address bar.
 const changelogId = version => version;
 
+function changelogDate(iso) {
+  const node = newsDate({ date: iso });
+  node.dataset.date = iso;
+  return node;
+}
+
 function changelogRelease(release, isLatest) {
   const id = changelogId(release.version);
   const meta = el('div', { class: 'news-meta changelog-meta' }, [
@@ -50,12 +56,8 @@ function changelogRelease(release, isLatest) {
     const latest = el('span', { class: 'news-tag', text: 'Latest' });
     meta.appendChild(latest);
   }
-  if (release.date) {
-    meta.appendChild(el('span', { class: 'news-when' }, [
-      calendarIcon(),
-      el('time', { class: 'news-date', text: displayDate(release.date, 'long'), attrs: { datetime: release.date } })
-    ]));
-  }
+  // The same date as the News page: the visitor's chosen format, or "3 days ago" when relative dates are on.
+  if (release.date) meta.appendChild(changelogDate(release.date));
   const note = release.note ? el('p', { class: 'about-text changelog-note' }, [changelogInline(release.note)]) : null;
   return el('article', { class: 'changelog-release', attrs: { id } }, [meta, note, ...release.groups.map(changelogGroup)]);
 }
@@ -106,6 +108,11 @@ function renderChangelogPage() {
   showUpTo(CHANGELOG_PAGE_SIZE);
   focusHash();
   window.addEventListener('hashchange', focusHash);
+
+  // Dates follow the Settings page, including a change made in another tab.
+  document.addEventListener(SETTINGS_EVENT, () => {
+    list.querySelectorAll('.news-when[data-date]').forEach(node => node.replaceWith(changelogDate(node.dataset.date)));
+  });
 }
 
 if (document.getElementById('changelog-page')) {
