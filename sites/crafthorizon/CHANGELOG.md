@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v1.0.0 — 2026-11-13
+
+### Added
+- Filters & search for the changelog page
+- "Join the server" card on the home page
+
+### Changed
+- Optimised seasonal themes
+
 ## v0.3.1 — 2026-11-13
 
 No user-facing changes.

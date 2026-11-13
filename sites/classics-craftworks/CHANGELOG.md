@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.15.0 — 2026-11-13
+
+### Added
+- Filters & search for the changelog page
+
+### Changed
+- Optimised seasonal themes
+
 ## v4.14.1 — 2026-11-13
 
 No user-facing changes.
