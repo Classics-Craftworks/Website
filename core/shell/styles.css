@@ -1595,6 +1595,42 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 
 .about-rule { margin: var(--s-6) 0; border: 0; border-top: 1px solid var(--border); }
 
+/* ---------- Changelog ---------- */
+.changelog-releases { display: flex; flex-direction: column; gap: var(--s-4); }
+
+.changelog-release {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  padding: var(--s-5);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  background: var(--surface);
+  transition: border-color var(--ease);
+}
+
+.changelog-release.is-targeted { border-color: var(--accent); }
+
+.changelog-meta { gap: var(--s-3); }
+
+.changelog-version { margin: 0; font-family: var(--font-body); font-size: var(--text-lg); line-height: var(--lh-lg); font-weight: 600; letter-spacing: 0; text-transform: none; }
+
+.changelog-anchor { color: var(--text); transition: color var(--ease); }
+
+@media (hover: hover) { .changelog-anchor:hover { color: var(--accent); } }
+
+.changelog-group { display: flex; flex-direction: column; gap: var(--s-2); }
+
+.changelog-group-head { margin: 0; font-family: var(--font-body); font-size: var(--text-md); line-height: var(--lh-md); font-weight: 700; letter-spacing: 0; text-transform: none; }
+
+.changelog-note { margin: 0; max-width: none; }
+
+.changelog-list { margin: 0; max-width: none; }
+
+.changelog-list .changelog-list { margin: var(--s-1) 0 var(--s-2); list-style: circle; }
+
+@media (max-width: 600px) { .changelog-release { padding: var(--s-4); } }
+
 /* ---------- 404 ---------- */
 .not-found { display: flex; align-items: center; min-height: 50vh; padding: var(--s-8) 0; }
 
@@ -1966,7 +2002,19 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 
 @media (hover: hover) { .news-filter[aria-pressed="false"]:hover { background: var(--surface-2); } }
 
-.news-show-more { width: 100%; margin-top: var(--s-4); background: var(--surface); }
+.news-show-more { width: 100%; margin-top: var(--s-4); background: var(--surface); text-align: center; }
+
+/* Downward chevron after the label (the same shape as the nav dropdown's). */
+.news-show-more::after {
+  content: '';
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
 
 .news-show-more[hidden] { display: none; }
 

@@ -67,6 +67,52 @@ function loadSiteData(file) {
   catch (err) { return fail(`could not read SITE_DATA from ${file}: ${err.message}`); }
 }
 
+// Reads a Keep a Changelog file (sites/<id>/CHANGELOG.md) into data the Changelog page renders:
+//   [{ version, date, note?, groups: [{ title, items: [{ text, items: [...] }] }] }]   newest first, as written.
+// "## v1.2.3 — 2026-01-31" starts a release, "### Added" a group and "- text" an item; lines indented by
+// two more spaces are sub-items. Text keeps its `code`, **bold** and [link](url) marks for the page to draw.
+function parseChangelog(text, file) {
+  const releases = [];
+  let release = null, group = null;
+  const stack = [];   // the open items, by depth
+  text.split(/\r?\n/).forEach((line, i) => {
+    const where = `${file}:${i + 1}`;
+    let m;
+    if ((m = line.match(/^## (.+?)\s*$/))) {
+      const head = m[1].match(/^\[?(v?\d[^\]\s]*)\]?\s*(?:[—–-]+\s*(\d{4}-\d{2}-\d{2}))?$/i);
+      if (!head) fail(`${where}: expected "## v1.2.3 — YYYY-MM-DD", got "${line}"`);
+      release = { version: head[1], date: head[2] || '', groups: [] };
+      releases.push(release);
+      group = null; stack.length = 0;
+    } else if ((m = line.match(/^### (.+?)\s*$/))) {
+      if (!release) fail(`${where}: a "###" group before any "##" release`);
+      group = { title: m[1], items: [] };
+      release.groups.push(group);
+      stack.length = 0;
+    } else if ((m = line.match(/^( *)- (.+?)\s*$/))) {
+      if (!group) fail(`${where}: a list item outside a "###" group`);
+      // An item indented more than one step past its parent still nests directly under it, as Markdown shows it.
+      const depth = Math.min(Math.floor(m[1].length / 2), stack.length);
+      stack.length = depth;
+      const item = { text: m[2] };
+      const siblings = depth === 0 ? group.items : (stack[depth - 1].items = stack[depth - 1].items || []);
+      siblings.push(item);
+      stack.push(item);
+    } else if (release && !group && line.trim() && !/^#/.test(line)) {
+      // A sentence under the release heading, before any group ("No user-facing changes."): the release's note.
+      release.note = release.note ? `${release.note} ${line.trim()}` : line.trim();
+    } else if (release && line.trim() && !/^#\s/.test(line)) {
+      fail(`${where}: unrecognised line "${line}"`);
+    }
+  });
+  const seen = new Set();
+  for (const r of releases) {
+    if (seen.has(r.version)) fail(`${file}: version ${r.version} appears twice`);
+    seen.add(r.version);
+  }
+  return releases;
+}
+
 // ---------- page kinds ----------
 
 // What each kind of page loads besides the shell. `extras` are the page's own scripts (after the shell's start-up
@@ -77,6 +123,7 @@ const PAGE_KINDS = {
   about:    { skip: ['#about', 'Skip to content'],     action: 'build its pages',           backToTop: false, extras: ['about'] },
   news:     { skip: ['#news-page', 'Skip to content'], action: 'build its pages',           backToTop: true,  extras: ['news'] },
   settings: { skip: ['#settings', 'Skip to settings'], action: 'build its pages',           backToTop: true,  extras: ['settings-page'] },
+  changelog: { skip: ['#changelog-page', 'Skip to content'], action: 'show its changelog', backToTop: true,  extras: ['changelog-data', 'changelog'] },
   notfound: { skip: null,                              action: null,                        backToTop: false, extras: ['404'] }
 };
 
@@ -168,7 +215,7 @@ function buildSite(id) {
   }
   for (const page of config.pages) {
     if (!PAGE_KINDS[page.kind]) fail(`page "${page.slug}": unknown kind "${page.kind}"`);
-    if (page.kind !== 'notfound' && !(data.pages || []).some(n => (n.url === '/' ? '' : n.url) === page.slug)) {
+    if (page.kind !== 'notfound' && page.nav !== false && !(data.pages || []).some(n => (n.url === '/' ? '' : n.url) === page.slug)) {
       fail(`site.config.js has page "${page.slug}" but SITE_DATA.pages does not link to it`);
     }
   }
@@ -231,6 +278,16 @@ function buildSite(id) {
       scripts: scriptTags(page.kind, features)
     }, `page ${file}`);
     write(path.join(out, file), html);
+  }
+
+  // The Changelog page reads its releases from the site's CHANGELOG.md, so the file stays the one place they are written.
+  if (config.pages.some(p => p.kind === 'changelog')) {
+    const file = path.join(siteDir, 'CHANGELOG.md');
+    if (!fs.existsSync(file)) fail(`sites/${id}/CHANGELOG.md not found (the "changelog" page needs it)`);
+    const releases = parseChangelog(read(file), `sites/${id}/CHANGELOG.md`);
+    if (!releases.length) fail(`sites/${id}/CHANGELOG.md has no "## vX.Y.Z — date" releases`);
+    write(path.join(out, 'changelog-data.js'),
+      `/* Generated from CHANGELOG.md by scripts/build.js; edit that file instead. */\nconst CHANGELOG_DATA = ${JSON.stringify(releases)};\n`);
   }
 
   // manifest.json

@@ -39,9 +39,10 @@ module.exports = {
     userAgent: 'Classics-Craftworks/Website (stats updater; https://github.com/Classics-Craftworks/Website)'
   },
 
-  // One entry per page. kind: home | section | about | news | settings | notfound.
+  // One entry per page. kind: home | section | about | news | changelog | settings | notfound.
   // slug: the URL path (and file name); sections' slugs must match their url in SITE_DATA.pages.
-  // Optional: tagline (noscript text for this page), ogDescription, lastmod (sitemap), robots, social: false.
+  // Optional: tagline (noscript text for this page), ogDescription, lastmod (sitemap), robots, social: false,
+  // nav: false (a page the header doesn't link to; the "changelog" page is reached from the footer's version number).
   pages: [
     {
       kind: 'home', slug: '',
@@ -77,6 +78,12 @@ module.exports = {
       title: "News - Classic's Craftworks",
       description: "News from Classic's Craftworks: new releases, new projects and retired ones.",
       lastmod: '2026-11-10'
+    },
+    {
+      kind: 'changelog', slug: 'changelog', nav: false,
+      title: "Changelog - Classic's Craftworks",
+      description: "Every change to the Classic's Craftworks website, newest first.",
+      lastmod: '2026-11-13'
     },
     {
       kind: 'settings', slug: 'settings',

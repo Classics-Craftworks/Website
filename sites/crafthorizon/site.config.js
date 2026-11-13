@@ -40,6 +40,12 @@ module.exports = {
       lastmod: '2026-11-12'
     },
     {
+      kind: 'changelog', slug: 'changelog', nav: false,
+      title: 'Changelog - CraftHorizon',
+      description: 'Every change to the CraftHorizon website, newest first.',
+      lastmod: '2026-11-13'
+    },
+    {
       kind: 'settings', slug: 'settings',
       title: 'Settings - CraftHorizon',
       description: 'Theme, accent colour, accessibility and display settings for CraftHorizon. Saved in your browser only.',

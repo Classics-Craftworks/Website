@@ -682,7 +682,10 @@ function renderFooter(socials, footer, version) {
   if (version) {
     const versionEl = document.getElementById('site-version');
     const { label, url } = typeof version === 'object' ? version : { label: version };
-    if (url) versionEl.appendChild(el('a', { href: url, class: 'version-link', text: label }));
+    // A page of this site ("/changelog") opens in the same tab; an address elsewhere in a new one.
+    if (url) versionEl.appendChild(/^https?:\/\//i.test(url)
+      ? el('a', { href: url, class: 'version-link', text: label })
+      : internalLink('version-link', url, [document.createTextNode(label)]));
     else versionEl.textContent = label;
   }
 }
