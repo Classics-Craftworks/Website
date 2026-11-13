@@ -29,7 +29,8 @@ let config = fs.readFileSync(configFile, 'utf8');
 config = config
   .replace(/^(\s*id: )'[^']*'/m, `$1'${id}'`)
   .replace(/^(\s*url: )'[^']*'/m, `$1'${url}'`)
-  .replace(/^(\s*cachePrefix: )'[^']*'/m, `$1'${id}'`);
+  .replace(/^(\s*cachePrefix: )'[^']*'/m, `$1'${id}'`)
+  .replace(/^(\s*cacheVersion: )\d+/m, '$11');
 fs.writeFileSync(configFile, config);
 
 console.log(`Created sites/${id} from sites/${from}.

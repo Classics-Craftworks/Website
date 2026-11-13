@@ -6,7 +6,9 @@
    - Images: cache first, refreshed in the background at most every IMAGE_REFRESH_MS.
    - Uncached pages fall back to the home page when offline.
 
-   Bump cacheVersion in core/core.json when the strategy changes (it applies to every site). SHELL is only a head start; anything else is
+   Cache name is <prefix>-cache-v<core>.<site>. Bump cacheVersion in core/core.json when the
+   strategy changes (it applies to every site); bump cacheVersion in a site's site.config.js to
+   refresh just that site's caches. SHELL is only a head start; anything else is
    cached on first fetch. */
 const CACHE = '{{cache}}';
 const NETWORK_TIMEOUT_MS = 4000;

@@ -15,6 +15,7 @@ module.exports = {
   backgroundColor: '#0b0716',
 
   cachePrefix: 'crafthorizon',
+  cacheVersion: 1,      // bump to refresh only this site's service worker cache
 
   features: ['landing'],   // see sites/classics-craftworks/site.config.js for what each feature is
 

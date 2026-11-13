@@ -319,9 +319,15 @@ function buildSite(id) {
     ...files.filter(f => /^fonts\/.*\.woff2$/.test(f)).sort().map(f => `/${f}`),
     '/' + data.brand.logo
   ];
-  const { cacheVersion } = JSON.parse(read(path.join(CORE, 'core.json')));
+  // Cache name = <prefix>-cache-v<core version>.<site version>. The core version (core/core.json) changes
+  // every site's cache; the site version (cacheVersion in site.config.js) changes only this site's.
+  const { cacheVersion: coreCacheVersion } = JSON.parse(read(path.join(CORE, 'core.json')));
+  const siteCacheVersion = config.cacheVersion === undefined ? 1 : config.cacheVersion;
+  if (!Number.isInteger(siteCacheVersion) || siteCacheVersion < 1) {
+    throw new Error(`${config.id}: cacheVersion in site.config.js must be a whole number, 1 or more`);
+  }
   write(path.join(out, 'sw.js'), render(read(path.join(CORE, 'sw.template.js')), {
-    cache: `${config.cachePrefix}-cache-v${cacheVersion}`,
+    cache: `${config.cachePrefix}-cache-v${coreCacheVersion}.${siteCacheVersion}`,
     shell: shell.map((f, i) => `  '${f}'${i < shell.length - 1 ? ',' : ''}`).join('\n')
   }, 'sw.js'));
 

@@ -17,7 +17,8 @@ module.exports = {
   themeColor: '#0d111a',
   backgroundColor: '#0d111a',
 
-  cachePrefix: 'ccw',   // service worker cache name: <prefix>-cache-v<core cacheVersion>
+  cachePrefix: 'ccw',   // service worker cache name: <prefix>-cache-v<core cacheVersion>.<cacheVersion>
+  cacheVersion: 1,      // bump to make visitors of this site drop their cached copy (core/core.json does it for every site)
 
   // Optional parts of the shared core this site uses (core/features/<name>/):
   //   catalog  project pages, release tables, project cards on the home page, header search, download dots
