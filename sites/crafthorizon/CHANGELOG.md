@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.2.1 — 2026-11-12
+
+### Changed
+- The site now loads less code, as it no longer includes the parts of the Classic’s Craftworks site it doesn't use
+- Active seasonal theme animations now pause when previewing other themes
+- Improved the Aurora theme
+- Updated the nav bar button order
+
+### Fixed
+- Fixed the Settings icon not being aligned to the right side of the nav bar
+
 ## v0.2.0 — 2026-11-12
 
 ### Added

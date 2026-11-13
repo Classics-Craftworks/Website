@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.13.1 — 2026-11-12
+
+### Changed
+- Separated the shared core into the parts every site uses and optional features, with no user-facing changes
+- Active seasonal theme animations now pause when previewing other themes
+- Improved the Aurora theme
+- Updated CraftHorizon's links - removed Modrinth & Trello and added Website
+
 ## v4.13.0 — 2026-11-12
 
 ### Changed
