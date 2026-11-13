@@ -378,8 +378,7 @@ const SITE_DATA = {
           description: "Whitelisted Minecraft server, with a focus on vanilla+ Survival and Creative gameplay.",
           created: "2025-01-15",
           links: [
-            { label: "Modrinth", icon: "modrinth", url: "https://modrinth.com/server/crafthorizon" },
-            { label: "Trello", icon: "document", url: "https://trello.com/b/TK7pofcG/crafthorizon" },
+            { label: "Website", icon: "newtab", url: "https://crafthorizon.classicscraftworks.co.uk" },
             { label: "Wiki", icon: "book", url: "https://classicscraftworks.gitbook.io/crafthorizon" }
           ]
         },
