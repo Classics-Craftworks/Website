@@ -5,7 +5,7 @@
    - home.splash.actions: the hero buttons ("primary" or "ghost"; an absolute url opens in a new tab).
    - home.join / home.versions / home.features: the home page blocks, in that order. Text may be a string or an
      array mixing strings with { link, url } / { bold } / { code } pieces. A block left out is not shown.
-   - Header pages: an absolute url (https://...) is an external link and opens in a new tab. */
+   - Header pages: shown in the order listed; an absolute url (https://...) is an external link and opens in a new tab. */
 
 const SITE_DATA = {
 
@@ -120,8 +120,9 @@ const SITE_DATA = {
     },
   },
 
-  // Header pages. Home ("/"), News, About and Settings are pages of this site; an entry with an absolute
-  // url (the wiki) links out.
+  // Header pages, shown in this order (Settings is the menu at the right-hand end, wherever it is listed).
+  // Home ("/"), News, About and Settings are pages of this site; an entry with an absolute url (Rules, the
+  // wiki) links out.
   pages: [
     { label: "Home", url: "/", icon: "home" },
     { label: "News", url: "news", icon: "news" },

@@ -42,8 +42,9 @@ const SITE_DATA = {
     projectsSubtitle: ""
   },
 
-  // Header pages. Entries with a "section" go in the Projects dropdown and
-  // must match a section heading below; Home ("/"), News, About and Settings get their own links.
+  // Header pages, shown in this order. Entries with a "section" go in the Projects dropdown (which sits where
+  // the first of them is listed) and must match a section heading below; Home ("/"), News, About and Settings
+  // get their own links.
   pages: [
     { label: "Home", url: "/", icon: "home" },
     { label: "Data Packs & Mods", url: "data-packs-mods", section: "Data Packs & Mods", icon: "brackets" },

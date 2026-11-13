@@ -392,7 +392,8 @@ function buildSettingsMenu(settingsPage, currentUrl, mobile) {
 // Keep in sync with the 900px breakpoint in styles.css.
 const MOBILE_NAV_QUERY = '(max-width: 900px)';
 
-// Builds the nav: Home, a Projects dropdown (pages with a "section"), News, About.
+// Builds the nav in the order of SITE_DATA.pages (data.js): each page is a link, and the pages with a "section"
+// share one Projects dropdown, which sits where the first of them is listed.
 // search.js adds the search box. On small screens the menu folds behind a button
 // and the dropdown becomes an accordion.
 function renderSiteHeader(pages, currentUrl) {
@@ -403,12 +404,8 @@ function renderSiteHeader(pages, currentUrl) {
   if (!header || !inner || !menuWrap || !nav || !pages || !pages.length) return;
 
   const mobile = window.matchMedia(MOBILE_NAV_QUERY);
-  const home = pages.find(p => p.url === '/');
-  const about = pages.find(p => p.url === 'about');
-  const newsPage = pages.find(p => p.url === 'news');
   const settingsPage = pages.find(p => p.url === 'settings');
   const projectPages = pages.filter(p => p.section);
-  const externalPages = pages.filter(p => /^https?:\/\//i.test(p.url)); // links out (the wiki), shown after About
 
   // Elements carrying a count pill; syncDots() redraws them at load and on back/forward restore.
   const dotTargets = [];
@@ -446,8 +443,7 @@ function renderSiteHeader(pages, currentUrl) {
     return a;
   }
 
-  if (home) nav.appendChild(pageLink(home, 'nav-link'));
-
+  let projectsDropdown = null; // placed in the nav below, at the first project page's position
   let setDropdown = () => {};
   if (projectPages.length) {
     const menuId = 'projects-menu';
@@ -471,7 +467,7 @@ function renderSiteHeader(pages, currentUrl) {
     });
     const menu = el('div', { class: 'nav-dropdown-menu', attrs: { id: menuId, hidden: '' } }, items);
     const dropdown = el('div', { class: 'nav-dropdown' }, [trigger, menu]);
-    nav.appendChild(dropdown);
+    projectsDropdown = dropdown;
 
     setDropdown = (open, opts = {}) => {
       menu.hidden = !open;
@@ -514,13 +510,17 @@ function renderSiteHeader(pages, currentUrl) {
     });
   }
 
-  if (newsPage) {
-    const newsLink = pageLink(newsPage, 'nav-link');
-    trackDots(newsLink, countUnseenNews, ['news entry', 'news entries']);
-    nav.appendChild(newsLink);
-  }
-  if (about) nav.appendChild(pageLink(about, 'nav-link'));
-  externalPages.forEach(page => nav.appendChild(pageLink(page, 'nav-link')));
+  // Settings has its own menu (below); everything else follows the order of the list.
+  pages.forEach(page => {
+    if (page.url === 'settings') return;
+    if (page.section) {
+      if (projectsDropdown) { nav.appendChild(projectsDropdown); projectsDropdown = null; }
+      return;
+    }
+    const link = pageLink(page, 'nav-link');
+    if (page.url === 'news') trackDots(link, countUnseenNews, ['news entry', 'news entries']);
+    nav.appendChild(link);
+  });
   // Settings sits in the menu beside the nav, not inside it: the search box (catalog sites) then takes it to its
   // right, and on a site without search the stylesheet pushes it to the far right of the header.
   if (settingsPage) menuWrap.appendChild(buildSettingsMenu(settingsPage, currentUrl, mobile));
