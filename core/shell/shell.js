@@ -334,8 +334,22 @@ function buildSettingsMenu(settingsPage, currentUrl, mobile) {
     settingsLink.setAttribute('aria-current', 'page');
   }
 
+  // "Mark all notifications as read": the same action as the button on the Settings page. Greyed out when nothing is waiting.
+  const markRead = el('button', { class: 'nav-dropdown-item quick-settings-link quick-mark-read', attrs: { type: 'button' } }, [
+    icon('tick', 'icon-sm'),
+    el('span', { text: 'Mark all notifications as read' })
+  ]);
+  markRead.addEventListener('click', () => {
+    if (markRead.getAttribute('aria-disabled') === 'true') return;
+    markAllSeen(); // fires DOTS_EVENT, which greys this out and clears the dots
+  });
+  function syncMarkRead() {
+    const { downloads, news } = unreadSummary();
+    markRead.setAttribute('aria-disabled', String(downloads + news === 0));
+  }
+
   const menu = el('div', { class: 'nav-dropdown-menu quick-settings', attrs: { id: menuId, hidden: '' } }, [
-    dark.row, season.row, el('hr', { class: 'quick-settings-divider' }), settingsLink
+    dark.row, season.row, el('hr', { class: 'quick-settings-divider' }), markRead, settingsLink
   ]);
   const wrap = el('div', { class: 'nav-dropdown nav-settings-menu' }, [trigger, menu]);
 
@@ -357,13 +371,15 @@ function buildSettingsMenu(settingsPage, currentUrl, mobile) {
     seasonName.hidden = !name;
   }
   sync();
+  syncMarkRead();
   document.addEventListener(SETTINGS_EVENT, sync);
+  document.addEventListener(DOTS_EVENT, syncMarkRead);
 
   const setOpen = (open, opts = {}) => {
     menu.hidden = !open;
     trigger.setAttribute('aria-expanded', String(open));
     wrap.classList.toggle('is-open', open);
-    if (open) sync();
+    if (open) { sync(); syncMarkRead(); }
     if (!open && opts.refocus) trigger.focus();
   };
   trigger.addEventListener('click', () => setOpen(menu.hidden));

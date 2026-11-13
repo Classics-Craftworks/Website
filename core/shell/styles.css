@@ -2665,6 +2665,15 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 
 .quick-settings-link { justify-content: flex-start; }
 
+/* A button that looks like the link beside it: no border or background of its own. */
+.quick-mark-read { width: 100%; border: 0; background: transparent; text-align: left; cursor: pointer; }
+
+.quick-mark-read[aria-disabled="true"] { color: var(--text-soft); cursor: default; }
+
+.quick-mark-read[aria-disabled="true"] .icon { opacity: 0.6; }
+
+@media (hover: hover) { .quick-mark-read[aria-disabled="true"]:hover { background: transparent; } }
+
 @media (max-width: 900px) {
   .nav-settings-chevron { display: block; }
   .nav-settings-menu .nav-dropdown-menu { right: auto; min-width: 0; }
