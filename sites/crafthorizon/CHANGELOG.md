@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.3.0 — 2026-11-13
+
+### Added
+- Changelog page with every version of the site, so you no longer need to go to GitHub to read it
+  - Open it by clicking the version number in the footer
+  - Each version has its own link, e.g. `/changelog#v0.3.0`
+- "Mark all notifications as read" button in the Settings dropdown
+- Downward chevrons to the News page's "Show more" button
+
+### Changed
+- The footer's version number now opens the Changelog page instead of GitHub
+- The About page now takes up the full width, rather than wrapping halfway through
+- Updated site images and logos
+
 ## v0.2.1 — 2026-11-12
 
 ### Changed
