@@ -1,6 +1,6 @@
 /* Changelog page: renders CHANGELOG_DATA, which the build generates from the site's CHANGELOG.md
    (changelog-data.js; edit the markdown, not the data). Newest release first (or oldest, from the sort menu), ten at
-   a time, filterable by month and release type with the same filter box as the News page.
+   a time, with the same search box and month and release-type filters as the News page.
    Each release has an address (/changelog#v1.2.3) that opens the page at that release. */
 
 const CHANGELOG_PAGE_SIZE = 10; // releases shown first and added per "Show more" click
@@ -84,8 +84,19 @@ function changelogType(version) {
 // "2026-11-13" -> "2026-11": the key releases are filtered by.
 const changelogMonth = release => (release.date || '').slice(0, 7);
 
-// Filters and sort live in the URL hash so a view can be linked to, as on the News page:
-//   #months=2026-10&types=hotfix,patch&sort=oldest
+// Everything a visitor can search a release for, lower-cased: its version, date, type, note and every item's text.
+// The markdown marks (`code`, **bold**, [label](url)) are dropped so a search matches what is read.
+function changelogSearchText(release, typeLabel) {
+  const items = list => list.flatMap(item => [item.text, ...items(item.items || [])]);
+  return [
+    release.version, release.date, typeLabel, release.note,
+    ...release.groups.flatMap(g => [g.title, ...items(g.items)])
+  ].filter(Boolean).join(' ')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[`*]/g, '').toLowerCase();
+}
+
+// Filters, sort and search live in the URL hash so a view can be linked to, as on the News page:
+//   #months=2026-10&types=hotfix,patch&sort=oldest&q=chevron
 // A hash without an "=" is a link to one release (#v4.13.1) and is read by focusHash() instead.
 function readChangelogHash(validMonths, validTypes) {
   const raw = location.hash.slice(1);
@@ -94,15 +105,17 @@ function readChangelogHash(validMonths, validTypes) {
   return {
     months: pick('months', validMonths),
     types: pick('types', validTypes),
-    sort: params.get('sort') === 'oldest' ? 'oldest' : 'newest'
+    sort: params.get('sort') === 'oldest' ? 'oldest' : 'newest',
+    query: (params.get('q') || '').trim()
   };
 }
 
-function writeChangelogHash(activeMonths, activeTypes, sort) {
+function writeChangelogHash(activeMonths, activeTypes, sort, query) {
   const params = new URLSearchParams();
   if (activeMonths.size) params.set('months', [...activeMonths].join(','));
   if (activeTypes.size) params.set('types', [...activeTypes].join(','));
   if (sort === 'oldest') params.set('sort', 'oldest');
+  if (query.trim()) params.set('q', query.trim());
   const text = params.toString();
   // With nothing selected, leave a link to a release (#v4.13.1) alone.
   if (!text && !location.hash.includes('=')) return;
@@ -127,12 +140,15 @@ function renderChangelogPage() {
 
   const typeOf = new Map(releases.map(r => [r, changelogType(r.version)]));
   const monthKeys = [...new Set(releases.map(changelogMonth).filter(Boolean))].sort().reverse(); // newest first
+  const typeLabel = new Map(CHANGELOG_TYPES.map(t => [t.key, t.label]));
+  const haystacks = new Map(releases.map(r => [r, changelogSearchText(r, typeLabel.get(typeOf.get(r)))]));
   const types = CHANGELOG_TYPES.filter(t => releases.some(r => typeOf.get(r) === t.key));
   const initial = readChangelogHash(monthKeys, types.map(t => t.key));
   // Active filter sets; an empty set means "all".
   const activeMonths = initial.months;
   const activeTypes = initial.types;
   let sort = initial.sort; // 'newest' | 'oldest'
+  let query = initial.query;
 
   const list = el('div', { class: 'changelog-releases' });
   const status = el('p', { class: 'news-status', attrs: { 'aria-live': 'polite' } });
@@ -154,17 +170,21 @@ function renderChangelogPage() {
 
   // Any change to the filters or the sort starts again at the first page.
   function refresh() {
+    // Every word typed has to appear somewhere in the release, in any order.
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     ordered = releases.filter(r =>
       (!activeMonths.size || activeMonths.has(changelogMonth(r))) &&
-      (!activeTypes.size || activeTypes.has(typeOf.get(r))));
+      (!activeTypes.size || activeTypes.has(typeOf.get(r))) &&
+      terms.every(t => haystacks.get(r).includes(t)));
     if (sort === 'oldest') ordered.reverse();
     list.replaceChildren();
     shown = 0;
     showUpTo(CHANGELOG_PAGE_SIZE);
     if (filterPanel) filterPanel.sync();
     sortControl.set(sort);
-    status.textContent = ordered.length ? '' : 'Nothing matches those filters.';
-    writeChangelogHash(activeMonths, activeTypes, sort);
+    searchBox.sync(query);
+    status.textContent = ordered.length ? '' : (query.trim() ? 'Nothing matches your search.' : 'Nothing matches those filters.');
+    writeChangelogHash(activeMonths, activeTypes, sort, query);
   }
 
   // Filter box: the same one as the News page (shell.js).
@@ -193,14 +213,20 @@ function renderChangelogPage() {
     onChange: key => { sort = key; refresh(); }
   });
 
-  // The News page's layout without its search box or side cards: the toolbar and list, with the filters beside them.
-  main.appendChild(el('div', { class: 'news-layout no-search' + (filterPanel ? '' : ' no-filters') }, [
+  const searchBox = buildSearchBox({
+    placeholder: 'Search changelog…', label: 'Search changelog', value: query,
+    onChange: value => { query = value; refresh(); }
+  });
+
+  // The News page's layout without its side cards.
+  main.appendChild(el('div', { class: 'news-layout no-extras' + (filterPanel ? '' : ' no-filters') }, [
     el('div', { class: 'news-toolbar' }, [countText, sortControl.node]),
+    el('div', { class: 'news-search-area' }, [searchBox.node]),
     filterPanel ? el('div', { class: 'news-filter-area' }, [filterPanel.node]) : null,
     el('div', { class: 'news-feed' }, [status, list, more])
   ]));
 
-  // A link to a release shows it: filters that hide it are cleared, and enough of the list is shown to include it.
+  // A link to a release shows it: a search or filters that hide it are cleared, and enough of the list is shown to include it.
   function focusHash() {
     const raw = location.hash.slice(1);
     if (!raw || raw.includes('=')) return false;
@@ -210,6 +236,8 @@ function renderChangelogPage() {
     if (!ordered.includes(release)) {
       activeMonths.clear();
       activeTypes.clear();
+      query = '';
+      searchBox.set('');
       refresh();
     }
     const index = ordered.indexOf(release);

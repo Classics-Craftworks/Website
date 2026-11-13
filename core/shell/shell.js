@@ -666,6 +666,39 @@ function buildSortDropdown({ options, current, label, menuId, onChange }) {
 // "2026-10" -> "October 2026": the month a News entry or a Changelog release is grouped and filtered under.
 const formatMonth = key => formatDate(key + '-01', { month: 'long', year: 'numeric' });
 
+// The search box shared by the News and Changelog pages, styled like the header search. The page keeps the query and
+// does the searching: onChange(query) runs on every keystroke, on Escape and on the clear button. Call sync(query)
+// after the query changes any other way, so the clear button shows only when there is something to clear.
+// Returns { node, sync, set }; set(query) also puts the text in the box.
+function buildSearchBox({ placeholder, label, value = '', onChange }) {
+  const input = el('input', {
+    class: 'nav-search-input',
+    attrs: {
+      type: 'search',
+      placeholder,
+      'aria-label': label,
+      autocomplete: 'off',
+      spellcheck: 'false',
+      enterkeyhint: 'search'
+    }
+  });
+  input.value = value;
+  const clearBtn = el('button', { class: 'nav-search-clear', attrs: { type: 'button', 'aria-label': 'Clear search', hidden: '' } });
+  const node = el('div', { class: 'news-search', attrs: { role: 'search' } }, [
+    icon('search', 'icon-sm nav-search-icon'),
+    input,
+    clearBtn
+  ]);
+  const sync = query => { clearBtn.hidden = !query; };
+  const clear = () => { input.value = ''; onChange(''); };
+  input.addEventListener('input', () => onChange(input.value));
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && input.value) { e.preventDefault(); clear(); }
+  });
+  clearBtn.addEventListener('click', () => { clear(); input.focus(); });
+  return { node, sync, set: query => { input.value = query; sync(query); } };
+}
+
 // The filter box shared by the News and Changelog pages: a collapsible panel of filter groups, each a titled list of
 // toggle buttons ("All" first) with counts. The page keeps the selected keys (one Set per group) and does the
 // filtering; this only builds the controls, flips a key in its Set when a button is pressed, calls onChange(), and

@@ -463,25 +463,10 @@ function renderNewsPage() {
   moreBtn.addEventListener('click', () => { limit += NEWS_PAGE_SIZE; refresh(true); });
   let filterPanel = null; // the shared filter box (shell.js), built below when there is anything to filter by
 
-  // Search box, styled like the header search.
-  const input = el('input', {
-    class: 'nav-search-input',
-    attrs: {
-      type: 'search',
-      placeholder: side.searchPlaceholder || 'Search news…',
-      'aria-label': 'Search news',
-      autocomplete: 'off',
-      spellcheck: 'false',
-      enterkeyhint: 'search'
-    }
+  const searchBox = buildSearchBox({
+    placeholder: side.searchPlaceholder || 'Search news…', label: 'Search news', value: query,
+    onChange: value => { query = value; refresh(); }
   });
-  input.value = query;
-  const clearBtn = el('button', { class: 'nav-search-clear', attrs: { type: 'button', 'aria-label': 'Clear search', hidden: '' } });
-  const searchBox = el('div', { class: 'news-search', attrs: { role: 'search' } }, [
-    icon('search', 'icon-sm nav-search-icon'),
-    input,
-    clearBtn
-  ]);
 
   // Every word typed has to appear somewhere in the entry, in any order.
   function matches(entry, terms) {
@@ -530,7 +515,7 @@ function renderNewsPage() {
 
     if (filterPanel) filterPanel.sync();
     sortControl.set(sort);
-    clearBtn.hidden = !query;
+    searchBox.sync(query);
 
     const onScreen = pinnedShown.length + visible.size;
     countText.replaceChildren('Showing ', el('strong', { text: `${onScreen} of ${entries.length}` }), ` ${entries.length === 1 ? 'entry' : 'entries'}`);
@@ -539,12 +524,6 @@ function renderNewsPage() {
       : '';
     writeHash(active, activeProjects, activeMonths, activeMc, sort, query, focused);
   }
-
-  input.addEventListener('input', () => { query = input.value; refresh(); });
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && input.value) { e.preventDefault(); input.value = ''; query = ''; refresh(); }
-  });
-  clearBtn.addEventListener('click', () => { input.value = ''; query = ''; refresh(); input.focus(); });
 
   // Filter dropdown: a toggle opening a panel of filter groups.
   function buildFilterDropdown() {
@@ -596,7 +575,7 @@ function renderNewsPage() {
 
   const filterBox = (projects.length || tagKeys.length > 1 || mcKeys.length || monthKeys.length > 1) ? buildFilterDropdown() : null;
   const filters = filterBox ? el('div', { class: 'news-filter-area' }, [filterBox]) : null;
-  const search = el('div', { class: 'news-search-area' }, [searchBox]);
+  const search = el('div', { class: 'news-search-area' }, [searchBox.node]);
 
   const extras = [renderLatestReleases(side.latestReleases), ...(side.cards || []).map(renderSideCard)].filter(Boolean);
   const layout = el('div', { class: 'news-layout' + (extras.length ? '' : ' no-extras') + (filters ? '' : ' no-filters') }, [
