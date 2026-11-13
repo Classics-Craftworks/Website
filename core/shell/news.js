@@ -264,9 +264,6 @@ function renderNewsPreview() {
 // "2026-10-13" -> "2026-10": the key entries are grouped and filtered by.
 const newsMonthKey = entry => entry.date.slice(0, 7);
 
-// "2026-10" -> "October 2026"
-const formatMonth = key => formatDate(key + '-01', { month: 'long', year: 'numeric' });
-
 // Filters and search live in the URL hash so a view can be linked to, e.g.
 // #projects=better-unpackables&tags=release&mc=26.4&months=2026-10&sort=oldest&q=snapshot
 function readHash(validTags, validProjects, validMonths, validMc) {
@@ -464,12 +461,7 @@ function renderNewsPage() {
   const status = el('p', { class: 'news-status', attrs: { 'aria-live': 'polite' } });
   const moreBtn = el('button', { class: 'news-show-more', attrs: { type: 'button', hidden: '' } });
   moreBtn.addEventListener('click', () => { limit += NEWS_PAGE_SIZE; refresh(true); });
-  // Filter buttons by option key ('' is the "All" button), paired with the set they toggle.
-  const buttons = new Map(); // tags
-  const projectButtons = new Map();
-  const monthButtons = new Map();
-  const mcButtons = new Map();
-  const filterRegistries = [[buttons, active], [projectButtons, activeProjects], [mcButtons, activeMc], [monthButtons, activeMonths]];
+  let filterPanel = null; // the shared filter box (shell.js), built below when there is anything to filter by
 
   // Search box, styled like the header search.
   const input = el('input', {
@@ -536,10 +528,7 @@ function renderNewsPage() {
     moreBtn.hidden = remaining === 0;
     moreBtn.textContent = `Show ${Math.min(remaining, NEWS_PAGE_SIZE)} more`; // what this click adds
 
-    filterRegistries.forEach(([registry, set]) => registry.forEach((btn, key) => {
-      btn.setAttribute('aria-pressed', String(key === '' ? !set.size : set.has(key)));
-    }));
-    groupUpdaters.forEach(update => update());
+    if (filterPanel) filterPanel.sync();
     sortControl.set(sort);
     clearBtn.hidden = !query;
 
@@ -557,140 +546,42 @@ function renderNewsPage() {
   });
   clearBtn.addEventListener('click', () => { input.value = ''; query = ''; refresh(); input.focus(); });
 
-  // One filter button: toggles `key` in `set`; `registry` lets refresh() show which are on.
-  function makeButton(key, label, tag, set, registry, count, image) {
-    const pic = image ? el('img', { class: 'news-filter-icon', src: image, alt: '', attrs: { width: '20', height: '20', decoding: 'async', draggable: 'false' } }) : null;
-    const btn = el('button', { class: 'news-filter' + (tag ? '' : ' is-plain'), attrs: { type: 'button', 'aria-pressed': 'false' } }, [
-      pic,
-      el('span', { text: label }),
-      el('span', { class: 'news-filter-count', text: String(count), attrs: { 'aria-hidden': 'true' } })
-    ]);
-    if (tag) setTagColor(btn, tag);
-    if (key !== '' && count === 0) btn.classList.add('is-empty');
-    btn.addEventListener('click', () => {
-      if (key === '') set.clear();
-      else if (set.has(key)) set.delete(key);
-      else set.add(key);
-      refresh();
-    });
-    registry.set(key, btn);
-    return btn;
-  }
-
-  const FILTER_VISIBLE = 4; // options per group shown before "Show more"
-
-  // A titled, collapsible group of filter buttons ("All" first). `startOpen` is the default
-  // state, but a group with a selection (e.g. from a shared link) always starts open.
-  // Only `visible` options show until "Show more" is pressed. `noun` is "projects", "tags", etc.
-  const groupUpdaters = []; // refresh() calls these so each title shows its selected count
-  function buildFilterGroup(title, noun, visible, startOpen, allButton, optionButtons, keys, set, panelId) {
-    const bodyId = 'news-filter-group-' + noun;
-    const options = el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': 'Filter news by ' + title.toLowerCase() } }, [
-      allButton,
-      ...optionButtons
-    ]);
-    const body = el('div', { class: 'news-filter-group-body', attrs: { id: bodyId } }, [options]);
-    const selected = el('span', { class: 'news-filter-group-selected', attrs: { hidden: '' } });
-    const heading = el('button', { class: 'news-filter-group-toggle', attrs: { type: 'button', 'aria-controls': bodyId } }, [
-      el('span', { class: 'news-filter-group-label', text: title }),
-      selected,
-      el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
-    ]);
-    const group = el('div', { class: 'news-filter-group' }, [
-      el('h3', { class: 'news-filter-group-title' }, [heading]),
-      body
-    ]);
-
-    let open = startOpen || set.size > 0;
-    function applyOpen() {
-      heading.setAttribute('aria-expanded', String(open));
-      body.hidden = !open;
-      group.classList.toggle('is-open', open);
-    }
-    heading.addEventListener('click', () => { open = !open; applyOpen(); });
-    applyOpen();
-    groupUpdaters.push(() => {
-      selected.textContent = String(set.size);
-      selected.hidden = set.size === 0;
-    });
-
-    let expanded = false;
-    let more = null;
-    function applyMore() {
-      optionButtons.forEach((b, i) => { b.hidden = !expanded && i >= visible; });
-      if (!more) return;
-      more.setAttribute('aria-expanded', String(expanded));
-      more.firstChild.textContent = (expanded ? 'Show fewer ' : 'Show more ') + noun;
-    }
-    if (optionButtons.length > visible) {
-      more = el('button', { class: 'news-filter-more', attrs: { type: 'button', 'aria-controls': panelId } }, [
-        el('span'),
-        el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
-      ]);
-      more.addEventListener('click', () => { expanded = !expanded; applyMore(); });
-      body.appendChild(more);
-    }
-    // A selection from a shared link might be hidden behind "Show more".
-    expanded = keys.slice(visible).some(k => set.has(k));
-    applyMore();
-    return group;
-  }
-
   // Filter dropdown: a toggle opening a panel of filter groups.
   function buildFilterDropdown() {
-    const panelId = 'news-filter-panel';
-    const toggle = el('button', { class: 'news-filter-toggle', attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': panelId } }, [
-      el('span', { class: 'news-filter-toggle-label', text: side.filterHeading || 'Filters' }),
-      el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
-    ]);
+    filterPanel = buildFilterPanel({ idPrefix: 'news', subject: 'news', heading: side.filterHeading, onChange: () => refresh() });
 
-    const groups = [];
     if (projects.length) {
       const projectCount = id => entries.filter(e => entryProjects.get(e).includes(id)).length;
-      groups.push(buildFilterGroup(
-        'Project', 'projects', FILTER_VISIBLE, true,
-        makeButton('', 'All projects', null, activeProjects, projectButtons, entries.length),
-        projects.map(p => makeButton(p.id, p.title, null, activeProjects, projectButtons, projectCount(p.id), p.image)),
-        projectIds, activeProjects, panelId
-      ));
+      filterPanel.addGroup({
+        title: 'Project', noun: 'projects', startOpen: true, set: activeProjects,
+        allLabel: 'All projects', total: entries.length,
+        options: projects.map(p => ({ key: p.id, label: p.title, count: projectCount(p.id), image: p.image }))
+      });
     }
     if (mcKeys.length) {
       const mcCount = v => entries.filter(e => entryMcVersions(e).includes(v)).length;
-      groups.push(buildFilterGroup(
-        'Minecraft version', 'versions', FILTER_VISIBLE, false,
-        makeButton('', 'All versions', null, activeMc, mcButtons, entries.length),
-        mcKeys.map(v => makeButton(v, v, null, activeMc, mcButtons, mcCount(v))),
-        mcKeys, activeMc, panelId
-      ));
+      filterPanel.addGroup({
+        title: 'Minecraft version', noun: 'versions', set: activeMc,
+        allLabel: 'All versions', total: entries.length,
+        options: mcKeys.map(v => ({ key: v, label: v, count: mcCount(v) }))
+      });
     }
     if (tagKeys.length > 1) {
-      groups.push(buildFilterGroup(
-        'Tags', 'tags', FILTER_VISIBLE, false,
-        makeButton('', 'All tags', null, active, buttons, entries.length),
-        tagKeys.map(k => { const t = newsTag(k); return makeButton(k, t.label, t, active, buttons, entries.filter(e => (e.tags || []).includes(k)).length); }),
-        tagKeys, active, panelId
-      ));
+      filterPanel.addGroup({
+        title: 'Tags', noun: 'tags', set: active,
+        allLabel: 'All tags', total: entries.length,
+        options: tagKeys.map(k => { const t = newsTag(k); return { key: k, label: t.label, tag: t, count: entries.filter(e => (e.tags || []).includes(k)).length }; })
+      });
     }
     if (monthKeys.length > 1) {
       const monthCount = key => entries.filter(e => newsMonthKey(e) === key).length;
-      groups.push(buildFilterGroup(
-        'Month', 'months', FILTER_VISIBLE, false,
-        makeButton('', 'All months', null, activeMonths, monthButtons, entries.length),
-        monthKeys.map(k => makeButton(k, formatMonth(k), null, activeMonths, monthButtons, monthCount(k))),
-        monthKeys, activeMonths, panelId
-      ));
+      filterPanel.addGroup({
+        title: 'Month', noun: 'months', set: activeMonths,
+        allLabel: 'All months', total: entries.length,
+        options: monthKeys.map(k => ({ key: k, label: formatMonth(k), count: monthCount(k) }))
+      });
     }
-    const panel = el('div', { class: 'news-filter-panel', attrs: { id: panelId, hidden: '' } }, groups);
-
-    const box = el('div', { class: 'news-filter-box' }, [toggle, panel]);
-    function setOpen(open) {
-      toggle.setAttribute('aria-expanded', String(open));
-      panel.hidden = !open;
-      box.classList.toggle('is-open', open);
-    }
-    toggle.addEventListener('click', () => setOpen(panel.hidden));
-    setOpen(true);
-    return box;
+    return filterPanel.node;
   }
 
   // Toolbar: "Showing X of Y entries" on the left, sort dropdown on the right.

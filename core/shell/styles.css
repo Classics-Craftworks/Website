@@ -1842,6 +1842,11 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 
 .news-layout.no-filters.no-extras { grid-template-rows: auto auto; }
 
+/* The Changelog page has no search box or side cards: the filters sit beside the toolbar and the list. */
+.news-layout.no-search { grid-template-areas: "toolbar filters" "feed filters"; grid-template-rows: auto 1fr; }
+
+.news-layout.no-search.no-filters { grid-template-columns: minmax(0, 1fr); grid-template-areas: "toolbar" "feed"; }
+
 .news-toolbar { grid-area: toolbar; }
 
 .news-search-area { grid-area: search; min-width: 0; }
@@ -1860,6 +1865,10 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
     grid-template-areas: "search" "toolbar" "filters" "feed" "extra";
     grid-template-rows: auto;
   }
+
+  .news-layout.no-search { grid-template-areas: "toolbar" "filters" "feed"; }
+
+  .news-layout.no-search.no-filters { grid-template-areas: "toolbar" "feed"; }
 }
 
 .news-search { position: relative; }
@@ -2649,6 +2658,8 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
     grid-template-areas: "search toolbar" "filters feed" "extra feed";
   }
   html[data-sidebar="left"] .news-layout.no-filters { grid-template-areas: "search toolbar" "extra feed"; }
+  html[data-sidebar="left"] .news-layout.no-search { grid-template-areas: "filters toolbar" "filters feed"; }
+  html[data-sidebar="left"] .news-layout.no-search.no-filters { grid-template-columns: minmax(0, 1fr); grid-template-areas: "toolbar" "feed"; }
 }
 
 /* Header Settings dropdown: quick toggles. */

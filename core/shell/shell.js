@@ -663,6 +663,129 @@ function buildSortDropdown({ options, current, label, menuId, onChange }) {
   };
 }
 
+// "2026-10" -> "October 2026": the month a News entry or a Changelog release is grouped and filtered under.
+const formatMonth = key => formatDate(key + '-01', { month: 'long', year: 'numeric' });
+
+// The filter box shared by the News and Changelog pages: a collapsible panel of filter groups, each a titled list of
+// toggle buttons ("All" first) with counts. The page keeps the selected keys (one Set per group) and does the
+// filtering; this only builds the controls, flips a key in its Set when a button is pressed, calls onChange(), and
+// shows which buttons are on when the page calls sync().
+//   idPrefix  makes the element ids unique per page ("news" -> news-filter-panel)
+//   subject   what is being filtered, for the screen-reader labels ("news" -> "Filter news by month")
+// addGroup({ title, noun, set, allLabel, total, options: [{ key, label, count, tag?, image?, hint? }],
+//            visible?, startOpen? }) adds a group; `noun` ("projects", "months") names its "Show more" button.
+// Only `visible` options show until "Show more" is pressed; a group with a selection (a shared link) starts open.
+// Returns { node, addGroup, sync, groupCount }.
+function buildFilterPanel({ idPrefix, subject, heading = 'Filters', onChange }) {
+  const panelId = `${idPrefix}-filter-panel`;
+  const FILTER_VISIBLE = 4; // options per group shown before "Show more"
+  const registries = []; // [Map of option key ('' is "All") -> button, Set] per group
+  const updaters = [];   // each group title shows its selected count
+
+  const toggle = el('button', { class: 'news-filter-toggle', attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': panelId } }, [
+    el('span', { class: 'news-filter-toggle-label', text: heading }),
+    el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+  ]);
+  const panel = el('div', { class: 'news-filter-panel', attrs: { id: panelId, hidden: '' } });
+  const box = el('div', { class: 'news-filter-box' }, [toggle, panel]);
+  function setOpen(open) {
+    toggle.setAttribute('aria-expanded', String(open));
+    panel.hidden = !open;
+    box.classList.toggle('is-open', open);
+  }
+  toggle.addEventListener('click', () => setOpen(panel.hidden));
+  setOpen(true);
+
+  // One filter button: toggles `key` in `set`.
+  function makeButton({ key, label, count, tag, image, hint }, set, registry) {
+    const pic = image ? el('img', { class: 'news-filter-icon', src: image, alt: '', attrs: { width: '20', height: '20', decoding: 'async', draggable: 'false' } }) : null;
+    const btn = el('button', { class: 'news-filter' + (tag ? '' : ' is-plain'), attrs: { type: 'button', 'aria-pressed': 'false' } }, [
+      pic,
+      el('span', { text: label }),
+      el('span', { class: 'news-filter-count', text: String(count), attrs: { 'aria-hidden': 'true' } })
+    ]);
+    if (tag) setTagColor(btn, tag);
+    if (hint) btn.title = hint;
+    if (key !== '' && count === 0) btn.classList.add('is-empty');
+    btn.addEventListener('click', () => {
+      if (key === '') set.clear();
+      else if (set.has(key)) set.delete(key);
+      else set.add(key);
+      onChange();
+    });
+    registry.set(key, btn);
+    return btn;
+  }
+
+  function addGroup({ title, noun, set, allLabel, total, options, visible = FILTER_VISIBLE, startOpen = false }) {
+    const registry = new Map();
+    const allButton = makeButton({ key: '', label: allLabel, count: total }, set, registry);
+    const optionButtons = options.map(o => makeButton(o, set, registry));
+    const keys = options.map(o => o.key);
+    registries.push([registry, set]);
+
+    const bodyId = `${idPrefix}-filter-group-${noun}`;
+    const list = el('div', { class: 'news-filters', attrs: { role: 'group', 'aria-label': `Filter ${subject} by ${title.toLowerCase()}` } }, [
+      allButton,
+      ...optionButtons
+    ]);
+    const body = el('div', { class: 'news-filter-group-body', attrs: { id: bodyId } }, [list]);
+    const selected = el('span', { class: 'news-filter-group-selected', attrs: { hidden: '' } });
+    const headingButton = el('button', { class: 'news-filter-group-toggle', attrs: { type: 'button', 'aria-controls': bodyId } }, [
+      el('span', { class: 'news-filter-group-label', text: title }),
+      selected,
+      el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+    ]);
+    const group = el('div', { class: 'news-filter-group' }, [
+      el('h3', { class: 'news-filter-group-title' }, [headingButton]),
+      body
+    ]);
+
+    let open = startOpen || set.size > 0;
+    function applyOpen() {
+      headingButton.setAttribute('aria-expanded', String(open));
+      body.hidden = !open;
+      group.classList.toggle('is-open', open);
+    }
+    headingButton.addEventListener('click', () => { open = !open; applyOpen(); });
+    applyOpen();
+    updaters.push(() => {
+      selected.textContent = String(set.size);
+      selected.hidden = set.size === 0;
+    });
+
+    let expanded = false;
+    let more = null;
+    function applyMore() {
+      optionButtons.forEach((b, i) => { b.hidden = !expanded && i >= visible; });
+      if (!more) return;
+      more.setAttribute('aria-expanded', String(expanded));
+      more.firstChild.textContent = (expanded ? 'Show fewer ' : 'Show more ') + noun;
+    }
+    if (optionButtons.length > visible) {
+      more = el('button', { class: 'news-filter-more', attrs: { type: 'button', 'aria-controls': panelId } }, [
+        el('span'),
+        el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+      ]);
+      more.addEventListener('click', () => { expanded = !expanded; applyMore(); });
+      body.appendChild(more);
+    }
+    // A selection from a shared link might be hidden behind "Show more".
+    expanded = keys.slice(visible).some(k => set.has(k));
+    applyMore();
+    panel.appendChild(group);
+  }
+
+  function sync() {
+    registries.forEach(([registry, set]) => registry.forEach((btn, key) => {
+      btn.setAttribute('aria-pressed', String(key === '' ? !set.size : set.has(key)));
+    }));
+    updaters.forEach(update => update());
+  }
+
+  return { node: box, addGroup, sync, groupCount: () => registries.length };
+}
+
 function footerLink(href, iconName, label) {
   const a = internalLink('footer-link footer-social', href, [icon(iconName, 'icon-sm'), el('span', { text: label })]);
   const li = document.createElement('li');
