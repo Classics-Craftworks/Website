@@ -1573,7 +1573,7 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 
 .about-h { margin: var(--s-6) 0 var(--s-3); font-family: var(--font-body); font-size: var(--text-xl); line-height: var(--lh-xl); font-weight: 600; letter-spacing: 0; text-transform: none; }
 
-.about-text, .about-list, .about-quote { max-width: var(--measure); margin-bottom: var(--s-4); }
+.about-text, .about-list, .about-quote { margin-bottom: var(--s-4); }
 
 .about-text, .about-list { color: var(--text-soft); }
 
@@ -1623,9 +1623,9 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 
 .changelog-group-head { margin: 0; font-family: var(--font-body); font-size: var(--text-md); line-height: var(--lh-md); font-weight: 700; letter-spacing: 0; text-transform: none; }
 
-.changelog-note { margin: 0; max-width: none; }
+.changelog-note { margin: 0; }
 
-.changelog-list { margin: 0; max-width: none; }
+.changelog-list { margin: 0; }
 
 .changelog-list .changelog-list { margin: var(--s-1) 0 var(--s-2); list-style: circle; }
 
