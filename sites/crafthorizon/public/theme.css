@@ -1,21 +1,26 @@
 /* CraftHorizon theme: purple. Loaded after the shared styles.css, so these override its tokens.
-   The shared file sets the light and OLED themes with more specific selectors, so each is repeated here. */
+   The shared file sets the light and OLED themes with more specific selectors, so each is repeated here.
+   The Settings theme previews (.pv) are on the same selectors as their themes, so they use these values too. */
 
 /* ---------- Dark (default) ---------- */
-:root {
+:root,
+.pv[data-pv="dark"] {
   --bg:         #0b0716;
   --surface:    #130d24;
   --surface-2:  #1b1432;
   --border:     #2b2148;
   --border-2:   #43356e;
   --text-soft:  #a99fc8;
+}
 
+:root {
   --accent:      #b78cf5;
   --accent-rgb:  183, 140, 245;
   --on-accent:   #0b0716;
 }
 
-:root[data-theme="oled"] {
+:root[data-theme="oled"],
+.pv[data-pv="oled"] {
   --surface:    #0a0712;
   --surface-2:  #110c1e;
   --border:     #281f40;
@@ -23,7 +28,8 @@
 }
 
 /* ---------- Light ---------- */
-:root[data-theme="light"] {
+:root[data-theme="light"],
+.pv[data-pv="light"] {
   --bg:         #f8f5fd;
   --surface:    #ffffff;
   --surface-2:  #efe9f9;
@@ -31,7 +37,9 @@
   --border-2:   #c3b2e3;
   --text:       #1a1030;
   --text-soft:  #594b79;
+}
 
+:root[data-theme="light"] {
   --accent:      #6d28d9;
   --accent-rgb:  109, 40, 217;
   --on-accent:   #ffffff;
@@ -55,13 +63,6 @@
   --accent:     #4c1d95;
   --accent-rgb: 76, 29, 149;
 }
-
-/* ---------- Colour theme previews (Settings) ----------
-   The previews draw each theme in its own colours whatever theme is active, so they can't read the live tokens;
-   these are this site's values for each theme (its --bg, --surface-2 and --border-2). */
-.pv { --pv-bg: #0b0716; --pv-surface: #1b1432; --pv-text: #f2f5fa; --pv-line: #43356e; }
-.pv[data-pv="oled"] { --pv-bg: #000000; --pv-surface: #110c1e; --pv-line: #3c2f63; }
-.pv[data-pv="light"] { --pv-bg: #f8f5fd; --pv-surface: #ffffff; --pv-text: #1a1030; --pv-line: #c3b2e3; }
 
 /* ---------- Logo ---------- */
 .brand-logo, .footer-logo { border-radius: var(--r-1); }

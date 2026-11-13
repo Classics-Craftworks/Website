@@ -46,14 +46,7 @@
   --r-2: 16px;
   --r-pill: 999px;
 
-  /* Neutral surfaces and text */
-  --bg:         #0d111a;
-  --surface:    #131a27;
-  --surface-2:  #1a2334;
-  --border:     #25324a;
-  --border-2:   #34476a;
-  --text:       #f2f5fa;
-  --text-soft:  #9ba7bf;
+  /* Neutral surfaces and text: see "Theme colours" below */
 
   /* Accent (the only brand colour) */
   --accent:      #74c4e7;
@@ -122,6 +115,23 @@
   --ease: 160ms ease-out;
 }
 
+/* ---------- Theme colours ----------
+   The neutral surface and text tokens of each theme. The Settings theme previews (.pv) are listed on the same
+   selectors, so each preview takes its colours from the tokens themselves and can't drift from them.
+   The OLED preview starts from the dark values (it has no --text of its own) and the OLED block then overrides them.
+   A site's theme.css repeats these selectors for its own colours. */
+:root,
+.pv[data-pv="dark"],
+.pv[data-pv="oled"] {
+  --bg:         #0d111a;
+  --surface:    #131a27;
+  --surface-2:  #1a2334;
+  --border:     #25324a;
+  --border-2:   #34476a;
+  --text:       #f2f5fa;
+  --text-soft:  #9ba7bf;
+}
+
 @media (max-width: 720px) {
   :root {
     --gutter: var(--s-4);
@@ -140,17 +150,21 @@
    - Order matters: themes, then accents, then high contrast; later rules at equal specificity win.
    - Accent text must stay readable on every surface: dark themes use the bright accent, the light
      theme a darker one (and a darker one again in high contrast). */
-:root[data-theme="oled"] {
+:root[data-theme="oled"],
+.pv[data-pv="oled"] {
   --bg:        #000000;
   --surface:   #08090d;
   --surface-2: #11141b;
   --border:    #232b3a;
   --border-2:  #38425a;
+}
+
+:root[data-theme="oled"] {
   --shadow-float: 0 8px 24px rgba(0, 0, 0, 0.8);
 }
 
-:root[data-theme="light"] {
-  color-scheme: light;
+:root[data-theme="light"],
+.pv[data-pv="light"] {
   --bg:         #f4f7fc;
   --surface:    #ffffff;
   --surface-2:  #e9eef7;
@@ -158,6 +172,10 @@
   --border-2:   #b6c3da;
   --text:       #101729;
   --text-soft:  #4a5875;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
   --accent:      #0b6a9a;
   --accent-rgb:  11, 106, 154;
   --on-accent:   #ffffff;
@@ -2424,19 +2442,18 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 /* Theme previews: a tiny page drawn in each theme's own colours. */
 .theme-preview { display: flex; height: 64px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--r-1); }
 
-.pv { --pv-bg: #0d111a; --pv-surface: #1a2334; --pv-text: #f2f5fa; --pv-line: #34476a; position: relative; flex: 1 1 0; background: var(--pv-bg); }
+/* Each .pv gets its theme's tokens from "Theme colours" and the theme blocks above, not from the active theme. */
+.pv { position: relative; flex: 1 1 0; background: var(--bg); }
 
-.pv[data-pv="oled"] { --pv-bg: #000000; --pv-surface: #11141b; --pv-line: #38425a; }
+.pv-bar { position: absolute; top: 0; left: 0; right: 0; height: 10px; border-bottom: 1px solid var(--border-2); background: var(--bg); }
 
-.pv[data-pv="light"] { --pv-bg: #f4f7fc; --pv-surface: #ffffff; --pv-text: #101729; --pv-line: #b6c3da; }
+.pv-bar::before { content: ''; position: absolute; top: 3px; left: 6px; width: 14px; height: 3px; border-radius: 2px; background: var(--text); }
 
-.pv-bar { position: absolute; top: 0; left: 0; right: 0; height: 10px; border-bottom: 1px solid var(--pv-line); background: var(--pv-bg); }
+.pv-card { position: absolute; top: 16px; left: 6px; right: 6px; bottom: 6px; border: 1px solid var(--border-2); border-radius: 4px; background: var(--surface-2); }
 
-.pv-bar::before { content: ''; position: absolute; top: 3px; left: 6px; width: 14px; height: 3px; border-radius: 2px; background: var(--pv-text); }
+.pv[data-pv="light"] .pv-card { background: var(--surface); } /* the light theme's cards are white on a tinted page */
 
-.pv-card { position: absolute; top: 16px; left: 6px; right: 6px; bottom: 6px; border: 1px solid var(--pv-line); border-radius: 4px; background: var(--pv-surface); }
-
-.pv-card::before { content: ''; position: absolute; top: 6px; left: 6px; width: 55%; height: 4px; border-radius: 2px; background: var(--pv-text); opacity: 0.85; }
+.pv-card::before { content: ''; position: absolute; top: 6px; left: 6px; width: 55%; height: 4px; border-radius: 2px; background: var(--text); opacity: 0.85; }
 
 .pv-card::after { content: ''; position: absolute; bottom: 5px; left: 6px; width: 22px; height: 6px; border-radius: 3px; background: var(--accent); }
 
