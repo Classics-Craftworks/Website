@@ -3,6 +3,7 @@
 
    - Icons: SVGs in core/static/images/icons/, referenced by filename without extension.
    - home.splash.actions: the hero buttons ("primary" or "ghost"; an absolute url opens in a new tab).
+   - home.splash.joinCard: the card beside the hero (heading, badge, 5:2 picture); it reads home.join and home.versions.
    - home.join / home.versions / home.features: the home page blocks, in that order. Text may be a string or an
      array mixing strings with { link, url } / { bold } / { code } pieces. A block left out is not shown.
    - Header pages: shown in the order listed; an absolute url (https://...) is an external link and opens in a new tab. */
@@ -25,7 +26,10 @@ const SITE_DATA = {
       subtitle: "A whitelisted Minecraft server with a focus on vanilla+ Survival and Creative gameplay.",
       actions: [
         { label: "How to join", url: "#how-to-join", icon: "compass", style: "primary" }
-      ]
+      ],
+      // The "Join the server" card beside the headline. Its addresses, recommended versions and Apply button
+      // come from home.join and home.versions below; only the heading, picture and badge are set here.
+      joinCard: { heading: "Join the server", badge: "Whitelisted", image: "images/featured-CH.webp", imageAlt: "CraftHorizon logo" }
     },
 
     features: {

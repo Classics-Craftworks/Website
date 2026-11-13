@@ -1057,12 +1057,71 @@ main:focus, #catalog:focus { outline: none; }
   background: var(--surface);
 }
 
+/* The card's parts shared by the catalogue's featured projects and the landing "Join the server" card:
+   label row, picture, footer with chips and a button. */
+.splash-featured-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); margin-bottom: var(--s-4); }
+
+.splash-featured-label {
+  margin-bottom: var(--s-4);
+  color: var(--text-soft);
+  font-size: var(--text-xs);
+  line-height: var(--lh-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.splash-featured-top .splash-featured-label { margin: 0; }
+
+.splash-featured-media {
+  overflow: hidden;
+  aspect-ratio: 5 / 2;
+  border: 1px solid var(--border);
+  border-radius: var(--r-1);
+  background: var(--surface-2);
+}
+
+.splash-featured-img { display: block; width: 100%; height: 100%; object-fit: cover; user-select: none; -webkit-user-drag: none; }
+
+.splash-featured-head { margin: var(--s-4) 0 var(--s-2); }
+
+.splash-featured-title { font-family: var(--font-body); font-size: var(--text-lg); line-height: var(--lh-lg); font-weight: 600; letter-spacing: 0; text-transform: none; }
+
+.splash-featured-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); }
+
+.splash-chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+
+.splash-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  height: var(--s-6);
+  padding: 0 var(--s-3);
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  font-size: var(--text-xs);
+  line-height: var(--lh-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.splash-chip .icon { color: var(--accent); }
+
+.splash-featured-foot .splash-btn { min-height: var(--control-h); padding: 0 var(--s-4); }
+
+@container splash-featured (max-width: 360px) {
+  .splash-featured-foot { flex-direction: column; align-items: stretch; }
+  .splash-featured-foot .splash-btn { width: 100%; }
+}
+
 /*@include catalog/featured-card*/
 .splash-featured-arrow-prev::before { transform: translateX(2px) rotate(-135deg); }
 
 .splash-featured-arrow-next::before { transform: translateX(-2px) rotate(45deg); }
 
 /*@include catalog/featured-slides*/
+/*@include landing/join-card*/
 @media (max-width: 900px) {
   .splash { padding: var(--s-6) 0 var(--section-gap); }
   .splash-inner { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; grid-template-areas: "copy" "featured" "stats"; row-gap: var(--s-6); }

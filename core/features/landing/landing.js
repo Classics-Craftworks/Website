@@ -114,6 +114,53 @@ function renderFeatures(features) {
   return homeBlock(features, 'features', [el('ul', { class: 'feature-grid' }, items)]);
 }
 
+// The splash's "Join the server" card: the same frame as the catalogue's featured card, filled from the join and
+// versions blocks (addresses, recommended versions, apply button) so nothing is written twice. The picture, badge and
+// heading come from SITE_DATA.home.splash.joinCard.
+function renderJoinCard(card, config, home) {
+  const join = home.join;
+  const addresses = join.addresses || [];
+  const java = addresses[0];
+  const header = el('div', { class: 'splash-featured-top' }, [
+    el('p', { class: 'splash-featured-label', text: config.heading || join.heading }),
+    config.badge ? el('span', { class: 'join-card-badge', text: config.badge }) : null
+  ]);
+
+  const media = config.image ? el('div', { class: 'splash-featured-media' }, [
+    el('img', { class: 'splash-featured-img', src: config.image, alt: config.imageAlt || '', attrs: { draggable: 'false', width: '1000', height: '400' } })
+  ]) : null;
+
+  // The first address gets the copy button; the rest (Bedrock) show address and port to type in.
+  const rows = el('ul', { class: 'join-card-addresses' }, addresses.map(a =>
+    el('li', { class: 'join-card-row' }, [
+      el('span', { class: 'join-card-edition', text: a.label }),
+      el('span', { class: 'join-card-value' }, [
+        el('code', { text: a.value }),
+        a.port ? el('span', { class: 'join-card-port', text: 'Port ' + a.port }) : null
+      ]),
+      a === java ? copyButton(a.value, `${a.label} address`) : null
+    ])
+  ));
+
+  // One chip per edition's recommended version: "Java 26.3", "Bedrock 26.60+".
+  const chips = ((home.versions && home.versions.editions) || []).flatMap(ed =>
+    (ed.versions || []).filter(v => v.recommended).map(v =>
+      el('li', { class: 'splash-chip' }, [
+        ed.icon ? icon(ed.icon, 'icon-sm') : null,
+        el('span', { text: `${ed.name.replace(/ Edition$/, '')} ${v.note || v.label}` })
+      ])
+    )
+  );
+  const apply = join.apply && join.apply.button;
+  const foot = el('div', { class: 'splash-featured-foot' }, [
+    chips.length ? el('ul', { class: 'splash-chips', attrs: { 'aria-label': 'Recommended versions' } }, chips) : el('span'),
+    apply ? renderAction({ ...apply, style: 'primary' }) : null
+  ]);
+
+  card.setAttribute('aria-label', config.heading || join.heading);
+  [header, media, rows, foot].forEach(node => node && card.appendChild(node));
+}
+
 // Fills #catalog with the site's own home blocks (a site with project sections shows its cards there instead).
 function renderHomeBlocks(home) {
   const main = document.getElementById('catalog');
@@ -124,3 +171,11 @@ function renderHomeBlocks(home) {
 }
 
 SITE_HOOKS.home.blocks.push(() => renderHomeBlocks(SITE_DATA.home));
+
+// The splash card, if the site asks for one (SITE_DATA.home.splash.joinCard) and has a "How to join" block to fill it.
+SITE_HOOKS.home.featured = (splash, card) => {
+  const home = SITE_DATA.home;
+  if (!card || !splash.joinCard || !home.join) return false;
+  renderJoinCard(card, splash.joinCard, home);
+  return true;
+};

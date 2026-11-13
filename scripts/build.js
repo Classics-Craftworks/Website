@@ -226,8 +226,14 @@ function buildSite(id) {
   const home = data.home || {};
   if (!has('landing') && (home.features || home.join || home.versions)) fail(`SITE_DATA.home has features/join/versions blocks but site.config.js doesn't list the "landing" feature`);
 
-  // A site without the catalogue gets no "Projects" footer column, no featured card and no project wording.
+  // The splash card: the catalogue's featured projects, or the landing "Join the server" card.
+  const joinCard = has('landing') && home.splash && home.splash.joinCard;
+  if (joinCard && !home.join) fail(`SITE_DATA.home.splash.joinCard needs a home.join block to fill it`);
+  if (joinCard && joinCard.image && !fs.existsSync(path.join(out, joinCard.image))) fail(`SITE_DATA.home.splash.joinCard.image "${joinCard.image}" is not in the site's files`);
+
+  // A site without the catalogue gets no "Projects" footer column and no project wording.
   const hasProjects = has('catalog');
+  const hasFeaturedCard = hasProjects || !!joinCard;
   const hasTheme = fs.existsSync(path.join(out, 'theme.css'));
   const og = config.ogImage;
   const noscriptLinks = config.noscriptLinks
@@ -273,7 +279,7 @@ function buildSite(id) {
       noscriptLinks,
       noscriptFind: hasProjects ? 'find our projects on' : 'find us on',
       logo: esc('/' + data.brand.logo),
-      main: render(mainTemplate(page.kind), { hasProjects }, `main/${page.kind}`),
+      main: render(mainTemplate(page.kind), { hasProjects, hasFeaturedCard }, `main/${page.kind}`),
       backToTop: k.backToTop,
       scripts: scriptTags(page.kind, features)
     }, `page ${file}`);

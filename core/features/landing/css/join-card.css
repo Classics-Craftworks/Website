@@ -1,0 +1,64 @@
+/* ---------- Home: "Join the server" card ----------
+   The splash's card for a site without a catalogue. It sits in the same .splash-featured frame as the catalogue's
+   featured projects and reuses their label row, picture, chips and footer (shell/styles.css); only the badge and
+   the address rows are its own. Drawn by landing.js from SITE_DATA.home.join / versions. */
+
+.join-card-badge {
+  flex: none;
+  padding: 0 var(--s-2);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-pill);
+  background: rgba(var(--accent-rgb), var(--tint-2));
+  color: var(--accent);
+  font-size: var(--text-xs);
+  line-height: var(--s-4);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.join-card-addresses { display: flex; flex-direction: column; gap: var(--s-2); margin: var(--s-4) 0; padding: 0; list-style: none; }
+
+.join-card-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: calc(var(--s-6) + var(--s-2) + 2px);   /* the Copy button's height, so both rows match */
+  padding: var(--s-1) var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-1);
+  background: var(--bg);
+}
+
+.join-card-edition { flex: none; width: 8em; white-space: nowrap; color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); font-weight: 600; }
+
+.join-card-value { display: flex; flex: 1 1 auto; align-items: baseline; flex-wrap: wrap; gap: 0 var(--s-3); min-width: 0; }
+
+.join-card-value code {
+  padding: 1px 6px;
+  border-radius: var(--r-0);
+  background: var(--surface-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.join-card-port { color: var(--text-soft); font-size: var(--text-xs); line-height: var(--lh-xs); font-variant-numeric: tabular-nums; }
+
+.join-card-row .copy-btn { flex: none; }
+
+/* A narrow card: the edition label and Copy button share a line, with the address on its own line below, so the
+   address is never broken. */
+@container splash-featured (max-width: 360px) {
+  .join-card-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "edition copy" "value value";
+    align-items: center;
+    gap: var(--s-1) var(--s-3);
+    padding: var(--s-2) var(--s-3);
+  }
+  .join-card-edition { grid-area: edition; width: auto; }
+  .join-card-value { grid-area: value; }
+  .join-card-row .copy-btn { grid-area: copy; }
+}
