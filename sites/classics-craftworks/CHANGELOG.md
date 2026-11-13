@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v4.14.1 — 2026-11-13
+
+No user-facing changes.
+
 ## v4.14.0.1 — 2026-11-13
 
 ### Changed
@@ -22,7 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 - The footer's version number now opens the Changelog page instead of GitHub
 - The About page now takes up the full width, rather than wrapping halfway through
 
-## v4.13.1 — 2026-11-12
+## v4.13.1 — 2026-11-13
 
 ### Changed
 - Separated the shared core into the parts every site uses and optional features, with no user-facing changes

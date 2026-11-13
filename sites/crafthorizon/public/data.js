@@ -15,7 +15,7 @@ const SITE_DATA = {
   },
 
   version: {
-    label: "v0.3.0",
+    label: "v0.3.1",
     url: "/changelog"
   },
 

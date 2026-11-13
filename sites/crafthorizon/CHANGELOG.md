@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com).
 
+## v0.3.1 — 2026-11-13
+
+No user-facing changes.
+
 ## v0.3.0 — 2026-11-13
 
 ### Added
@@ -18,7 +22,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com).
 - The About page now takes up the full width, rather than wrapping halfway through
 - Updated site images and logos
 
-## v0.2.1 — 2026-11-12
+## v0.2.1 — 2026-11-13
 
 ### Changed
 - The site now loads less code, as it no longer includes the parts of the Classic’s Craftworks site it doesn't use
