@@ -10,7 +10,7 @@
 const SITE_DATA = {
 
   brand: {
-    logo: "images/crafthorizon.webp",
+    logo: "images/icon-192.png",
     name: "CRAFTHORIZON"
   },
 
