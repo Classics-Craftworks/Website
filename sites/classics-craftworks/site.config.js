@@ -50,7 +50,7 @@ module.exports = {
       title: "Classic's Craftworks | Minecraft Java Data Packs, Mods & Resource Packs",
       description: 'Data packs, mods and resource packs for Minecraft Java Edition. Every project lists its current release, beta and archive versions, with downloads on Modrinth and SpigotMC.',
       ogDescription: 'Data packs, mods and resource packs for Minecraft Java Edition, with versioned releases and downloads on Modrinth and SpigotMC.',
-      lastmod: '2026-11-10'
+      lastmod: '2026-11-13'
     },
     {
       kind: 'section', slug: 'data-packs-mods',
