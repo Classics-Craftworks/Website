@@ -282,12 +282,29 @@ function applyThemeColor() {
   if (meta && bg) meta.content = bg;
 }
 
+// Changing the theme, accent, contrast or season repaints nearly everything. The colour transitions on buttons,
+// cards and links would all start at once, on top of whatever else is animating (the seasonal canvas, the carousel),
+// and only some elements have them, so the page would also fade unevenly. data-theming switches them off (styles.css)
+// for the frame that applies the change.
+let appearanceKey = null;
+let themingFrame = 0;
+function suspendTransitions(root, key) {
+  const changed = appearanceKey !== null && appearanceKey !== key;
+  appearanceKey = key;
+  if (!changed) return;
+  root.setAttribute('data-theming', '');
+  cancelAnimationFrame(themingFrame);
+  // Two frames: the first one computes the new styles, the second is safely after it.
+  themingFrame = requestAnimationFrame(() => { themingFrame = requestAnimationFrame(() => root.removeAttribute('data-theming')); });
+}
+
 function applySettings() {
   const s = getSettings();
   const root = document.documentElement;
   const toggle = (name, on, value) => { if (on) root.setAttribute(name, value); else root.removeAttribute(name); };
 
   const theme = effectiveTheme(s);
+  suspendTransitions(root, [theme, s.accent, effectiveHighContrast(s), effectiveSeason(s)].join('|'));
   root.setAttribute('data-theme', theme);
   toggle('data-accent', s.accent !== 'blue', s.accent);
   toggle('data-contrast', effectiveHighContrast(s), 'high');

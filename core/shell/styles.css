@@ -2252,6 +2252,9 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 /* ---------- Reduced motion ----------
    Driven by data-motion="reduce" on <html> (settings.js: the device setting unless the visitor
    overrode it in Settings). The animated rules above are written against :root:not([data-motion="reduce"]). */
+/* settings.js sets data-theming for the frame in which the theme, accent, contrast or season changes. */
+:root[data-theming] *, :root[data-theming] *::before, :root[data-theming] *::after { transition: none !important; }
+
 :root[data-motion="reduce"] *, :root[data-motion="reduce"] *::before, :root[data-motion="reduce"] *::after {
   animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important;
 }

@@ -1941,6 +1941,7 @@
     window.removeEventListener('resize', onResize);
     if (canvas) canvas.remove();
     canvas = ctx = effect = null;
+    footerTop = null;
     mode = '';
   }
 
@@ -1991,6 +1992,8 @@
       canvas.className = 'season-canvas';
       canvas.setAttribute('aria-hidden', 'true');
       document.body.prepend(canvas);
+      footerTop = null;
+      queueFooter(); // the new canvas needs the footer position too
       ctx = canvas.getContext('2d');
       if (!ctx) { stop(); return; }
       window.addEventListener('resize', onResize);
@@ -2011,13 +2014,24 @@
   }
 
   // Tell the stylesheet where the footer's top edge is on screen, so the canvas can fade out behind it.
+  // The value goes on the canvas only: a custom property changed on <html> is inherited by every element, so the
+  // browser would re-check the whole page's styles on each scroll frame. It is also left unset while the footer is
+  // more than a fade-length below the screen (the fade can't show yet) and held at 0 once it is above it, so most
+  // scrolling writes nothing and the mask isn't redrawn.
   let footerFrame = 0;
+  let footerTop = null; // what is on the canvas now, null = unset
   function trackFooter() {
     footerFrame = 0;
+    if (!canvas) return;
     const footer = document.querySelector('.site-footer');
-    const root = document.documentElement.style;
-    if (!footer) { root.removeProperty('--footer-top'); return; }
-    root.setProperty('--footer-top', Math.round(footer.getBoundingClientRect().top) + 'px');
+    let top = null;
+    if (footer) {
+      const y = Math.round(footer.getBoundingClientRect().top);
+      if (y - 100 < window.innerHeight) top = Math.max(y, 0);
+    }
+    if (top === footerTop) return;
+    footerTop = top;
+    if (top === null) canvas.style.removeProperty('--footer-top'); else canvas.style.setProperty('--footer-top', top + 'px');
   }
   function queueFooter() { if (!footerFrame) footerFrame = requestAnimationFrame(trackFooter); }
   window.addEventListener('scroll', queueFooter, { passive: true });
