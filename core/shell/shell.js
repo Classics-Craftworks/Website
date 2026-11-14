@@ -844,6 +844,14 @@ function renderFooter(socials, footer, version) {
   document.getElementById('copyright').textContent = footer.copyright;
   document.getElementById('disclaimer').textContent = footer.disclaimer;
 
+  // The profile picture's own credit line (footer.profileCredit): { prefix, label, url?, suffix? }.
+  const pfp = footer.profileCredit, pfpEl = document.getElementById('profile-credit');
+  if (pfp && pfpEl) {
+    if (pfp.prefix) pfpEl.appendChild(document.createTextNode(pfp.prefix));
+    pfpEl.appendChild(pfp.url ? el('a', { href: pfp.url, class: 'credits-link', text: pfp.label }) : document.createTextNode(pfp.label));
+    if (pfp.suffix) pfpEl.appendChild(document.createTextNode(pfp.suffix));
+  }
+
   const credits = footer.iconCredits;
   if (credits) {
     const creditsEl = document.getElementById('icon-credits');

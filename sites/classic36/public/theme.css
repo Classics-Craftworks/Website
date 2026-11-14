@@ -1,0 +1,70 @@
+/* Classic36 theme: dark red. Loaded after the shared styles.css, so these override its tokens.
+   The shared file sets the light and OLED themes with more specific selectors, so each is repeated here. */
+
+/* ---------- Dark (default) ---------- */
+:root,
+.pv[data-pv="dark"] {
+  --bg:         #0d0507;
+  --surface:    #170a0e;
+  --surface-2:  #241016;
+  --border:     #3a1a22;
+  --border-2:   #5a2a35;
+  --text-soft:  #cdb3b8;
+  --accent-strong: #c8283f;   /* buttons and badges that sit behind white text */
+}
+
+:root {
+  --accent:      #ff5a6e;
+  --accent-rgb:  255, 90, 110;
+  --on-accent:   #ffffff;
+}
+
+:root[data-theme="oled"],
+.pv[data-pv="oled"] {
+  --bg:         #000000;
+  --surface:    #0b0305;
+  --surface-2:  #170810;
+  --border:     #331820;
+  --border-2:   #512933;
+}
+
+/* ---------- Light ---------- */
+:root[data-theme="light"],
+.pv[data-pv="light"] {
+  --bg:         #fdf5f6;
+  --surface:    #ffffff;
+  --surface-2:  #f9e4e7;
+  --border:     #efcdd2;
+  --border-2:   #dba4ac;
+  --text:       #2a0c12;
+  --text-soft:  #6e3a44;
+}
+
+:root[data-theme="light"] {
+  --accent:      #c8223a;
+  --accent-rgb:  200, 34, 58;
+  --on-accent:   #ffffff;
+}
+
+/* The logo is a full-colour skin head; the shared styles invert it in the light theme. */
+:root[data-theme="light"] .brand-logo,
+:root[data-theme="light"] .footer-logo { filter: none; }
+.brand-logo, .footer-logo { image-rendering: pixelated; }
+
+/* ---------- Layout touches that match the design ---------- */
+:root[data-theme="light"] { --accent-strong: #c8223a; }
+
+/* Plain text nav and buttons: no icons or arrows. */
+.site-nav a .icon, .splash-btn-arrow { display: none; }
+.splash-btn-primary { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
+@media (hover: hover) { .splash-btn-primary:hover { background: var(--accent); border-color: var(--accent); } }
+
+/* Big pixel headline. */
+.splash-headline { font-size: clamp(2.75rem, 1.2rem + 5.4vw, 4.75rem); line-height: 1.05; }
+
+/* No figures on this site. */
+#stats-section { display: none; }
+
+/* ---------- High contrast ---------- */
+:root[data-contrast="high"] { --text-soft: #f1dde0; --border: #a35a68; --border-2: #d99aa6; }
+:root[data-contrast="high"][data-theme="light"] { --text-soft: #3a1018; --accent: #9b1c28; --accent-rgb: 155, 28, 40; }

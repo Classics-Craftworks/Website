@@ -124,6 +124,8 @@ const PAGE_KINDS = {
   news:     { skip: ['#news-page', 'Skip to content'], action: 'build its pages',           backToTop: true,  extras: ['news'] },
   settings: { skip: ['#settings', 'Skip to settings'], action: 'build its pages',           backToTop: true,  extras: ['settings-page'] },
   changelog: { skip: ['#changelog-page', 'Skip to content'], action: 'show its changelog', backToTop: true,  extras: ['changelog-data', 'changelog'] },
+  skins:    { skip: ['#skins-page', 'Skip to content'], action: 'show its skin history',     backToTop: true,  extras: [] },
+  extras:   { skip: ['#extras-page', 'Skip to content'], action: 'show its extra pages',     backToTop: true,  extras: [] },
   notfound: { skip: null,                              action: null,                        backToTop: false, extras: ['404'] }
 };
 
@@ -233,7 +235,12 @@ function buildSite(id) {
 
   // A site without the catalogue gets no "Projects" footer column and no project wording.
   const hasProjects = has('catalog');
-  const hasFeaturedCard = hasProjects || !!joinCard;
+  // The profile feature's "Current skin" card fills the splash's card slot for a personal site.
+  const skinCard = has('profile') && home.splash && home.splash.skinCard;
+  if (skinCard && skinCard.image && !fs.existsSync(path.join(out, skinCard.image))) fail(`SITE_DATA.home.splash.skinCard.image "${skinCard.image}" is not in the site's files`);
+  if (!has('profile') && (home.socials || home.related || home.explore || data.skins || data.extras)) fail(`SITE_DATA has profile content (home.socials/related/explore, skins, extras) but site.config.js doesn't list the "profile" feature`);
+  const hasFeaturedCard = hasProjects || !!joinCard || !!skinCard;
+  const hasProfileCredit = !!(data.footer && data.footer.profileCredit);
   const hasTheme = fs.existsSync(path.join(out, 'theme.css'));
   const og = config.ogImage;
   const noscriptLinks = config.noscriptLinks
@@ -273,6 +280,7 @@ function buildSite(id) {
       skipHref: kindSkip ? kindSkip[0] : '',
       skipLabel: kindSkip ? kindSkip[1] : '',
       hasProjects,
+      hasProfileCredit,
       brandName: esc(data.brand.name),
       tagline: esc(page.tagline || config.tagline),
       noscriptAction: kindAction || '',

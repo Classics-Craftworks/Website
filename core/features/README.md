@@ -26,3 +26,9 @@ The build checks the site's `data.js` agrees with its features (for example `sec
 
 Wording and names a site wants to differ go in its `data.js` / `site.config.js`, not in the core
 (for example `brand.aprilFoolsName`). Colours go in the site's `theme.css`.
+
+## `profile` (personal sites)
+
+| Feature   | For                          | Provides |
+|-----------|------------------------------|----------|
+| `profile` | a personal "find me" site    | the splash's "Current skin" card (`home.splash.skinCard`), `home.socials` / `home.related` / `home.explore` blocks, the `skins` and `extras` page kinds (`SITE_DATA.skins`, `SITE_DATA.extras`) and the footer's profile picture credit (`footer.profileCredit`) |
