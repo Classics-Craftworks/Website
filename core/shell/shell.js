@@ -844,6 +844,10 @@ function renderFooter(socials, footer, version) {
   document.getElementById('copyright').textContent = footer.copyright;
   document.getElementById('disclaimer').textContent = footer.disclaimer;
 
+  // Per-game trademark notices (footer.trademarks: [text, ...]) sit in a collapsed list so the footer stays short.
+  const marks = footer.trademarks, marksList = document.getElementById('trademark-list');
+  if (marks && marksList) marks.forEach(text => marksList.appendChild(el('li', { text })));
+
   // The profile picture's own credit line (footer.profileCredit): { prefix, label, url?, suffix? }.
   const pfp = footer.profileCredit, pfpEl = document.getElementById('profile-credit');
   if (pfp && pfpEl) {

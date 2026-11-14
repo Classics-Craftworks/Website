@@ -109,6 +109,12 @@
 
     <div class="footer-legal">
       <p id="disclaimer" class="footer-line footer-disclaimer"></p>
+{{#if hasTrademarks}}
+      <details id="trademarks" class="footer-trademarks">
+        <summary>Trademark notices</summary>
+        <ul id="trademark-list" class="footer-trademark-list"></ul>
+      </details>
+{{/if}}
 {{#if hasProfileCredit}}
       <p id="profile-credit" class="footer-line footer-credits footer-profile-credit"></p>
 {{/if}}

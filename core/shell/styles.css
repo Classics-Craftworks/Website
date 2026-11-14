@@ -2814,3 +2814,10 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 /* Footer without a Projects column (single-project sites). */
 @media (min-width: 901px) { .footer-grid:not(:has(#footer-projects)) { grid-template-columns: repeat(2, max-content); } }
 /*@include profile/blocks*/
+
+/* Footer: collapsed trademark notices (footer.trademarks). */
+.footer-trademarks { max-width: 70ch; }
+.footer-trademarks summary { display: inline-block; cursor: pointer; color: var(--text-soft); text-decoration: underline; text-underline-offset: 3px; }
+.footer-trademarks summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (hover: hover) { .footer-trademarks summary:hover { color: var(--text); } }
+.footer-trademark-list { display: flex; flex-direction: column; gap: var(--s-1); margin: var(--s-2) 0 0; padding: 0; list-style: none; }

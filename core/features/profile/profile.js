@@ -47,8 +47,8 @@ function renderRelated(block) {
       el('span', { class: 'p36-card-badge', attrs: { 'aria-hidden': 'true' } }, [document.createTextNode(r.badge)]),
       el('span', { class: 'p36-card-body' }, [
         el('span', { class: 'p36-card-title', text: r.label }),
-        el('span', { class: 'p36-card-text', text: r.text }),
-        el('span', { class: 'p36-card-url', text: r.display })
+        r.text ? el('span', { class: 'p36-card-text', text: r.text }) : null,
+        r.display ? el('span', { class: 'p36-card-url', text: r.display }) : null
       ])
     ], `${r.label}${p36External(r.url) ? ' (opens in a new tab)' : ''}`)
   );

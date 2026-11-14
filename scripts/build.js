@@ -241,6 +241,7 @@ function buildSite(id) {
   if (!has('profile') && (home.socials || home.related || home.explore || data.skins || data.extras)) fail(`SITE_DATA has profile content (home.socials/related/explore, skins, extras) but site.config.js doesn't list the "profile" feature`);
   const hasFeaturedCard = hasProjects || !!joinCard || !!skinCard;
   const hasProfileCredit = !!(data.footer && data.footer.profileCredit);
+  const hasTrademarks = !!(data.footer && (data.footer.trademarks || []).length);
   const hasTheme = fs.existsSync(path.join(out, 'theme.css'));
   const og = config.ogImage;
   const noscriptLinks = config.noscriptLinks
@@ -281,6 +282,7 @@ function buildSite(id) {
       skipLabel: kindSkip ? kindSkip[1] : '',
       hasProjects,
       hasProfileCredit,
+      hasTrademarks,
       brandName: esc(data.brand.name),
       tagline: esc(page.tagline || config.tagline),
       noscriptAction: kindAction || '',
