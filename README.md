@@ -8,6 +8,7 @@ The source for the Classic's Craftworks family of websites. They are plain stati
 | --- | --- | --- |
 | [Classic's Craftworks](sites/classics-craftworks) | [classicscraftworks.co.uk](https://classicscraftworks.co.uk) | Minecraft Java Edition data packs, mods and resource packs |
 | [CraftHorizon](sites/crafthorizon) | [crafthorizon.classicscraftworks.co.uk](https://crafthorizon.classicscraftworks.co.uk) | Whitelisted Minecraft server with a focus on vanilla+ Survival and Creative gameplay |
+| [Classic36](sites/classic36) | TBD - not live yet | Personal site with social links and some fun bits, such as tier lists & game history |
 
 ## How the repository is laid out
 
