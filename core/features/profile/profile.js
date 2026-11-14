@@ -25,34 +25,20 @@ function p36Block(block, className, content) {
 const p36Arrow = () => el('span', { class: 'p36-arrow', attrs: { 'aria-hidden': 'true' } });
 const p36Badge = text => el('span', { class: 'p36-badge', attrs: { 'aria-hidden': 'true' } }, [document.createTextNode(text)]);
 
-// "Find me online": one tile per account.
-function renderSocials(block) {
-  const tiles = (block.items || []).map(s =>
-    p36Link('p36-tile', s.url, [
+// "Social Media Profiles" and "Other profiles": the same tile grid. A tile's second line is its `handle` or its `text`.
+function renderTiles(block, className) {
+  const tiles = (block.items || []).map(s => {
+    const sub = s.handle || s.text;
+    return p36Link('p36-tile', s.url, [
       p36Badge(s.badge),
       el('span', { class: 'p36-tile-text' }, [
         el('span', { class: 'p36-tile-title', text: s.label }),
-        el('span', { class: 'p36-tile-sub', text: s.handle })
+        sub ? el('span', { class: 'p36-tile-sub', text: sub }) : null
       ]),
       p36Arrow()
-    ], `${s.label}: ${s.handle}${p36External(s.url) ? ' (opens in a new tab)' : ''}`)
-  );
-  return p36Block(block, 'p36-socials', [el('div', { class: 'p36-tiles' }, tiles)]);
-}
-
-// "Related profiles": a card per project or profile, with its address.
-function renderRelated(block) {
-  const cards = (block.items || []).map(r =>
-    p36Link('p36-card', r.url, [
-      el('span', { class: 'p36-card-badge', attrs: { 'aria-hidden': 'true' } }, [document.createTextNode(r.badge)]),
-      el('span', { class: 'p36-card-body' }, [
-        el('span', { class: 'p36-card-title', text: r.label }),
-        r.text ? el('span', { class: 'p36-card-text', text: r.text }) : null,
-        r.display ? el('span', { class: 'p36-card-url', text: r.display }) : null
-      ])
-    ], `${r.label}${p36External(r.url) ? ' (opens in a new tab)' : ''}`)
-  );
-  return p36Block(block, 'p36-related', [el('div', { class: 'p36-cards' }, cards)]);
+    ], `${s.label}${sub ? ': ' + sub : ''}${p36External(s.url) ? ' (opens in a new tab)' : ''}`);
+  });
+  return p36Block(block, className, [el('div', { class: 'p36-tiles' }, tiles)]);
 }
 
 // "More to explore": cards for the site's other pages; the heading has an "All extras" button.
@@ -78,8 +64,8 @@ SITE_HOOKS.home.blocks.push(() => {
   const main = document.getElementById('catalog');
   const home = SITE_DATA.home;
   if (!main || !home) return;
-  if (home.socials) main.appendChild(renderSocials(home.socials));
-  if (home.related) main.appendChild(renderRelated(home.related));
+  if (home.socials) main.appendChild(renderTiles(home.socials, 'p36-socials'));
+  if (home.related) main.appendChild(renderTiles(home.related, 'p36-related'));
   if (home.explore) main.appendChild(renderExplore(home.explore));
 });
 

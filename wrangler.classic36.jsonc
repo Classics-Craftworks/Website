@@ -1,0 +1,8 @@
+{
+  "name": "classic36",
+  "compatibility_date": "2026-11-14",
+  "assets": {
+    "directory": "./dist/classic36",
+    "not_found_handling": "404-page"
+  }
+}

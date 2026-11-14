@@ -55,7 +55,7 @@
 :root[data-theme="light"] { --accent-strong: #c8223a; }
 
 /* Plain text nav and buttons: no icons or arrows. */
-.site-nav a .icon, .splash-btn-arrow { display: none; }
+.site-nav a .icon, .site-nav .nav-dropdown-toggle .icon, .splash-btn-arrow { display: none; }
 .splash-btn-primary { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
 @media (hover: hover) { .splash-btn-primary:hover { background: var(--accent); border-color: var(--accent); } }
 

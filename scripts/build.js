@@ -124,8 +124,9 @@ const PAGE_KINDS = {
   news:     { skip: ['#news-page', 'Skip to content'], action: 'build its pages',           backToTop: true,  extras: ['news'] },
   settings: { skip: ['#settings', 'Skip to settings'], action: 'build its pages',           backToTop: true,  extras: ['settings-page'] },
   changelog: { skip: ['#changelog-page', 'Skip to content'], action: 'show its changelog', backToTop: true,  extras: ['changelog-data', 'changelog'] },
-  skins:    { skip: ['#skins-page', 'Skip to content'], action: 'show its skin history',     backToTop: true,  extras: [] },
-  extras:   { skip: ['#extras-page', 'Skip to content'], action: 'show its extra pages',     backToTop: true,  extras: [] },
+  skins:    { skip: ['#skins-page', 'Skip to content'], action: 'show its skin history',     backToTop: true,  extras: [], dataPage: true },
+  content:  { skip: ['#content-page', 'Skip to content'], action: 'show this page',            backToTop: true,  extras: [], dataPage: true },
+  extras:   { skip: ['#extras-page', 'Skip to content'], action: 'show its extra pages',     backToTop: true,  extras: [], dataPage: true },
   notfound: { skip: null,                              action: null,                        backToTop: false, extras: ['404'] }
 };
 
@@ -210,14 +211,19 @@ function buildSite(id) {
 
   // The page list here and the nav in data.js must describe the same pages.
   const bySlug = new Map(config.pages.map(p => [p.slug, p]));
-  for (const nav of data.pages || []) {
+  // A nav entry with `children` is a dropdown group: its links count, the group itself has no page.
+  const navEntries = (data.pages || []).flatMap(n => n.children ? n.children : [n]);
+  for (const group of (data.pages || []).filter(n => n.children)) {
+    if (!group.children.length || group.url) fail(`SITE_DATA.pages group "${group.label}" needs children and no url`);
+  }
+  for (const nav of navEntries) {
     if (/^https?:\/\//i.test(nav.url)) continue;   // an external link (the wiki, say) has no page here
     const slug = nav.url === '/' ? '' : nav.url;
     if (!bySlug.has(slug)) fail(`SITE_DATA.pages has "${nav.url}" but site.config.js has no page with slug "${slug}"`);
   }
   for (const page of config.pages) {
     if (!PAGE_KINDS[page.kind]) fail(`page "${page.slug}": unknown kind "${page.kind}"`);
-    if (page.kind !== 'notfound' && page.nav !== false && !(data.pages || []).some(n => (n.url === '/' ? '' : n.url) === page.slug)) {
+    if (page.kind !== 'notfound' && page.nav !== false && !navEntries.some(n => (n.url === '/' ? '' : n.url) === page.slug)) {
       fail(`site.config.js has page "${page.slug}" but SITE_DATA.pages does not link to it`);
     }
   }
@@ -238,7 +244,7 @@ function buildSite(id) {
   // The profile feature's "Current skin" card fills the splash's card slot for a personal site.
   const skinCard = has('profile') && home.splash && home.splash.skinCard;
   if (skinCard && skinCard.image && !fs.existsSync(path.join(out, skinCard.image))) fail(`SITE_DATA.home.splash.skinCard.image "${skinCard.image}" is not in the site's files`);
-  if (!has('profile') && (home.socials || home.related || home.explore || data.skins || data.extras)) fail(`SITE_DATA has profile content (home.socials/related/explore, skins, extras) but site.config.js doesn't list the "profile" feature`);
+  if (!has('profile') && (home.socials || home.related || home.explore || data.skins || data.extras || data.content)) fail(`SITE_DATA has profile content (home.socials/related/explore, skins, extras) but site.config.js doesn't list the "profile" feature`);
   const hasFeaturedCard = hasProjects || !!joinCard || !!skinCard;
   const hasProfileCredit = !!(data.footer && data.footer.profileCredit);
   const hasTrademarks = !!(data.footer && (data.footer.trademarks || []).length);

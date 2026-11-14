@@ -526,9 +526,66 @@ function renderSiteHeader(pages, currentUrl) {
     });
   }
 
+  // Nav groups: a page entry with `children` (SITE_DATA.pages: { label, icon?, children: [{ label, url, icon }] })
+  // is a dropdown of those links, built like the Projects one: a popover on desktop, an accordion on mobile.
+  const groupClosers = [];
+  function buildNavGroup(group, index) {
+    const menuId = `nav-group-${index}`;
+    const kids = group.children;
+    const trigger = el('button', {
+      class: 'nav-link nav-dropdown-toggle' + (kids.some(k => k.url === currentUrl) ? ' is-current' : ''),
+      attrs: { type: 'button', 'aria-expanded': 'false', 'aria-controls': menuId }
+    }, [
+      group.icon ? icon(group.icon, 'icon-sm') : null,
+      el('span', { text: group.label }),
+      el('span', { class: 'nav-chevron', attrs: { 'aria-hidden': 'true' } })
+    ]);
+    const items = kids.map(k => pageLink(k, 'nav-dropdown-item'));
+    const menu = el('div', { class: 'nav-dropdown-menu', attrs: { id: menuId, hidden: '' } }, items);
+    const dropdown = el('div', { class: 'nav-dropdown' }, [trigger, menu]);
+
+    const setOpen = (open, opts = {}) => {
+      if (open) groupClosers.forEach(close => close !== closeThis && close());
+      menu.hidden = !open;
+      trigger.setAttribute('aria-expanded', String(open));
+      dropdown.classList.toggle('is-open', open);
+      if (!open && opts.refocus) trigger.focus();
+    };
+    const closeThis = () => setOpen(false);
+    groupClosers.push(closeThis);
+
+    trigger.addEventListener('click', () => setOpen(menu.hidden));
+    trigger.addEventListener('keydown', e => {
+      if (e.key !== 'ArrowDown') return;
+      e.preventDefault();
+      setOpen(true);
+      items[0].focus();
+    });
+    menu.addEventListener('keydown', e => {
+      const i = items.indexOf(document.activeElement);
+      let next = -1;
+      if (e.key === 'ArrowDown') next = (i + 1) % items.length;
+      else if (e.key === 'ArrowUp') next = (i - 1 + items.length) % items.length;
+      else if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = items.length - 1;
+      else if (e.key === 'Escape') { e.preventDefault(); setOpen(false, { refocus: true }); return; }
+      if (next < 0) return;
+      e.preventDefault();
+      items[next].focus();
+    });
+    dropdown.addEventListener('focusout', e => {
+      if (!mobile.matches && !dropdown.contains(e.relatedTarget)) setOpen(false);
+    });
+    document.addEventListener('pointerdown', e => {
+      if (!mobile.matches && !dropdown.contains(e.target)) setOpen(false);
+    });
+    return dropdown;
+  }
+
   // Settings has its own menu (below); everything else follows the order of the list.
-  pages.forEach(page => {
+  pages.forEach((page, index) => {
     if (page.url === 'settings') return;
+    if (page.children) { nav.appendChild(buildNavGroup(page, index)); return; }
     if (page.section) {
       if (projectsDropdown) { nav.appendChild(projectsDropdown); projectsDropdown = null; }
       return;
@@ -570,6 +627,7 @@ function renderSiteHeader(pages, currentUrl) {
   mobile.addEventListener('change', () => {
     setMenu(false);
     setDropdown(false);
+    groupClosers.forEach(close => close());
   });
 
   syncDots();

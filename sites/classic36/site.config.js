@@ -41,9 +41,27 @@ module.exports = {
       lastmod: '2026-11-14'
     },
     {
-      kind: 'extras', slug: 'extras',
-      title: 'Extras - Classic36',
-      description: 'Extra pages on the Classic36 site: setup and settings, build gallery and more, added over time.',
+      kind: 'content', slug: 'fortnite-skin-history',
+      title: 'Fortnite skin history - Classic36',
+      description: 'Every skin used as the main in Fortnite, newest first.',
+      lastmod: '2026-11-14'
+    },
+    {
+      kind: 'content', slug: 'fortnite-season-tier-list',
+      title: 'Fortnite season tier list - Classic36',
+      description: 'A tier list ranking every season of Fortnite.',
+      lastmod: '2026-11-14'
+    },
+    {
+      kind: 'content', slug: 'fortnite-skin-tier-lists',
+      title: 'Fortnite skin tier lists - Classic36',
+      description: 'Skin tier lists for each season of Fortnite.',
+      lastmod: '2026-11-14'
+    },
+    {
+      kind: 'content', slug: 'games',
+      title: 'Games - Classic36',
+      description: 'The games Classic36 plays and has played.',
       lastmod: '2026-11-14'
     },
     {

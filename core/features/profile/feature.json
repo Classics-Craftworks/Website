@@ -1,8 +1,7 @@
 {
-  "description": "Personal-site pieces: a 'current skin' card, social and related-profile link grids, explore cards, and the Skin history and Extras pages.",
+  "description": "Personal-site pieces: a 'current skin' card, social and related-profile tile grids, explore cards, and the Skin history, Extras and content pages (skins, single image, image gallery, games list).",
   "scripts": [
     { "file": "profile.js", "pages": ["home"] },
-    { "file": "skins.js", "pages": ["skins"], "phase": "late" },
-    { "file": "extras.js", "pages": ["extras"], "phase": "late" }
+    { "file": "pages.js", "pages": ["skins", "extras", "content"], "phase": "late" }
   ]
 }
