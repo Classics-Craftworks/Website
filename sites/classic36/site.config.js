@@ -29,32 +29,32 @@ module.exports = {
   pages: [
     {
       kind: 'home', slug: '',
-      title: 'Classic36 | Personal Site',
+      title: 'Classic36',
       description: "Classic36 is a Minecraft player and tinkerer, maker of Classic's Craftworks and CraftHorizon. Find social links, related profiles and skin history here.",
       ogDescription: "Minecraft player and tinkerer. Find Classic36 online and browse every Minecraft skin used.",
       lastmod: '2026-11-14'
     },
     {
       kind: 'skins', slug: 'skin-history',
-      title: 'Skin history - Classic36',
-      description: 'Every Minecraft skin Classic36 has used, newest first.',
+      title: 'Minecraft Skin History - Classic36',
+      description: 'Every Minecraft skin Classic36 has used.',
       lastmod: '2026-11-14'
     },
     {
       kind: 'content', slug: 'fortnite-skin-history',
-      title: 'Fortnite skin history - Classic36',
-      description: 'Every skin used as the main in Fortnite, newest first.',
+      title: 'Fortnite Skin History - Classic36',
+      description: 'Every skin used as a main in Fortnite.',
       lastmod: '2026-11-14'
     },
     {
       kind: 'content', slug: 'fortnite-season-tier-list',
-      title: 'Fortnite season tier list - Classic36',
+      title: 'Fortnite Season Tier List - Classic36',
       description: 'A tier list ranking every season of Fortnite.',
       lastmod: '2026-11-14'
     },
     {
       kind: 'content', slug: 'fortnite-skin-tier-lists',
-      title: 'Fortnite skin tier lists - Classic36',
+      title: 'Fortnite Skin Tier Lists - Classic36',
       description: 'Skin tier lists for each season of Fortnite.',
       lastmod: '2026-11-14'
     },
