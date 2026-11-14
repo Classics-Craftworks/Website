@@ -6,7 +6,7 @@
 
    Attributes set on <html> (styles.css keys off these):
      data-theme          dark | light | oled   ("auto" is resolved to light or dark here)
-     data-accent         purple | magenta | pink | ... | auto   (absent = blue; auto = the seasonal theme's colour)
+     data-accent         purple | magenta | pink | ... | auto   (auto = the seasonal theme's colour, else the site's own colour)
      data-contrast       high                  (absent = normal)
      data-motion         reduce                (absent = full motion)
      data-heading-font   plain                 (absent = pixel font)
@@ -306,7 +306,7 @@ function applySettings() {
   const theme = effectiveTheme(s);
   suspendTransitions(root, [theme, s.accent, effectiveHighContrast(s), effectiveSeason(s)].join('|'));
   root.setAttribute('data-theme', theme);
-  toggle('data-accent', s.accent !== 'blue', s.accent);
+  root.setAttribute('data-accent', s.accent);   // blue too, so a site whose own default accent isn't blue can still offer blue
   toggle('data-contrast', effectiveHighContrast(s), 'high');
   toggle('data-motion', effectiveReducedMotion(s), 'reduce');
   toggle('data-heading-font', s.headingFont !== 'pixel', s.headingFont);

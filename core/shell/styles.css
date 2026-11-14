@@ -201,6 +201,10 @@
 :root[data-theme="light"] .footer-logo { filter: invert(1); }
 
 /* Accent colours. Dark and OLED use the bright value, light a darker one. */
+:root[data-accent="blue"] { --accent: #74c4e7; --accent-rgb: 116, 196, 231; --on-accent: #0d111a; }
+
+:root[data-theme="light"][data-accent="blue"] { --accent: #0b6a9a; --accent-rgb: 11, 106, 154; --on-accent: #ffffff; }
+
 :root[data-accent="purple"] { --accent: #bb9dff; --accent-rgb: 187, 157, 255; --on-accent: #0d111a; }
 
 :root[data-accent="magenta"] { --accent: #ec8ff7; --accent-rgb: 236, 143, 247; --on-accent: #0d111a; }
@@ -2809,4 +2813,4 @@ body.has-announcement .back-to-top { bottom: calc(var(--s-6) + var(--announce-h,
 /*@include landing/blocks*/
 /* Footer without a Projects column (single-project sites). */
 @media (min-width: 901px) { .footer-grid:not(:has(#footer-projects)) { grid-template-columns: repeat(2, max-content); } }
-
+/*@include profile/blocks*/
